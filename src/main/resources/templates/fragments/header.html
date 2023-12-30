@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <nav th:fragment="headerFragment">
-        <ul>
+    <div th:fragment="headerFragment" class="header-box">
+        <ul class="user-header">
             <li>로그인</li>
+            <li>알림</li>
             <li>내 정보</li>
             <li>로그아웃</li>
         </ul>
 
-        <ul>
+        <ul class="category-header">
+            <li><img th:src="@{/img/logo.png}" alt="logo" id="header-logo"/></li>
             <li>동행</li>
-            <li><img th:src="@{/img/logo.png}" alt="logo" /></li>
             <li>커뮤니티</li>
         </ul>
-    </nav>
+    </div>
 </html>
