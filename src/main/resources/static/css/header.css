@@ -24,14 +24,15 @@
     font-size:14px;
     color: #696969;
 }
-#header-logo {
-    margin-bottom: -8px;
+.user-header > li:hover {
+    cursor: pointer;
 }
+
 
 
 .category-header{
     height:50px;
-    width:500px;
+    width:600px;
     margin-top:auto;
     display:flex;
     align-items:flex-end;
@@ -44,4 +45,10 @@
     justify-content:center;
     align-items:center;
     font-size:17px;
+}
+.category-header > li:hover {
+    cursor: pointer;
+}
+#header-logo {
+    margin-bottom: -8px;
 }
