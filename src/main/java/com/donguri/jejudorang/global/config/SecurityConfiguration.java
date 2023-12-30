@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.config;
+package com.donguri.jejudorang.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
