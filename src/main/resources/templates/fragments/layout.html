@@ -11,16 +11,18 @@
     </head>
 
     <body>
-        <div>
-            <div th:replace="~{fragments/header :: headerFragment}"></div>
-        </div>
+        <div class="whole-body">
+            <div class="header-body">
+                <div th:replace="~{fragments/header :: headerFragment}"></div>
+            </div>
 
-        <div>
-            <div layout:fragment="content"></div>
-        </div>
+            <div class="content-body">
+                <div layout:fragment="content"></div>
+            </div>
 
-        <div>
-            <th:block th:replace="~{fragments/footer :: footerFragment}"></th:block>
+            <div class="footer-body">
+                <th:block th:replace="~{fragments/footer :: footerFragment}"></th:block>
+            </div>
         </div>
     </body>
 

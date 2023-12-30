@@ -22,7 +22,10 @@
     font-style: normal;
 }
 
-*{
+.whole-body{
     margin:0 auto;
     padding:0;
+
+    width: 1280px;
+    border: 1px solid royalblue;
 }
