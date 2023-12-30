@@ -1,24 +1,27 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<link rel="stylesheet" th:href="@{/css/common.css}">
-<link rel="stylesheet" th:href="@{/css/footer.css}">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>test</title>
-</head>
-<body>
-    <div>
-        <div th:replace="~{fragments/header :: headerFragment}"></div>
-    </div>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 
-    <div>
-        <div layout:fragment="content"></div>
-    </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>test</title>
+    </head>
 
-    <div>
-        <th:block th:replace="~{fragments/footer :: footerFragment}"></th:block>
-    </div>
-</body>
+    <body>
+        <div>
+            <div th:replace="~{fragments/header :: headerFragment}"></div>
+        </div>
+
+        <div>
+            <div layout:fragment="content"></div>
+        </div>
+
+        <div>
+            <th:block th:replace="~{fragments/footer :: footerFragment}"></th:block>
+        </div>
+    </body>
+
 </html>

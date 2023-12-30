@@ -6,18 +6,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration
-@EnableWebSecurity
+@Configuration // Config 파일로 설정
+@EnableWebSecurity // WebSecurity 활성화
 public class SecurityConfiguration {
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Bean // 임시 전체 경로 접근 허가
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         String[] staticResources  =  {
                 "/**",
-                "/css/**",
-                "/images/**",
-                "/fonts/**",
-                "/scripts/**",
         };
 
         http
