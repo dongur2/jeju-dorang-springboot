@@ -1,8 +1,10 @@
 package com.donguri.jejudorang.domain.trip.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Entity
+@Entity @Getter @RequiredArgsConstructor
 public class Trip {
 
     @Id
