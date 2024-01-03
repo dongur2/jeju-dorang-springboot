@@ -34,6 +34,6 @@ public class TripController {
         TripDetailResponseDto tripDetail = tripService.getTripDetail(placeId);
 
         model.addAttribute("trip", tripDetail);
-        return tripDetail.toString();
+        return "/trip/tripDetail";
     }
 }
