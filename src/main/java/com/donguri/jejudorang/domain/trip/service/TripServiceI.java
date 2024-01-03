@@ -13,7 +13,7 @@ public class TripServiceI implements TripService{
     private TripRepository tripRepository;
 
     @Override
-    public void saveApiTrips(List<Trip> trips) {
-        tripRepository.saveAll(trips);
+    public void saveApiTrips(List<Trip> data) {
+        tripRepository.saveAll(data);
     }
 }
