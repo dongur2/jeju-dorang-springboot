@@ -25,6 +25,7 @@ public class TripController {
         Pageable pageable = PageRequest.of(nowPage, 10);
         Page<TripListResponseDto> trips = tripService.findAll(pageable);
 
+//        model.addAttribute("nowPage", nowPage);
         model.addAttribute("trips", trips);
         return "/trip/tripList";
     }
