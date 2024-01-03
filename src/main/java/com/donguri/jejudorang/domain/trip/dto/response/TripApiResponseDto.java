@@ -58,8 +58,4 @@ public record TripApiResponseDto(
                 .image(item.repPhoto.photoid.imgpath)
                 .build();
     }
-
-    public int nowPage(TripApiResponseDto dto) {
-        return dto.currentPage;
-    }
 }
