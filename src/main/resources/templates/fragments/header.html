@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <div th:fragment="headerFragment" class="header-box">
-        <ul class="user-header">
-            <li>로그인</li>
-            <li>알림</li>
-            <li>내 정보</li>
-            <li>로그아웃</li>
+        <ul class="nav justify-content-end" style="margin-right:2%">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">알림</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">로그인</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">마이페이지</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" aria-disabled="true">로그아웃</a>
+            </li>
         </ul>
 
         <ul class="category-header">
             <li><img th:src="@{/img/logo.png}" alt="logo" id="header-logo"/></li>
-            <li>동행</li>
-            <li>여행</li>
+            <li><a th:href="@{/trip/list/0}">여행</a></li>
             <li>커뮤니티</li>
         </ul>
     </div>

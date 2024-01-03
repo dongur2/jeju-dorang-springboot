@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/fragments/layout}">
+<head>
+    <title>여행</title>
+</head>
+<th layout:fragment="content">
+
+    <!-- 여행 목록 블록 -->
+    <div th:each="trip: ${trips}">
+        <div class="card mb-3" style="width: 580px; min-height: 150px; cursor: pointer" th:onclick="|location.href='@{/trip/places/{placeId}(placeId=${trip.id})}'|">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="..." th:src="${trip.getThumbnail()}" class="img-fluid rounded-start" alt="...">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${trip.getName()}">Card title</h5>
+                        <p class="card-text" ><small class="text-body-secondary" th:text="${trip.getTags()}">Last updated 3 mins ago</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 페이지 네비게이션 블록 -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" th:href="@{/trip/list/0}" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item" th:if="${nowPage > 1}"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage - 2})}" href="#" th:text="${nowPage - 2}">0</a></li>
+            <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage - 1})}" href="#" th:text="${nowPage - 1}">0</a></li>
+            <li class="page-item"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage})}" href="#" th:text="${nowPage}">2</a>
+            <li class="page-item" th:if="${nowPage < 356}"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage + 1})}" href="#" th:text="${nowPage + 1}">3</a></li>
+            <li class="page-item" th:if="${nowPage < 355}"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage + 2})}" href="#" th:text="${nowPage + 2}">3</a></li>
+            <li class="page-item">
+                <a class="page-link" th:href="@{/trip/list/356}" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+
+</th>
+</html>

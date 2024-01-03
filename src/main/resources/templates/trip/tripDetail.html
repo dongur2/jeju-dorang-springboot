@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/fragments/layout}">
+<head>
+    <title>여행 상세</title>
+</head>
+<th layout:fragment="content">
+
+    <div class="card text-bg-dark">
+        <img src="..." th:src="${trip.getImage()}" class="card-img" alt="...">
+        <div class="card-img-overlay"
+             style="width:35%; background:rgba(20,34,35,0.59); color:white; margin-left:auto;
+             display:flex; flex-direction:column; align-content:center; justify-content:center">
+            <h5 class="card-text" th:text="${trip.getCategory()}" style="color:#FB7A51">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</h5>
+            <h1 class="card-title" th:text="${trip.getName()}">Card title</h1>
+            <h5 class="card-text" th:text="${trip.getTags()}"></h5>
+            <p class="card-text" th:text="${trip.getIntroduction()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+            <br><br>
+            <p class="card-text" th:text="${trip.getAddress()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+            <p class="card-text" th:text="${trip.getTel()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+        </div>
+    </div>
+
+</th>
+</html>

@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.home.controller;
+package com.donguri.jejudorang.domain.home.api;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
