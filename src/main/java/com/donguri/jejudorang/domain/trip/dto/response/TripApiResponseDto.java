@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record TripApiResponseDto(
-//    String result,
-//    String resultMessage,
-//    int totalCount,
-//    int resultCount,
-//    int pageCount,
-//    int currentPage,
+    String result,
+    String resultMessage,
+    int totalCount,
+    int resultCount,
+    int pageCount,
+    int currentPage,
     List<Item> items
 ) {
     public record Item(
@@ -57,5 +57,9 @@ public record TripApiResponseDto(
                 .thumbnail(item.repPhoto.photoid.thumbnailpath)
                 .image(item.repPhoto.photoid.imgpath)
                 .build();
+    }
+
+    public int nowPage(TripApiResponseDto dto) {
+        return dto.currentPage;
     }
 }

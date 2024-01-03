@@ -23,6 +23,7 @@ public class TripApiController {
     @Value("${jeju-api-uri}")
     private String baseUrl;
 
+    private int page = 2;
     private final String locale = "kr";
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
 
@@ -43,11 +44,13 @@ public class TripApiController {
                 .baseUrl(baseUrl) // request baseURL 설정
                 .build(); // WebClient 인스턴스 생성
 
+
         Mono<TripApiResponseDto> result = webClient.get() // HTTP GET Request 빌드 시작 - Returns: a spec for specifying the target URL (Interface WebClient.RequestHeadersUriSpec<S extends WebClient.RequestHeadersSpec<S>>)
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("apiKey", apiKey)
                         .queryParam("locale", locale)
                         .queryParam("category", categories.toArray()) // Query Parameter 설정
+                        .queryParam("page", page)
                         .build()) // URI 빌드
                 .retrieve() // Response를 추출할 방법 선언
                 .bodyToMono(TripApiResponseDto.class);
