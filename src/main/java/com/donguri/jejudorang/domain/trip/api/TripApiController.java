@@ -8,7 +8,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -42,7 +44,7 @@ public class TripApiController {
                             .queryParam("category", categories.toArray()) // Query Parameter 설정
                             .build()) // URI 빌드
                     .retrieve() // Response를 추출할 방법 선언
-                    .bodyToMono(String.class)
-                    .block(); // WebClient는 기본적으로 비동기 방식 -> block()으로 동기 방식으로 변환
+                    .bodyToMono(String.class) // 여러 결과: Flux, 한 개: Mono
+                    .block(); // WebClient는 기본적으로 Non-blocking -> block()으로 blocking으로 변환: block()이 있어야 String.class로 변환된 block return
     }
 }
