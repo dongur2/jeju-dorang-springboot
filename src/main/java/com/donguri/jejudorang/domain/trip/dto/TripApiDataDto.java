@@ -17,7 +17,7 @@ public record TripApiDataDto(
     public record Item(
             String alltag,
             String contentsid,
-            ContentCategory region2cd,
+            ContentCategory contentscd,
             String title,
             String roadaddress,
             String introduction,
@@ -48,7 +48,7 @@ public record TripApiDataDto(
     private static Trip mapToEntity(TripApiDataDto.Item item) {
         return Trip.builder()
                 .placeId(item.contentsid())
-                .category(item.region2cd().label())
+                .category(item.contentscd().label())
                 .name(item.title())
                 .introduction(item.introduction())
                 .address(item.roadaddress())
