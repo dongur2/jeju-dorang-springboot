@@ -15,6 +15,11 @@ public class TripServiceI implements TripService{
     private TripRepository tripRepository;
 
     @Override
+    public List<Trip> findAll() {
+        return tripRepository.findAll();
+    }
+
+    @Override
     public void saveApiTrips(Mono<TripApiDataDto> response) {
         // Dto -> Entity
         List<Trip> data = response
