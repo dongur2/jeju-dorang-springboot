@@ -10,22 +10,44 @@
 </head>
 <th layout:fragment="content">
 
-<div th:each="trip: ${trips}">
-    <div class="card mb-3" style="max-width: 540px; min-height:125px">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <img src="..." th:src="${trip.getThumbnail()}" class="img-fluid rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${trip.getName()}">Card title</h5>
-                    <p class="card-text" th:text="${trip.getIntroduction()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                    <p class="card-text" ><small class="text-body-secondary" th:text="${trip.getTags()}">Last updated 3 mins ago</small></p>
+    <!-- 여행 목록 블록 -->
+    <div th:each="trip: ${trips}">
+        <div class="card mb-3" style="max-width: 580px; min-height: 150px">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="..." th:src="${trip.getThumbnail()}" class="img-fluid rounded-start" alt="...">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${trip.getName()}">Card title</h5>
+                        <p class="card-text" th:text="${trip.getIntroduction()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                        <p class="card-text" ><small class="text-body-secondary" th:text="${trip.getTags()}">Last updated 3 mins ago</small></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+
+    <!-- 페이지 네비게이션 블록 -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
 
 </th>
 </html>
