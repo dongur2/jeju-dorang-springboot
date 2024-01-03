@@ -23,23 +23,26 @@ public class TripApiController {
 
     @GetMapping("/trip/api/data")
     public String fetch() {
+        // DefaultUriBuilderFactory implements UriBuilderFactory
+        // URI에 alternative encoding mode를 설정해 UriBuilder 인스턴스를 생성할 수 있게 하는 DefaultUriBuilderFactory
+        // WebClient를 이용하면 인코딩을 하지 않아 API KEY가 달라지는 문제 발생 가능
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(baseUrl);
-        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY); // 인코딩 모드 설정; VALUES_ONLY: URI 템플릿은 인코딩하지않고, URI 변수를 템플릿으로 확장하기 전에 엄격한 인코딩 적용
 
-        WebClient webClient = WebClient.builder()
-                    .uriBuilderFactory(factory)
-                    .baseUrl(baseUrl)
-                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .build();
+        // WebClient 생성
+        WebClient webClient = WebClient.builder() // WebClient.Builder 획득
+                    .uriBuilderFactory(factory) // 미리 설정해뒀던 UriBuilderFactory 인스턴스(factory) 삽입
+                    .baseUrl(baseUrl) // request baseURL 설정
+                    .build(); // WebClient 인스턴스 생성
 
-        return webClient.get()
+        return webClient.get() // HTTP GET Request 빌드 시작 - Returns: a spec for specifying the target URL (Interface WebClient.RequestHeadersUriSpec<S extends WebClient.RequestHeadersSpec<S>>)
                     .uri(uriBuilder -> uriBuilder
                             .queryParam("apiKey", apiKey)
                             .queryParam("locale", locale)
-                            .queryParam("category", categories.toArray())
-                            .build())
-                    .retrieve()
+                            .queryParam("category", categories.toArray()) // Query Parameter 설정
+                            .build()) // URI 빌드
+                    .retrieve() // Response를 추출할 방법 선언
                     .bodyToMono(String.class)
-                    .block();
+                    .block(); // WebClient는 기본적으로 비동기 방식 -> block()으로 동기 방식으로 변환
     }
 }
