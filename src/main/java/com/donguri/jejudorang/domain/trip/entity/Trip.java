@@ -26,7 +26,7 @@ public class Trip {
     private String introduction; // 소개
     private String address; // 도로명 주소: 제주특별자치도 제주시 구좌읍 구좌로 51-1
 
-    @Column(length = 20)
+    @Column(length = 50)
     private String tel; // 064-766-3080
 
     @Column(length = 500)

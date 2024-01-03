@@ -23,7 +23,7 @@ public class TripApiController {
     @Value("${jeju-api-uri}")
     private String baseUrl;
 
-    private int page = 2;
+    private int page = 37;
     private final String locale = "kr";
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
 
@@ -42,23 +42,28 @@ public class TripApiController {
         WebClient webClient = WebClient.builder() // WebClient.Builder 획득
                 .uriBuilderFactory(factory) // 미리 설정해뒀던 UriBuilderFactory 인스턴스(factory) 삽입
                 .baseUrl(baseUrl) // request baseURL 설정
+                .codecs(clientCodecConfigurer -> clientCodecConfigurer
+                        .defaultCodecs()
+                        .maxInMemorySize(16 * 1024 * 1024))
                 .build(); // WebClient 인스턴스 생성
 
-
+        // Data
         Mono<TripApiResponseDto> result = webClient.get() // HTTP GET Request 빌드 시작 - Returns: a spec for specifying the target URL (Interface WebClient.RequestHeadersUriSpec<S extends WebClient.RequestHeadersSpec<S>>)
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("apiKey", apiKey)
-                        .queryParam("locale", locale)
-                        .queryParam("category", categories.toArray()) // Query Parameter 설정
-                        .queryParam("page", page)
-                        .build()) // URI 빌드
-                .retrieve() // Response를 추출할 방법 선언
-                .bodyToMono(TripApiResponseDto.class);
+                    .uri(uriBuilder -> uriBuilder
+                            .queryParam("apiKey", apiKey)
+                            .queryParam("locale", locale)
+                            .queryParam("category", categories.toArray()) // Query Parameter 설정
+                            .queryParam("page", page)
+                            .build()) // URI 빌드
+                    .retrieve() // Response를 추출할 방법 선언
+                    .bodyToMono(TripApiResponseDto.class);
 
+        // Dto -> Entity
         List<Trip> trips = result
                 .map(TripApiResponseDto::toEntity)
                 .block();
 
+        // Entity -> DB
         tripService.saveApiTrips(trips);
 
         return "OK";
