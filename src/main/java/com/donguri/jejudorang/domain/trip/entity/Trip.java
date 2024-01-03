@@ -16,10 +16,10 @@ public class Trip {
     @Column(length = 20)
     private String placeId; // CNTS_300000000015996
 
-    @Column(length = 3)
+    @Column(length = 10)
     private String category; // 쇼핑
 
-    @Column(length = 20)
+    @Column(length = 50)
     private String name; // 장소 이름
 
     @Column(length = 1000)

@@ -54,6 +54,8 @@ public record TripApiResponseDto(
                 .address(item.roadaddress())
                 .tel(item.phoneno())
                 .tags(item.alltag())
+                .thumbnail(item.repPhoto.photoid.thumbnailpath)
+                .image(item.repPhoto.photoid.imgpath)
                 .build();
     }
 }

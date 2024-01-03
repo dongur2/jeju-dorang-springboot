@@ -2,7 +2,9 @@ package com.donguri.jejudorang.domain.trip.api;
 
 import com.donguri.jejudorang.domain.trip.dto.response.TripApiResponseDto;
 import com.donguri.jejudorang.domain.trip.entity.Trip;
+import com.donguri.jejudorang.domain.trip.service.TripService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,9 @@ public class TripApiController {
 
     private final String locale = "kr";
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
+
+    @Autowired
+    private TripService tripService;
 
     @GetMapping("/trip/api/data")
     public String fetch() {
@@ -51,9 +56,7 @@ public class TripApiController {
                 .map(TripApiResponseDto::toEntity)
                 .block();
 
-        
-
-        log.info("trips:{}", trips);
+        tripService.saveApiTrips(trips);
 
         return "OK";
     }
