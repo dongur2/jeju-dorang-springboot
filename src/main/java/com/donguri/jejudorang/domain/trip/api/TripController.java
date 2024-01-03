@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.trip.api;
 
+import com.donguri.jejudorang.domain.trip.dto.response.TripDetailResponseDto;
 import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,18 @@ public class TripController {
 
     @GetMapping("/list/{nowPage}")
     public String tripHome(@PathVariable("nowPage") Integer nowPage, Model model) {
-
         Pageable pageable = PageRequest.of(nowPage, 10);
-        Page<TripListResponseDto> trips = tripService.findAll(pageable);
+        Page<TripListResponseDto> trips = tripService.getAllTripsOnPage(pageable);
 
-//        model.addAttribute("nowPage", nowPage);
         model.addAttribute("trips", trips);
         return "/trip/tripList";
+    }
+
+    @GetMapping("/places/{placeId}")
+    public String tripDetail(@PathVariable("placeId") Long placeId, Model model) {
+        TripDetailResponseDto tripDetail = tripService.getTripDetail(placeId);
+
+        model.addAttribute("trip", tripDetail);
+        return tripDetail.toString();
     }
 }

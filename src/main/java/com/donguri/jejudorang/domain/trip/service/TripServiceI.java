@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.trip.service;
 
 import com.donguri.jejudorang.domain.trip.dto.TripApiDataDto;
+import com.donguri.jejudorang.domain.trip.dto.response.TripDetailResponseDto;
 import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.entity.Trip;
 import com.donguri.jejudorang.domain.trip.repository.TripRepository;
@@ -18,9 +19,15 @@ public class TripServiceI implements TripService{
     private TripRepository tripRepository;
 
     @Override
-    public Page<TripListResponseDto> findAll(Pageable pageable) {
+    public Page<TripListResponseDto> getAllTripsOnPage(Pageable pageable) {
         Page<Trip> tripEntityList =  tripRepository.findAll(pageable);
         return tripEntityList.map(TripListResponseDto::new);
+    }
+
+    @Override
+    public TripDetailResponseDto getTripDetail(Long tripId) {
+        Trip tripEntity = tripRepository.findById(tripId).get();
+        return new TripDetailResponseDto(tripEntity);
     }
 
     @Override
