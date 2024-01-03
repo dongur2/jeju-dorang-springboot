@@ -50,6 +50,7 @@ COLOR
 }
 
 .content-body{
+    margin: 2% 0;
     width:100%;
     display: flex;
     flex-wrap: wrap;
