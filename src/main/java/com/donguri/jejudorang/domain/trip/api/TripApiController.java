@@ -23,7 +23,7 @@ public class TripApiController {
     @Value("${jeju-api-uri}")
     private String baseUrl;
 
-    private int page = 37;
+    private final int page = 37;
     private final String locale = "kr";
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
 
