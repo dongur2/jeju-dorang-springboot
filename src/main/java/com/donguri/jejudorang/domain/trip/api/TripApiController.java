@@ -2,7 +2,6 @@ package com.donguri.jejudorang.domain.trip.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,10 +13,11 @@ import java.util.List;
 @Slf4j
 @RestController
 public class TripApiController {
-
-    @Value("${jeju-api-key}") // application-API-KEY.properties
+    @Value("${jeju-api-key}")
     private String apiKey;
-    private final String baseUrl = "https://api.visitjeju.net/vsjApi/contents/searchList";
+    @Value("${jeju-api-uri}")
+    private String baseUrl;
+
     private final String locale = "kr";
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
 
