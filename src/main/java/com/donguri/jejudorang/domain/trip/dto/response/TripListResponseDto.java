@@ -9,7 +9,6 @@ public class TripListResponseDto {
     private Long id;
     private String category;
     private String name;
-    private String introduction;
     private String tags;
     private String thumbnail;
 
@@ -18,7 +17,6 @@ public class TripListResponseDto {
         this.id = trip.getId();
         this.category = trip.getCategory();
         this.name = trip.getName();
-        this.introduction = trip.getIntroduction();
         this.tags = trip.getTags();
         this.thumbnail = trip.getThumbnail();
     }
