@@ -1,11 +1,11 @@
-package com.donguri.jejudorang.domain.trip.dto.response;
+package com.donguri.jejudorang.domain.trip.dto;
 
 import com.donguri.jejudorang.domain.trip.entity.Trip;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record TripApiResponseDto(
+public record TripApiDataDto(
     String result,
     String resultMessage,
     int totalCount,
@@ -41,11 +41,11 @@ public record TripApiResponseDto(
     // items의 item을 Trip Entity로 변환해 리스트로 반환
     public List<Trip> toEntity() {
         return items.stream()
-                .map(TripApiResponseDto::mapToEntity)
+                .map(TripApiDataDto::mapToEntity)
                 .collect(Collectors.toList());
     }
 
-    private static Trip mapToEntity(TripApiResponseDto.Item item) {
+    private static Trip mapToEntity(TripApiDataDto.Item item) {
         return Trip.builder()
                 .placeId(item.contentsid())
                 .category(item.region2cd().label())

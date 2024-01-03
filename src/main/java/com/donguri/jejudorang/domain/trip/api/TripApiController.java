@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.trip.api;
 
-import com.donguri.jejudorang.domain.trip.dto.response.TripApiResponseDto;
+import com.donguri.jejudorang.domain.trip.dto.TripApiDataDto;
 import com.donguri.jejudorang.domain.trip.entity.Trip;
 import com.donguri.jejudorang.domain.trip.service.TripService;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ public class TripApiController {
                 .build(); // WebClient 인스턴스 생성
 
         // Data
-        Mono<TripApiResponseDto> result = webClient.get() // HTTP GET Request 빌드 시작 - Returns: a spec for specifying the target URL (Interface WebClient.RequestHeadersUriSpec<S extends WebClient.RequestHeadersSpec<S>>)
+        Mono<TripApiDataDto> result = webClient.get() // HTTP GET Request 빌드 시작 - Returns: a spec for specifying the target URL (Interface WebClient.RequestHeadersUriSpec<S extends WebClient.RequestHeadersSpec<S>>)
                     .uri(uriBuilder -> uriBuilder
                             .queryParam("apiKey", apiKey)
                             .queryParam("locale", locale)
@@ -56,11 +56,11 @@ public class TripApiController {
                             .queryParam("page", page)
                             .build()) // URI 빌드
                     .retrieve() // Response를 추출할 방법 선언
-                    .bodyToMono(TripApiResponseDto.class);
+                    .bodyToMono(TripApiDataDto.class);
 
         // Dto -> Entity
         List<Trip> trips = result
-                .map(TripApiResponseDto::toEntity)
+                .map(TripApiDataDto::toEntity)
                 .block();
 
         // Entity -> DB
