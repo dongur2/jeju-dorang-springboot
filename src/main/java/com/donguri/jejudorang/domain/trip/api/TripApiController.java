@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.trip.api;
 
 import com.donguri.jejudorang.domain.trip.dto.response.TripApiResponseDto;
+import com.donguri.jejudorang.domain.trip.entity.Trip;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ public class TripApiController {
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
 
     @GetMapping("/trip/api/data")
-    public Mono<TripApiResponseDto> fetch() {
+    public String fetch() {
         // DefaultUriBuilderFactory implements UriBuilderFactory
         // URI에 alternative encoding mode를 설정해 UriBuilder 인스턴스를 생성할 수 있게 하는 DefaultUriBuilderFactory
         // WebClient를 이용하면 인코딩을 하지 않아 API KEY가 달라지는 문제 발생 가능
@@ -37,7 +38,7 @@ public class TripApiController {
                 .baseUrl(baseUrl) // request baseURL 설정
                 .build(); // WebClient 인스턴스 생성
 
-        return webClient.get() // HTTP GET Request 빌드 시작 - Returns: a spec for specifying the target URL (Interface WebClient.RequestHeadersUriSpec<S extends WebClient.RequestHeadersSpec<S>>)
+        Mono<TripApiResponseDto> result = webClient.get() // HTTP GET Request 빌드 시작 - Returns: a spec for specifying the target URL (Interface WebClient.RequestHeadersUriSpec<S extends WebClient.RequestHeadersSpec<S>>)
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("apiKey", apiKey)
                         .queryParam("locale", locale)
@@ -46,5 +47,14 @@ public class TripApiController {
                 .retrieve() // Response를 추출할 방법 선언
                 .bodyToMono(TripApiResponseDto.class);
 
+        List<Trip> trips = result
+                .map(TripApiResponseDto::toEntity)
+                .block();
+
+        
+
+        log.info("trips:{}", trips);
+
+        return "OK";
     }
 }

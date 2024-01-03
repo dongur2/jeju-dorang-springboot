@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.trip.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -38,4 +39,16 @@ public class Trip {
 
     private int likeCount; // 북마크 수
 
+    @Builder
+    public Trip(String placeId, String category, String name, String introduction, String address, String tel, String tags, String thumbnail, String image) {
+        this.placeId = placeId;
+        this.category = category;
+        this.name = name;
+        this.introduction = introduction;
+        this.address = address;
+        this.tel = tel;
+        this.tags = tags;
+        this.thumbnail = thumbnail;
+        this.image = image;
+    }
 }
