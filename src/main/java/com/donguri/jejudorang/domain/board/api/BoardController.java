@@ -1,11 +1,11 @@
 package com.donguri.jejudorang.domain.board.api;
 
+import com.donguri.jejudorang.domain.board.entity.Board;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -18,7 +18,12 @@ public class BoardController {
     }
 
     @GetMapping("/write")
-    public String getWriteForm() {
+    public String getBoardWriteForm() {
         return "/board/boardForm";
+    }
+    @PostMapping("/write")
+    public String writeBoard(@ModelAttribute Board board, RedirectAttributes redirectAttributes) {
+        log.info("form's data={}", board.toString());
+        return "redirect:/board/list/0";
     }
 }

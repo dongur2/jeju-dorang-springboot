@@ -27,5 +27,17 @@ public class Board {
 
     private LocalDateTime createdAt;
 
-
+    @Override
+    public String toString() {
+        return "Board{" +
+                "id=" + id +
+                ", writer=" + writer +
+                ", type='" + type + '\'' +
+                ", state='" + state + '\'' +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", tags='" + tags + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }
