@@ -6,7 +6,6 @@
       href="../css/bootstrap.min.css" rel="stylesheet">
 <link th:href="@{/js/bootstrap.js}"
       href="../js/bootstrap.js" rel="js">
-
 <head>
     <!-- Editor's Style -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
@@ -14,22 +13,25 @@
 </head>
 
     <div class="board-write-form-whole-box">
-        <form th:action method="post" th:object="${board}">
+        <form th:action method="post" th:object="${boardWriteRequestDto}">
 
             <div class="board-write-form-top">
                 <div>
-                    <ul class="nav nav-tabs" style="margin-bottom: 25px">
+                    <ul class="nav nav-tabs" style="margin-bottom: 25px" id="menuTabs">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#" style="font-size:22px">커뮤니티</a>
+                            <a class="nav-link active" aria-current="page" onclick="changeType('chat')"
+                               href="#" style="font-size:22px">커뮤니티</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" style="font-size:22px">동행모집</a>
+                            <a class="nav-link"  onclick="changeType('party')"
+                               href="#" style="font-size:22px">동행모집</a>
                         </li>
+                        <input type="hidden" id="postType" name="type" value="chat">
                     </ul>
                 </div>
                 <div class="board-form-input-box">
-                    <input class="board-title" name="title" placeholder="제목을 입력하세요">
-                    <input class="board-tags" name="tags" placeholder="태그를 입력하세요">
+                    <input type="text" class="board-title" name="title" placeholder="제목을 입력하세요">
+                    <input type="text" class="board-tags" name="tags" placeholder="태그를 입력하세요">
                 </div>
             </div>
 
@@ -57,6 +59,21 @@
             previewStyle: 'tab',
             placeholder: '내용을 입력해 주세요',
         });
+
+        // 글분류 NAV 클릭 -> type value 설정
+        function changeType(type) {
+            var menuTabs = document.getElementById('menuTabs');
+            var links = menuTabs.getElementsByClassName('nav-link');
+
+            // 모든 링크에서 'active' 클래스 제거하고 클릭한 클래스에 추가
+            for (var i = 0; i < links.length; i++) {
+                links[i].classList.remove('active');
+            }
+            event.target.classList.add('active');
+
+            // input hidden에 value 설정 (default: chat)
+            document.getElementById('postType').value = type;
+        }
     </script>
 
 

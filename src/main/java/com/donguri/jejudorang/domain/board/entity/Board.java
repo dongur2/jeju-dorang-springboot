@@ -1,15 +1,13 @@
 package com.donguri.jejudorang.domain.board.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Board {
     @Id
     @Column(name = "board_id")
