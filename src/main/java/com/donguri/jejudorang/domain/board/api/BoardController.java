@@ -22,7 +22,7 @@ public class BoardController {
         return "/board/boardForm";
     }
     @PostMapping("/write")
-    public String writeBoard(@ModelAttribute Board board, RedirectAttributes redirectAttributes) {
+    public String writeBoard(@ModelAttribute("board") Board board, RedirectAttributes redirectAttributes) {
         log.info("form's data={}", board.toString());
         return "redirect:/board/list/0";
     }

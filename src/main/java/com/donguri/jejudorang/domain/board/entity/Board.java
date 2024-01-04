@@ -1,12 +1,15 @@
 package com.donguri.jejudorang.domain.board.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
+@RequiredArgsConstructor
 public class Board {
     @Id
     @Column(name = "board_id")
@@ -26,6 +29,16 @@ public class Board {
     private String tags;
 
     private LocalDateTime createdAt;
+
+    @Builder
+    public Board(Long writer, String type, String state, String title, String content, String tags) {
+        this.writer = writer;
+        this.type = type;
+        this.state = state;
+        this.title = title;
+        this.content = content;
+        this.tags = tags;
+    }
 
     @Override
     public String toString() {

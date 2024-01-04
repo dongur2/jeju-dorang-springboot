@@ -17,6 +17,7 @@ public class SecurityConfiguration {
         };
 
         http
+                .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers(staticResources).permitAll()
                 .anyRequest().authenticated();
