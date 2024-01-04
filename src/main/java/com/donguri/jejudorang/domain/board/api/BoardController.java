@@ -16,4 +16,9 @@ public class BoardController {
     public String boardHome(@PathVariable("nowPage") Integer nowPage, Model model) {
         return "/board/boardList";
     }
+
+    @GetMapping("/writeForm")
+    public String getWriteForm() {
+        return "/board/boardForm";
+    }
 }
