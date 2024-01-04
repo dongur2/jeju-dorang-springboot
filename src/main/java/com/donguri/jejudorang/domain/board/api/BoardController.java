@@ -17,7 +17,7 @@ public class BoardController {
         return "/board/boardList";
     }
 
-    @GetMapping("/writeForm")
+    @GetMapping("/write")
     public String getWriteForm() {
         return "/board/boardForm";
     }
