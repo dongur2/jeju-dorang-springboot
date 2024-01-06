@@ -10,10 +10,18 @@
     <!-- Editor's Style -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
     <title>커뮤니티 작성폼</title>
+    <style>
+        #contents {
+            width:50%;
+            height: 100px;
+            margin: 30px auto;
+            border: 1px solid;
+        }
+    </style>
 </head>
 
     <div class="board-write-form-whole-box">
-        <form th:action method="post" th:object="${boardWriteRequestDto}">
+        <form id="board-write-form" th:action method="post" th:object="${boardWriteRequestDto}">
 
             <div class="board-write-form-top">
                 <div>
@@ -26,22 +34,26 @@
                             <a class="nav-link"  onclick="changeType('party')"
                                href="#" style="font-size:22px">동행모집</a>
                         </li>
+                        <!--   글분류값 전달(default: chat)   -->
                         <input type="hidden" id="postType" name="type" value="chat">
                     </ul>
                 </div>
                 <div class="board-form-input-box">
-                    <input type="text" class="board-title" name="title" placeholder="제목을 입력하세요">
-                    <input type="text" class="board-tags" name="tags" placeholder="태그를 입력하세요">
+                    <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요">
+                    <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력하세요">
                 </div>
             </div>
 
-            <!-- TUI Container -->
+            <!-- TOAST UI Editor -->
             <div id="content"></div>
+            <input type="hidden" id="board-form-content" name="content" value="">
 
             <div class="board-write-form-bottom">
                 <button type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
                         th:onclick="history.back()">취소</button>
-                <button type="submit" class="btn btn-primary" style="width:150px; height:50px; border-radius: 10px">등록</button>
+                <button type="button" class="btn btn-primary"
+                        onclick="submitForm()"
+                        style="width:150px; height:50px; border-radius: 10px">등록</button>
             </div>
 
         </form>
@@ -56,9 +68,10 @@
             height: '750px',
             initialEditType: 'wysiwyg',
             initialValue: '',
-            previewStyle: 'tab',
+            previewStyle: 'vertical',
             placeholder: '내용을 입력해 주세요',
         });
+
 
         // 글분류 NAV 클릭 -> type value 설정
         function changeType(type) {
@@ -74,6 +87,14 @@
             // input hidden에 value 설정 (default: chat)
             document.getElementById('postType').value = type;
         }
+
+        // 폼 데이터 전달
+        function submitForm() {
+            let formContent = editor.getHTML();
+            document.getElementById("board-form-content").setAttribute("value", formContent);
+            document.getElementById("board-write-form").submit();
+        }
+
     </script>
 
 
