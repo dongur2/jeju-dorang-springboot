@@ -2,14 +2,13 @@ package com.donguri.jejudorang.domain.board.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -46,4 +45,21 @@ public class BoardImageFileController {
             throw new RuntimeException(e);
         }
     }
+
+    @GetMapping(value = "/img-print", produces = { MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE })
+    public byte[] printEditorImage(@RequestParam("filename") final String filename) {
+        String fileFullPath = Paths.get(uploadDir, filename).toString();
+
+        File uploadedFile = new File(fileFullPath);
+        if (!uploadedFile.exists()) {
+            throw new RuntimeException();
+        }
+
+        try {
+            return Files.readAllBytes(uploadedFile.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
