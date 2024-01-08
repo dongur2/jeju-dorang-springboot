@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.board.dto;
+package com.donguri.jejudorang.domain.board.dto.request;
 
 import com.donguri.jejudorang.domain.board.entity.Board;
 import lombok.*;
