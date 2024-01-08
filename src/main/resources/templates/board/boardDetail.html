@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/fragments/layout}">
+<head>
+    <title>여행</title>
+</head>
+<th layout:fragment="content">
+    <h1 th:text="${post.getTitle()}"></h1>
+    <h1 th:text="${post.getContent()}"></h1>
+    <h1 th:text="${post.getTags()}"></h1>
+</th>
+</html>

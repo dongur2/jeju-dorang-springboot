@@ -19,6 +19,11 @@ public class BoardServiceI implements BoardService{
     }
 
     @Override
+    public Board getPost(Long id) {
+        return boardRepository.findById(id).get();
+    }
+
+    @Override
     public Board savePost(BoardWriteRequestDto post) {
         return boardRepository.save(post.toEntity());
     }

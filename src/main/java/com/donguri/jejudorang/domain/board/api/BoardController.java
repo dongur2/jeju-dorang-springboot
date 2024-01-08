@@ -37,4 +37,11 @@ public class BoardController {
         log.info("saved data={}", saved.toString());
         return "redirect:/board/list/0";
     }
+
+    @GetMapping("/detail/{boardId}")
+    public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {
+        Board foundPost = boardService.getPost(boardId);
+        model.addAttribute("post", foundPost);
+        return "/board/boardDetail";
+    }
 }
