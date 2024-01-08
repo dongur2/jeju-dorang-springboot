@@ -27,8 +27,8 @@ public class BoardImageFileController {
         }
 
         String originalName = image.getOriginalFilename();
+        String extension = originalName.substring(originalName.lastIndexOf(".") + 1); // 파일 확장자 (png..)
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        String extension = originalName.substring(originalName.lastIndexOf(".") + 1);
         String saveFileName = uuid + "." + extension;
         String fileFullPath = Paths.get(uploadDir, saveFileName).toString();
 
@@ -39,8 +39,8 @@ public class BoardImageFileController {
 
         try {
             File uploadFile = new File(fileFullPath);
-            image.transferTo(uploadFile);
-            return saveFileName;
+            image.transferTo(uploadFile); // 서버에 저장
+            return saveFileName; // 서버에 저장된 파일명
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

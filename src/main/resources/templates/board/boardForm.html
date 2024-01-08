@@ -81,10 +81,10 @@
                             body: formData,
                         });
 
-                        const filename = await response.text();
+                        const filename = await response.text(); // public String uploadEditorImage()
                         console.log('서버에 저장된 파일명 : ', filename);
 
-                        const imageUrl = `/tui-editor/img-print?filename=${filename}`;
+                        const imageUrl = `/tui-editor/img-print?filename=${filename}`; // public byte[] printEditorImage
                         console.log(imageUrl);
                         callback(imageUrl, 'img alt attribute');
 
