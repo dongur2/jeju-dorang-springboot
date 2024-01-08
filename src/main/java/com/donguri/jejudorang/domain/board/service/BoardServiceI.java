@@ -6,10 +6,17 @@ import com.donguri.jejudorang.domain.board.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BoardServiceI implements BoardService{
     @Autowired
     private BoardRepository boardRepository;
+
+    @Override
+    public List<Board> getAllPosts() {
+        return boardRepository.findAll();
+    }
 
     @Override
     public Board savePost(BoardWriteRequestDto post) {

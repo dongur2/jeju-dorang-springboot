@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Slf4j
 @Controller
 @RequestMapping("/board")
@@ -19,6 +21,8 @@ public class BoardController {
 
     @GetMapping("/list/{nowPage}")
     public String boardHome(@PathVariable("nowPage") Integer nowPage, Model model) {
+        List<Board> allPosts = boardService.getAllPosts();
+        model.addAttribute("posts", allPosts);
         return "/board/boardList";
     }
 
@@ -26,9 +30,9 @@ public class BoardController {
     public String getBoardWriteForm() {
         return "/board/boardForm";
     }
+
     @PostMapping("/write")
     public String writeBoard(BoardWriteRequestDto post, RedirectAttributes redirectAttributes, Model model) {
-        log.info("form's data={}", post.toString());
         Board saved = boardService.savePost(post);
         log.info("saved data={}", saved.toString());
         return "redirect:/board/list/0";
