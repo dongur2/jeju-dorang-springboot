@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.board.dto;
 
+import com.donguri.jejudorang.domain.board.entity.Board;
 import lombok.*;
 
 @Getter
@@ -17,6 +18,15 @@ public class BoardWriteRequestDto {
         this.tags = tags;
         this.type = type;
         this.content = content;
+    }
+
+    public Board toEntity() {
+        return Board.builder()
+                .title(title)
+                .tags(tags)
+                .type(type)
+                .content(content)
+                .build();
     }
 
     @Override
