@@ -39,6 +39,9 @@ public class BoardImageFileController {
 
         try {
             File uploadFile = new File(fileFullPath);
+            if (!uploadFile.getParentFile().exists()) {
+                uploadFile.getParentFile().mkdirs(); // Create parent directories if they do not exist
+            }
             image.transferTo(uploadFile); // 서버에 저장
             return saveFileName; // 서버에 저장된 파일명
         } catch (IOException e) {

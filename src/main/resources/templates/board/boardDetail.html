@@ -8,7 +8,9 @@
 </head>
 <th layout:fragment="content">
     <h1 th:text="${post.getTitle()}"></h1>
-    <h1 th:text="${post.getContent()}"></h1>
     <h1 th:text="${post.getTags()}"></h1>
+
+    <div id="viewer" th:utext="${post.getContent()}"> viewer </div>
+
 </th>
 </html>
