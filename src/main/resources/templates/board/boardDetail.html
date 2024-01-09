@@ -22,11 +22,11 @@
                     <div class="sub-title-box content-date">
                         <span class="sub-title sub-title-created-at">
                             <span class="sub-title-title">작성일</span>
-                            <span class="sub-title-value">24.01.08 16:30</span>
+                            <span class="sub-title-value" th:text="${#temporals.format(post.getCreatedAt(), 'yy.MM.dd HH:mm')}">24.01.08 16:30</span>
                         </span>
                         <span class="sub-title sub-title-updated-at">
                             <span class="sub-title-title">수정일</span>
-                            <span class="sub-title-value">24.01.08 16:32</span>
+                            <span class="sub-title-value" th:text="${#temporals.format(post.getUpdatedAt(), 'yy.MM.dd HH:mm')}">24.01.08 16:30</span>
                         </span>
                         <span class="sub-title sub-title-view-count">
                             <span class="sub-title-title">조회수</span>
