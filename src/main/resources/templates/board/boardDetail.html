@@ -7,10 +7,55 @@
     <title>여행</title>
 </head>
 <th layout:fragment="content">
-    <h1 th:text="${post.getTitle()}"></h1>
-    <h1 th:text="${post.getTags()}"></h1>
 
-    <div id="viewer" th:utext="${post.getContent()}"> viewer </div>
+    <div class="board-whole-content-box">
+        <!-- 헤더: 제목, 작성자(닉네임), 작성/수정날짜, 조회수   -->
+        <div class="board-post-info">
+            <div class="board-header">
+                <h1 th:text="${post.getTitle()}"></h1>
+            </div>
+            <div class="board-sub-header">
+                <div class="board-sub-title">
+                    <h6 class="user-name">
+                        <a href="#">닉네임</a>
+                    </h6>
+                    <div class="content-date">
+                        <span class="sub-title sub-title-created-at">
+                            <span class="sub-title-title">작성일</span>
+                            <span class="sub-title-value">24.01.08 16:30</span>
+                        </span>
+                        <span class="sub-title sub-title-updated-at">
+                            <span class="sub-title-title">수정일</span>
+                            <span class="sub-title-value">24.01.08 16:32</span>
+                        </span>
+                        <span class="sub-title sub-title-view-count">
+                            <span class="sub-title-title">조회수</span>
+                            <span class="sub-title-value">00</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="board-post-content">
+            <!--   글 내용   -->
+            <div class="board-content-body" id="viewer" th:utext="${post.getContent()}"> viewer </div>
+
+            <!--    버튼    -->
+            <div class="board-post-features">
+                <div class="board-post-feature board-state">
+                    <button class="feature-row board-state-btn">모집중</button>
+                </div>
+                <div class="board-post-feature board-liked">
+                    <button class="feature-row board-liked-btn">추천</button>
+                </div>
+                <div class="board-post-feature board-share">
+                    <button class="feature-row board-share-btn">공유</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  댓글  -->
 </th>
 </html>
