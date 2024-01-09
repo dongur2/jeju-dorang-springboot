@@ -47,7 +47,9 @@ public class BoardController {
     }
 
     @GetMapping("/detail/{boardId}/modify")
-    public String getBoardModifyForm() {
+    public String getBoardModifyForm(@PathVariable("boardId") Long boardId, Model model) {
+        Board foundPost = boardService.getPost(boardId);
+        model.addAttribute("post", foundPost);
         return "/board/boardModifyForm";
     }
 }
