@@ -77,14 +77,15 @@
             }
         });
 
+        // 원래 내용
+        let defaultContent = document.getElementById('board-form-content').value;
 
         const editor = new toastui.Editor({
             el: document.querySelector('#content'),
             height: '750px',
             initialEditType: 'wysiwyg',
-            initialValue: '',
             previewStyle: 'vertical',
-            placeholder: 'content',
+            initialValue: defaultContent, // 원래 내용으로 설정
             hooks: {
                 async addImageBlobHook(blob, callback) {
                     try {
