@@ -30,10 +30,12 @@ public class Board {
     private String content;
     private String tags;
 
+    @Column(nullable = false)
+    private int viewCount;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
-
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
