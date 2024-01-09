@@ -67,6 +67,10 @@
                 <div class="board-post-feature board-share">
                     <button class="feature-row board-share-btn">공유</button>
                 </div>
+                <div class="board-post-feature board-modify">
+                    <button class="feature-row board-modify-btn"
+                    th:onclick="|location.href='@{/board/detail/{boardId}/modify(boardId=${post.id})}'|">수정</button>
+                </div>
             </div>
         </div>
     </div>
