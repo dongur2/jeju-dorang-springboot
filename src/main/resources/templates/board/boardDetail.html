@@ -16,10 +16,10 @@
             </div>
             <div class="board-sub-header">
                 <div class="board-sub-title">
-                    <h6 class="user-name">
+                    <h6 class="sub-title-box user-name">
                         <a href="#">닉네임</a>
                     </h6>
-                    <div class="content-date">
+                    <div class="sub-title-box content-date">
                         <span class="sub-title sub-title-created-at">
                             <span class="sub-title-title">작성일</span>
                             <span class="sub-title-value">24.01.08 16:30</span>
@@ -41,6 +41,21 @@
             <!--   글 내용   -->
             <div class="board-content-body" id="viewer" th:utext="${post.getContent()}"> viewer </div>
 
+            <div class="board-content-sub-body">
+                <ul class="sub-body-tags">
+                    <li class="sub-body-tag">태그1</li>
+                    <li class="sub-body-tag">태그2</li>
+                    <li class="sub-body-tag">태그3</li>
+                    <li class="sub-body-tag">태그3</li>
+                    <li class="sub-body-tag">태그3</li>
+                    <li class="sub-body-tag">태그1</li>
+                    <li class="sub-body-tag">태그2</li>
+                    <li class="sub-body-tag">xormxormxorm</li>
+                    <li class="sub-body-tag">태그3</li>
+                    <li class="sub-body-tag">태그3</li>
+                </ul>
+            </div>
+
             <!--    버튼    -->
             <div class="board-post-features">
                 <div class="board-post-feature board-state">
@@ -54,6 +69,10 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="comments-box">
+        COMMENT
     </div>
 
     <!--  댓글  -->
