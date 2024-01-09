@@ -65,11 +65,11 @@
     <!-- TUI 에디터 JS CDN -->
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script>
+        // 글분류 디폴트 설정 (탭 클릭 CSS 효과 설정)
         window.addEventListener("load", function() {
-            // 여기에 스크립트 코드 작성
             let defaultPostType = document.getElementById('postType').value;
             let defaultTabs = document.getElementById('menuTabs');
-            let links = menuTabs.getElementsByClassName('nav-link');
+            let links = defaultTabs.getElementsByClassName('nav-link');
             for (let i = 0; i < links.length; i++) {
                 if (links[i].classList.contains(defaultPostType)) {
                     links[i].classList.add('active');
