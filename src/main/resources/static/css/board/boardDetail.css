@@ -1,0 +1,9 @@
+
+#viewer{
+    width:100%;
+    background: green;
+}
+
+#viewer > p > img {
+    max-width:100%;
+}
