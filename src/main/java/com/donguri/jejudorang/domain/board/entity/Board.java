@@ -49,6 +49,15 @@ public class Board {
         this.tags = tags;
     }
 
+    @Builder
+    public Board(Long id, String type, String title, String tags,  String content) {
+        this.id = id;
+        this.type = type;
+        this.title = title;
+        this.tags = tags;
+        this.content = content;
+    }
+
     @Override
     public String toString() {
         return "Board{" +

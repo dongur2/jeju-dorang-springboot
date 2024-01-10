@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.board.api;
 
+import com.donguri.jejudorang.domain.board.dto.request.BoardUpdateRequestDto;
 import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.service.BoardService;
@@ -51,5 +52,12 @@ public class BoardController {
         Board foundPost = boardService.getPost(boardId);
         model.addAttribute("post", foundPost);
         return "/board/boardModifyForm";
+    }
+
+    @PutMapping("/detail/{boardId}/modify")
+    public String modifyBoard(@PathVariable("boardId") Long boardId, BoardUpdateRequestDto post) {
+        boardService.updatePost(boardId, post);
+        log.info("BoardUpdateRequestDto={}", post);
+        return "redirect:/board/detail/{boardId}";
     }
 }
