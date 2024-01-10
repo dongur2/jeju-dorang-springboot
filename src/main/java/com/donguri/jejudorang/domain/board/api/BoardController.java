@@ -57,4 +57,10 @@ public class BoardController {
         boardService.updatePost(boardId, post);
         return "redirect:/board/detail/{boardId}";
     }
+
+    @ResponseBody
+    @PutMapping("/detail/{boardId}/modifyJoining")
+    public void modifyBoardJoinState(@PathVariable("boardId") Long boardId) {
+        boardService.changePartyJoinState(boardId);
+    }
 }

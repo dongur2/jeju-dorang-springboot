@@ -64,6 +64,14 @@ public class Board {
         }
     }
 
+    public void changeJoinState() {
+        if (joining == JoinState.FINDING) {
+            joining = JoinState.DONE;
+        } else {
+            joining = JoinState.FINDING;
+        }
+    }
+
 
 
     @Override

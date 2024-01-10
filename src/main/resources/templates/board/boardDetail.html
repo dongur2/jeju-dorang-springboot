@@ -59,8 +59,15 @@
             <!--    버튼    -->
             <div class="board-post-features">
                 <div th:if="${post.getType()} == 'party'" class="board-post-feature board-state">
-                    <button th:if="${post.getJoining().name()} == 'FINDING'" class="feature-row board-state-btn">모집중</button>
-                    <button th:if="${post.getJoining().name()} == 'DONE'" class="feature-row board-state-btn">모집완료</button>
+<!--                    <button th:if="${post.getJoining().name()} == 'FINDING'" class="feature-row board-state-btn"-->
+<!--                    th:method="put" th:onclick="|location.href='@{/board/detail/{boardId}/modifyJoining(boardId=${post.id})}'|"-->
+<!--                    >모집중</button> -->
+                    <button th:if="${post.getJoining().name()} == 'FINDING'" class="feature-row board-state-btn"
+                            th:onclick="'testJoin(' + ${post.id} + ')'">모집중</button>
+                    <button th:if="${post.getJoining().name()} == 'DONE'" class="feature-row board-state-btn"
+                            th:onclick="'testJoin(' + ${post.id} + ')'">모집완료</button>
+<!--                    <button th:if="${post.getJoining().name()} == 'DONE'" class="feature-row board-state-btn"-->
+<!--                    th:onclick="|location.href='@{/board/detail/{boardId}/modifyJoining(boardId=${post.id})}'|">모집완료</button>-->
                 </div>
                 <div class="board-post-feature board-liked">
                     <button class="feature-row board-liked-btn">추천</button>
@@ -85,5 +92,18 @@
     </div>
 
     <!--  댓글  -->
+
+    <script>
+        function testJoin(boardId) {
+            let xhr = new XMLHttpRequest();
+            xhr.open('PUT', '/board/detail/' + boardId + '/modifyJoining', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) { //  XMLHttpRequest 객체가 통신을 완료하여 응답이 완전히 수신되었을 때
+                    window.location.href = '/board/detail/' + boardId;
+                }
+            };
+            xhr.send();
+        }
+    </script>
 </th>
 </html>

@@ -14,4 +14,6 @@ public interface BoardService {
     Board savePost(BoardWriteRequestDto post);
 
     void updatePost(Long id, BoardUpdateRequestDto post);
+
+    void changePartyJoinState(Long id);
 }

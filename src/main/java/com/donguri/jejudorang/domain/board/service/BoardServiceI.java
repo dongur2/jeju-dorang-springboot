@@ -4,7 +4,6 @@ import com.donguri.jejudorang.domain.board.dto.request.BoardUpdateRequestDto;
 import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.repository.BoardRepository;
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,5 +55,12 @@ public class BoardServiceI implements BoardService{
                 .build();
         update.setDefaultJoinState();
         boardRepository.save(update);
+    }
+
+    @Override
+    @Transactional
+    public void changePartyJoinState(Long id) {
+        Board found = boardRepository.findById(id).get();
+        found.changeJoinState();
     }
 }
