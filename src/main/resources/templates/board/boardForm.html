@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/common.css}">
+<link rel="stylesheet" th:href="@{/css/board/boardForm.css}">
+<link th:href="@{/css/bootstrap.min.css}"
+      href="../css/bootstrap.min.css" rel="stylesheet">
+<link th:href="@{/js/bootstrap.js}"
+      href="../js/bootstrap.js" rel="js">
+<head>
+    <!-- Editor's Style -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <title>커뮤니티 작성폼</title>
+    <style>
+        #contents {
+            width:50%;
+            height: 100px;
+            margin: 30px auto;
+            border: 1px solid;
+        }
+    </style>
+</head>
+
+    <div class="board-write-form-whole-box">
+        <form id="board-write-form" th:action method="post" th:object="${boardWriteRequestDto}">
+
+            <div class="board-write-form-top">
+                <div>
+                    <ul class="nav nav-tabs" style="margin-bottom: 25px" id="menuTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" onclick="changeType('chat')"
+                               href="#" style="font-size:22px">커뮤니티</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"  onclick="changeType('party')"
+                               href="#" style="font-size:22px">동행모집</a>
+                        </li>
+                        <!--   글분류값 전달(default: chat)   -->
+                        <input type="hidden" id="postType" name="type" value="chat">
+                    </ul>
+                </div>
+                <div class="board-form-input-box">
+                    <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요">
+                    <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력하세요">
+                </div>
+            </div>
+
+            <!-- TOAST UI Editor -->
+            <div id="content"></div>
+            <input type="hidden" id="board-form-content" name="content" value="">
+
+            <div class="board-write-form-bottom">
+                <button type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
+                        th:onclick="history.back()">취소</button>
+                <button type="button" class="btn btn-primary"
+                        onclick="submitForm()"
+                        style="width:150px; height:50px; border-radius: 10px">등록</button>
+            </div>
+
+        </form>
+    </div>
+
+
+    <!-- TUI 에디터 JS CDN -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script>
+        const editor = new toastui.Editor({
+            el: document.querySelector('#content'),
+            height: '750px',
+            initialEditType: 'wysiwyg',
+            initialValue: '',
+            previewStyle: 'vertical',
+            placeholder: '내용을 입력해 주세요',
+            hooks: {
+                async addImageBlobHook(blob, callback) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('image', blob);
+
+                        const response = await fetch('/tui-editor/img-upload', {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        const filename = await response.text(); // public String uploadEditorImage()
+                        console.log('서버에 저장된 파일명 : ', filename);
+
+                        const imageUrl = `/tui-editor/img-print?filename=${filename}`; // public byte[] printEditorImage
+                        console.log(imageUrl);
+                        callback(imageUrl, 'imgUrl');
+
+                    } catch (error) {
+                        console.error('업로드 실패 : ', error);
+                    }
+                }
+            }
+        });
+
+
+        // 글분류 NAV 클릭 -> type value 설정
+        function changeType(type) {
+            var menuTabs = document.getElementById('menuTabs');
+            var links = menuTabs.getElementsByClassName('nav-link');
+
+            // 모든 링크에서 'active' 클래스 제거하고 클릭한 클래스에 추가
+            for (var i = 0; i < links.length; i++) {
+                links[i].classList.remove('active');
+            }
+            event.target.classList.add('active');
+
+            // input hidden에 value 설정 (default: chat)
+            document.getElementById('postType').value = type;
+        }
+
+        // 폼 데이터 전달
+        function submitForm() {
+            let formContent = editor.getHTML();
+            document.getElementById("board-form-content").setAttribute("value", formContent);
+            document.getElementById("board-write-form").submit();
+        }
+
+    </script>
+
+
+
+
+</html>

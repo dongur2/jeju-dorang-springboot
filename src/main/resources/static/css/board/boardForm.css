@@ -1,0 +1,57 @@
+/* 프리텐다드 */
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+.board-write-form-whole-box {
+    margin:1% auto;
+    width: 1280px;
+    font-weight:normal;
+    font-family: 'Pretendard-Regular';
+}
+
+.board-write-form-top {
+    margin-bottom:2%;
+}
+
+.board-form-input-box {
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    gap:5px;
+}
+.board-title {
+    width:100%;
+    height:50px;
+    border:none;
+    font-size:30px;
+    font-weight: bolder;
+    padding: 5px 10px;
+}
+.board-title:focus{
+    outline: none;
+}
+
+.board-tags {
+    width:100%;
+    height:30px;
+    border:none;
+    padding: 5px 10px;
+}
+.board-tags:focus {
+    outline: none;
+}
+
+
+
+/* 하단 버튼 */
+.board-write-form-bottom{
+    width:100%;
+    padding:30px 0;
+    display: flex;
+    justify-content: end;
+    gap:1%;
+}
