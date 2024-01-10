@@ -23,7 +23,8 @@ public class Board {
 //    private User writer;
     private Long writer;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private BoardType type;
 
     @Enumerated(EnumType.STRING)
     private JoinState joining;
@@ -41,10 +42,9 @@ public class Board {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Board(Long id, Long writer, String type, String title, String content, String tags, int viewCount) {
+    public Board(Long id, Long writer, String title, String content, String tags, int viewCount) {
         this.id = id;
         this.writer = writer;
-        this.type = type;
         this.title = title;
         this.content = content;
         this.tags = tags;
@@ -56,10 +56,18 @@ public class Board {
         viewCount++;
     }
 
+    public void setBoardType(String paramType) {
+        if (paramType.equals("chat")) {
+            type = BoardType.CHAT;
+        } else {
+            type = BoardType.PARTY;
+        }
+    }
+
     public void setDefaultJoinState() {
-        if (type.equals("party") && joining != JoinState.DONE) {
+        if (type.equals(BoardType.PARTY) && joining != JoinState.DONE) {
             joining = JoinState.FINDING;
-        } else if (type.equals("chat")) {
+        } else if (type.equals(BoardType.CHAT)) {
             joining = null;
         }
     }

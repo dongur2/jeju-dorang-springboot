@@ -35,10 +35,9 @@ public class BoardServiceI implements BoardService{
     public Board savePost(BoardWriteRequestDto post) {
         Board newPost = Board.builder()
                 .title(post.getTitle())
-                .tags(post.getTags())
                 .content(post.getContent())
-                .type(post.getType())
                 .build();
+        newPost.setBoardType(post.getType());
         newPost.setDefaultJoinState();
         return boardRepository.save(newPost);
     }
@@ -51,8 +50,8 @@ public class BoardServiceI implements BoardService{
                 .title(post.getTitle())
                 .tags(post.getTags())
                 .content(post.getContent())
-                .type(post.getType())
                 .build();
+        update.setBoardType(post.getType());
         update.setDefaultJoinState();
         boardRepository.save(update);
     }
