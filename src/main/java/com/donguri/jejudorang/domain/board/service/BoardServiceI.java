@@ -40,6 +40,7 @@ public class BoardServiceI implements BoardService{
                 .content(post.getContent())
                 .type(post.getType())
                 .build();
+        newPost.setDefaultJoinState();
         return boardRepository.save(newPost);
     }
 
@@ -53,6 +54,7 @@ public class BoardServiceI implements BoardService{
                 .content(post.getContent())
                 .type(post.getType())
                 .build();
+        update.setDefaultJoinState();
         boardRepository.save(update);
     }
 }

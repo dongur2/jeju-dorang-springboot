@@ -24,7 +24,7 @@ public class Board {
     private Long writer;
 
     private String type;
-    private String state;
+    private JoinState joining;
 
     private String title;
     private String content;
@@ -39,21 +39,30 @@ public class Board {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Board(Long id, Long writer, String type, String state, String title, String content, String tags, int viewCount) {
+    public Board(Long id, Long writer, String type, String title, String content, String tags, int viewCount) {
         this.id = id;
         this.writer = writer;
         this.type = type;
-        this.state = state;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.viewCount = viewCount;
     }
 
-    // 유저 아이디 후 조건 추가 필요
+    // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정
     public void upViewCount() {
         viewCount++;
     }
+
+    public void setDefaultJoinState() {
+        if (type.equals("party") && joining != JoinState.DONE) {
+            joining = JoinState.FINDING;
+        } else if (type.equals("chat")) {
+            joining = null;
+        }
+    }
+
+
 
     @Override
     public String toString() {
@@ -61,7 +70,7 @@ public class Board {
                 "id=" + id +
                 ", writer=" + writer +
                 ", type='" + type + '\'' +
-                ", state='" + state + '\'' +
+                ", state='" + joining + '\'' +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", tags='" + tags + '\'' +
