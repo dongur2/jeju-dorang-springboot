@@ -58,8 +58,9 @@
 
             <!--    버튼    -->
             <div class="board-post-features">
-                <div  th:if="${post.getType()} == 'party'" class="board-post-feature board-state">
-                    <button class="feature-row board-state-btn">모집중</button>
+                <div th:if="${post.getType()} == 'party'" class="board-post-feature board-state">
+                    <button th:if="${post.getJoining().name()} == 'FINDING'" class="feature-row board-state-btn">모집중</button>
+                    <button th:if="${post.getJoining().name()} == 'DONE'" class="feature-row board-state-btn">모집완료</button>
                 </div>
                 <div class="board-post-feature board-liked">
                     <button class="feature-row board-liked-btn">추천</button>
