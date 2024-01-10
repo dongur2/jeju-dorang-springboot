@@ -23,14 +23,16 @@ public class Board {
 //    private User writer;
     private Long writer;
 
-    private String type;
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private BoardType type;
+
+    @Enumerated(EnumType.STRING)
+    private JoinState joining;
 
     private String title;
     private String content;
     private String tags;
 
-    @Column(nullable = false)
     private int viewCount;
 
     @CreatedDate
@@ -40,16 +42,45 @@ public class Board {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Board(Long id, Long writer, String type, String state, String title, String content, String tags, int viewCount) {
+    public Board(Long id, Long writer, String title, String content, String tags, int viewCount) {
         this.id = id;
         this.writer = writer;
-        this.type = type;
-        this.state = state;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.viewCount = viewCount;
     }
+
+    // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정
+    public void upViewCount() {
+        viewCount++;
+    }
+
+    public void setBoardType(String paramType) {
+        if (paramType.equals("chat")) {
+            type = BoardType.CHAT;
+        } else {
+            type = BoardType.PARTY;
+        }
+    }
+
+    public void setDefaultJoinState() {
+        if (type.equals(BoardType.PARTY) && joining != JoinState.DONE) {
+            joining = JoinState.FINDING;
+        } else if (type.equals(BoardType.CHAT)) {
+            joining = null;
+        }
+    }
+
+    public void changeJoinState() {
+        if (joining == JoinState.FINDING) {
+            joining = JoinState.DONE;
+        } else {
+            joining = JoinState.FINDING;
+        }
+    }
+
+
 
     @Override
     public String toString() {
@@ -57,7 +88,7 @@ public class Board {
                 "id=" + id +
                 ", writer=" + writer +
                 ", type='" + type + '\'' +
-                ", state='" + state + '\'' +
+                ", state='" + joining + '\'' +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", tags='" + tags + '\'' +

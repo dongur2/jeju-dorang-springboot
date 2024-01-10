@@ -40,7 +40,6 @@ public class BoardController {
 
     @GetMapping("/detail/{boardId}")
     public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {
-        // 조회수 +1 * 나중에 작성자 아이디랑 현재 로그인 아이디 불일치인 상황에서만 추가
         Board foundPost = boardService.getPost(boardId);
         model.addAttribute("post", foundPost);
         return "/board/boardDetail";
@@ -57,5 +56,11 @@ public class BoardController {
     public String modifyBoard(@PathVariable("boardId") Long boardId, BoardUpdateRequestDto post) {
         boardService.updatePost(boardId, post);
         return "redirect:/board/detail/{boardId}";
+    }
+
+    @ResponseBody
+    @PutMapping("/detail/{boardId}/modifyJoining")
+    public void modifyBoardJoinState(@PathVariable("boardId") Long boardId) {
+        boardService.changePartyJoinState(boardId);
     }
 }

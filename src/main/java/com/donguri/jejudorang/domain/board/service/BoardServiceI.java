@@ -23,8 +23,11 @@ public class BoardServiceI implements BoardService{
     }
 
     @Override
+    @Transactional
     public Board getPost(Long id) {
-        return boardRepository.findById(id).get();
+        Board found = boardRepository.findById(id).get();
+        found.upViewCount();
+        return found;
     }
 
     @Override
@@ -32,10 +35,10 @@ public class BoardServiceI implements BoardService{
     public Board savePost(BoardWriteRequestDto post) {
         Board newPost = Board.builder()
                 .title(post.getTitle())
-                .tags(post.getTags())
                 .content(post.getContent())
-                .type(post.getType())
                 .build();
+        newPost.setBoardType(post.getType());
+        newPost.setDefaultJoinState();
         return boardRepository.save(newPost);
     }
 
@@ -47,8 +50,16 @@ public class BoardServiceI implements BoardService{
                 .title(post.getTitle())
                 .tags(post.getTags())
                 .content(post.getContent())
-                .type(post.getType())
                 .build();
+        update.setBoardType(post.getType());
+        update.setDefaultJoinState();
         boardRepository.save(update);
+    }
+
+    @Override
+    @Transactional
+    public void changePartyJoinState(Long id) {
+        Board found = boardRepository.findById(id).get();
+        found.changeJoinState();
     }
 }
