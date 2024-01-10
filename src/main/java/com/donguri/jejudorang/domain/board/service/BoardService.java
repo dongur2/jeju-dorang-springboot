@@ -10,6 +10,7 @@ public interface BoardService {
     List<Board> getAllPosts();
 
     Board getPost(Long id);
+
     Board savePost(BoardWriteRequestDto post);
 
     void updatePost(Long id, BoardUpdateRequestDto post);

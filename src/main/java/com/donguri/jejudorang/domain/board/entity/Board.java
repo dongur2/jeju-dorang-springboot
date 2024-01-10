@@ -30,7 +30,6 @@ public class Board {
     private String content;
     private String tags;
 
-    @Column(nullable = false)
     private int viewCount;
 
     @CreatedDate
@@ -49,6 +48,11 @@ public class Board {
         this.content = content;
         this.tags = tags;
         this.viewCount = viewCount;
+    }
+
+    // 유저 아이디 후 조건 추가 필요
+    public void upViewCount() {
+        viewCount++;
     }
 
     @Override
