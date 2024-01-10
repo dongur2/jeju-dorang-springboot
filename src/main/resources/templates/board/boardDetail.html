@@ -58,7 +58,7 @@
 
             <!--    버튼    -->
             <div class="board-post-features">
-                <div class="board-post-feature board-state">
+                <div  th:if="${post.getType()} == 'party'" class="board-post-feature board-state">
                     <button class="feature-row board-state-btn">모집중</button>
                 </div>
                 <div class="board-post-feature board-liked">
