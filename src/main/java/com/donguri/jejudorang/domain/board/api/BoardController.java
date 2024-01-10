@@ -35,7 +35,6 @@ public class BoardController {
     @PostMapping("/write")
     public String writeBoard(BoardWriteRequestDto post, RedirectAttributes redirectAttributes, Model model) {
         Board saved = boardService.savePost(post);
-        log.info("saved data={}", saved.toString());
         return "redirect:/board/list/0";
     }
 
@@ -57,7 +56,6 @@ public class BoardController {
     @PutMapping("/detail/{boardId}/modify")
     public String modifyBoard(@PathVariable("boardId") Long boardId, BoardUpdateRequestDto post) {
         boardService.updatePost(boardId, post);
-        log.info("BoardUpdateRequestDto={}", post);
         return "redirect:/board/detail/{boardId}";
     }
 }

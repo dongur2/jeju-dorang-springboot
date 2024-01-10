@@ -40,22 +40,15 @@ public class Board {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Board(Long writer, String type, String state, String title, String content, String tags) {
+    public Board(Long id, Long writer, String type, String state, String title, String content, String tags, int viewCount) {
+        this.id = id;
         this.writer = writer;
         this.type = type;
         this.state = state;
         this.title = title;
         this.content = content;
         this.tags = tags;
-    }
-
-    @Builder
-    public Board(Long id, String type, String title, String tags,  String content) {
-        this.id = id;
-        this.type = type;
-        this.title = title;
-        this.tags = tags;
-        this.content = content;
+        this.viewCount = viewCount;
     }
 
     @Override
