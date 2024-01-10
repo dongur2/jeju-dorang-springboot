@@ -24,6 +24,8 @@ public class Board {
     private Long writer;
 
     private String type;
+
+    @Enumerated(EnumType.STRING)
     private JoinState joining;
 
     private String title;
