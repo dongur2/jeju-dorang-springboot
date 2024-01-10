@@ -71,6 +71,10 @@
                     <button class="feature-row board-modify-btn"
                     th:onclick="|location.href='@{/board/detail/{boardId}/modify(boardId=${post.id})}'|">수정</button>
                 </div>
+                <div class="board-post-feature board-back-to-list">
+                    <button class="feature-row board-share-btn"
+                    th:onclick="|location.href='@{/board/list/0}'|">목록</button>
+                </div>
             </div>
         </div>
     </div>
