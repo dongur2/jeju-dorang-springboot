@@ -35,7 +35,7 @@ public class BoardController {
     @PostMapping("/write")
     public String writeBoard(BoardWriteRequestDto post, RedirectAttributes redirectAttributes, Model model) {
         Board saved = boardService.savePost(post);
-        return "redirect:/board/list/0";
+        return "redirect:/board/detail/" + saved.getId();
     }
 
     @GetMapping("/detail/{boardId}")

@@ -12,13 +12,4 @@ public class BoardWriteRequestDto {
     private String tags;
     private String type;
     private String content;
-
-    public Board toEntity() {
-        return Board.builder()
-                .title(title)
-                .tags(tags)
-                .type(type)
-                .content(content)
-                .build();
-    }
 }

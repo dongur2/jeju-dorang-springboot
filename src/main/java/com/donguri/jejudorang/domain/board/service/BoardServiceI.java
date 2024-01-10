@@ -28,8 +28,15 @@ public class BoardServiceI implements BoardService{
     }
 
     @Override
+    @Transactional
     public Board savePost(BoardWriteRequestDto post) {
-        return boardRepository.save(post.toEntity());
+        Board newPost = Board.builder()
+                .title(post.getTitle())
+                .tags(post.getTags())
+                .content(post.getContent())
+                .type(post.getType())
+                .build();
+        return boardRepository.save(newPost);
     }
 
     @Override
