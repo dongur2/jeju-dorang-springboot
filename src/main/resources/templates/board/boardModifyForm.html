@@ -40,9 +40,9 @@
                 </div>
                 <div class="board-form-input-box">
                     <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요"
-                    th:placeholder="${post.getTitle()}">
+                    th:placeholder="${post.getTitle()}" th:value="${post.getTitle()}">
                     <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력하세요"
-                    th:placeholder="${post.getTags()}">
+                    th:placeholder="${post.getTags()}" th:value="${post.getTags()}">
                 </div>
             </div>
 
