@@ -93,7 +93,13 @@
 
 
     <div class="modal-sns-share-box hidden-modal" id="modal-sns-share-box">
-        <button class="modal-sns-share-btn kakao-share-btn">카카오 공유</button>
+        <div class="modal-sns-header">
+            <h2 class="modal-sns-title">글 공유하기</h2>
+        </div>
+        <div class="modal-sns-btns-box">
+            <button class="modal-sns-share-btn kakao-share-btn">카카오 공유</button>
+            <button class="modal-sns-share-btn close-share-btn" th:onclick="openSnsModal()">닫기</button>
+        </div>
     </div>
 
 
