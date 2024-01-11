@@ -3,6 +3,7 @@
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{/fragments/layout}">
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
 <head>
     <title>여행</title>
 </head>
@@ -68,7 +69,8 @@
                     <button class="feature-row board-liked-btn">추천</button>
                 </div>
                 <div class="board-post-feature board-share">
-                    <button class="feature-row board-share-btn">공유</button>
+                    <button class="feature-row board-share-btn"
+                    th:onclick="openSnsModal()">공유</button>
                 </div>
                 <div class="board-post-feature board-modify">
                     <button class="feature-row board-modify-btn"
@@ -79,14 +81,21 @@
                     th:onclick="|location.href='@{/board/list/0}'|">목록</button>
                 </div>
             </div>
+
         </div>
+
     </div>
 
+    <!--  댓글  -->
     <div class="comments-box">
         COMMENT
     </div>
 
-    <!--  댓글  -->
+
+    <div class="modal-sns-share-box hidden-modal" id="modal-sns-share-box">
+        <button class="modal-sns-share-btn kakao-share-btn">카카오 공유</button>
+    </div>
+
 
     <script>
         function testJoin(boardId) {
@@ -98,6 +107,17 @@
                 }
             };
             xhr.send();
+        }
+
+        function openSnsModal() {
+            let selectedModal = document.querySelector('#modal-sns-share-box');
+            if (selectedModal.classList.contains("hidden-modal")) {
+                selectedModal.classList.remove("hidden-modal");
+                selectedModal.classList.add("show-modal");
+            } else {
+                selectedModal.classList.remove("show-modal");
+                selectedModal.classList.add("hidden-modal");
+            }
         }
     </script>
 </th>
