@@ -84,9 +84,12 @@
 
 /* 모달 */
 .modal-sns-share-box{
-    width:300px;
-    height:500px;
-    background: red;
+    width:450px;
+    height:200px;
+    padding:25px 30px;
+    background: white;
+    border:1px solid #696969;
+    border-radius: 15px;
     top:50%;
     left:50%;
     position: fixed;
@@ -98,4 +101,29 @@
 }
 .show-modal{
     display: block;
+}
+
+.modal-sns-header{
+    display: flex;
+}
+.modal-sns-title{
+    margin-right:auto;
+}
+.modal-sns-btns-box{
+    display: flex;
+    height: 80%;
+    gap:15%;
+    justify-content: center;
+    align-items: center;
+    background: pink;
+}
+.modal-sns-share-btn {
+    width:30%;
+    height:100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #3dd5f3;
+    gap:5%;
 }
