@@ -85,7 +85,7 @@
 /* 모달 */
 .modal-sns-share-box{
     width:450px;
-    height:200px;
+    height:260px;
     padding:25px 30px;
     background: white;
     border:1px solid rgba(105, 105, 105, 0.51);
@@ -109,6 +109,13 @@
 .modal-sns-title{
     margin-right:auto;
 }
+.close-share-btn{
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    margin-top:-10px;
+}
+
 .modal-sns-btns-box{
     display: flex;
     height: 80%;
@@ -155,4 +162,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.etc-btn:hover{
+    background: #575757;
+    color:white;
+    font-weight: bold;
 }
