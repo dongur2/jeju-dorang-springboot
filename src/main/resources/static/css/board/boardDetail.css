@@ -88,7 +88,7 @@
     height:200px;
     padding:25px 30px;
     background: white;
-    border:1px solid #696969;
+    border:1px solid rgba(105, 105, 105, 0.51);
     border-radius: 15px;
     top:50%;
     left:50%;
