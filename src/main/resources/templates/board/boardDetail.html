@@ -119,7 +119,7 @@
                 <button class="etc-btn twitter-share-button" th:onclick="shareTwitter()">
                     트위터로 공유
                 </button>
-                <button class="etc-btn copy-share-button" href="#">
+                <button class="etc-btn copy-share-button" th:onclick="shareCopiedLink()">
                     링크 복사
                 </button>
             </div>
@@ -163,7 +163,6 @@
                 webUrl: document.URL
             },
         });
-
         function shareTwitter() {
             const twitterIntent = 'https://twitter.com/intent/tweet?url=' + document.URL;
             window.open(twitterIntent, '_blank');
@@ -172,6 +171,21 @@
             const facebookIntent = 'http://www.facebook.com/sharer/sharer.php?u=' + document.URL;
             window.open(facebookIntent, '_blank');
         }
+        // 링크 복사
+        function shareCopiedLink() {
+            const url = window.location.href; // 현재 URL
+
+            const copiedLink = async () => { // 비동기 함수: URL을 클립보드에 쓰기 위해 기다리는 Promise를 반환
+                await navigator.clipboard.writeText(url);
+            };
+
+            copiedLink().then(() => { // Promise 성공적인 반환 후 실행
+                alert("링크 복사 완료");
+            }).catch((error) => {
+                console.error('복사 실패:', error);
+            });
+        }
+
     </script>
 </th>
 </html>
