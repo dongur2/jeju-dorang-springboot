@@ -11,7 +11,6 @@
 
         // 카카오톡 공유 텍스트 설정 - 글 제목
         let nowPostTitleForShare = [[${post.title}]];
-        let nowPostId = [[${post.id}]];
     </script>
     <title>여행</title>
 </head>
@@ -150,8 +149,8 @@
                 nowPostTitleForShare,
             link: {
                 // [내 애플리케이션] > [플랫폼] 에서 등록한 사이트 도메인과 일치해야 함
-                mobileWebUrl: 'localhost:8080/board/detail/' + nowPostId,
-                webUrl: 'localhost:8080/board/detail/' + nowPostId,
+                mobileWebUrl: document.URL,
+                webUrl: document.URL
             },
         });
     </script>
