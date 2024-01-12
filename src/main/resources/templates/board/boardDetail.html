@@ -8,6 +8,10 @@
             integrity="sha384-6MFdIr0zOira1CHQkedUqJVql0YtcZA1P0nbPrQYJXVJZUkTk/oX4U9GhUIs3/z8" crossorigin="anonymous"></script>
     <script th:inline="javascript">
         Kakao.init([[${kakaoApiKey}]]); // 사용하려는 앱의 JavaScript 키 입력
+
+        // 카카오톡 공유 텍스트 설정 - 글 제목
+        let nowPostTitleForShare = [[${post.title}]];
+        let nowPostId = [[${post.id}]];
     </script>
     <title>여행</title>
 </head>
@@ -17,7 +21,7 @@
         <!-- 헤더: 제목, 작성자(닉네임), 작성/수정날짜, 조회수   -->
         <div class="board-post-info">
             <div class="board-header">
-                <h1 th:text="${post.getTitle()}"></h1>
+                <h1 th:text="${post.getTitle()}" id="board-post-title"></h1>
             </div>
             <div class="board-sub-header">
                 <div class="board-sub-title">
@@ -137,16 +141,17 @@
             }
         }
 
+
         // 카카오공유 버튼
         Kakao.Share.createDefaultButton({
             container: '#kakaotalk-sharing-btn',
             objectType: 'text',
             text:
-                '기본 템플릿으로 제공되는 텍스트 템플릿은 텍스트를 최대 200자까지 표시할 수 있습니다. 텍스트 템플릿은 텍스트 영역과 하나의 기본 버튼을 가집니다. 임의의 버튼을 설정할 수도 있습니다. 여러 장의 이미지, 프로필 정보 등 보다 확장된 형태의 카카오톡 공유는 다른 템플릿을 이용해 보낼 수 있습니다.',
+                nowPostTitleForShare,
             link: {
                 // [내 애플리케이션] > [플랫폼] 에서 등록한 사이트 도메인과 일치해야 함
-                mobileWebUrl: 'https://developers.kakao.com',
-                webUrl: 'https://developers.kakao.com',
+                mobileWebUrl: 'localhost:8080/board/detail/' + nowPostId,
+                webUrl: 'localhost:8080/board/detail/' + nowPostId,
             },
         });
     </script>
