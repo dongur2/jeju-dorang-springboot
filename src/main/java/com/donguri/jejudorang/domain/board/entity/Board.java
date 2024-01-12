@@ -34,6 +34,7 @@ public class Board {
     private String tags;
 
     private int viewCount;
+    private int likedCount;
 
     @CreatedDate
     @Column(updatable = false)

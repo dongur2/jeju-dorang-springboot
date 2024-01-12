@@ -6,6 +6,7 @@ import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,12 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
+    @Value("${kakao-api-key}")
+    private String kakaoApiKey;
+
     @GetMapping("/list/{nowPage}")
     public String boardHome(@PathVariable("nowPage") Integer nowPage, Model model) {
+
         List<Board> allPosts = boardService.getAllPosts();
         model.addAttribute("posts", allPosts);
         return "/board/boardList";
@@ -42,6 +47,7 @@ public class BoardController {
     public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {
         Board foundPost = boardService.getPost(boardId);
         model.addAttribute("post", foundPost);
+        model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/board/boardDetail";
     }
 
