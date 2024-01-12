@@ -102,17 +102,27 @@
     <div class="modal-sns-share-box hidden-modal" id="modal-sns-share-box">
         <div class="modal-sns-header">
             <h4 class="modal-sns-title">글 공유하기</h4>
-            <button class="modal-sns-share-btn close-share-btn" th:onclick="openSnsModal()">닫기</button>
+            <button class="modal-sns-share-btn close-share-btn" th:onclick="openSnsModal()">X</button>
         </div>
         <div class="modal-sns-btns-box">
-            <div class="modal-sns-share-btn kakao-share-btn">
+            <div class="modal-sns-share-btn-kakao kakao-share-btn">
                 <a id="kakaotalk-sharing-btn" href="javascript:;">
                     <img src="https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png"
                          alt="카카오톡 공유 보내기 버튼" />
                 </a>
-                <div class="kakao-btn-txt">카카오톡으로 공유</div>
             </div>
-            <button class="modal-sns-share-btn copy-link-share-btn">링크 복사</button>
+
+            <div class="modal-sns-share-btn etc-btns">
+                <button class="etc-btn facebook-share-button" th:onclick="shareFacebook()">
+                    페이스북으로 공유
+                </button>
+                <button class="etc-btn twitter-share-button" th:onclick="shareTwitter()">
+                    트위터로 공유
+                </button>
+                <button class="etc-btn copy-share-button" href="#">
+                    링크 복사
+                </button>
+            </div>
         </div>
     </div>
 
@@ -153,6 +163,15 @@
                 webUrl: document.URL
             },
         });
+
+        function shareTwitter() {
+            const twitterIntent = 'https://twitter.com/intent/tweet?url=' + document.URL;
+            window.open(twitterIntent, '_blank');
+        }
+        function shareFacebook() {
+            const facebookIntent = 'http://www.facebook.com/sharer/sharer.php?u=' + document.URL;
+            window.open(facebookIntent, '_blank');
+        }
     </script>
 </th>
 </html>

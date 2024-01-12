@@ -115,15 +115,44 @@
     gap:15%;
     justify-content: center;
     align-items: center;
-    background: pink;
 }
-.modal-sns-share-btn {
+.modal-sns-share-btn-kakao {
     width:30%;
     height:100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #3dd5f3;
+    gap:3%;
+}
+
+
+.etc-btns{
+    width:60%;
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     gap:5%;
+}
+
+.modal-sns-share-btn-etc {
+    width:100%;
+    height:30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #575757;
+    border-radius: 15px;
+}
+.etc-btn {
+    height:30px;
+    width: 100%;
+    border:1px solid #575757;
+    background: white;
+    border-radius: 15px;
+    font-size:0.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
