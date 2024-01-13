@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.board.service;
 
 import com.donguri.jejudorang.domain.board.dto.request.BoardUpdateRequestDto;
 import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
+import com.donguri.jejudorang.domain.board.dto.response.BoardDetailResponseDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.repository.BoardRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,21 @@ public class BoardServiceI implements BoardService{
 
     @Override
     @Transactional
-    public Board getPost(Long id) {
+    public BoardDetailResponseDto getPost(Long id) {
         Board found = boardRepository.findById(id).get();
         found.upViewCount();
-        return found;
+
+        return BoardDetailResponseDto.builder()
+                .id(found.getId())
+                .type(found.getType())
+                .joining(found.getJoining())
+                .title(found.getTitle())
+                .createdAt(found.getCreatedAt())
+                .updatedAt(found.getUpdatedAt())
+                .viewCount(found.getViewCount())
+                .content(found.getContent())
+                .tags(found.getTags())
+                .build();
     }
 
     @Override

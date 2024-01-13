@@ -51,7 +51,7 @@
 
             <div class="board-content-sub-body">
                 <ul class="sub-body-tags">
-                    <li class="sub-body-tag" th:text="${post.tags}">태그1</li>
+                    <li class="sub-body-tag" th:each="tag : ${post.tags}" th:text="${tag}">태그1</li>
                 </ul>
             </div>
 
