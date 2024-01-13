@@ -9,6 +9,10 @@
 <head>
     <!-- Editor's Style -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <!--  tagify  -->
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css"/>
+
     <title>커뮤니티 작성폼</title>
     <style>
         #contents {
@@ -16,6 +20,14 @@
             height: 100px;
             margin: 30px auto;
             border: 1px solid;
+        }
+        .tagify+input{
+            display: block !important;
+            position: static !important;
+            transform: none !important;
+            width: 90%;
+            margin-top: 1em;
+            padding: .5em;
         }
     </style>
 </head>
@@ -40,7 +52,7 @@
                 </div>
                 <div class="board-form-input-box">
                     <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요">
-                    <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력하세요">
+                    <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력해보세요">
                 </div>
             </div>
 
@@ -117,6 +129,19 @@
             document.getElementById("board-form-content").setAttribute("value", formContent);
             document.getElementById("board-write-form").submit();
         }
+
+        // tagify
+        var input = document.querySelector('#board-form-tags')
+        var tagify = new Tagify(input, { // tagify 라이브러리를 사용해 #board-form-tags 초기화
+            dropdown: { // dropdown 속성 -> 드롭다운 비활성화
+                enabled: 0
+            },
+            whitelist: ["a", "aa", "b", "bb", "ccc"] // whitelist: 허용 태그 미리 정의
+        })
+
+        // tagify.on('change', console.log) // tagify 인스턴스의 change이벤트에 대한 리스너 등록: 사용자가 태그 변경할 때마다 콘솔에 출력
+
+        // tagify.addTags(["a", "b"]) // 초기 태그 추가: whitelist에 a,b가 있으므로 허용됨
 
     </script>
 
