@@ -22,14 +22,14 @@
             border: 1px solid;
         }
         /* 인풋 아래로 들어오는 tagify 인스턴스 */
-        .tagify+input{
-            display: block !important;
-            position: static !important;
-            transform: none !important;
-            width: 90%;
-            margin-top: 1em;
-            padding: .5em;
-        }
+        /*.tagify+input{*/
+        /*    display: block !important;*/
+        /*    position: static !important;*/
+        /*    transform: none !important;*/
+        /*    width: 90%;*/
+        /*    margin-top: 1em;*/
+        /*    padding: .5em;*/
+        /*}*/
     </style>
 </head>
 
@@ -142,11 +142,6 @@
                 duplicate: "Duplicates are not allowed"
             },
         })
-
-        // tagify.on('change', console.log) // tagify 인스턴스의 change이벤트에 대한 리스너 등록: 사용자가 태그 변경할 때마다 콘솔에 출력
-
-        // tagify.addTags(["a", "b"]) // 초기 태그 추가: whitelist에 a,b가 있으므로 허용됨
-
     </script>
 
 

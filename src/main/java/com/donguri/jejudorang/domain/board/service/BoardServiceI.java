@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -33,9 +34,12 @@ public class BoardServiceI implements BoardService{
     @Override
     @Transactional
     public Board savePost(BoardWriteRequestDto post) {
+        List<String> splitTagStringToWrite = Arrays.stream(post.getTags().split(","))
+                .toList();
+
         Board newPost = Board.builder()
                 .title(post.getTitle())
-                .tags(post.getTags())
+                .tags(splitTagStringToWrite)
                 .content(post.getContent())
                 .build();
         newPost.setBoardType(post.getType());
@@ -46,10 +50,13 @@ public class BoardServiceI implements BoardService{
     @Override
     @Transactional
     public void updatePost(Long id, BoardUpdateRequestDto post) {
+        List<String> splitTagStringToUpdate = Arrays.stream(post.getTags().split(","))
+                .toList();
+
         Board update = Board.builder()
                 .id(id)
                 .title(post.getTitle())
-                .tags(post.getTags())
+                .tags(splitTagStringToUpdate)
                 .content(post.getContent())
                 .build();
         update.setBoardType(post.getType());
