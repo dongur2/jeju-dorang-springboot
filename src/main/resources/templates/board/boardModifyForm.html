@@ -46,7 +46,7 @@
                     <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요"
                     th:placeholder="${post.getTitle()}" th:value="${post.getTitle()}">
                     <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력해보세요"
-                    th:placeholder="${post.getTags()}" th:value="${post.getTags()}">
+                           th:value="${#strings.toString(post.tags).replace('[', '').replace(']', '')}">
                 </div>
             </div>
 
