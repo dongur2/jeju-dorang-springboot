@@ -137,7 +137,7 @@
             dropdown: { // dropdown 속성 -> 드롭다운 비활성화
                 enabled: 0
             },
-            whitelist: ["a", "aa", "b", "bb", "ccc"] // whitelist: 허용 태그 미리 정의
+            originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
         })
 
         // tagify.on('change', console.log) // tagify 인스턴스의 change이벤트에 대한 리스너 등록: 사용자가 태그 변경할 때마다 콘솔에 출력
