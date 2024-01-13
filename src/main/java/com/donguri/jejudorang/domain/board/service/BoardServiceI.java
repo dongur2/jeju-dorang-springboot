@@ -35,6 +35,7 @@ public class BoardServiceI implements BoardService{
     public Board savePost(BoardWriteRequestDto post) {
         Board newPost = Board.builder()
                 .title(post.getTitle())
+                .tags(post.getTags())
                 .content(post.getContent())
                 .build();
         newPost.setBoardType(post.getType());
