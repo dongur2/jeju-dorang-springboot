@@ -9,6 +9,10 @@
 <head>
     <!-- Editor's Style -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <!--  tagify  -->
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css"/>
+
     <title>커뮤니티 작성폼</title>
     <style>
         #contents {
@@ -40,7 +44,7 @@
                 </div>
                 <div class="board-form-input-box">
                     <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요">
-                    <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력하세요">
+                    <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력해보세요">
                 </div>
             </div>
 
@@ -118,6 +122,17 @@
             document.getElementById("board-write-form").submit();
         }
 
+        // tagify
+        var input = document.querySelector('#board-form-tags')
+        var tagify = new Tagify(input, { // tagify 라이브러리를 사용해 #board-form-tags 초기화
+            dropdown: { // dropdown 속성 -> 드롭다운 비활성화
+                enabled: 0
+            },
+            originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
+            texts: {
+                duplicate: "Duplicates are not allowed"
+            },
+        })
     </script>
 
 

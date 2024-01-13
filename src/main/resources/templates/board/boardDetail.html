@@ -4,15 +4,15 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{/fragments/layout}">
 <head>
+    <!-- 카카오톡 공유  -->
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js"
             integrity="sha384-6MFdIr0zOira1CHQkedUqJVql0YtcZA1P0nbPrQYJXVJZUkTk/oX4U9GhUIs3/z8" crossorigin="anonymous"></script>
     <script th:inline="javascript">
         Kakao.init([[${kakaoApiKey}]]); // 사용하려는 앱의 JavaScript 키 입력
-
         // 카카오톡 공유 텍스트 설정 - 글 제목
         let nowPostTitleForShare = [[${post.title}]];
     </script>
-    <title>여행</title>
+    <title>커뮤니티 - 상세글</title>
 </head>
 <th layout:fragment="content">
 
@@ -51,16 +51,7 @@
 
             <div class="board-content-sub-body">
                 <ul class="sub-body-tags">
-                    <li class="sub-body-tag">태그1</li>
-                    <li class="sub-body-tag">태그2</li>
-                    <li class="sub-body-tag">태그3</li>
-                    <li class="sub-body-tag">태그3</li>
-                    <li class="sub-body-tag">태그3</li>
-                    <li class="sub-body-tag">태그1</li>
-                    <li class="sub-body-tag">태그2</li>
-                    <li class="sub-body-tag">xormxormxorm</li>
-                    <li class="sub-body-tag">태그3</li>
-                    <li class="sub-body-tag">태그3</li>
+                    <li class="sub-body-tag" th:each="tag : ${post.tags}" th:text="${tag}">태그1</li>
                 </ul>
             </div>
 

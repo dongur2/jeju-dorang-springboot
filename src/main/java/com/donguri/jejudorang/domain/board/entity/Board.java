@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Entity
@@ -31,7 +32,11 @@ public class Board {
 
     private String title;
     private String content;
-    private String tags;
+
+    @ElementCollection(targetClass = String.class)
+    @CollectionTable(name = "board_tags", joinColumns = @JoinColumn(name = "board_id"))
+    @Column(name = "board_tag")
+    private List<String> tags;
 
     private int viewCount;
     private int likedCount;
@@ -43,7 +48,7 @@ public class Board {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Board(Long id, Long writer, String title, String content, String tags, int viewCount) {
+    public Board(Long id, Long writer, String title, String content, List<String> tags, int viewCount) {
         this.id = id;
         this.writer = writer;
         this.title = title;

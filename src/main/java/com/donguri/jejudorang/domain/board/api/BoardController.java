@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.board.api;
 
 import com.donguri.jejudorang.domain.board.dto.request.BoardUpdateRequestDto;
 import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
+import com.donguri.jejudorang.domain.board.dto.response.BoardDetailResponseDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class BoardController {
 
     @GetMapping("/detail/{boardId}")
     public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {
-        Board foundPost = boardService.getPost(boardId);
+        BoardDetailResponseDto foundPost = boardService.getPost(boardId);
         model.addAttribute("post", foundPost);
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/board/boardDetail";
@@ -53,7 +54,7 @@ public class BoardController {
 
     @GetMapping("/detail/{boardId}/modify")
     public String getBoardModifyForm(@PathVariable("boardId") Long boardId, Model model) {
-        Board foundPost = boardService.getPost(boardId);
+        BoardDetailResponseDto foundPost = boardService.getPost(boardId);
         model.addAttribute("post", foundPost);
         return "/board/boardModifyForm";
     }
