@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.board.entity;
 
+import com.donguri.jejudorang.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -7,7 +8,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -39,7 +42,11 @@ public class Board {
     private List<String> tags;
 
     private int viewCount;
-    private int likedCount;
+
+    @OneToMany(mappedBy = "board" // 게시글(Board) 1 : 여러 사용자에 의한 좋아요(Liked)
+            , cascade = CascadeType.ALL // Board 엔티티에 대한 변경이 Liked 엔티티에 전파
+            , orphanRemoval = true) //  Board 엔티티에서 제거된 Liked 엔티티가 자동으로 삭제
+    private Set<Liked> liked = new HashSet<>();
 
     @CreatedDate
     @Column(updatable = false)
