@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface BoardService {
-    Map<String, Object> getAllPosts(Pageable pageable);
+    Map<String, Object> getAllPosts(Pageable pageable, String boardType);
 
     BoardDetailResponseDto getPost(Long id);
 

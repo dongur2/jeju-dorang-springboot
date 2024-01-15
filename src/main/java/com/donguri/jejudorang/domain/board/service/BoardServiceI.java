@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
 import com.donguri.jejudorang.domain.board.dto.response.BoardDetailResponseDto;
 import com.donguri.jejudorang.domain.board.dto.response.BoardListResponseDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
+import com.donguri.jejudorang.domain.board.entity.BoardType;
 import com.donguri.jejudorang.domain.board.repository.BoardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,18 @@ public class BoardServiceI implements BoardService{
     private BoardRepository boardRepository;
 
     @Override
-    public Map<String, Object> getAllPosts(Pageable pageable) {
+    public Map<String, Object> getAllPosts(Pageable pageable, String boardType) {
         Map<String, Object> returnMap = new HashMap<>();
 
-        Integer allBoardPageCount = boardRepository.findAll().size()/5;
-        Page<Board> boardEntityList = boardRepository.findAll(pageable);
+        BoardType findType;
+        if (boardType.equals("party")) {
+            findType = BoardType.PARTY;
+        } else {
+            findType = BoardType.CHAT;
+        }
+
+        Integer allBoardPageCount = boardRepository.findAllByType(findType, pageable).getTotalPages()/5;
+        Page<Board> boardEntityList = boardRepository.findAllByType(findType, pageable);
         Page<BoardListResponseDto> boardDtoList =
                 boardEntityList.map(board -> BoardListResponseDto.builder()
                         .id(board.getId())

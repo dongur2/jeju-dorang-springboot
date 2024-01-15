@@ -32,16 +32,18 @@ public class BoardController {
     @Value("${kakao-api-key}")
     private String kakaoApiKey;
 
-    @GetMapping("/list/{criteria}/{nowPage}")
-    public String boardHome(@PathVariable("nowPage") Integer nowPage,
+    @GetMapping("/{boardType}/list/{criteria}/{nowPage}")
+    public String boardHome(@PathVariable("boardType") String boardType,
                             @PathVariable("criteria") String criteria,
+                            @PathVariable("nowPage") Integer nowPage,
                             Model model) {
         log.info("SORTED BY CRITERIA = {}", criteria);
         Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(criteria).descending());
-        Map<String, Object> allPostsInMap = boardService.getAllPosts(pageable);
+        Map<String, Object> allPostsInMap = boardService.getAllPosts(pageable, boardType);
 
-        model.addAttribute("postAllPageCount", allPostsInMap.get("boardCounts"));
-        model.addAttribute("posts", allPostsInMap.get("boardPage"));
+        model.addAttribute("nowPostType", boardType); // 모임 or 잡담 구분
+        model.addAttribute("postAllPageCount", allPostsInMap.get("boardCounts")); // 총 페이지 수
+        model.addAttribute("posts", allPostsInMap.get("boardPage")); // 페이지
         return "/board/boardList";
     }
 
