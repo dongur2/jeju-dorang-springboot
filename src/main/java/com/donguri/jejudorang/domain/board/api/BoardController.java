@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.board.api;
 import com.donguri.jejudorang.domain.board.dto.request.BoardUpdateRequestDto;
 import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
 import com.donguri.jejudorang.domain.board.dto.response.BoardDetailResponseDto;
+import com.donguri.jejudorang.domain.board.dto.response.BoardListResponseDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class BoardController {
     @GetMapping("/list/{nowPage}")
     public String boardHome(@PathVariable("nowPage") Integer nowPage, Model model) {
 
-        List<Board> allPosts = boardService.getAllPosts();
+        List<BoardListResponseDto> allPosts = boardService.getAllPosts();
         model.addAttribute("posts", allPosts);
         return "/board/boardList";
     }

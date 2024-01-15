@@ -3,8 +3,10 @@ package com.donguri.jejudorang.domain.board.service;
 import com.donguri.jejudorang.domain.board.dto.request.BoardUpdateRequestDto;
 import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
 import com.donguri.jejudorang.domain.board.dto.response.BoardDetailResponseDto;
+import com.donguri.jejudorang.domain.board.dto.response.BoardListResponseDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.repository.BoardRepository;
+import com.donguri.jejudorang.global.common.DateFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.donguri.jejudorang.global.common.DateFormat.calculateTime;
 
 @Service
 @Slf4j
@@ -20,8 +25,21 @@ public class BoardServiceI implements BoardService{
     private BoardRepository boardRepository;
 
     @Override
-    public List<Board> getAllPosts() {
-        return boardRepository.findAll();
+    public List<BoardListResponseDto> getAllPosts() {
+        return boardRepository.findAll().stream()
+                .map(board -> BoardListResponseDto.builder()
+                        .id(board.getId())
+                        .type(board.getType())
+                        .joining(board.getJoining())
+                        .title(board.getTitle())
+                        .createdAt(calculateTime(board.getCreatedAt()))
+                        .viewCount(board.getViewCount())
+                        .content(board.getContent())
+                        .tags(board.getTags())
+                        .likedCount(board.getLiked().size())
+                        .build()
+                )
+                .collect(Collectors.toList());
     }
 
     @Override
