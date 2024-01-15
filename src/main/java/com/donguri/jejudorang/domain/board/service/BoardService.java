@@ -17,4 +17,5 @@ public interface BoardService {
     void updatePost(Long id, BoardUpdateRequestDto post);
 
     void changePartyJoinState(Long id);
+
 }

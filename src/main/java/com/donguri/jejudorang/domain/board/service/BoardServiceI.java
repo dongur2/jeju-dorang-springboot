@@ -40,6 +40,7 @@ public class BoardServiceI implements BoardService{
                 .viewCount(found.getViewCount())
                 .content(found.getContent())
                 .tags(found.getTags())
+                .likedCount(found.getLiked().size())
                 .build();
     }
 

@@ -5,9 +5,13 @@ import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
 import com.donguri.jejudorang.domain.board.dto.response.BoardDetailResponseDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.service.BoardService;
+import com.donguri.jejudorang.domain.board.service.LikedService;
+import com.donguri.jejudorang.domain.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -65,9 +69,10 @@ public class BoardController {
         return "redirect:/board/detail/{boardId}";
     }
 
-    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/detail/{boardId}/modifyJoining")
     public void modifyBoardJoinState(@PathVariable("boardId") Long boardId) {
         boardService.changePartyJoinState(boardId);
     }
+
 }

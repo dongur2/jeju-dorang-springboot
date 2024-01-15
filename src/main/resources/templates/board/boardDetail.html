@@ -30,15 +30,19 @@
                     <div class="sub-title-box content-date">
                         <span class="sub-title sub-title-created-at">
                             <span class="sub-title-title">작성일</span>
-                            <span class="sub-title-value" th:text="${#temporals.format(post.getCreatedAt(), 'yy.MM.dd HH:mm')}">24.01.08 16:30</span>
+                            <span class="sub-title-value" th:text="${#temporals.format(post.createdAt, 'yy.MM.dd HH:mm')}">24.01.08 16:30</span>
                         </span>
                         <span class="sub-title sub-title-updated-at">
                             <span class="sub-title-title">수정일</span>
-                            <span class="sub-title-value" th:text="${#temporals.format(post.getUpdatedAt(), 'yy.MM.dd HH:mm')}">24.01.08 16:30</span>
+                            <span class="sub-title-value" th:text="${#temporals.format(post.updatedAt, 'yy.MM.dd HH:mm')}">24.01.08 16:30</span>
                         </span>
                         <span class="sub-title sub-title-view-count">
                             <span class="sub-title-title">조회수</span>
-                            <span class="sub-title-value" th:text="${post.getViewCount()}">00</span>
+                            <span class="sub-title-value" th:text="${post.viewCount}">00</span>
+                        </span>
+                        <span class="sub-title sub-title-view-count">
+                            <span class="sub-title-title">북마크수</span>
+                            <span class="sub-title-value" th:text="${post.likedCount}">00</span>
                         </span>
                     </div>
                 </div>
@@ -47,7 +51,7 @@
 
         <div class="board-post-content">
             <!--   글 내용   -->
-            <div class="board-content-body" id="viewer" th:utext="${post.getContent()}"> viewer </div>
+            <div class="board-content-body" id="viewer" th:utext="${post.content}"> viewer </div>
 
             <div class="board-content-sub-body">
                 <ul class="sub-body-tags">
@@ -57,14 +61,15 @@
 
             <!--    버튼    -->
             <div class="board-post-features">
-                <div th:if="${post.getType().name()} == 'PARTY'" class="board-post-feature board-state">
-                    <button th:if="${post.getJoining().name()} == 'FINDING'" class="feature-row board-state-btn"
+                <div th:if="${post.type.name()} == 'PARTY'" class="board-post-feature board-state">
+                    <button th:if="${post.joining.name()} == 'FINDING'" class="feature-row board-state-btn"
                             th:onclick="'changeJoinState(' + ${post.id} + ')'">모집중</button>
-                    <button th:if="${post.getJoining().name()} == 'DONE'" class="feature-row board-state-btn"
+                    <button th:if="${post.joining.name()} == 'DONE'" class="feature-row board-state-btn"
                             th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
                 </div>
                 <div class="board-post-feature board-liked">
-                    <button class="feature-row board-liked-btn">추천</button>
+                    <button class="feature-row board-liked-btn"
+                            th:onclick="'changeLikedState(' + ${post.id} + ')'">북마크</button>
                 </div>
                 <div class="board-post-feature board-share">
                     <button class="feature-row board-share-btn"
@@ -125,6 +130,22 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) { //  XMLHttpRequest 객체가 통신을 완료하여 응답이 완전히 수신되었을 때
                     window.location.href = '/board/detail/' + boardId;
+                }
+            };
+            xhr.send();
+        }
+
+        function changeLikedState(boardId) {
+            let xhr = new XMLHttpRequest();
+            xhr.open('PUT', '/board/detail/' + boardId + '/updateLiked', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 401) {
+                        alert("로그인 필요: 비회원은 북마크할 수 없음");
+                    } else {
+                        window.location.href = '/board/detail/' + boardId;
+                        alert("북마크 완료");
+                    }
                 }
             };
             xhr.send();
