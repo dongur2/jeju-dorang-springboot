@@ -8,6 +8,8 @@ import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.repository.BoardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +26,9 @@ public class BoardServiceI implements BoardService{
     private BoardRepository boardRepository;
 
     @Override
-    public List<BoardListResponseDto> getAllPosts() {
-        return boardRepository.findAll().stream()
-                .map(board -> BoardListResponseDto.builder()
+    public Page<BoardListResponseDto> getAllPosts(Pageable pageable) {
+        Page<Board> boardEntityList = boardRepository.findAll(pageable);
+        return boardEntityList.map(board -> BoardListResponseDto.builder()
                         .id(board.getId())
                         .type(board.getType())
                         .joining(board.getJoining())
@@ -36,8 +38,7 @@ public class BoardServiceI implements BoardService{
                         .tags(board.getTags())
                         .likedCount(board.getLiked().size())
                         .build()
-                )
-                .collect(Collectors.toList());
+                );
     }
 
     @Override

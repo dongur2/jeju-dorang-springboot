@@ -9,6 +9,9 @@ import com.donguri.jejudorang.domain.board.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,8 +32,9 @@ public class BoardController {
 
     @GetMapping("/list/{nowPage}")
     public String boardHome(@PathVariable("nowPage") Integer nowPage, Model model) {
+        Pageable pageable = PageRequest.of(nowPage, 5);
+        Page<BoardListResponseDto> allPosts = boardService.getAllPosts(pageable);
 
-        List<BoardListResponseDto> allPosts = boardService.getAllPosts();
         model.addAttribute("posts", allPosts);
         return "/board/boardList";
     }
