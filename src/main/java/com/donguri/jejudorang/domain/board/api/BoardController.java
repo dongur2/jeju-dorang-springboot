@@ -55,13 +55,17 @@ public class BoardController {
 
     @PostMapping("/write")
     public String writeBoard(BoardWriteRequestDto post, RedirectAttributes redirectAttributes, Model model) {
-        Board saved = boardService.savePost(post);
-        return "redirect:/board/detail/" + saved.getId();
+        boardService.savePost(post);
+
+        String boardType = post.getType().toLowerCase();
+        log.info("boardType={}", boardType);
+        return "redirect:/board/" + boardType + "/list/createdAt/0";
     }
 
     @GetMapping("/detail/{boardId}")
     public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {
         BoardDetailResponseDto foundPost = boardService.getPost(boardId);
+
         model.addAttribute("post", foundPost);
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/board/boardDetail";

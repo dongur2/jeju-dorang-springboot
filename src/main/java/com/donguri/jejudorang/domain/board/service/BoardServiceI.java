@@ -82,7 +82,7 @@ public class BoardServiceI implements BoardService{
 
     @Override
     @Transactional
-    public Board savePost(BoardWriteRequestDto post) {
+    public void savePost(BoardWriteRequestDto post) {
         // 태그 리스트
         List<String> splitTagStringToWrite;
 
@@ -102,7 +102,8 @@ public class BoardServiceI implements BoardService{
                 .build();
         newPost.setBoardType(post.getType());
         newPost.setDefaultJoinState();
-        return boardRepository.save(newPost);
+
+        boardRepository.save(newPost);
     }
 
     @Override

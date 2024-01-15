@@ -16,7 +16,7 @@ public interface BoardService {
 
     BoardDetailResponseDto getPost(Long id);
 
-    Board savePost(BoardWriteRequestDto post);
+    void savePost(BoardWriteRequestDto post);
 
     void updatePost(Long id, BoardUpdateRequestDto post);
 
