@@ -68,7 +68,8 @@
                             th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
                 </div>
                 <div class="board-post-feature board-liked">
-                    <button class="feature-row board-liked-btn">북마크</button>
+                    <button class="feature-row board-liked-btn"
+                            th:onclick="'changeLikedState(' + ${post.id} + ')'">북마크</button>
                 </div>
                 <div class="board-post-feature board-share">
                     <button class="feature-row board-share-btn"
@@ -129,6 +130,22 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) { //  XMLHttpRequest 객체가 통신을 완료하여 응답이 완전히 수신되었을 때
                     window.location.href = '/board/detail/' + boardId;
+                }
+            };
+            xhr.send();
+        }
+
+        function changeLikedState(boardId) {
+            let xhr = new XMLHttpRequest();
+            xhr.open('PUT', '/board/detail/' + boardId + '/updateLiked', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 401) {
+                        alert("로그인 필요: 비회원은 북마크할 수 없음");
+                    } else {
+                        window.location.href = '/board/detail/' + boardId;
+                        alert("북마크 완료");
+                    }
                 }
             };
             xhr.send();
