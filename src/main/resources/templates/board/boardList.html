@@ -46,13 +46,15 @@
             <div class="sort-and-write-box">
                 <ul class="nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969">최신순</a>
+                        <a class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                            th:href="@{/board/list/createdAt/0}">최신순</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" style="font-size: 18px; color: #696969">댓글많은순</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969">좋아요순</a>
+                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/board/list/liked/0}">북마크순</a>
                     </li>
                 </ul>
 

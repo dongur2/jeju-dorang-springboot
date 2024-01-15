@@ -32,9 +32,12 @@ public class BoardController {
     @Value("${kakao-api-key}")
     private String kakaoApiKey;
 
-    @GetMapping("/list/{nowPage}")
-    public String boardHome(@PathVariable("nowPage") Integer nowPage, Model model) {
-        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by("createdAt").descending());
+    @GetMapping("/list/{criteria}/{nowPage}")
+    public String boardHome(@PathVariable("nowPage") Integer nowPage,
+                            @PathVariable("criteria") String criteria,
+                            Model model) {
+        log.info("SORTED BY CRITERIA = {}", criteria);
+        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(criteria).descending());
         Map<String, Object> allPostsInMap = boardService.getAllPosts(pageable);
 
         model.addAttribute("postAllPageCount", allPostsInMap.get("boardCounts"));
