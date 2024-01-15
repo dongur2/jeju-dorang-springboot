@@ -79,17 +79,17 @@ public class Board {
 
     public void setDefaultJoinState() {
         if (type.equals(BoardType.PARTY) && joining != JoinState.DONE) {
-            joining = JoinState.FINDING;
+            joining = JoinState.RECRUITING;
         } else if (type.equals(BoardType.CHAT)) {
             joining = null;
         }
     }
 
     public void changeJoinState() {
-        if (joining == JoinState.FINDING) {
+        if (joining == JoinState.RECRUITING) {
             joining = JoinState.DONE;
         } else {
-            joining = JoinState.FINDING;
+            joining = JoinState.RECRUITING;
         }
     }
 
