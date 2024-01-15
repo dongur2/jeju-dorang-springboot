@@ -33,7 +33,6 @@ public class BoardServiceI implements BoardService{
                         .title(board.getTitle())
                         .createdAt(calculateTime(board.getCreatedAt())) // 포맷 변경
                         .viewCount(board.getViewCount())
-                        .content(board.getContent())
                         .tags(board.getTags())
                         .likedCount(board.getLiked().size())
                         .build()

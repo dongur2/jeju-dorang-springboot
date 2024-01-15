@@ -15,19 +15,17 @@ public class BoardListResponseDto {
     private final String title;
     private final String createdAt; // DateFormat으로 변경한 결과 (~초 전)
     private final int viewCount;
-    private final String content;
     private final List<String> tags;
     private final int likedCount;
 
     @Builder
-    public BoardListResponseDto(Long id, BoardType type, JoinState joining, String title, String createdAt, int viewCount, String content, List<String> tags, int likedCount) {
+    public BoardListResponseDto(Long id, BoardType type, JoinState joining, String title, String createdAt, int viewCount, List<String> tags, int likedCount) {
         this.id = id;
         this.type = type;
         this.joining = joining;
         this.title = title;
         this.createdAt = createdAt;
         this.viewCount = viewCount;
-        this.content = content;
         this.tags = tags;
         this.likedCount = likedCount;
     }
