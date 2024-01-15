@@ -2,16 +2,15 @@ package com.donguri.jejudorang.domain.user.entity;
 
 import com.donguri.jejudorang.domain.board.entity.Liked;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class User {
     @Id
     @Column(name = "user_id")
@@ -22,4 +21,20 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Liked> boardLiked;
+
+    @Builder
+    public User(String email, String nickname) {
+        this.email = email;
+        this.nickname = nickname;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", boardLiked=" + boardLiked +
+                '}';
+    }
 }
