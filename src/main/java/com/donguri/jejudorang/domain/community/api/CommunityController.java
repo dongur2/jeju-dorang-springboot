@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.community.api;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
@@ -21,7 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Map;
 
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/community")
 public class CommunityController {
     @Autowired
@@ -84,19 +85,21 @@ public class CommunityController {
         return order;
     }
 
-    @GetMapping("/write")
-    public String getBoardWriteForm() {
+
+    @GetMapping("/post/new")
+    public String getCommunityWriteForm(@RequestParam(name = "type") String type, Model model) {
+        model.addAttribute("type", type); // 미리 설정되는 글타입
         return "/board/boardForm";
     }
 
-    @PostMapping("/write")
-    public String writeBoard(CommunityWriteRequestDto post, RedirectAttributes redirectAttributes, Model model) {
-        communityService.savePost(post);
+    @PostMapping("/post/new")
+    public String postNewCommunity(CommunityWriteRequestDto post, Model model) {
+        CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(post);
 
-        String boardType = post.getType().toLowerCase();
-        log.info("boardType={}", boardType);
-        return "redirect:/board/" + boardType + "/list/createdAt/0";
+        return "redirect:/community/" + communityTypeResponseDto.getTypeForRedirect();
     }
+
+
 
     @GetMapping("/detail/{boardId}")
     public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {

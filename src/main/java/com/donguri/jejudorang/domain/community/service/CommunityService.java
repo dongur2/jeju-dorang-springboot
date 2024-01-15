@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.community.service;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Map;
@@ -14,12 +15,12 @@ public interface CommunityService {
     // getChatList
     Map<String, Object> getChatPostList(Pageable pageable);
 
+    // postNewCommunity
+    CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto post);
 
 
 
     CommunityDetailResponseDto getPost(Long id);
-
-    void savePost(CommunityWriteRequestDto post);
 
     void updatePost(Long id, CommunityUpdateRequestDto post);
 

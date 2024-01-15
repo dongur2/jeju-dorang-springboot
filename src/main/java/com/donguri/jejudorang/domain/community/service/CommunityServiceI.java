@@ -4,6 +4,7 @@ import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateReques
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.ChatListResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
@@ -130,7 +131,7 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public void savePost(CommunityWriteRequestDto post) {
+    public CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto post) {
         // 태그 리스트
         List<String> splitTagStringToWrite;
 
@@ -151,7 +152,19 @@ public class CommunityServiceI implements CommunityService {
         newPost.setBoardType(post.getType());
         newPost.setDefaultJoinState();
 
-        communityRepository.save(newPost);
+        Community saved = communityRepository.save(newPost);
+
+        // 리다이렉트할 때 넣어줄 글타입
+        String typeForDto;
+        if (saved.getType() == BoardType.PARTY) {
+            typeForDto = "parties";
+        } else  {
+            typeForDto = "chats";
+        }
+
+        return CommunityTypeResponseDto.builder()
+                .typeForRedirect(typeForDto)
+                .build();
     }
 
     @Override
