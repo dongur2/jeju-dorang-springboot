@@ -2,11 +2,9 @@ package com.donguri.jejudorang.domain.board.dto.response;
 
 import com.donguri.jejudorang.domain.board.entity.BoardType;
 import com.donguri.jejudorang.domain.board.entity.JoinState;
-import com.donguri.jejudorang.global.common.DateFormat;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -15,7 +13,7 @@ public class BoardListResponseDto {
     private final BoardType type;
     private final JoinState joining;
     private final String title;
-    private final String createdAt;
+    private final String createdAt; // DateFormat으로 변경한 결과 (~초 전)
     private final int viewCount;
     private final String content;
     private final List<String> tags;

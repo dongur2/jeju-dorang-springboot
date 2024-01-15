@@ -6,7 +6,6 @@ import com.donguri.jejudorang.domain.board.dto.response.BoardDetailResponseDto;
 import com.donguri.jejudorang.domain.board.dto.response.BoardListResponseDto;
 import com.donguri.jejudorang.domain.board.entity.Board;
 import com.donguri.jejudorang.domain.board.repository.BoardRepository;
-import com.donguri.jejudorang.global.common.DateFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,7 @@ public class BoardServiceI implements BoardService{
                         .type(board.getType())
                         .joining(board.getJoining())
                         .title(board.getTitle())
-                        .createdAt(calculateTime(board.getCreatedAt()))
+                        .createdAt(calculateTime(board.getCreatedAt())) // 포맷 변경
                         .viewCount(board.getViewCount())
                         .content(board.getContent())
                         .tags(board.getTags())
@@ -65,8 +64,17 @@ public class BoardServiceI implements BoardService{
     @Override
     @Transactional
     public Board savePost(BoardWriteRequestDto post) {
-        List<String> splitTagStringToWrite = Arrays.stream(post.getTags().split(","))
-                .toList();
+        // 태그 리스트
+        List<String> splitTagStringToWrite;
+
+        // 태그 입력란에 아무것도 입력하지 않을 경우
+        boolean isTagEmpty = post.getTags().trim().isEmpty();
+        if (isTagEmpty) {
+            splitTagStringToWrite = null;
+        } else {
+            splitTagStringToWrite = Arrays.stream(post.getTags().split(","))
+                    .toList();
+        }
 
         Board newPost = Board.builder()
                 .title(post.getTitle())
@@ -81,8 +89,15 @@ public class BoardServiceI implements BoardService{
     @Override
     @Transactional
     public void updatePost(Long id, BoardUpdateRequestDto post) {
-        List<String> splitTagStringToUpdate = Arrays.stream(post.getTags().split(","))
-                .toList();
+        List<String> splitTagStringToUpdate;
+
+        boolean isTagEmpty = post.getTags().trim().isEmpty();
+        if (isTagEmpty) {
+            splitTagStringToUpdate = null;
+        } else {
+            splitTagStringToUpdate = Arrays.stream(post.getTags().split(","))
+                    .toList();
+        }
 
         Board update = Board.builder()
                 .id(id)

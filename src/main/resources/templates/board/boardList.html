@@ -63,10 +63,17 @@
 
             <div class="board-cards-box">
 
-                <div th:each="post : ${posts}" class="card w-75 mb-3" style="min-width:100%; height:124px;">
+                <div th:each="post : ${posts}" class="card w-75 mb-3" style="min-width:100%; height:170px;">
                     <div class="card-body" style="width:100%;" th:onclick="|location.href='@{/board/detail/{boardId}(boardId=${post.id})}'|">
                         <h5 class="card-title" style="font-weight: bold;" th:text="${post.title}">Card title</h5>
                         <p class="card-text" th:text="${post.content}">With supporting text below as a natural lead-in to additional content.</p>
+
+                        <div class="card-tags" th:if="${post.tags != null}">
+                            <ul class="sub-body-tags">
+                                <li class="sub-body-tag" th:each="tag : ${post.tags}" th:text="${tag}">태그1</li>
+                            </ul>
+                        </div>
+
                         <div class="card-bottom">
                             <div class="card-text card-bottom-sub">
                                 <small>nickname</small>
