@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.donguri.jejudorang.global.common.DateFormat.calculateTime;
@@ -26,9 +28,13 @@ public class BoardServiceI implements BoardService{
     private BoardRepository boardRepository;
 
     @Override
-    public Page<BoardListResponseDto> getAllPosts(Pageable pageable) {
+    public Map<String, Object> getAllPosts(Pageable pageable) {
+        Map<String, Object> returnMap = new HashMap<>();
+
+        Integer allBoardPageCount = boardRepository.findAll().size()/5;
         Page<Board> boardEntityList = boardRepository.findAll(pageable);
-        return boardEntityList.map(board -> BoardListResponseDto.builder()
+        Page<BoardListResponseDto> boardDtoList =
+                boardEntityList.map(board -> BoardListResponseDto.builder()
                         .id(board.getId())
                         .type(board.getType())
                         .joining(board.getJoining())
@@ -39,6 +45,11 @@ public class BoardServiceI implements BoardService{
                         .likedCount(board.getLiked().size())
                         .build()
                 );
+
+        returnMap.put("boardCounts", allBoardPageCount);
+        returnMap.put("boardPage", boardDtoList);
+
+        return returnMap;
     }
 
     @Override

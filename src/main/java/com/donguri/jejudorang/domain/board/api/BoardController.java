@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -33,9 +34,10 @@ public class BoardController {
     @GetMapping("/list/{nowPage}")
     public String boardHome(@PathVariable("nowPage") Integer nowPage, Model model) {
         Pageable pageable = PageRequest.of(nowPage, 5);
-        Page<BoardListResponseDto> allPosts = boardService.getAllPosts(pageable);
+        Map<String, Object> allPostsInMap = boardService.getAllPosts(pageable);
 
-        model.addAttribute("posts", allPosts);
+        model.addAttribute("postAllPageCount", allPostsInMap.get("boardCounts"));
+        model.addAttribute("posts", allPostsInMap.get("boardPage"));
         return "/board/boardList";
     }
 
