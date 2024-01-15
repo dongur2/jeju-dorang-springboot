@@ -39,7 +39,7 @@ public class BoardServiceI implements BoardService{
             findType = BoardType.CHAT;
         }
 
-        Integer allBoardPageCount = boardRepository.findAllByType(findType, pageable).getTotalPages()/5;
+        Integer allBoardPageCount = boardRepository.findAllByType(findType, pageable).getTotalPages();
         Page<Board> boardEntityList = boardRepository.findAllByType(findType, pageable);
         Page<BoardListResponseDto> boardDtoList =
                 boardEntityList.map(board -> BoardListResponseDto.builder()

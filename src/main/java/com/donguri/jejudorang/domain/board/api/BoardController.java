@@ -42,6 +42,7 @@ public class BoardController {
         Map<String, Object> allPostsInMap = boardService.getAllPosts(pageable, boardType);
 
         model.addAttribute("nowPostType", boardType); // 모임 or 잡담 구분
+        model.addAttribute("nowPostSortCriteria", criteria); // 정렬 기준
         model.addAttribute("postAllPageCount", allPostsInMap.get("boardCounts")); // 총 페이지 수
         model.addAttribute("posts", allPostsInMap.get("boardPage")); // 페이지
         return "/board/boardList";

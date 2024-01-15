@@ -24,7 +24,7 @@
         </div>
 
         <div class="board-item board-main">
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs" th:if="${nowPostType == 'party'}">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="#" style="font-size: 20px">전체</a>
                 </li>
@@ -100,15 +100,15 @@
                 <nav aria-label="Page navigation example">
                     <ul class="pagination">
                         <li class="page-item">
-                            <a class="page-link" th:href="@{/board/list/0}" href="#" aria-label="Previous">
+                            <a class="page-link" th:href="@{/board/{boardType}/list/{criteria}/0(boardType=${nowPostType}, criteria=${nowPostSortCriteria})}" href="#" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
-                        <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/board/list/{pageNo}(pageNo=${nowPage - 1})}" href="#" th:text="${nowPage - 1}">0</a></li>
-                        <li class="page-item"><a class="page-link" th:href="@{/board/list/{pageNo}(pageNo=${nowPage})}" href="#" th:text="${nowPage}">2</a>
-                        <li class="page-item" th:if="${nowPage < postAllPageCount}"><a class="page-link" th:href="@{/board/list/{pageNo}(pageNo=${nowPage + 1})}" href="#" th:text="${nowPage + 1}">3</a></li>
+                        <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/board/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage - 1})}" href="#" th:text="${nowPage - 1}">0</a></li>
+                        <li class="page-item"><a class="page-link" th:href="@{/board/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage})}" href="#" th:text="${nowPage}">2</a>
+                        <li class="page-item" th:if="${nowPage < postAllPageCount - 1}"><a class="page-link" th:href="@{/board/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage + 1})}" href="#" th:text="${nowPage + 1}">3</a></li>
                         <li class="page-item">
-                            <a class="page-link" th:href="@{/board/list/{endPage}(endPage=${postAllPageCount})}" href="#" aria-label="Next">
+                            <a class="page-link" th:href="@{/board/{boardType}/list/{criteria}/{endPage}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},endPage=${postAllPageCount - 1})}" href="#" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
