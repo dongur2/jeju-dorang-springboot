@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CommunityRepository extends JpaRepository<Community, Long> {
 
-    // getPartyList
+    // getPartyList, getChatList
     Page<Community> findAllByType(BoardType boardType, Pageable pageable);
     Page<Community> findAllByTypeAndState(BoardType boardType, JoinState state, Pageable pageable);
 }

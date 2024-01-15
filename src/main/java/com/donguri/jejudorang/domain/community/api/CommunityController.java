@@ -37,7 +37,7 @@ public class CommunityController {
                                             @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, liked
                                             Model model) {
 
-        log.info("page={}, state={}, recent={}",nowPage,state,order);
+        log.info("page={}, state={}, order={}",nowPage,state,order);
 
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
         order = convertToProperty(order);
@@ -52,6 +52,27 @@ public class CommunityController {
         return partyListInMap;
     }
 
+    @GetMapping("/chats")
+    @ResponseBody
+    public Map<String, Object> getChatList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
+                                           @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, liked
+                                           Model model) {
+
+        log.info("page={}, order={}",nowPage,order);
+
+        // 넘어온 정렬 기준값 -> 컬럼명으로 변환
+        order = convertToProperty(order);
+        // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
+        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
+
+        Map<String, Object> chatListInMap = communityService.getChatPostList(pageable);
+
+        // 뷰로 함께 리턴
+        model.addAttribute("allChatPageCount", chatListInMap.get("allChatPageCount")); // 총 페이지 수
+        model.addAttribute("chatListDtoPage", chatListInMap.get("chatListDtoPage")); // 데이터
+        return chatListInMap;
+    }
+
     private static String convertToProperty(String order) {
         if (order.equals("recent")) {
             order = "createdAt";
@@ -61,11 +82,6 @@ public class CommunityController {
             order = "liked";
         }
         return order;
-    }
-
-    @GetMapping("/chats")
-    public void getChatList() {
-
     }
 
     @GetMapping("/write")

@@ -11,6 +11,8 @@ public interface CommunityService {
 
     // getPartyList
     Map<String, Object> getPartyPostList(Pageable pageable, String partyState);
+    // getChatList
+    Map<String, Object> getChatPostList(Pageable pageable);
 
 
 
