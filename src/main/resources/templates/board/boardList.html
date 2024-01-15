@@ -26,7 +26,8 @@
         <div class="board-item board-main">
             <ul class="nav nav-tabs" th:if="${nowPostType == 'party'}">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" style="font-size: 20px">전체</a>
+                    <a class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    th:href="@{/board/party/list/all/createdAt/0}">전체</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" style="font-size: 20px; color: #696969">모집중</a>
