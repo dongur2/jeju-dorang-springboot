@@ -4,8 +4,6 @@ import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateReques
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
-import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Map;
 
@@ -89,7 +86,7 @@ public class CommunityController {
     @GetMapping("/post/new")
     public String getCommunityWriteForm(@RequestParam(name = "type") String type, Model model) {
         model.addAttribute("type", type); // 미리 설정되는 글타입
-        return "/board/boardForm";
+        return "/community/communityPostForm";
     }
 
     @PostMapping("/post/new")
@@ -107,14 +104,14 @@ public class CommunityController {
 
         model.addAttribute("post", foundPost);
         model.addAttribute("kakaoApiKey", kakaoApiKey);
-        return "/board/boardDetail";
+        return "/community/communityDetail";
     }
 
     @GetMapping("/detail/{boardId}/modify")
     public String getBoardModifyForm(@PathVariable("boardId") Long boardId, Model model) {
         CommunityDetailResponseDto foundPost = communityService.getPost(boardId);
         model.addAttribute("post", foundPost);
-        return "/board/boardModifyForm";
+        return "/community/communityModifyForm";
     }
 
     @PutMapping("/detail/{boardId}/modify")

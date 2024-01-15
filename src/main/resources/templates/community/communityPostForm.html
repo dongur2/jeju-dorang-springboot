@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" th:href="@{/css/common.css}">
-<link rel="stylesheet" th:href="@{/css/board/boardForm.css}">
+<link rel="stylesheet" th:href="@{/css/community/communityPostForm.css}">
 <link th:href="@{/css/bootstrap.min.css}"
       href="../css/bootstrap.min.css" rel="stylesheet">
 <link th:href="@{/js/bootstrap.js}"
@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css"/>
 
-    <title>커뮤니티 수정폼</title>
+    <title>커뮤니티 작성폼</title>
     <style>
         #contents {
             width:50%;
@@ -25,41 +25,39 @@
 </head>
 
     <div class="board-write-form-whole-box">
-        <form id="board-write-form" th:action th:method="put" th:object="${boardWriteRequestDto}">
+        <form id="board-write-form" th:action method="post" th:object="${boardWriteRequestDto}">
 
             <div class="board-write-form-top">
                 <div>
                     <ul class="nav nav-tabs" style="margin-bottom: 25px" id="menuTabs">
                         <li class="nav-item">
-                            <a class="nav-link chat" aria-current="page" onclick="changeType('chat')"
+                            <a class="nav-link active" aria-current="page" onclick="changeType('chat')"
                                href="#" style="font-size:22px">커뮤니티</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link party"  onclick="changeType('party')"
+                            <a class="nav-link"  onclick="changeType('party')"
                                href="#" style="font-size:22px">동행모집</a>
                         </li>
                         <!--   글분류값 전달(default: chat)   -->
-                        <input type="hidden" id="postType" name="type" value="chat" th:value="${post.type.name()}">
+                        <input type="hidden" id="postType" name="type" value="chat">
                     </ul>
                 </div>
                 <div class="board-form-input-box">
-                    <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요"
-                    th:placeholder="${post.title}" th:value="${post.title}">
-                    <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력해보세요"
-                           th:value="${#strings.toString(post.tags).replace('[', '').replace(']', '')}">
+                    <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요">
+                    <input type="text" class="board-tags" id="board-form-tags" name="tags" placeholder="태그를 입력해보세요">
                 </div>
             </div>
 
             <!-- TOAST UI Editor -->
             <div id="content"></div>
-            <input type="hidden" id="board-form-content" name="content" value="" th:value="${post.content}">
+            <input type="hidden" id="board-form-content" name="content" value="">
 
             <div class="board-write-form-bottom">
                 <button type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
                         th:onclick="history.back()">취소</button>
                 <button type="button" class="btn btn-primary"
                         onclick="submitForm()"
-                        style="width:150px; height:50px; border-radius: 10px">수정</button>
+                        style="width:150px; height:50px; border-radius: 10px">등록</button>
             </div>
 
         </form>
@@ -69,27 +67,13 @@
     <!-- TUI 에디터 JS CDN -->
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script>
-        // 글분류 디폴트 설정 (탭 클릭 CSS 효과 설정)
-        window.addEventListener("load", function() {
-            let defaultPostType = document.getElementById('postType').value.toLowerCase();
-            let defaultTabs = document.getElementById('menuTabs');
-            let links = defaultTabs.getElementsByClassName('nav-link');
-            for (let i = 0; i < links.length; i++) {
-                if (links[i].classList.contains(defaultPostType)) {
-                    links[i].classList.add('active');
-                }
-            }
-        });
-
-        // 원래 내용
-        let defaultContent = document.getElementById('board-form-content').value;
-
         const editor = new toastui.Editor({
             el: document.querySelector('#content'),
             height: '750px',
             initialEditType: 'wysiwyg',
+            initialValue: '',
             previewStyle: 'vertical',
-            initialValue: defaultContent, // 원래 내용으로 설정
+            placeholder: '내용을 입력해 주세요',
             hooks: {
                 async addImageBlobHook(blob, callback) {
                     try {
@@ -114,7 +98,6 @@
                 }
             }
         });
-
 
 
         // 글분류 NAV 클릭 -> type value 설정
