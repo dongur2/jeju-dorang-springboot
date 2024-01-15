@@ -1,9 +1,9 @@
-package com.donguri.jejudorang.domain.board.service;
+package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.board.entity.Board;
-import com.donguri.jejudorang.domain.board.entity.Liked;
-import com.donguri.jejudorang.domain.board.repository.BoardRepository;
-import com.donguri.jejudorang.domain.board.repository.LikedRepository;
+import com.donguri.jejudorang.domain.community.entity.Community;
+import com.donguri.jejudorang.domain.community.entity.Liked;
+import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.community.repository.LikedRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ public class LikedServiceI implements LikedService{
     @Autowired
     private LikedRepository likedRepository;
     @Autowired
-    private BoardRepository boardRepository;
+    private CommunityRepository boardRepository;
     @Autowired
     private UserRepository userRepository;
 
@@ -27,7 +27,7 @@ public class LikedServiceI implements LikedService{
             log.info("추천 삭제 완료");
         } else {
             User foundUser = userRepository.findById(nowUserId).get();
-            Board foundBoard = boardRepository.findById(nowBoardId).get();
+            Community foundBoard = boardRepository.findById(nowBoardId).get();
 
             Liked LikedToUpdate = Liked.builder()
                     .user(foundUser)

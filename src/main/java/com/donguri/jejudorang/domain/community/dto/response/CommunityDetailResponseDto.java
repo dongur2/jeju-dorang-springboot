@@ -1,7 +1,7 @@
-package com.donguri.jejudorang.domain.board.dto.response;
+package com.donguri.jejudorang.domain.community.dto.response;
 
-import com.donguri.jejudorang.domain.board.entity.BoardType;
-import com.donguri.jejudorang.domain.board.entity.JoinState;
+import com.donguri.jejudorang.domain.community.entity.BoardType;
+import com.donguri.jejudorang.domain.community.entity.JoinState;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-public class BoardDetailResponseDto {
+public class CommunityDetailResponseDto {
     private final Long id;
     private final BoardType type;
     private final JoinState state;
@@ -22,7 +22,7 @@ public class BoardDetailResponseDto {
     private final int likedCount;
 
     @Builder
-    public BoardDetailResponseDto(Long id, BoardType type, JoinState state, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int likedCount) {
+    public CommunityDetailResponseDto(Long id, BoardType type, JoinState state, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int likedCount) {
         this.id = id;
         this.type = type;
         this.state = state;

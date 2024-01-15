@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.board.api;
+package com.donguri.jejudorang.domain.community.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/tui-editor")
-public class BoardImageFileController {
+public class CommunityImageFileController {
 
     @Value("${file.upload-directory}")
     private String uploadDir;

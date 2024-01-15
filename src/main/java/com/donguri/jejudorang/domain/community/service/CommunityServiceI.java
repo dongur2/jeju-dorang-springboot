@@ -1,12 +1,12 @@
-package com.donguri.jejudorang.domain.board.service;
+package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.board.dto.request.BoardUpdateRequestDto;
-import com.donguri.jejudorang.domain.board.dto.request.BoardWriteRequestDto;
-import com.donguri.jejudorang.domain.board.dto.response.BoardDetailResponseDto;
-import com.donguri.jejudorang.domain.board.dto.response.BoardListResponseDto;
-import com.donguri.jejudorang.domain.board.entity.Board;
-import com.donguri.jejudorang.domain.board.entity.BoardType;
-import com.donguri.jejudorang.domain.board.repository.BoardRepository;
+import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
+import com.donguri.jejudorang.domain.community.entity.Community;
+import com.donguri.jejudorang.domain.community.entity.BoardType;
+import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,15 +18,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.donguri.jejudorang.global.common.DateFormat.calculateTime;
 
 @Service
 @Slf4j
-public class BoardServiceI implements BoardService{
+public class CommunityServiceI implements CommunityService {
     @Autowired
-    private BoardRepository boardRepository;
+    private CommunityRepository boardRepository;
 
     @Override
     public Map<String, Object> getAllPosts(Pageable pageable, String boardType) {
@@ -40,9 +39,9 @@ public class BoardServiceI implements BoardService{
         }
 
         Integer allBoardPageCount = boardRepository.findAllByType(findType, pageable).getTotalPages();
-        Page<Board> boardEntityList = boardRepository.findAllByType(findType, pageable);
-        Page<BoardListResponseDto> boardDtoList =
-                boardEntityList.map(board -> BoardListResponseDto.builder()
+        Page<Community> boardEntityList = boardRepository.findAllByType(findType, pageable);
+        Page<CommunityListResponseDto> boardDtoList =
+                boardEntityList.map(board -> CommunityListResponseDto.builder()
                         .id(board.getId())
                         .type(board.getType())
                         .state(board.getState())
@@ -62,11 +61,11 @@ public class BoardServiceI implements BoardService{
 
     @Override
     @Transactional
-    public BoardDetailResponseDto getPost(Long id) {
-        Board found = boardRepository.findById(id).get();
+    public CommunityDetailResponseDto getPost(Long id) {
+        Community found = boardRepository.findById(id).get();
         found.upViewCount();
 
-        return BoardDetailResponseDto.builder()
+        return CommunityDetailResponseDto.builder()
                 .id(found.getId())
                 .type(found.getType())
                 .state(found.getState())
@@ -82,7 +81,7 @@ public class BoardServiceI implements BoardService{
 
     @Override
     @Transactional
-    public void savePost(BoardWriteRequestDto post) {
+    public void savePost(CommunityWriteRequestDto post) {
         // 태그 리스트
         List<String> splitTagStringToWrite;
 
@@ -95,7 +94,7 @@ public class BoardServiceI implements BoardService{
                     .toList();
         }
 
-        Board newPost = Board.builder()
+        Community newPost = Community.builder()
                 .title(post.getTitle())
                 .tags(splitTagStringToWrite)
                 .content(post.getContent())
@@ -108,7 +107,7 @@ public class BoardServiceI implements BoardService{
 
     @Override
     @Transactional
-    public void updatePost(Long id, BoardUpdateRequestDto post) {
+    public void updatePost(Long id, CommunityUpdateRequestDto post) {
         List<String> splitTagStringToUpdate;
 
         boolean isTagEmpty = post.getTags().trim().isEmpty();
@@ -119,7 +118,7 @@ public class BoardServiceI implements BoardService{
                     .toList();
         }
 
-        Board update = Board.builder()
+        Community update = Community.builder()
                 .id(id)
                 .title(post.getTitle())
                 .tags(splitTagStringToUpdate)
@@ -133,7 +132,7 @@ public class BoardServiceI implements BoardService{
     @Override
     @Transactional
     public void changePartyJoinState(Long id) {
-        Board found = boardRepository.findById(id).get();
+        Community found = boardRepository.findById(id).get();
         found.changeJoinState();
     }
 }

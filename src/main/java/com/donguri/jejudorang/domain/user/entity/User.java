@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.entity;
 
-import com.donguri.jejudorang.domain.board.entity.Liked;
+import com.donguri.jejudorang.domain.community.entity.Liked;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

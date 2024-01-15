@@ -1,7 +1,6 @@
-package com.donguri.jejudorang.domain.board.api;
+package com.donguri.jejudorang.domain.community.api;
 
-import com.donguri.jejudorang.domain.board.entity.Liked;
-import com.donguri.jejudorang.domain.board.service.LikedService;
+import com.donguri.jejudorang.domain.community.service.LikedService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,5 @@
-package com.donguri.jejudorang.domain.board.entity;
+package com.donguri.jejudorang.domain.community.entity;
 
-import com.donguri.jejudorang.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,9 +15,9 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Board {
+public class Community {
     @Id
-    @Column(name = "board_id")
+    @Column(name = "community_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,6 +26,7 @@ public class Board {
 //    private User writer;
     private Long writer;
 
+    // 글 분류 (PARTY: 모임, CHAT: 잡담)
     @Enumerated(EnumType.STRING)
     private BoardType type;
 
@@ -38,13 +38,13 @@ public class Board {
     private String content;
 
     @ElementCollection(targetClass = String.class)
-    @CollectionTable(name = "board_tags", joinColumns = @JoinColumn(name = "board_id"))
-    @Column(name = "board_tag")
+    @CollectionTable(name = "community_tags", joinColumns = @JoinColumn(name = "community_id"))
+    @Column(name = "community_tag")
     private List<String> tags;
 
     private int viewCount;
 
-    @OneToMany(mappedBy = "board" // 게시글(Board) 1 : 여러 사용자에 의한 좋아요(Liked)
+    @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 좋아요(Liked)
             , cascade = CascadeType.ALL // Board 엔티티에 대한 변경이 Liked 엔티티에 전파
             , orphanRemoval = true) //  Board 엔티티에서 제거된 Liked 엔티티가 자동으로 삭제
     private Set<Liked> liked = new HashSet<>();
@@ -56,7 +56,7 @@ public class Board {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Board(Long id, Long writer, String title, String content, List<String> tags, int viewCount) {
+    public Community(Long id, Long writer, String title, String content, List<String> tags, int viewCount) {
         this.id = id;
         this.writer = writer;
         this.title = title;
@@ -98,7 +98,7 @@ public class Board {
 
     @Override
     public String toString() {
-        return "Board{" +
+        return "Community{" +
                 "id=" + id +
                 ", writer=" + writer +
                 ", type='" + type + '\'' +

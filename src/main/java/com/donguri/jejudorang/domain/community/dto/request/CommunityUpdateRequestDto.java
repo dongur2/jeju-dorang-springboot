@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.board.dto.request;
+package com.donguri.jejudorang.domain.community.dto.request;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardUpdateRequestDto {
+public class CommunityUpdateRequestDto {
     private Long boardId;
     private String title;
     private String tags;

@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.board.service;
+package com.donguri.jejudorang.domain.community.service;
 
 
 public interface LikedService {

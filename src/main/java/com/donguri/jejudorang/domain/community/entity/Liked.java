@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.board.entity;
+package com.donguri.jejudorang.domain.community.entity;
 
 import com.donguri.jejudorang.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -21,10 +21,10 @@ public class Liked {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
-    private Board board;
+    private Community board;
 
     @Builder
-    public Liked(User user, Board board) {
+    public Liked(User user, Community board) {
         this.user = user;
         this.board = board;
     }

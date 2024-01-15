@@ -1,6 +1,6 @@
-package com.donguri.jejudorang.domain.board.repository;
+package com.donguri.jejudorang.domain.community.repository;
 
-import com.donguri.jejudorang.domain.board.entity.Liked;
+import com.donguri.jejudorang.domain.community.entity.Liked;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

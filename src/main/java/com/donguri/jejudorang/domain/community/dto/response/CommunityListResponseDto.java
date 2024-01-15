@@ -1,14 +1,14 @@
-package com.donguri.jejudorang.domain.board.dto.response;
+package com.donguri.jejudorang.domain.community.dto.response;
 
-import com.donguri.jejudorang.domain.board.entity.BoardType;
-import com.donguri.jejudorang.domain.board.entity.JoinState;
+import com.donguri.jejudorang.domain.community.entity.BoardType;
+import com.donguri.jejudorang.domain.community.entity.JoinState;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-public class BoardListResponseDto {
+public class CommunityListResponseDto {
     private final Long id;
     private final BoardType type;
     private final JoinState state;
@@ -19,7 +19,7 @@ public class BoardListResponseDto {
     private final int likedCount;
 
     @Builder
-    public BoardListResponseDto(Long id, BoardType type, JoinState state, String title, String createdAt, int viewCount, List<String> tags, int likedCount) {
+    public CommunityListResponseDto(Long id, BoardType type, JoinState state, String title, String createdAt, int viewCount, List<String> tags, int likedCount) {
         this.id = id;
         this.type = type;
         this.state = state;

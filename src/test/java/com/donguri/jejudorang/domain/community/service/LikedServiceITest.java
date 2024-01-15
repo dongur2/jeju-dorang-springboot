@@ -1,7 +1,7 @@
-package com.donguri.jejudorang.domain.board.service;
+package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.board.repository.BoardRepository;
-import com.donguri.jejudorang.domain.board.repository.LikedRepository;
+import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.community.repository.LikedRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -15,7 +15,7 @@ class LikedServiceITest {
     @Autowired
     private LikedRepository likedRepository;
     @Autowired
-    private BoardRepository boardRepository;
+    private CommunityRepository boardRepository;
     @Autowired
     private UserRepository userRepository;
 
