@@ -3,9 +3,11 @@ package com.donguri.jejudorang.domain.community.service;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.ChatListResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
+import com.donguri.jejudorang.domain.community.entity.JoinState;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,23 +27,40 @@ import static com.donguri.jejudorang.global.common.DateFormat.calculateTime;
 @Slf4j
 public class CommunityServiceI implements CommunityService {
     @Autowired
-    private CommunityRepository boardRepository;
+    private CommunityRepository communityRepository;
 
     @Override
-    public Map<String, Object> getAllPosts(Pageable pageable, String boardType) {
-        Map<String, Object> returnMap = new HashMap<>();
+    public Map<String, Object> getPartyPostList(Pageable pageable, String partyState) {
+        Map<String, Object> resultMap = new HashMap<>();
 
-        BoardType findType;
-        if (boardType.equals("party")) {
-            findType = BoardType.PARTY;
+        int allPartyPageCount;
+        Page<Community> partyEntityList;
+
+        // 모든 모임글
+        if (partyState == null) {
+            log.info("partyState={}", partyState);
+            // 전체 페이지 수
+            allPartyPageCount = communityRepository.findAllByType(BoardType.PARTY, pageable).getTotalPages();
+            // 데이터
+            partyEntityList = communityRepository.findAllByType(BoardType.PARTY, pageable);
+
+        // 모집중, 모집완료 전체 모임글
         } else {
-            findType = BoardType.CHAT;
+            // String으로 넘어온 state 변환
+            JoinState state;
+            if (partyState.equals("recruiting")) {
+                state = JoinState.RECRUITING;
+            } else {
+                state = JoinState.DONE;
+            }
+            log.info("joinstate={}", state);
+
+            allPartyPageCount = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages();
+            partyEntityList = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable);
         }
 
-        Integer allBoardPageCount = boardRepository.findAllByType(findType, pageable).getTotalPages();
-        Page<Community> boardEntityList = boardRepository.findAllByType(findType, pageable);
-        Page<CommunityListResponseDto> boardDtoList =
-                boardEntityList.map(board -> CommunityListResponseDto.builder()
+        Page<PartyListResponseDto> partyListDtoPage =
+                partyEntityList.map(board -> PartyListResponseDto.builder()
                         .id(board.getId())
                         .type(board.getType())
                         .state(board.getState())
@@ -53,16 +72,16 @@ public class CommunityServiceI implements CommunityService {
                         .build()
                 );
 
-        returnMap.put("boardCounts", allBoardPageCount);
-        returnMap.put("boardPage", boardDtoList);
+        resultMap.put("allPartyPageCount", allPartyPageCount);
+        resultMap.put("partyListDtoPage", partyListDtoPage);
 
-        return returnMap;
+        return resultMap;
     }
 
     @Override
     @Transactional
     public CommunityDetailResponseDto getPost(Long id) {
-        Community found = boardRepository.findById(id).get();
+        Community found = communityRepository.findById(id).get();
         found.upViewCount();
 
         return CommunityDetailResponseDto.builder()
@@ -102,7 +121,7 @@ public class CommunityServiceI implements CommunityService {
         newPost.setBoardType(post.getType());
         newPost.setDefaultJoinState();
 
-        boardRepository.save(newPost);
+        communityRepository.save(newPost);
     }
 
     @Override
@@ -126,13 +145,13 @@ public class CommunityServiceI implements CommunityService {
                 .build();
         update.setBoardType(post.getType());
         update.setDefaultJoinState();
-        boardRepository.save(update);
+        communityRepository.save(update);
     }
 
     @Override
     @Transactional
     public void changePartyJoinState(Long id) {
-        Community found = boardRepository.findById(id).get();
+        Community found = communityRepository.findById(id).get();
         found.changeJoinState();
     }
 }

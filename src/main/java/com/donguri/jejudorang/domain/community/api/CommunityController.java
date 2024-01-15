@@ -3,6 +3,8 @@ package com.donguri.jejudorang.domain.community.api;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
+import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,29 +21,51 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Map;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/community")
 public class CommunityController {
     @Autowired
-    private CommunityService boardService;
+    private CommunityService communityService;
 
     @Value("${kakao-api-key}")
     private String kakaoApiKey;
 
-    @GetMapping("/{boardType}/list/{criteria}/{nowPage}")
-    public String boardHome(@PathVariable("boardType") String boardType,
-                            @PathVariable("criteria") String criteria,
-                            @PathVariable("nowPage") Integer nowPage,
-                            Model model) {
-        log.info("SORTED BY CRITERIA = {}", criteria);
-        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(criteria).descending());
-        Map<String, Object> allPostsInMap = boardService.getAllPosts(pageable, boardType);
+    @GetMapping("/parties")
+    @ResponseBody
+    public Map<String, Object> getPartyList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
+                                            @RequestParam(name = "state", required = false) String state, // recruiting, done
+                                            @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, liked
+                                            Model model) {
 
-        model.addAttribute("nowPostType", boardType); // 모임 or 잡담 구분
-        model.addAttribute("nowPostSortCriteria", criteria); // 정렬 기준
-        model.addAttribute("postAllPageCount", allPostsInMap.get("boardCounts")); // 총 페이지 수
-        model.addAttribute("posts", allPostsInMap.get("boardPage")); // 페이지
-        return "/board/boardList";
+        log.info("page={}, state={}, recent={}",nowPage,state,order);
+
+        // 넘어온 정렬 기준값 -> 컬럼명으로 변환
+        order = convertToProperty(order);
+        // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
+        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
+
+        Map<String, Object> partyListInMap = communityService.getPartyPostList(pageable, state);
+
+        // 뷰로 함께 리턴
+        model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수
+        model.addAttribute("partyListDtoPage", partyListInMap.get("partyListDtoPage")); // 데이터
+        return partyListInMap;
+    }
+
+    private static String convertToProperty(String order) {
+        if (order.equals("recent")) {
+            order = "createdAt";
+        } else if (order.equals("comment")) {
+            order = "comments";
+        } else if (order.equals("liked")) {
+            order = "liked";
+        }
+        return order;
+    }
+
+    @GetMapping("/chats")
+    public void getChatList() {
+
     }
 
     @GetMapping("/write")
@@ -51,7 +75,7 @@ public class CommunityController {
 
     @PostMapping("/write")
     public String writeBoard(CommunityWriteRequestDto post, RedirectAttributes redirectAttributes, Model model) {
-        boardService.savePost(post);
+        communityService.savePost(post);
 
         String boardType = post.getType().toLowerCase();
         log.info("boardType={}", boardType);
@@ -60,7 +84,7 @@ public class CommunityController {
 
     @GetMapping("/detail/{boardId}")
     public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {
-        CommunityDetailResponseDto foundPost = boardService.getPost(boardId);
+        CommunityDetailResponseDto foundPost = communityService.getPost(boardId);
 
         model.addAttribute("post", foundPost);
         model.addAttribute("kakaoApiKey", kakaoApiKey);
@@ -69,21 +93,21 @@ public class CommunityController {
 
     @GetMapping("/detail/{boardId}/modify")
     public String getBoardModifyForm(@PathVariable("boardId") Long boardId, Model model) {
-        CommunityDetailResponseDto foundPost = boardService.getPost(boardId);
+        CommunityDetailResponseDto foundPost = communityService.getPost(boardId);
         model.addAttribute("post", foundPost);
         return "/board/boardModifyForm";
     }
 
     @PutMapping("/detail/{boardId}/modify")
     public String modifyBoard(@PathVariable("boardId") Long boardId, CommunityUpdateRequestDto post) {
-        boardService.updatePost(boardId, post);
+        communityService.updatePost(boardId, post);
         return "redirect:/board/detail/{boardId}";
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/detail/{boardId}/modifyJoining")
     public void modifyBoardJoinState(@PathVariable("boardId") Long boardId) {
-        boardService.changePartyJoinState(boardId);
+        communityService.changePartyJoinState(boardId);
     }
 
 }

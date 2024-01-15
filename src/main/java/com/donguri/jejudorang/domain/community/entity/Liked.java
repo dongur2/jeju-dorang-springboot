@@ -20,12 +20,12 @@ public class Liked {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    private Community board;
+    @JoinColumn(name = "community_id")
+    private Community community;
 
     @Builder
-    public Liked(User user, Community board) {
+    public Liked(User user, Community community) {
         this.user = user;
-        this.board = board;
+        this.community = community;
     }
 }

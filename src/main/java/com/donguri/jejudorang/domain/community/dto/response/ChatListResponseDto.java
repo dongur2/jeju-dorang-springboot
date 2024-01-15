@@ -8,10 +8,9 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class CommunityListResponseDto {
+public class ChatListResponseDto {
     private final Long id;
     private final BoardType type;
-    private final JoinState state;
     private final String title;
     private final String createdAt; // DateFormat으로 변경한 결과 (~초 전)
     private final int viewCount;
@@ -19,10 +18,9 @@ public class CommunityListResponseDto {
     private final int likedCount;
 
     @Builder
-    public CommunityListResponseDto(Long id, BoardType type, JoinState state, String title, String createdAt, int viewCount, List<String> tags, int likedCount) {
+    public ChatListResponseDto(Long id, BoardType type, String title, String createdAt, int viewCount, List<String> tags, int likedCount) {
         this.id = id;
         this.type = type;
-        this.state = state;
         this.title = title;
         this.createdAt = createdAt;
         this.viewCount = viewCount;

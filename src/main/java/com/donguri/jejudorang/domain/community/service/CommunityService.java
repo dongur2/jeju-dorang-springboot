@@ -8,7 +8,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.Map;
 
 public interface CommunityService {
-    Map<String, Object> getAllPosts(Pageable pageable, String boardType);
+
+    // getPartyList
+    Map<String, Object> getPartyPostList(Pageable pageable, String partyState);
+
+
+
 
     CommunityDetailResponseDto getPost(Long id);
 
