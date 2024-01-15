@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +34,7 @@ public class BoardController {
 
     @GetMapping("/list/{nowPage}")
     public String boardHome(@PathVariable("nowPage") Integer nowPage, Model model) {
-        Pageable pageable = PageRequest.of(nowPage, 5);
+        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by("createdAt").descending());
         Map<String, Object> allPostsInMap = boardService.getAllPosts(pageable);
 
         model.addAttribute("postAllPageCount", allPostsInMap.get("boardCounts"));
