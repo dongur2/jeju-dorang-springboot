@@ -2,7 +2,6 @@ package com.donguri.jejudorang.global.common;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class DateFormat {
     private static class TIME_MAXIMUM {
@@ -14,9 +13,9 @@ public class DateFormat {
     }
 
     public static String calculateTime(LocalDateTime dateTime) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        Duration duration = Duration.between(dateTime, currentTime);
-        long diffTime = duration.getSeconds();
+        LocalDateTime currentTime = LocalDateTime.now(); // 현재 시간
+        Duration duration = Duration.between(dateTime, currentTime); // 현재 ~ 작성일
+        long diffTime = duration.getSeconds(); // 작성 이후 흐른 초
         String msg = null;
         if (diffTime < TIME_MAXIMUM.SEC) {
             // sec
