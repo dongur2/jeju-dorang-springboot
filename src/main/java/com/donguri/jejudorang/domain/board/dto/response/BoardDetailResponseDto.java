@@ -12,7 +12,7 @@ import java.util.List;
 public class BoardDetailResponseDto {
     private final Long id;
     private final BoardType type;
-    private final JoinState joining;
+    private final JoinState state;
     private final String title;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
@@ -22,10 +22,10 @@ public class BoardDetailResponseDto {
     private final int likedCount;
 
     @Builder
-    public BoardDetailResponseDto(Long id, BoardType type, JoinState joining, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int likedCount) {
+    public BoardDetailResponseDto(Long id, BoardType type, JoinState state, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int likedCount) {
         this.id = id;
         this.type = type;
-        this.joining = joining;
+        this.state = state;
         this.title = title;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

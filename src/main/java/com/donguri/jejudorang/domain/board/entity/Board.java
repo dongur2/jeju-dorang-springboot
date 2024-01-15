@@ -30,8 +30,9 @@ public class Board {
     @Enumerated(EnumType.STRING)
     private BoardType type;
 
+    // 모임글인 경우 모집 상태 (RECRUITING: 모집중, DONE: 모집완료)
     @Enumerated(EnumType.STRING)
-    private JoinState joining;
+    private JoinState state;
 
     private String title;
     private String content;
@@ -78,18 +79,18 @@ public class Board {
     }
 
     public void setDefaultJoinState() {
-        if (type.equals(BoardType.PARTY) && joining != JoinState.DONE) {
-            joining = JoinState.RECRUITING;
+        if (type.equals(BoardType.PARTY) && state != JoinState.DONE) {
+            state = JoinState.RECRUITING;
         } else if (type.equals(BoardType.CHAT)) {
-            joining = null;
+            state = null;
         }
     }
 
     public void changeJoinState() {
-        if (joining == JoinState.RECRUITING) {
-            joining = JoinState.DONE;
+        if (state == JoinState.RECRUITING) {
+            state = JoinState.DONE;
         } else {
-            joining = JoinState.RECRUITING;
+            state = JoinState.RECRUITING;
         }
     }
 
@@ -101,7 +102,7 @@ public class Board {
                 "id=" + id +
                 ", writer=" + writer +
                 ", type='" + type + '\'' +
-                ", state='" + joining + '\'' +
+                ", state='" + state + '\'' +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", tags='" + tags + '\'' +

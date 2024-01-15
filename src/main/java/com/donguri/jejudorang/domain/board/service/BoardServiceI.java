@@ -45,7 +45,7 @@ public class BoardServiceI implements BoardService{
                 boardEntityList.map(board -> BoardListResponseDto.builder()
                         .id(board.getId())
                         .type(board.getType())
-                        .joining(board.getJoining())
+                        .state(board.getState())
                         .title(board.getTitle())
                         .createdAt(calculateTime(board.getCreatedAt())) // 포맷 변경
                         .viewCount(board.getViewCount())
@@ -69,7 +69,7 @@ public class BoardServiceI implements BoardService{
         return BoardDetailResponseDto.builder()
                 .id(found.getId())
                 .type(found.getType())
-                .joining(found.getJoining())
+                .state(found.getState())
                 .title(found.getTitle())
                 .createdAt(found.getCreatedAt())
                 .updatedAt(found.getUpdatedAt())
