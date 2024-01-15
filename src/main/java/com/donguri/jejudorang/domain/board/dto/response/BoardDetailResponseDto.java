@@ -19,9 +19,10 @@ public class BoardDetailResponseDto {
     private final int viewCount;
     private final String content;
     private final List<String> tags;
+    private final int likedCount;
 
     @Builder
-    public BoardDetailResponseDto(Long id, BoardType type, JoinState joining, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags) {
+    public BoardDetailResponseDto(Long id, BoardType type, JoinState joining, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int likedCount) {
         this.id = id;
         this.type = type;
         this.joining = joining;
@@ -31,5 +32,6 @@ public class BoardDetailResponseDto {
         this.viewCount = viewCount;
         this.content = content;
         this.tags = tags;
+        this.likedCount = likedCount;
     }
 }
