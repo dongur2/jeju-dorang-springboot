@@ -37,6 +37,7 @@ public class CommunityController {
         return order;
     }
 
+
     @GetMapping("/post/new")
     public String getCommunityWriteForm(@RequestParam(name = "type") String type, Model model) {
         model.addAttribute("type", type); // 미리 설정되는 글타입
@@ -51,24 +52,13 @@ public class CommunityController {
     }
 
 
-
-    @GetMapping("/{type}/{boardId}")
-    public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {
-        CommunityDetailResponseDto foundPost = communityService.getPost(boardId);
-
-        model.addAttribute("post", foundPost);
-        model.addAttribute("kakaoApiKey", kakaoApiKey);
-        return "/community/communityDetail";
-    }
-
-
-
-    @GetMapping("/detail/{boardId}/modify")
-    public String getBoardModifyForm(@PathVariable("boardId") Long boardId, Model model) {
-        CommunityDetailResponseDto foundPost = communityService.getPost(boardId);
-        model.addAttribute("post", foundPost);
-        return "/community/communityModifyForm";
-    }
+//
+//    @GetMapping("/detail/{boardId}/modify")
+//    public String getBoardModifyForm(@PathVariable("boardId") Long boardId, Model model) {
+//        CommunityDetailResponseDto foundPost = communityService.getPost(boardId);
+//        model.addAttribute("post", foundPost);
+//        return "/community/communityModifyForm";
+//    }
 
     @PutMapping("/detail/{boardId}/modify")
     public String modifyBoard(@PathVariable("boardId") Long boardId, CommunityUpdateRequestDto post) {

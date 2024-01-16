@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.api;
 
+import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.service.PartyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -46,6 +44,15 @@ public class PartyController {
         model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수
         model.addAttribute("partyListDtoPage", partyListInMap.get("partyListDtoPage")); // 데이터
         return partyListInMap;
+    }
+
+    @GetMapping("/{communityId}")
+    public String getPartyDetail(@PathVariable("communityId") Long communityId, Model model) {
+        PartyDetailResponseDto foundPartyPost = partyService.getPartyPost(communityId);
+
+        model.addAttribute("post", foundPartyPost);
+        model.addAttribute("kakaoApiKey", kakaoApiKey);
+        return "/community/communityDetail";
     }
 
 }

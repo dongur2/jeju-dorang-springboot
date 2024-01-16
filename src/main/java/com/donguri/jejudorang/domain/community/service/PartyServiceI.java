@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
@@ -69,5 +70,24 @@ public class PartyServiceI implements PartyService{
         resultMap.put("partyListDtoPage", partyListDtoPage);
 
         return resultMap;
+    }
+
+    @Override
+    public PartyDetailResponseDto getPartyPost(Long communityId) {
+        Community found = communityRepository.findById(communityId).get();
+        found.upViewCount();
+
+        return PartyDetailResponseDto.builder()
+                .id(found.getId())
+                .type(found.getType())
+                .state(found.getState())
+                .title(found.getTitle())
+                .createdAt(found.getCreatedAt())
+                .updatedAt(found.getUpdatedAt())
+                .viewCount(found.getViewCount())
+                .content(found.getContent())
+                .tags(found.getTags())
+                .likedCount(found.getLiked().size())
+                .build();
     }
 }

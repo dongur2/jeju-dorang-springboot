@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.community.api;
 
-import com.donguri.jejudorang.domain.community.service.ChatsService;
+import com.donguri.jejudorang.domain.community.dto.response.ChatDetailResponseDto;
+import com.donguri.jejudorang.domain.community.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,10 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -23,7 +21,7 @@ import static com.donguri.jejudorang.domain.community.api.CommunityController.co
 @RequestMapping("/community/chats")
 public class ChatController {
     @Autowired
-    private ChatsService chatsService;
+    private ChatService chatsService;
 
     @Value("${kakao-api-key}")
     private String kakaoApiKey;
@@ -45,5 +43,14 @@ public class ChatController {
         model.addAttribute("allChatPageCount", chatListInMap.get("allChatPageCount")); // 총 페이지 수
         model.addAttribute("chatListDtoPage", chatListInMap.get("chatListDtoPage")); // 데이터
         return chatListInMap;
+    }
+
+    @GetMapping("/{communityId}")
+    public String getChatDetail(@PathVariable("communityId") Long communityId, Model model) {
+        ChatDetailResponseDto foundChatPost = chatsService.getChatPost(communityId);
+
+        model.addAttribute("post", foundChatPost);
+        model.addAttribute("kakaoApiKey", kakaoApiKey);
+        return "/community/communityDetail";
     }
 }

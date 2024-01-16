@@ -14,7 +14,7 @@ public interface CommunityService {
     CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto post);
 
 
-    CommunityDetailResponseDto getPost(Long id);
+
 
     void updatePost(Long id, CommunityUpdateRequestDto post);
 

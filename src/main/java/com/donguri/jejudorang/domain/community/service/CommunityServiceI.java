@@ -23,26 +23,6 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public CommunityDetailResponseDto getPost(Long id) {
-        Community found = communityRepository.findById(id).get();
-        found.upViewCount();
-
-        return CommunityDetailResponseDto.builder()
-                .id(found.getId())
-                .type(found.getType())
-                .state(found.getState())
-                .title(found.getTitle())
-                .createdAt(found.getCreatedAt())
-                .updatedAt(found.getUpdatedAt())
-                .viewCount(found.getViewCount())
-                .content(found.getContent())
-                .tags(found.getTags())
-                .likedCount(found.getLiked().size())
-                .build();
-    }
-
-    @Override
-    @Transactional
     public CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto post) {
         // 태그 리스트
         List<String> splitTagStringToWrite;
