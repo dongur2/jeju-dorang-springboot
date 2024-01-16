@@ -25,7 +25,7 @@
 </head>
 
     <div class="board-write-form-whole-box">
-        <form id="board-write-form" th:action th:method="put" th:object="${boardWriteRequestDto}">
+        <form id="board-write-form" th:action th:method="put" th:object="${communityUpdateRequestDto}">
 
             <div class="board-write-form-top">
                 <div>
@@ -39,7 +39,7 @@
                                href="#" style="font-size:22px">동행모집</a>
                         </li>
                         <!--   글분류값 전달(default: chat)   -->
-                        <input type="hidden" id="postType" name="type" value="chat" th:value="${post.type.name()}">
+                        <input type="hidden" id="postType" name="type" value="chat" th:value="${post.type.name().toLowerCase()}">
                     </ul>
                 </div>
                 <div class="board-form-input-box">
@@ -71,7 +71,7 @@
     <script>
         // 글분류 디폴트 설정 (탭 클릭 CSS 효과 설정)
         window.addEventListener("load", function() {
-            let defaultPostType = document.getElementById('postType').value.toLowerCase();
+            let defaultPostType = document.getElementById('postType').value;
             let defaultTabs = document.getElementById('menuTabs');
             let links = defaultTabs.getElementsByClassName('nav-link');
             for (let i = 0; i < links.length; i++) {

@@ -74,6 +74,7 @@ public class PartyServiceI implements PartyService{
     }
 
     @Override
+    @Transactional
     public PartyDetailResponseDto getPartyPost(Long communityId) {
         Community foundParty = communityRepository.findById(communityId).get();
         foundParty.upViewCount();
