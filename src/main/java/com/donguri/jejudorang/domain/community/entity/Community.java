@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -48,6 +49,11 @@ public class Community {
             , cascade = CascadeType.ALL // Board 엔티티에 대한 변경이 Bookmark 엔티티에 전파
             , orphanRemoval = true) //  Board 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
     private Set<Bookmark> bookmarks = new HashSet<>();
+
+    // 페이징 정렬 위한 가상 컬럼
+    @Formula("(SELECT COUNT(*) FROM bookmark b WHERE b.community_id = community_id)")
+    private int bookmarksCount;
+
 
     @CreatedDate
     @Column(updatable = false)

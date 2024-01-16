@@ -31,7 +31,7 @@ public class CommunityController {
         } else if (order.equals("comment")) {
             order = "comments";
         } else if (order.equals("bookmark")) {
-            order = "bookmarks";
+            order = "bookmarksCount";
         }
         return order;
     }
