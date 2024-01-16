@@ -55,15 +55,15 @@ public class PartyServiceI implements PartyService{
         }
 
         Page<PartyListResponseDto> partyListDtoPage =
-                partyEntityList.map(board -> PartyListResponseDto.builder()
-                        .id(board.getId())
-                        .type(board.getType())
-                        .state(board.getState())
-                        .title(board.getTitle())
-                        .createdAt(calculateTime(board.getCreatedAt())) // 포맷 변경
-                        .viewCount(board.getViewCount())
-                        .tags(board.getTags())
-                        .likedCount(board.getLiked().size())
+                partyEntityList.map(party -> PartyListResponseDto.builder()
+                        .id(party.getId())
+                        .type(party.getType())
+                        .state(party.getState())
+                        .title(party.getTitle())
+                        .createdAt(calculateTime(party.getCreatedAt())) // 포맷 변경
+                        .viewCount(party.getViewCount())
+                        .tags(party.getTags())
+                        .bookmarkCount(party.getBookmarks().size())
                         .build()
                 );
 
@@ -75,20 +75,20 @@ public class PartyServiceI implements PartyService{
 
     @Override
     public PartyDetailResponseDto getPartyPost(Long communityId) {
-        Community found = communityRepository.findById(communityId).get();
-        found.upViewCount();
+        Community foundParty = communityRepository.findById(communityId).get();
+        foundParty.upViewCount();
 
         return PartyDetailResponseDto.builder()
-                .id(found.getId())
-                .type(found.getType())
-                .state(found.getState())
-                .title(found.getTitle())
-                .createdAt(found.getCreatedAt())
-                .updatedAt(found.getUpdatedAt())
-                .viewCount(found.getViewCount())
-                .content(found.getContent())
-                .tags(found.getTags())
-                .likedCount(found.getLiked().size())
+                .id(foundParty.getId())
+                .type(foundParty.getType())
+                .state(foundParty.getState())
+                .title(foundParty.getTitle())
+                .createdAt(foundParty.getCreatedAt())
+                .updatedAt(foundParty.getUpdatedAt())
+                .viewCount(foundParty.getViewCount())
+                .content(foundParty.getContent())
+                .tags(foundParty.getTags())
+                .bookmarkCount(foundParty.getBookmarks().size())
                 .build();
     }
 

@@ -17,10 +17,10 @@ public class ChatDetailResponseDto {
     private final int viewCount;
     private final String content;
     private final List<String> tags;
-    private final int likedCount;
+    private final int bookmarkCount;
 
     @Builder
-    public ChatDetailResponseDto(Long id, BoardType type, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int likedCount) {
+    public ChatDetailResponseDto(Long id, BoardType type, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int bookmarkCount) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -29,6 +29,6 @@ public class ChatDetailResponseDto {
         this.viewCount = viewCount;
         this.content = content;
         this.tags = tags;
-        this.likedCount = likedCount;
+        this.bookmarkCount = bookmarkCount;
     }
 }

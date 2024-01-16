@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
 
-public interface LikedService {
+public interface BookmarkService {
 //    void updateBoardLikedState(Long nowUserId, Long nowBoardId);
 }

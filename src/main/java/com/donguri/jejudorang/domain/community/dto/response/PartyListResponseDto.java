@@ -16,10 +16,10 @@ public class PartyListResponseDto {
     private final String createdAt; // DateFormat으로 변경한 결과 (~초 전)
     private final int viewCount;
     private final List<String> tags;
-    private final int likedCount;
+    private final int bookmarkCount;
 
     @Builder
-    public PartyListResponseDto(Long id, BoardType type, JoinState state, String title, String createdAt, int viewCount, List<String> tags, int likedCount) {
+    public PartyListResponseDto(Long id, BoardType type, JoinState state, String title, String createdAt, int viewCount, List<String> tags, int bookmarkCount) {
         this.id = id;
         this.type = type;
         this.state = state;
@@ -27,20 +27,7 @@ public class PartyListResponseDto {
         this.createdAt = createdAt;
         this.viewCount = viewCount;
         this.tags = tags;
-        this.likedCount = likedCount;
+        this.bookmarkCount = bookmarkCount;
     }
 
-    @Override
-    public String toString() {
-        return "PartyListResponseDto{" +
-                "id=" + id +
-                ", type=" + type +
-                ", state=" + state +
-                ", title='" + title + '\'' +
-                ", createdAt='" + createdAt + '\'' +
-                ", viewCount=" + viewCount +
-                ", tags=" + tags +
-                ", likedCount=" + likedCount +
-                '}';
-    }
 }

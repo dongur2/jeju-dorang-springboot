@@ -69,7 +69,7 @@ public class CommunityServiceI implements CommunityService {
                 .viewCount(found.getViewCount())
                 .content(found.getContent())
                 .tags(found.getTags())
-                .likedCount(found.getLiked().size())
+                .bookmarkCount(found.getBookmarks().size())
                 .build();
     }
 

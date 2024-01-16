@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.community.service;
 
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
-import com.donguri.jejudorang.domain.community.repository.LikedRepository;
+import com.donguri.jejudorang.domain.community.repository.BookmarkRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -13,14 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 class LikedServiceITest {
 
     @Autowired
-    private LikedRepository likedRepository;
+    private BookmarkRepository likedRepository;
     @Autowired
     private CommunityRepository boardRepository;
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    LikedService likedService;
+    BookmarkService likedService;
 
     @Test
     void 회원가입() {

@@ -1,18 +1,11 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.entity.Community;
-import com.donguri.jejudorang.domain.community.entity.Liked;
-import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
-import com.donguri.jejudorang.domain.community.repository.LikedRepository;
-import com.donguri.jejudorang.domain.user.entity.User;
-import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class LikedServiceI implements LikedService{
+public class BookmarkServiceI implements BookmarkService {
 //    @Autowired
 //    private LikedRepository likedRepository;
 //    @Autowired

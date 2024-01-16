@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,14 +35,14 @@ public class ChatServiceI implements ChatService {
         chatEntityList = communityRepository.findAllByType(BoardType.CHAT, pageable);
 
         Page<ChatListResponseDto> chatListDtoPage =
-                chatEntityList.map(board -> ChatListResponseDto.builder()
-                        .id(board.getId())
-                        .type(board.getType())
-                        .title(board.getTitle())
-                        .createdAt(calculateTime(board.getCreatedAt())) // 포맷 변경
-                        .viewCount(board.getViewCount())
-                        .tags(board.getTags())
-                        .likedCount(board.getLiked().size())
+                chatEntityList.map(chat -> ChatListResponseDto.builder()
+                        .id(chat.getId())
+                        .type(chat.getType())
+                        .title(chat.getTitle())
+                        .createdAt(calculateTime(chat.getCreatedAt())) // 포맷 변경
+                        .viewCount(chat.getViewCount())
+                        .tags(chat.getTags())
+                        .bookmarkCount(chat.getBookmarks().size())
                         .build()
                 );
 
@@ -55,19 +54,19 @@ public class ChatServiceI implements ChatService {
 
     @Override
     public ChatDetailResponseDto getChatPost(Long communityId) {
-        Community found = communityRepository.findById(communityId).get();
-        found.upViewCount();
+        Community foundChat = communityRepository.findById(communityId).get();
+        foundChat.upViewCount();
 
         return ChatDetailResponseDto.builder()
-                .id(found.getId())
-                .type(found.getType())
-                .title(found.getTitle())
-                .createdAt(found.getCreatedAt())
-                .updatedAt(found.getUpdatedAt())
-                .viewCount(found.getViewCount())
-                .content(found.getContent())
-                .tags(found.getTags())
-                .likedCount(found.getLiked().size())
+                .id(foundChat.getId())
+                .type(foundChat.getType())
+                .title(foundChat.getTitle())
+                .createdAt(foundChat.getCreatedAt())
+                .updatedAt(foundChat.getUpdatedAt())
+                .viewCount(foundChat.getViewCount())
+                .content(foundChat.getContent())
+                .tags(foundChat.getTags())
+                .bookmarkCount(foundChat.getBookmarks().size())
                 .build();
     }
 }

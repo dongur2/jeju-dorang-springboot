@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Liked {
+public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "liked_id")
+    @Column(name = "bookmark_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,7 +24,7 @@ public class Liked {
     private Community community;
 
     @Builder
-    public Liked(User user, Community community) {
+    public Bookmark(User user, Community community) {
         this.user = user;
         this.community = community;
     }

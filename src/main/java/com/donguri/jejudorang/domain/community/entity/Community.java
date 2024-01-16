@@ -44,10 +44,10 @@ public class Community {
 
     private int viewCount;
 
-    @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 좋아요(Liked)
-            , cascade = CascadeType.ALL // Board 엔티티에 대한 변경이 Liked 엔티티에 전파
-            , orphanRemoval = true) //  Board 엔티티에서 제거된 Liked 엔티티가 자동으로 삭제
-    private Set<Liked> liked = new HashSet<>();
+    @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 좋아요(Bookmark)
+            , cascade = CascadeType.ALL // Board 엔티티에 대한 변경이 Bookmark 엔티티에 전파
+            , orphanRemoval = true) //  Board 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
+    private Set<Bookmark> bookmarks = new HashSet<>();
 
     @CreatedDate
     @Column(updatable = false)
@@ -94,19 +94,4 @@ public class Community {
         }
     }
 
-
-
-    @Override
-    public String toString() {
-        return "Community{" +
-                "id=" + id +
-                ", writer=" + writer +
-                ", type='" + type + '\'' +
-                ", state='" + state + '\'' +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", tags='" + tags + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
-    }
 }
