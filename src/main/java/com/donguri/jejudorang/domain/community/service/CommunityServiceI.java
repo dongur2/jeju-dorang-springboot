@@ -2,8 +2,9 @@ package com.donguri.jejudorang.domain.community.service;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
@@ -47,12 +48,7 @@ public class CommunityServiceI implements CommunityService {
         Community saved = communityRepository.save(newPost);
 
         // 리다이렉트할 때 넣어줄 글타입
-        String typeForDto;
-        if (saved.getType() == BoardType.PARTY) {
-            typeForDto = "parties";
-        } else  {
-            typeForDto = "chats";
-        }
+        String typeForDto = setTypeForRedirect(saved);
 
         return CommunityTypeResponseDto.builder()
                 .typeForRedirect(typeForDto)
@@ -60,33 +56,69 @@ public class CommunityServiceI implements CommunityService {
     }
 
     @Override
-    @Transactional
-    public void updatePost(Long id, CommunityUpdateRequestDto post) {
-        List<String> splitTagStringToUpdate;
+    public CommunityForModifyResponseDto getCommunityPost(Long communityId) {
+        Community found = communityRepository.findById(communityId).get();
+        found.upViewCount();
 
-        boolean isTagEmpty = post.getTags().trim().isEmpty();
-        if (isTagEmpty) {
-            splitTagStringToUpdate = null;
-        } else {
-            splitTagStringToUpdate = Arrays.stream(post.getTags().split(","))
-                    .toList();
-        }
-
-        Community update = Community.builder()
-                .id(id)
-                .title(post.getTitle())
-                .tags(splitTagStringToUpdate)
-                .content(post.getContent())
+        return CommunityForModifyResponseDto.builder()
+                .id(found.getId())
+                .type(found.getType())
+                .state(found.getState())
+                .title(found.getTitle())
+                .createdAt(found.getCreatedAt())
+                .updatedAt(found.getUpdatedAt())
+                .viewCount(found.getViewCount())
+                .content(found.getContent())
+                .tags(found.getTags())
+                .likedCount(found.getLiked().size())
                 .build();
-        update.setBoardType(post.getType());
-        update.setDefaultJoinState();
-        communityRepository.save(update);
     }
 
     @Override
     @Transactional
-    public void changePartyJoinState(Long id) {
-        Community found = communityRepository.findById(id).get();
-        found.changeJoinState();
+    public CommunityTypeResponseDto updatePost(Long communityId, CommunityUpdateRequestDto postToUpdate) {
+        List<String> splitTagStringToUpdate;
+
+        boolean isTagEmpty = postToUpdate.getTags().trim().isEmpty();
+        if (isTagEmpty) {
+            splitTagStringToUpdate = null;
+        } else {
+            splitTagStringToUpdate = Arrays.stream(postToUpdate.getTags().split(","))
+                    .toList();
+        }
+
+        Community updated = Community.builder()
+                .id(communityId)
+                .title(postToUpdate.getTitle())
+                .tags(splitTagStringToUpdate)
+                .content(postToUpdate.getContent())
+                .build();
+        updated.setBoardType(postToUpdate.getType());
+        updated.setDefaultJoinState();
+        communityRepository.save(updated);
+
+        // 리다이렉트할 때 넣어줄 글타입
+        String typeForDto = setTypeForRedirect(updated);
+
+        return CommunityTypeResponseDto.builder()
+                .typeForRedirect(typeForDto)
+                .build();
     }
+
+    private static String setTypeForRedirect(Community resultCommunity) {
+        String typeForDto;
+        if (resultCommunity.getType() == BoardType.PARTY) {
+            typeForDto = "parties";
+        } else  {
+            typeForDto = "chats";
+        }
+        return typeForDto;
+    }
+
+//    @Override
+//    @Transactional
+//    public void changePartyJoinState(Long id) {
+//        Community found = communityRepository.findById(id).get();
+//        found.changeJoinState();
+//    }
 }

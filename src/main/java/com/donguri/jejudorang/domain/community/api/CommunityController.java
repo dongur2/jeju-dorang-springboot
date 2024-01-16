@@ -2,7 +2,7 @@ package com.donguri.jejudorang.domain.community.api;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,39 +37,50 @@ public class CommunityController {
         return order;
     }
 
-
+    /*
+    * 글 작성
+    * /community/post/new
+    * GET, POST
+    *
+    * */
     @GetMapping("/post/new")
-    public String getCommunityWriteForm(@RequestParam(name = "type") String type, Model model) {
-        model.addAttribute("type", type); // 미리 설정되는 글타입
+    public String getCommunityWriteForm(@RequestParam(name = "type") String preType, Model model) {
+        model.addAttribute("type", preType); // 미리 설정되는 글타입
         return "/community/communityPostForm";
     }
 
     @PostMapping("/post/new")
-    public String postNewCommunity(CommunityWriteRequestDto post, Model model) {
-        CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(post);
+    public String postNewCommunity(CommunityWriteRequestDto postToWrite, Model model) {
+        CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
 
         return "redirect:/community/" + communityTypeResponseDto.getTypeForRedirect();
     }
 
 
-//
-//    @GetMapping("/detail/{boardId}/modify")
-//    public String getBoardModifyForm(@PathVariable("boardId") Long boardId, Model model) {
-//        CommunityDetailResponseDto foundPost = communityService.getPost(boardId);
-//        model.addAttribute("post", foundPost);
-//        return "/community/communityModifyForm";
+    /*
+    * 글 수정
+    * /community/post/{communityId}/modify
+    * GET, PUT
+    *
+    * */
+    @GetMapping("/post/{communityId}/modify")
+    public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
+        CommunityForModifyResponseDto foundPost = communityService.getCommunityPost(communityId);
+        model.addAttribute("post", foundPost);
+        return "/community/communityModifyForm";
+    }
+
+    @PutMapping("/post/{communityId}/modify")
+    public String modifyCommunity(@PathVariable("communityId") Long communityId, CommunityUpdateRequestDto postToUpdate) {
+        CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
+        return "redirect:/community/" + redirectTypeDto.getTypeForRedirect() + "/{communityId}";
+    }
+
+
+//    @ResponseStatus(HttpStatus.OK)
+//    @PutMapping("/detail/{boardId}/modifyJoining")
+//    public void modifyBoardJoinState(@PathVariable("boardId") Long boardId) {
+//        communityService.changePartyJoinState(boardId);
 //    }
-
-    @PutMapping("/detail/{boardId}/modify")
-    public String modifyBoard(@PathVariable("boardId") Long boardId, CommunityUpdateRequestDto post) {
-        communityService.updatePost(boardId, post);
-        return "redirect:/board/detail/{boardId}";
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/detail/{boardId}/modifyJoining")
-    public void modifyBoardJoinState(@PathVariable("boardId") Long boardId) {
-        communityService.changePartyJoinState(boardId);
-    }
 
 }

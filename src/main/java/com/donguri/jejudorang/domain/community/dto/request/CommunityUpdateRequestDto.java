@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommunityUpdateRequestDto {
-    private Long boardId;
+    private Long communityId;
     private String title;
     private String tags;
     private String type;

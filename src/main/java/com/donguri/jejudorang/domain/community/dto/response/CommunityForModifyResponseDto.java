@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-public class CommunityDetailResponseDto {
+public class CommunityForModifyResponseDto {
     private final Long id;
     private final BoardType type;
     private final JoinState state;
@@ -22,7 +22,7 @@ public class CommunityDetailResponseDto {
     private final int likedCount;
 
     @Builder
-    public CommunityDetailResponseDto(Long id, BoardType type, JoinState state, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int likedCount) {
+    public CommunityForModifyResponseDto(Long id, BoardType type, JoinState state, String title, LocalDateTime createdAt, LocalDateTime updatedAt, int viewCount, String content, List<String> tags, int likedCount) {
         this.id = id;
         this.type = type;
         this.state = state;
