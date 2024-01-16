@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/fragments/layout}">
+<head>
+    <title>모임 - 제주도랑 | 커뮤니티</title>
+</head>
+
+<th layout:fragment="content">
+
+    <div class="board-whole-box">
+        <div class="board-item board-tab">
+            <ul class="nav flex-column">
+                <li class="nav-item" style="font-size: 20px;">
+                    <a class="nav-link active" aria-current="page" href="#" style="color: #696969;"
+                       th:href="@{/community/parties}">모임</a>
+                </li>
+                <li class="nav-item" style="font-size: 20px;">
+                    <a class="nav-link" href="#" style="color: #696969;"
+                       th:href="@{/community/chats}">잡담</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="board-item board-main">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    th:href="@{/community/parties}">전체</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="font-size: 20px; color: #696969"
+                    th:href="@{/community/parties(state=recruiting)}">모집중</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="font-size: 20px; color: #696969"
+                       th:href="@{/community/parties(state=done)}">모집완료</a>
+                </li>
+            </ul>
+
+            <div class="search-input-box">
+                <div class="search-input-box-sub">
+                    <input class="search-words" name="words"><button type="button" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
+                </div>
+                <div class="search-input-tag-box-sub">
+                    <input class="search-tags" placeholder="태그로 검색하세요" name="tags"><button type="button" class="btn btn-light reset-btn">초기화</button>
+                </div>
+            </div>
+
+            <div class="sort-and-write-box">
+                <ul class="nav">
+                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
+                        <a class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                        th:href="@{${currentUrl}}">최신순</a>
+                    </li>
+                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
+                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                        th:href="@{${currentUrl}(order=comment)}">댓글많은순</a>
+                    </li>
+                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
+                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                        th:href="@{${currentUrl}(order=bookmark)}">북마크순</a>
+                    </li>
+                </ul>
+
+                <a class="btn btn-primary write-btn"
+                   href="#" role="button" style="background: #696969"
+                   th:href="@{/community/post/new(type=party)}">글쓰기</a>
+            </div>
+
+            <div class="board-cards-box">
+
+                <div th:each="post : ${partyListDtoPage}" class="card w-75 mb-3" style="min-width:100%; max-height:170px;">
+                    <div class="card-body" style="width:100%;" th:onclick="|location.href='@{/community/parties/{communityId}(communityId=${post.id})}'|">
+                        <h5 class="card-title" style="font-weight: bold;" th:text="${post.title}">Card title</h5>
+
+                        <div class="card-tags">
+                            <ul class="sub-body-tags">
+                                <li class="sub-body-tag" th:each="tag : ${post.tags}" th:text="${tag}">태그</li>
+                            </ul>
+                        </div>
+
+                        <div class="card-bottom">
+                            <div class="card-text card-bottom-sub">
+                                <small>nickname</small>
+                                <small> • </small>
+                                <small th:text="${post.createdAt}">date</small>
+                            </div>
+                            <div class="card-text card-bottom-sub">
+                                <small>추천 <span th:text="${post.bookmarkCount}">0</span></small>
+                                <small>조회 <span th:text="${post.viewCount}">0</span></small>
+                                <small>댓글 0</small>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 페이지 네비게이션 블록 -->
+            <div class="board-paging">
+                <nav aria-label="Page navigation example">
+<!--                    <ul class="pagination">-->
+<!--                        <li class="page-item">-->
+<!--                            <a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/0(boardType=${nowPostType}, criteria=${nowPostSortCriteria})}" href="#" aria-label="Previous">-->
+<!--                                <span aria-hidden="true">&laquo;</span>-->
+<!--                            </a>-->
+<!--                        </li>-->
+<!--                        <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage - 1})}" href="#" th:text="${nowPage - 1}">0</a></li>-->
+<!--                        <li class="page-item"><a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage})}" href="#" th:text="${nowPage}">2</a>-->
+<!--                        <li class="page-item" th:if="${nowPage < postAllPageCount - 1}"><a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage + 1})}" href="#" th:text="${nowPage + 1}">3</a></li>-->
+<!--                        <li class="page-item">-->
+<!--                            <a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/{endPage}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},endPage=${postAllPageCount - 1})}" href="#" aria-label="Next">-->
+<!--                                <span aria-hidden="true">&raquo;</span>-->
+<!--                            </a>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+                </nav>
+            </div>
+
+        </div>
+    </div>
+
+
+</th>
+
+
+</html>

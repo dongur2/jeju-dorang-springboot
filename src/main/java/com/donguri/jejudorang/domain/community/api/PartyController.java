@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.api;
 
 import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.service.PartyService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,10 +38,9 @@ public class PartyController {
     *
     * */
     @GetMapping
-    @ResponseBody
-    public Map<String, Object> getPartyList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
+    public String getPartyList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
                                             @RequestParam(name = "state", required = false) String state, // recruiting, done
-                                            @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, liked
+                                            @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
                                             Model model) {
 
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
@@ -53,7 +53,7 @@ public class PartyController {
         // 뷰로 함께 리턴
         model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수
         model.addAttribute("partyListDtoPage", partyListInMap.get("partyListDtoPage")); // 데이터
-        return partyListInMap;
+        return "/community/communityPartyList";
     }
 
 

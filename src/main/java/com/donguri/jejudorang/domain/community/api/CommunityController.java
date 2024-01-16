@@ -30,8 +30,8 @@ public class CommunityController {
             order = "createdAt";
         } else if (order.equals("comment")) {
             order = "comments";
-        } else if (order.equals("liked")) {
-            order = "liked";
+        } else if (order.equals("bookmark")) {
+            order = "bookmarks";
         }
         return order;
     }
