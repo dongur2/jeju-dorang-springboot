@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.api;
 
-import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.domain.community.service.PartyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ import static com.donguri.jejudorang.domain.community.api.CommunityController.co
 @RequestMapping("/community/parties")
 public class PartyController {
     @Autowired
-    private CommunityService communityService;
+    private PartyService partyService;
 
     @Value("${kakao-api-key}")
     private String kakaoApiKey;
@@ -40,7 +40,7 @@ public class PartyController {
         // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
         Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
-        Map<String, Object> partyListInMap = communityService.getPartyPostList(pageable, state);
+        Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state);
 
         // 뷰로 함께 리턴
         model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수

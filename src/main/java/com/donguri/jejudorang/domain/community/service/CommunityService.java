@@ -10,14 +10,8 @@ import java.util.Map;
 
 public interface CommunityService {
 
-    // getPartyList
-    Map<String, Object> getPartyPostList(Pageable pageable, String partyState);
-    // getChatList
-    Map<String, Object> getChatPostList(Pageable pageable);
-
     // postNewCommunity
     CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto post);
-
 
 
     CommunityDetailResponseDto getPost(Long id);
