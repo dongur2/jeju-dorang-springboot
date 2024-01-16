@@ -24,10 +24,11 @@
         </div>
 
         <div class="board-item board-main">
-            <div class="search-input-box">
-                <div class="search-input-box-sub">
-                    <input class="search-words" name="words"><button type="button" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
-                </div>
+            <div class="search-input-box" th:with="currentUrl=(${@currentUrlWithoutParam.apply('search')})">
+                <form class="search-input-box-sub" th:method="get" th:action="@{${currentUrl}}">
+                    <input class="search-words" name="search">
+                    <button type="submit" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
+                </form>
                 <div class="search-input-tag-box-sub">
                     <input class="search-tags" placeholder="태그로 검색하세요" name="tags"><button type="button" class="btn btn-light reset-btn">초기화</button>
                 </div>
