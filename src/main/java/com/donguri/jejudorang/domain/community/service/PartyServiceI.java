@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,5 +90,12 @@ public class PartyServiceI implements PartyService{
                 .tags(found.getTags())
                 .likedCount(found.getLiked().size())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void changePartyJoinState(Long communityId) {
+        Community toUpdateState = communityRepository.findById(communityId).get();
+        toUpdateState.changeJoinState();
     }
 }

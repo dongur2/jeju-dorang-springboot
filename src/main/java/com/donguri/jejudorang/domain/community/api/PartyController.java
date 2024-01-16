@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,14 @@ public class PartyController {
     @Value("${kakao-api-key}")
     private String kakaoApiKey;
 
+
+    /*
+    * 모임글 목록
+    * /community/parties
+    * GET
+    * Query Parameters: page, state, order, (tag, search)
+    *
+    * */
     @GetMapping
     @ResponseBody
     public Map<String, Object> getPartyList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
@@ -46,6 +56,13 @@ public class PartyController {
         return partyListInMap;
     }
 
+
+    /*
+     * 상세글 조회
+     * /community/parties/{communityId}
+     * GET
+     *
+     * */
     @GetMapping("/{communityId}")
     public String getPartyDetail(@PathVariable("communityId") Long communityId, Model model) {
         PartyDetailResponseDto foundPartyPost = partyService.getPartyPost(communityId);
@@ -53,6 +70,21 @@ public class PartyController {
         model.addAttribute("post", foundPartyPost);
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/community/communityDetail";
+    }
+
+    /*
+    * 모집상태 변경
+    * /community/parties/{communityId}/state
+    *
+    * */
+    @PutMapping("/{communityId}/state")
+    public ResponseEntity<String> modifyBoardJoinState(@PathVariable("communityId") Long communityId) {
+        try {
+            partyService.changePartyJoinState(communityId);
+            return ResponseEntity.ok("상태 변경 완료");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred");
+        }
     }
 
 }

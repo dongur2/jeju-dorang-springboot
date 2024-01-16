@@ -8,7 +8,6 @@ import com.donguri.jejudorang.domain.community.service.CommunityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -76,11 +75,5 @@ public class CommunityController {
         return "redirect:/community/" + redirectTypeDto.getTypeForRedirect() + "/{communityId}";
     }
 
-
-//    @ResponseStatus(HttpStatus.OK)
-//    @PutMapping("/detail/{boardId}/modifyJoining")
-//    public void modifyBoardJoinState(@PathVariable("boardId") Long boardId) {
-//        communityService.changePartyJoinState(boardId);
-//    }
 
 }

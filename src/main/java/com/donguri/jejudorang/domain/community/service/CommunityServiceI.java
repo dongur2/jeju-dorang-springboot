@@ -4,7 +4,6 @@ import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateReques
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
@@ -115,10 +114,5 @@ public class CommunityServiceI implements CommunityService {
         return typeForDto;
     }
 
-//    @Override
-//    @Transactional
-//    public void changePartyJoinState(Long id) {
-//        Community found = communityRepository.findById(id).get();
-//        found.changeJoinState();
-//    }
+
 }

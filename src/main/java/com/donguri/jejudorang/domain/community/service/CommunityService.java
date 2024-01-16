@@ -17,7 +17,4 @@ public interface CommunityService {
     CommunityTypeResponseDto updatePost(Long communityId, CommunityUpdateRequestDto postToUpdate);
 
 
-//
-//    void changePartyJoinState(Long id);
-
 }
