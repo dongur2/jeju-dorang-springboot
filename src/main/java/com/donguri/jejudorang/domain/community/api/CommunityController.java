@@ -28,50 +28,9 @@ public class CommunityController {
     @Value("${kakao-api-key}")
     private String kakaoApiKey;
 
-    @GetMapping("/parties")
-    @ResponseBody
-    public Map<String, Object> getPartyList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
-                                            @RequestParam(name = "state", required = false) String state, // recruiting, done
-                                            @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, liked
-                                            Model model) {
 
-        log.info("page={}, state={}, order={}",nowPage,state,order);
-
-        // 넘어온 정렬 기준값 -> 컬럼명으로 변환
-        order = convertToProperty(order);
-        // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
-        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
-
-        Map<String, Object> partyListInMap = communityService.getPartyPostList(pageable, state);
-
-        // 뷰로 함께 리턴
-        model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수
-        model.addAttribute("partyListDtoPage", partyListInMap.get("partyListDtoPage")); // 데이터
-        return partyListInMap;
-    }
-
-    @GetMapping("/chats")
-    @ResponseBody
-    public Map<String, Object> getChatList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
-                                           @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, liked
-                                           Model model) {
-
-        log.info("page={}, order={}",nowPage,order);
-
-        // 넘어온 정렬 기준값 -> 컬럼명으로 변환
-        order = convertToProperty(order);
-        // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
-        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
-
-        Map<String, Object> chatListInMap = communityService.getChatPostList(pageable);
-
-        // 뷰로 함께 리턴
-        model.addAttribute("allChatPageCount", chatListInMap.get("allChatPageCount")); // 총 페이지 수
-        model.addAttribute("chatListDtoPage", chatListInMap.get("chatListDtoPage")); // 데이터
-        return chatListInMap;
-    }
-
-    private static String convertToProperty(String order) {
+    // default: api package 내에서만 사용 가능 - getPartyList, getCharList
+    static String convertToProperty(String order) {
         if (order.equals("recent")) {
             order = "createdAt";
         } else if (order.equals("comment")) {
@@ -81,7 +40,6 @@ public class CommunityController {
         }
         return order;
     }
-
 
     @GetMapping("/post/new")
     public String getCommunityWriteForm(@RequestParam(name = "type") String type, Model model) {
@@ -98,7 +56,7 @@ public class CommunityController {
 
 
 
-    @GetMapping("/detail/{boardId}")
+    @GetMapping("/{type}/{boardId}")
     public String boardDetail(@PathVariable("boardId") Long boardId, Model model) {
         CommunityDetailResponseDto foundPost = communityService.getPost(boardId);
 
@@ -106,6 +64,8 @@ public class CommunityController {
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/community/communityDetail";
     }
+
+
 
     @GetMapping("/detail/{boardId}/modify")
     public String getBoardModifyForm(@PathVariable("boardId") Long boardId, Model model) {
