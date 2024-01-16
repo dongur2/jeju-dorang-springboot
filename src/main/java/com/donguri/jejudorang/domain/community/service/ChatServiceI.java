@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class ChatServiceI implements ChatService {
     CommunityRepository communityRepository;
 
     @Override
+    @Transactional
     public Map<String, Object> getChatPostList(Pageable pageable) {
         Map<String, Object> resultMap = new HashMap<>();
 
@@ -53,6 +55,7 @@ public class ChatServiceI implements ChatService {
     }
 
     @Override
+    @Transactional
     public ChatDetailResponseDto getChatPost(Long communityId) {
         Community foundChat = communityRepository.findById(communityId).get();
         foundChat.upViewCount();

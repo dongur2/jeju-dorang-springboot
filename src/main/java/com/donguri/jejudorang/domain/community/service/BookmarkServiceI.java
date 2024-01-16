@@ -9,6 +9,7 @@ import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,17 +22,18 @@ public class BookmarkServiceI implements BookmarkService {
     private UserRepository userRepository;
 
     @Override
-    public void updateBoardLikedState(Long nowUserId, Long nowCommunityId) {
+    @Transactional
+    public void changeCommunityLikedState(Long nowUserId, Long nowCommunityId) {
         if(bookmarkRepository.findByUserIdAndCommunityId(nowUserId, nowCommunityId).isPresent()) {
             bookmarkRepository.delete(bookmarkRepository.findByUserIdAndCommunityId(nowUserId, nowCommunityId).get());
             log.info("추천 삭제 완료");
         } else {
             User foundUser = userRepository.findById(nowUserId).get();
-            Community foundBoard = communityRepository.findById(nowCommunityId).get();
+            Community foundCommunity = communityRepository.findById(nowCommunityId).get();
 
             Bookmark LikedToUpdate = Bookmark.builder()
                     .user(foundUser)
-                    .community(foundBoard)
+                    .community(foundCommunity)
                     .build();
 
             bookmarkRepository.save(LikedToUpdate);

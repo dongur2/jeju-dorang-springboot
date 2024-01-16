@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +36,8 @@ public class ChatController {
      *
      * */
     @GetMapping
-    @ResponseBody
-    public Map<String, Object> getChatList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
-                                           @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, liked
+    public String getChatList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
+                                           @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
                                            Model model) {
 
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
@@ -50,7 +50,7 @@ public class ChatController {
         // 뷰로 함께 리턴
         model.addAttribute("allChatPageCount", chatListInMap.get("allChatPageCount")); // 총 페이지 수
         model.addAttribute("chatListDtoPage", chatListInMap.get("chatListDtoPage")); // 데이터
-        return chatListInMap;
+        return "/community/communityChatList";
     }
 
 

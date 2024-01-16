@@ -25,6 +25,7 @@ public class PartyServiceI implements PartyService{
     CommunityRepository communityRepository;
 
     @Override
+    @Transactional
     public Map<String, Object> getPartyPostList(Pageable pageable, String partyState) {
         Map<String, Object> resultMap = new HashMap<>();
 
@@ -74,6 +75,7 @@ public class PartyServiceI implements PartyService{
     }
 
     @Override
+    @Transactional
     public PartyDetailResponseDto getPartyPost(Long communityId) {
         Community foundParty = communityRepository.findById(communityId).get();
         foundParty.upViewCount();

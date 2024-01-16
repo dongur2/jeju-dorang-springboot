@@ -8,7 +8,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration // Config 파일로 설정
 @EnableWebSecurity // WebSecurity 활성화
-public class SecurityConfiguration {
+public class SecurityConfig {
 
     @Bean // 임시 전체 경로 접근 허가
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
