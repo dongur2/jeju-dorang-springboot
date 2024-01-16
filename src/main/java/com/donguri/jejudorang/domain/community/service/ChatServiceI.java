@@ -25,16 +25,21 @@ public class ChatServiceI implements ChatService {
 
     @Override
     @Transactional
-    public Map<String, Object> getChatPostList(Pageable pageable) {
+    public Map<String, Object> getChatPostList(Pageable pageable, String searchWord) {
         Map<String, Object> resultMap = new HashMap<>();
 
         int allChatPageCount;
         Page<Community> chatEntityList;
 
-        // 전체 페이지 수
-        allChatPageCount = communityRepository.findAllByType(BoardType.CHAT, pageable).getTotalPages();
-        // 데이터
-        chatEntityList = communityRepository.findAllByType(BoardType.CHAT, pageable);
+        if (searchWord == null) {
+            // 전체 페이지 수
+            allChatPageCount = communityRepository.findAllByType(BoardType.CHAT, pageable).getTotalPages();
+            // 데이터
+            chatEntityList = communityRepository.findAllByType(BoardType.CHAT, pageable);
+        } else {
+            allChatPageCount = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable).getTotalPages();
+            chatEntityList = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable);
+        }
 
         Page<ChatListResponseDto> chatListDtoPage =
                 chatEntityList.map(chat -> ChatListResponseDto.builder()
