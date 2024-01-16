@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.entity;
 
-import com.donguri.jejudorang.domain.board.entity.Liked;
+import com.donguri.jejudorang.domain.community.entity.Bookmark;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class User {
     private String nickname;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Liked> boardLiked;
+    private Set<Bookmark> boardLiked;
 
     @Builder
     public User(String email, String nickname) {
