@@ -55,6 +55,7 @@ public class CommunityServiceI implements CommunityService {
     }
 
     @Override
+    @Transactional
     public CommunityForModifyResponseDto getCommunityPost(Long communityId) {
         Community found = communityRepository.findById(communityId).get();
         found.upViewCount();

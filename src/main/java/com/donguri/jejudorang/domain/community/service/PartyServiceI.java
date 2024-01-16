@@ -25,6 +25,7 @@ public class PartyServiceI implements PartyService{
     CommunityRepository communityRepository;
 
     @Override
+    @Transactional
     public Map<String, Object> getPartyPostList(Pageable pageable, String partyState) {
         Map<String, Object> resultMap = new HashMap<>();
 

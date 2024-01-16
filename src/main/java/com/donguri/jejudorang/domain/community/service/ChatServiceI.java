@@ -24,6 +24,7 @@ public class ChatServiceI implements ChatService {
     CommunityRepository communityRepository;
 
     @Override
+    @Transactional
     public Map<String, Object> getChatPostList(Pageable pageable) {
         Map<String, Object> resultMap = new HashMap<>();
 
