@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.community.dto.response.ChatListResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -61,7 +63,11 @@ public class PartyServiceI implements PartyService{
             }
         }
 
-        Page<PartyListResponseDto> partyListDtoPage = partyEntityList.map(PartyListResponseDto::from);
+        Page<PartyListResponseDto> partyListDtoPage = partyEntityList.map(
+                party -> PartyListResponseDto.from(party, party.getTags().stream().map(
+                                tag -> tag.getTag().getKeyword())
+                        .toList())
+        );
 
         resultMap.put("allPartyPageCount", allPartyPageCount);
         resultMap.put("partyListDtoPage", partyListDtoPage);
@@ -85,7 +91,14 @@ public class PartyServiceI implements PartyService{
         Community foundParty = communityRepository.findById(communityId).get();
         foundParty.upViewCount();
 
-        return PartyDetailResponseDto.from(foundParty);
+        List<String> tagsToStringList = null;
+        if (foundParty.getTags() != null) {
+            tagsToStringList = foundParty.getTags().stream().map(
+                            communityWithTag -> communityWithTag.getTag().getKeyword())
+                    .toList();
+        }
+
+        return PartyDetailResponseDto.from(foundParty, tagsToStringList);
     }
 
     @Override

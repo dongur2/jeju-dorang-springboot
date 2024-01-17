@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.api.bookmark;
 
-import com.donguri.jejudorang.domain.community.service.BookmarkService;
+import com.donguri.jejudorang.domain.community.service.bookmark.BookmarkService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

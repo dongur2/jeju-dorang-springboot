@@ -17,7 +17,7 @@ public record PartyListResponseDto (
     List<String> tags,
     int bookmarkCount
 ) {
-    public static PartyListResponseDto from(Community community) {
+    public static PartyListResponseDto from(Community community, List<String> tagList) {
         return new PartyListResponseDto(
                 community.getId(),
                 community.getType(),
@@ -25,7 +25,7 @@ public record PartyListResponseDto (
                 community.getTitle(),
                 DateFormat.calculateTime(community.getCreatedAt()),
                 community.getViewCount(),
-                community.getTags(),
+                tagList,
                 community.getBookmarksCount()
         );
     }

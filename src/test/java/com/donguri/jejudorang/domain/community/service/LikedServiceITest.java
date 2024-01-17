@@ -1,7 +1,8 @@
 package com.donguri.jejudorang.domain.community.service;
 
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
-import com.donguri.jejudorang.domain.community.repository.BookmarkRepository;
+import com.donguri.jejudorang.domain.community.repository.bookmark.BookmarkRepository;
+import com.donguri.jejudorang.domain.community.service.bookmark.BookmarkService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;

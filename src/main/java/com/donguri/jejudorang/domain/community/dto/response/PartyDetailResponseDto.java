@@ -19,7 +19,7 @@ public record PartyDetailResponseDto (
     List<String> tags,
     int bookmarkCount
 ) {
-    public static PartyDetailResponseDto from(Community community) {
+    public static PartyDetailResponseDto from(Community community, List<String> tagList) {
         return new PartyDetailResponseDto(
                 community.getId(),
                 community.getType(),
@@ -29,7 +29,7 @@ public record PartyDetailResponseDto (
                 community.getUpdatedAt(),
                 community.getViewCount(),
                 community.getContent(),
-                community.getTags(),
+                tagList,
                 community.getBookmarksCount()
         );
     }

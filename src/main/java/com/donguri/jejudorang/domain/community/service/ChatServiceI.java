@@ -65,7 +65,12 @@ public class ChatServiceI implements ChatService {
             chatEntityList = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable);
         }
 
-        Page<ChatListResponseDto> chatListDtoPage = chatEntityList.map(ChatListResponseDto::from);
+
+        Page<ChatListResponseDto> chatListDtoPage = chatEntityList.map(
+                chat -> ChatListResponseDto.from(chat, chat.getTags().stream().map(
+                        tag -> tag.getTag().getKeyword())
+                        .toList())
+        );
 
         resultMap.put("allChatPageCount", allChatPageCount);
         resultMap.put("chatListDtoPage", chatListDtoPage);
@@ -79,6 +84,13 @@ public class ChatServiceI implements ChatService {
         Community foundChat = communityRepository.findById(communityId).get();
         foundChat.upViewCount();
 
-        return ChatDetailResponseDto.from(foundChat);
+        List<String> tagsToStringList = null;
+        if (foundChat.getTags() != null) {
+            tagsToStringList = foundChat.getTags().stream().map(
+                            communityWithTag -> communityWithTag.getTag().getKeyword())
+                    .toList();
+        }
+
+        return ChatDetailResponseDto.from(foundChat, tagsToStringList);
     }
 }
