@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.entity;
 
 import com.donguri.jejudorang.domain.community.entity.Bookmark;
+import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,11 +12,8 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor
-public class User {
-    @Id
-    @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseEntity {
+
     private String email;
     private String nickname;
 
@@ -31,7 +29,6 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
                 ", email='" + email + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", boardLiked=" + boardLiked +

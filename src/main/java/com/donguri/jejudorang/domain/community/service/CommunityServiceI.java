@@ -7,6 +7,7 @@ import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeRespons
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,42 +58,42 @@ public class CommunityServiceI implements CommunityService {
     @Override
     @Transactional
     public CommunityForModifyResponseDto getCommunityPost(Long communityId) {
-        Community found = communityRepository.findById(communityId).get();
-        found.upViewCount();
+        Community existingCommunity = communityRepository.findById(communityId)
+                .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+        existingCommunity.upViewCount();
 
         return CommunityForModifyResponseDto.builder()
-                .id(found.getId())
-                .type(found.getType())
-                .state(found.getState())
-                .title(found.getTitle())
-                .createdAt(found.getCreatedAt())
-                .updatedAt(found.getUpdatedAt())
-                .viewCount(found.getViewCount())
-                .content(found.getContent())
-                .tags(found.getTags())
-                .bookmarkCount(found.getBookmarks().size())
+                .id(existingCommunity.getId())
+                .type(existingCommunity.getType())
+                .state(existingCommunity.getState())
+                .title(existingCommunity.getTitle())
+                .createdAt(existingCommunity.getCreatedAt())
+                .updatedAt(existingCommunity.getUpdatedAt())
+                .viewCount(existingCommunity.getViewCount())
+                .content(existingCommunity.getContent())
+                .tags(existingCommunity.getTags())
+                .bookmarkCount(existingCommunity.getBookmarks().size())
                 .build();
     }
 
     @Override
     @Transactional
     public CommunityTypeResponseDto updatePost(Long communityId, CommunityUpdateRequestDto postToUpdate) {
+
+        Community existingCommunity = communityRepository.findById(communityId)
+                .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+
+
         List<String> splitTagStringToUpdate;
 
-        boolean isTagEmpty = postToUpdate.getTags().trim().isEmpty();
-        if (isTagEmpty) {
+        if (postToUpdate.getTags().trim().isEmpty()) {
             splitTagStringToUpdate = null;
         } else {
             splitTagStringToUpdate = Arrays.stream(postToUpdate.getTags().split(","))
                     .toList();
         }
 
-        Community updated = Community.builder()
-                .id(communityId)
-                .title(postToUpdate.getTitle())
-                .tags(splitTagStringToUpdate)
-                .content(postToUpdate.getContent())
-                .build();
+        existingCommunity.
         updated.setBoardType(postToUpdate.getType());
         updated.setDefaultJoinState();
         communityRepository.save(updated);
@@ -106,13 +107,11 @@ public class CommunityServiceI implements CommunityService {
     }
 
     private static String setTypeForRedirect(Community resultCommunity) {
-        String typeForDto;
         if (resultCommunity.getType() == BoardType.PARTY) {
-            typeForDto = "parties";
+            return "parties";
         } else  {
-            typeForDto = "chats";
+            return "chats";
         }
-        return typeForDto;
     }
 
 

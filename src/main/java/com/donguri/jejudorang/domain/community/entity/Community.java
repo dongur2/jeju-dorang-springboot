@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.entity;
 
+import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Formula;
@@ -16,12 +17,9 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Community {
-    @Id
-    @Column(name = "community_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Community extends BaseEntity {
 
+//    * 작성자 임시 코드
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "writer_id")
 //    private User writer;
@@ -55,15 +53,8 @@ public class Community {
     private int bookmarksCount;
 
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
     @Builder
-    public Community(Long id, Long writer, String title, String content, List<String> tags, int viewCount) {
-        this.id = id;
+    public Community(Long writer, String title, String content, List<String> tags, int viewCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;

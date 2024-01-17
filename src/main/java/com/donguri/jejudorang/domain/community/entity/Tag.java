@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.entity;
 
+import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
-public class Tag {
+public class Tag extends BaseEntity {
 
     private String keyword;
 
