@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.community.dto.response;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
+import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +20,7 @@ public record CommunityForModifyResponseDto (
     List<String> tags,
     int bookmarkCount
 ) {
-    public static CommunityForModifyResponseDto from(Community community) {
+    public static CommunityForModifyResponseDto from(Community community, List<String> tagList) {
         return new CommunityForModifyResponseDto(
                 community.getId(),
                 community.getType(),
@@ -29,7 +30,7 @@ public record CommunityForModifyResponseDto (
                 community.getUpdatedAt(),
                 community.getViewCount(),
                 community.getContent(),
-                community.getTags(),
+                tagList,
                 community.getBookmarksCount()
         );
     }

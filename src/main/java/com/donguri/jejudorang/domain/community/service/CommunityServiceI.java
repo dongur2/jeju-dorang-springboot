@@ -7,6 +7,7 @@ import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeRespons
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,26 +23,24 @@ public class CommunityServiceI implements CommunityService {
     @Autowired
     private CommunityRepository communityRepository;
 
+    @Autowired
+    private CommunityWithTagService communityWithTagService;
+
     @Override
     @Transactional
     public CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto postToWrite) {
-        // 태그 리스트
-        List<String> splitTagStringToWrite;
-
-        // 태그 입력란에 아무것도 입력하지 않을 경우
-        boolean isTagEmpty = postToWrite.tags().trim().isEmpty();
-        if (isTagEmpty) {
-            splitTagStringToWrite = null;
-        } else {
-            splitTagStringToWrite = Arrays.stream(postToWrite.tags().split(","))
-                    .toList();
-        }
 
         Community communityToWrite = postToWrite.toEntity();
         communityToWrite.setBoardType(postToWrite.type());
         communityToWrite.setDefaultJoinState();
 
         Community saved = communityRepository.save(communityToWrite);
+        // 태그 제외 entity 생성 & 저장 완료
+
+        // 태그 저장
+        if (postToWrite.tags() != null) {
+            communityWithTagService.saveTagToPost(saved, postToWrite.tags());
+        }
 
         // 리다이렉트할 때 넣어줄 글타입
         String typeForDto = setTypeForRedirect(saved);
@@ -55,7 +54,11 @@ public class CommunityServiceI implements CommunityService {
                 .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
         existingCommunity.upViewCount();
 
-        return CommunityForModifyResponseDto.from(existingCommunity);
+        List<String> tagsToStringList = existingCommunity.getTags().stream().map(
+                        communityWithTag -> communityWithTag.getTag().getKeyword())
+                        .toList();
+
+        return CommunityForModifyResponseDto.from(existingCommunity, tagsToStringList);
     }
 
     @Override
@@ -78,8 +81,12 @@ public class CommunityServiceI implements CommunityService {
         Community communityToUpdate = postToUpdate.toEntity();
         communityToUpdate.setBoardType(postToUpdate.type());
         communityToUpdate.setDefaultJoinState();
-
         communityRepository.save(communityToUpdate);
+        // 태그 제외 업데이트
+
+        if (postToUpdate.tags() != null) {
+            communityWithTagService.saveTagToPost(communityToUpdate, postToUpdate.tags());
+        }
 
         // 리다이렉트할 때 넣어줄 글타입
         String typeForDto = setTypeForRedirect(communityToUpdate);

@@ -14,9 +14,7 @@ public record CommunityUpdateRequestDto (
     public Community toEntity() {
         return Community.builder()
                 .title(title)
-                .tags(Arrays.stream(tags.split(",")).toList())
                 .content(content)
                 .build();
-
     };
 }

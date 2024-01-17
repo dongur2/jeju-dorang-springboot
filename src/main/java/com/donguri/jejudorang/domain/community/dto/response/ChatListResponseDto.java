@@ -15,14 +15,14 @@ public record ChatListResponseDto (
         List<String> tags,
         int bookmarkCount
 ) {
-    public static ChatListResponseDto from(Community community) {
+    public static ChatListResponseDto from(Community community, List<String> tagList) {
         return new ChatListResponseDto(
                 community.getId(),
                 community.getType(),
                 community.getTitle(),
                 DateFormat.calculateTime(community.getCreatedAt()),
                 community.getViewCount(),
-                community.getTags(),
+                tagList,
                 community.getBookmarksCount()
         );
     }

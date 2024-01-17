@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.community.entity;
 
 import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
+import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,10 +35,8 @@ public class Community extends BaseEntity {
     private String title;
     private String content;
 
-    @ElementCollection(targetClass = String.class)
-    @CollectionTable(name = "community_tags", joinColumns = @JoinColumn(name = "community_id"))
-    @Column(name = "community_tag")
-    private List<String> tags;
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommunityWithTag> tags;
 
     private int viewCount;
 
@@ -47,12 +46,12 @@ public class Community extends BaseEntity {
     private Set<Bookmark> bookmarks = new HashSet<>();
 
     // 페이징 정렬 위한 가상 컬럼
-    @Formula("(SELECT COUNT(*) FROM bookmark b WHERE b.community_id = community_id)")
+    @Formula("(SELECT COUNT(*) FROM bookmark b WHERE b.id = id)")
     private int bookmarksCount;
 
 
     @Builder
-    public Community(Long writer, String title, String content, List<String> tags, int viewCount) {
+    public Community(Long writer, String title, String content, List<CommunityWithTag> tags, int viewCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;

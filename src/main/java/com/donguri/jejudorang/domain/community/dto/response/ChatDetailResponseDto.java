@@ -17,7 +17,7 @@ public record ChatDetailResponseDto (
         List<String> tags,
         int bookmarkCount
 ) {
-    public static ChatDetailResponseDto from(Community community) {
+    public static ChatDetailResponseDto from(Community community, List<String> tagList) {
         return new ChatDetailResponseDto(
                 community.getId(),
                 community.getType(),
@@ -26,7 +26,7 @@ public record ChatDetailResponseDto (
                 community.getUpdatedAt(),
                 community.getViewCount(),
                 community.getContent(),
-                community.getTags(),
+                tagList,
                 community.getBookmarksCount()
         );
     }
