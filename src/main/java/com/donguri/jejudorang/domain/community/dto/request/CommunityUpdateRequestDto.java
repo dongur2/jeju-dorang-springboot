@@ -1,15 +1,22 @@
 package com.donguri.jejudorang.domain.community.dto.request;
 
-import lombok.*;
+import com.donguri.jejudorang.domain.community.entity.Community;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class CommunityUpdateRequestDto {
-    private Long communityId;
-    private String title;
-    private String tags;
-    private String type;
-    private String content;
+import java.util.Arrays;
+
+public record CommunityUpdateRequestDto (
+        Long communityId,
+        String title,
+        String tags,
+        String type,
+        String content
+) {
+    public Community toEntity() {
+        return Community.builder()
+                .title(title)
+                .tags(Arrays.stream(tags.split(",")).toList())
+                .content(content)
+                .build();
+
+    };
 }

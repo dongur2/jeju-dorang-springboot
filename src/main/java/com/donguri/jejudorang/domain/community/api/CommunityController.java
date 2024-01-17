@@ -52,7 +52,7 @@ public class CommunityController {
     public String postNewCommunity(CommunityWriteRequestDto postToWrite, Model model) {
         CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
 
-        return "redirect:/community/" + communityTypeResponseDto.getTypeForRedirect();
+        return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
     }
 
 
@@ -72,7 +72,7 @@ public class CommunityController {
     @PutMapping("/post/{communityId}/modify")
     public String modifyCommunity(@PathVariable("communityId") Long communityId, CommunityUpdateRequestDto postToUpdate) {
         CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
-        return "redirect:/community/" + redirectTypeDto.getTypeForRedirect() + "/{communityId}";
+        return "redirect:/community/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
     }
 
 

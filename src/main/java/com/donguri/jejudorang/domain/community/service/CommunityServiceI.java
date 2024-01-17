@@ -50,9 +50,7 @@ public class CommunityServiceI implements CommunityService {
         // 리다이렉트할 때 넣어줄 글타입
         String typeForDto = setTypeForRedirect(saved);
 
-        return CommunityTypeResponseDto.builder()
-                .typeForRedirect(typeForDto)
-                .build();
+        return new CommunityTypeResponseDto(typeForDto);
     }
 
     @Override
@@ -86,24 +84,23 @@ public class CommunityServiceI implements CommunityService {
 
         List<String> splitTagStringToUpdate;
 
-        if (postToUpdate.getTags().trim().isEmpty()) {
+        if (postToUpdate.tags().trim().isEmpty()) {
             splitTagStringToUpdate = null;
         } else {
-            splitTagStringToUpdate = Arrays.stream(postToUpdate.getTags().split(","))
+            splitTagStringToUpdate = Arrays.stream(postToUpdate.tags().split(","))
                     .toList();
         }
 
-        existingCommunity.
-        updated.setBoardType(postToUpdate.getType());
-        updated.setDefaultJoinState();
-        communityRepository.save(updated);
+        Community communityToUpdate = postToUpdate.toEntity();
+        communityToUpdate.setBoardType(postToUpdate.type());
+        communityToUpdate.setDefaultJoinState();
+
+        communityRepository.save(communityToUpdate);
 
         // 리다이렉트할 때 넣어줄 글타입
-        String typeForDto = setTypeForRedirect(updated);
+        String typeForDto = setTypeForRedirect(communityToUpdate);
 
-        return CommunityTypeResponseDto.builder()
-                .typeForRedirect(typeForDto)
-                .build();
+        return new CommunityTypeResponseDto(typeForDto);
     }
 
     private static String setTypeForRedirect(Community resultCommunity) {
