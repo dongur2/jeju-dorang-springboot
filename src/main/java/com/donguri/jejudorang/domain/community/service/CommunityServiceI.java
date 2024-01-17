@@ -24,32 +24,27 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto post) {
+    public CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto postToWrite) {
         // 태그 리스트
         List<String> splitTagStringToWrite;
 
         // 태그 입력란에 아무것도 입력하지 않을 경우
-        boolean isTagEmpty = post.getTags().trim().isEmpty();
+        boolean isTagEmpty = postToWrite.tags().trim().isEmpty();
         if (isTagEmpty) {
             splitTagStringToWrite = null;
         } else {
-            splitTagStringToWrite = Arrays.stream(post.getTags().split(","))
+            splitTagStringToWrite = Arrays.stream(postToWrite.tags().split(","))
                     .toList();
         }
 
-        Community newPost = Community.builder()
-                .title(post.getTitle())
-                .tags(splitTagStringToWrite)
-                .content(post.getContent())
-                .build();
-        newPost.setBoardType(post.getType());
-        newPost.setDefaultJoinState();
+        Community communityToWrite = postToWrite.toEntity();
+        communityToWrite.setBoardType(postToWrite.type());
+        communityToWrite.setDefaultJoinState();
 
-        Community saved = communityRepository.save(newPost);
+        Community saved = communityRepository.save(communityToWrite);
 
         // 리다이렉트할 때 넣어줄 글타입
         String typeForDto = setTypeForRedirect(saved);
-
         return new CommunityTypeResponseDto(typeForDto);
     }
 
@@ -99,7 +94,6 @@ public class CommunityServiceI implements CommunityService {
 
         // 리다이렉트할 때 넣어줄 글타입
         String typeForDto = setTypeForRedirect(communityToUpdate);
-
         return new CommunityTypeResponseDto(typeForDto);
     }
 
