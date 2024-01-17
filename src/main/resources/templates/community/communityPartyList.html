@@ -14,7 +14,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item" style="font-size: 20px;">
                     <a class="nav-link active" aria-current="page" href="#" style="color: #696969;"
-                       th:href="@{/community/parties}">모임</a>
+                       th:href="@{/community/parties(state='all')}">모임</a>
                 </li>
                 <li class="nav-item" style="font-size: 20px;">
                     <a class="nav-link" href="#" style="color: #696969;"
@@ -27,22 +27,23 @@
             <ul class="nav nav-tabs">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
-                    th:href="@{/community/parties}">전체</a>
+                    th:href="@{/community/parties(state='all')}">전체</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" style="font-size: 20px; color: #696969"
-                    th:href="@{/community/parties(state=recruiting)}">모집중</a>
+                    th:href="@{/community/parties(state='recruiting')}">모집중</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" style="font-size: 20px; color: #696969"
-                       th:href="@{/community/parties(state=done)}">모집완료</a>
+                       th:href="@{/community/parties(state='done')}">모집완료</a>
                 </li>
             </ul>
 
             <div class="search-input-box">
-                <div class="search-input-box-sub">
-                    <input class="search-words" name="words"><button type="button" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
-                </div>
+                <form class="search-input-box-sub" th:method="get" th:action>
+                    <input class="search-words" name="search" th:placeholder="${currentSearchWord}">
+                    <button type="submit" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
+                </form>
                 <div class="search-input-tag-box-sub">
                     <input class="search-tags" placeholder="태그로 검색하세요" name="tags"><button type="button" class="btn btn-light reset-btn">초기화</button>
                 </div>
@@ -50,17 +51,29 @@
 
             <div class="sort-and-write-box">
                 <ul class="nav">
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
-                        th:href="@{${currentUrl}}">최신순</a>
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                           class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState}, search=${currentSearchWord})}">최신순</a>
+                        <a th:if="${currentSearchWord} == null"
+                           class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState})}">최신순</a>
                     </li>
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                        th:href="@{${currentUrl}(order=comment)}">댓글많은순</a>
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState}, search=${currentSearchWord}, order='comment')}">댓글많은순</a>
+                        <a th:if="${currentSearchWord} == null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState},order='comment')}">댓글많은순</a>
                     </li>
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                        th:href="@{${currentUrl}(order=bookmark)}">북마크순</a>
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState}, search=${currentSearchWord}, order='bookmark')}">북마크순</a>
+                        <a th:if="${currentSearchWord} == null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState}, order='bookmark')}">북마크순</a>
                     </li>
                 </ul>
 

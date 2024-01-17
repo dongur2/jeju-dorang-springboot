@@ -38,18 +38,24 @@ public class PartyController {
     * */
     @GetMapping
     public String getPartyList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
-                                            @RequestParam(name = "state", required = false) String state, // recruiting, done
-                                            @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
-                                            Model model) {
+                               @RequestParam(name = "state", required = false, defaultValue = "all") String state, // all, recruiting, done
+                               @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
+                               @RequestParam(name = "search", required = false) String searchWord,
+                               Model model) {
 
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
         order = convertToProperty(order);
         // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
         Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
-        Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state);
+        log.info("order={}, state={}, search={}", order,state,searchWord);
 
-        // 뷰로 함께 리턴
+        Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state, searchWord);
+
+        model.addAttribute("nowState", state);
+        model.addAttribute("currentSearchWord", searchWord);
+        model.addAttribute("nowOrdered", order);
+
         model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수
         model.addAttribute("partyListDtoPage", partyListInMap.get("partyListDtoPage")); // 데이터
         return "/community/communityPartyList";

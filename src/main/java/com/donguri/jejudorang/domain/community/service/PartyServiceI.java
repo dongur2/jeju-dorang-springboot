@@ -26,33 +26,44 @@ public class PartyServiceI implements PartyService{
 
     @Override
     @Transactional
-    public Map<String, Object> getPartyPostList(Pageable pageable, String partyState) {
+    public Map<String, Object> getPartyPostList(Pageable pageable, String paramState, String searchWord) {
         Map<String, Object> resultMap = new HashMap<>();
+
+        // all로 넘어온 상태는 null로 변환
+        paramState = convertParamStateIfAll(paramState);
 
         int allPartyPageCount;
         Page<Community> partyEntityList;
 
-        // 모든 모임글
-        if (partyState == null) {
-            log.info("partyState={}", partyState);
-            // 전체 페이지 수
-            allPartyPageCount = communityRepository.findAllByType(BoardType.PARTY, pageable).getTotalPages();
-            // 데이터
-            partyEntityList = communityRepository.findAllByType(BoardType.PARTY, pageable);
+        // 모든 모임글 (전체)
+        if (paramState == null) {
 
-            // 모집중, 모집완료 전체 모임글
+            // 검색어가 존재할 경우
+            if (searchWord != null) {
+                allPartyPageCount = communityRepository.findAllPartiesWithSearchWord(BoardType.PARTY, searchWord, pageable).getTotalPages(); // 전체 페이지 수
+                partyEntityList = communityRepository.findAllPartiesWithSearchWord(BoardType.PARTY, searchWord, pageable); // 데이터
+
+            // 검색어가 없을 경우
+            } else {
+                allPartyPageCount = communityRepository.findAllByType(BoardType.PARTY, pageable).getTotalPages(); // 전체 페이지 수
+                partyEntityList = communityRepository.findAllByType(BoardType.PARTY, pageable); // 데이터
+            }
+
+        // 상태 존재 (모집중 or 모집완료)
         } else {
             // String으로 넘어온 state 변환
-            JoinState state;
-            if (partyState.equals("recruiting")) {
-                state = JoinState.RECRUITING;
-            } else {
-                state = JoinState.DONE;
-            }
-            log.info("joinstate={}", state);
+            JoinState state = setStateToSort(paramState);
 
-            allPartyPageCount = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages();
-            partyEntityList = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable);
+            // 검색어가 존재할 경우
+            if (searchWord != null) {
+                allPartyPageCount = communityRepository.findAllPartiesWithTypeAndSearchWord(BoardType.PARTY, state, searchWord, pageable).getTotalPages(); // 전체 페이지 수
+                partyEntityList = communityRepository.findAllPartiesWithTypeAndSearchWord(BoardType.PARTY, state, searchWord, pageable); // 데이터
+
+            // 검색어가 없을 경우
+            } else {
+                allPartyPageCount = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages();
+                partyEntityList = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable);
+            }
         }
 
         Page<PartyListResponseDto> partyListDtoPage =
@@ -72,6 +83,21 @@ public class PartyServiceI implements PartyService{
         resultMap.put("partyListDtoPage", partyListDtoPage);
 
         return resultMap;
+    }
+
+    private static String convertParamStateIfAll(String paramState) {
+        if (paramState.equals("all")) {
+            paramState = null;
+        }
+        return paramState;
+    }
+
+    private static JoinState setStateToSort(String paramState) {
+        if (paramState.equals("recruiting")) {
+            return JoinState.RECRUITING;
+        } else {
+            return JoinState.DONE;
+        }
     }
 
     @Override
