@@ -1,5 +1,6 @@
-package com.donguri.jejudorang.domain.community.entity;
+package com.donguri.jejudorang.domain.community.entity.bookmark;
 
+import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;

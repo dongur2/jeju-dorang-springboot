@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.entity.Bookmark;
+import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.BookmarkRepository;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;

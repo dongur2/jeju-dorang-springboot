@@ -1,14 +1,12 @@
 package com.donguri.jejudorang.domain.community.entity;
 
+import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Formula;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

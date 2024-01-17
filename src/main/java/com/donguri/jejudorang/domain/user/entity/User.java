@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.entity;
 
-import com.donguri.jejudorang.domain.community.entity.Bookmark;
+import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.community.entity;
+package com.donguri.jejudorang.domain.community.entity.tag;
 
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -16,11 +16,13 @@ public class Tag extends BaseEntity {
     private String keyword;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Community> postsWithTag;
+    private List<CommunityWithTag> postsWithTag;
+
 
     @Builder
-    public Tag(String keyword, List<Community> postsWithTag) {
+    public Tag(String keyword, List<CommunityWithTag> postsWithTag) {
         this.keyword = keyword;
         this.postsWithTag = postsWithTag;
     }
+
 }
