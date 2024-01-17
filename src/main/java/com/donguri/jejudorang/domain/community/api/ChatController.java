@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import static com.donguri.jejudorang.domain.community.api.CommunityController.convertToProperty;
@@ -46,9 +48,13 @@ public class ChatController {
         // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
         Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
+        log.info("wordToService search= {}", searchWord);
         Map<String, Object> chatListInMap = chatsService.getChatPostList(pageable, searchWord);
 
-        // 뷰로 함께 리턴
+
+        model.addAttribute("currentSearchWord", searchWord);
+        model.addAttribute("nowOrdered", order);
+
         model.addAttribute("allChatPageCount", chatListInMap.get("allChatPageCount")); // 총 페이지 수
         model.addAttribute("chatListDtoPage", chatListInMap.get("chatListDtoPage")); // 데이터
         return "/community/communityChatList";

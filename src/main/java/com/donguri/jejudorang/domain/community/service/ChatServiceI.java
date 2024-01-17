@@ -31,12 +31,16 @@ public class ChatServiceI implements ChatService {
         int allChatPageCount;
         Page<Community> chatEntityList;
 
+        log.info("ChatServiceI searchWord={}", searchWord);
+
         if (searchWord == null) {
+            log.info("검색어 없음");
             // 전체 페이지 수
             allChatPageCount = communityRepository.findAllByType(BoardType.CHAT, pageable).getTotalPages();
             // 데이터
             chatEntityList = communityRepository.findAllByType(BoardType.CHAT, pageable);
         } else {
+            log.info("검색어 존재");
             allChatPageCount = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable).getTotalPages();
             chatEntityList = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable);
         }
@@ -52,6 +56,8 @@ public class ChatServiceI implements ChatService {
                         .bookmarkCount(chat.getBookmarks().size())
                         .build()
                 );
+
+        chatListDtoPage.forEach(chat -> log.info("foundChat = {}", chat.getTitle()));
 
         resultMap.put("allChatPageCount", allChatPageCount);
         resultMap.put("chatListDtoPage", chatListDtoPage);

@@ -24,9 +24,9 @@
         </div>
 
         <div class="board-item board-main">
-            <div class="search-input-box" th:with="currentUrl=(${@currentUrlWithoutParam.apply('search')})">
-                <form class="search-input-box-sub" th:method="get" th:action="@{${currentUrl}}">
-                    <input class="search-words" name="search">
+            <div class="search-input-box">
+                <form class="search-input-box-sub" th:method="get" th:action>
+                    <input class="search-words" name="search" th:placeholder="${currentSearchWord}">
                     <button type="submit" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
                 </form>
                 <div class="search-input-tag-box-sub">
@@ -36,18 +36,33 @@
 
             <div class="sort-and-write-box">
                 <ul class="nav">
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{${currentUrl}}">최신순</a>
+
+                    <!-- 검색어 있는 경우, 없을 경우 분리 -->
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                            class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/chats(search=${currentSearchWord})}">최신순</a>
+                        <a th:if="${currentSearchWord} == null"
+                            class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/chats}">최신순</a>
                     </li>
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{${currentUrl}(order=comment)}">댓글많은순</a>
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                            class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/chats(search=${currentSearchWord}, order='comment')}">댓글많은순</a>
+                        <a th:if="${currentSearchWord} == null"
+                            class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/chats(order='comment')}">댓글많은순</a>
                     </li>
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{${currentUrl}(order=bookmark)}">북마크순</a>
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/chats(search=${currentSearchWord}, order='bookmark')}">북마크순</a>
+                        <a th:if="${currentSearchWord} == null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/chats(order='bookmark')}">북마크순</a>
                     </li>
+
                 </ul>
 
                 <a class="btn btn-primary write-btn"
