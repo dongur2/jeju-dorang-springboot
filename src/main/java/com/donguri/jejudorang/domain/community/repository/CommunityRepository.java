@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
+import java.util.List;
+
 public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     // getPartyList, getChatList
@@ -32,5 +34,9 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     @Query("select c from Community c where c.type=:type and c.title like %:word%")
     Page<Community> findAllChatsWithSearchWord(@Param("type") BoardType boardType, @Param("word") String searchWord, Pageable pageable);
 
+
+    // Chat Search with only Tags
+    @Query(nativeQuery = true, value = "SELECT * FROM Community as c JOIN Community_tags as t WHERE c.type = :type AND t.community_tag IN :tags")
+    Page<Community> findAllChatsWithTag(@Param("type") BoardType boardType, @Param("tags") List<String> searchTag, Pageable pageable);
 
 }

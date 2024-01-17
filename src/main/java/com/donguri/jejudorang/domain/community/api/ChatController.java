@@ -42,19 +42,21 @@ public class ChatController {
     public String getChatList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
                               @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
                               @RequestParam(name = "search", required = false) String searchWord,
+                              @RequestParam(name = "tags", required = false) String searchTag,
                               Model model) {
+
+        log.info(searchWord);
+        log.info(searchTag);
 
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
         order = convertToProperty(order);
         // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
         Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
-        log.info("wordToService search= {}", searchWord);
-        Map<String, Object> chatListInMap = chatsService.getChatPostList(pageable, searchWord);
+        Map<String, Object> chatListInMap = chatsService.getChatPostList(pageable, searchWord, searchTag);
 
 
         model.addAttribute("currentSearchWord", searchWord);
-        model.addAttribute("nowOrdered", order);
 
         model.addAttribute("allChatPageCount", chatListInMap.get("allChatPageCount")); // 총 페이지 수
         model.addAttribute("chatListDtoPage", chatListInMap.get("chatListDtoPage")); // 데이터

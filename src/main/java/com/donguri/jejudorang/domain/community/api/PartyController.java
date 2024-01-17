@@ -43,7 +43,7 @@ public class PartyController {
     * (tags: 태그 검색어)
     *
     *
-    * > Return Model Attributes:
+    * > Return Model Attributes
     * String currentSearchWord: 목록 정렬한 모집 상태 - all / recruiting / done
     * String searchWord: 검색어
     * int allPartyPageCount: 목록 전체 페이지 수

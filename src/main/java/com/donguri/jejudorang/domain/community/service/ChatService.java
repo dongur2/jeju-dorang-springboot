@@ -6,6 +6,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.Map;
 
 public interface ChatService {
-    Map<String, Object> getChatPostList(Pageable pageable, String searchWord);
+    Map<String, Object> getChatPostList(Pageable pageable, String searchWord, String searchTag);
     ChatDetailResponseDto getChatPost(Long id);
 }
