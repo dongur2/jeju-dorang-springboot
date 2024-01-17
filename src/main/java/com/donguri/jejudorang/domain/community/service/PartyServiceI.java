@@ -7,6 +7,7 @@ import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.mapping.Join;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.donguri.jejudorang.global.common.DateFormat.calculateTime;
 
@@ -29,14 +31,14 @@ public class PartyServiceI implements PartyService{
     public Map<String, Object> getPartyPostList(Pageable pageable, String paramState, String searchWord) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        // all로 넘어온 상태는 null로 변환
-        paramState = convertParamStateIfAll(paramState);
+        // 넘어온 String state -> null / Enum 변환
+        JoinState state = setStateToSort(paramState);
 
         int allPartyPageCount;
         Page<Community> partyEntityList;
 
         // 모든 모임글 (전체)
-        if (paramState == null) {
+        if (state == null) {
 
             // 검색어가 존재할 경우
             if (searchWord != null) {
@@ -51,8 +53,6 @@ public class PartyServiceI implements PartyService{
 
         // 상태 존재 (모집중 or 모집완료)
         } else {
-            // String으로 넘어온 state 변환
-            JoinState state = setStateToSort(paramState);
 
             // 검색어가 존재할 경우
             if (searchWord != null) {
@@ -85,15 +85,10 @@ public class PartyServiceI implements PartyService{
         return resultMap;
     }
 
-    private static String convertParamStateIfAll(String paramState) {
-        if (paramState.equals("all")) {
-            paramState = null;
-        }
-        return paramState;
-    }
-
     private static JoinState setStateToSort(String paramState) {
-        if (paramState.equals("recruiting")) {
+        if (paramState.equals("all")) {
+            return null;
+        } else if (paramState.equals("recruiting")) {
             return JoinState.RECRUITING;
         } else {
             return JoinState.DONE;
