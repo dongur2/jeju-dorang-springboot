@@ -55,18 +55,7 @@ public class CommunityServiceI implements CommunityService {
                 .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
         existingCommunity.upViewCount();
 
-        return CommunityForModifyResponseDto.builder()
-                .id(existingCommunity.getId())
-                .type(existingCommunity.getType())
-                .state(existingCommunity.getState())
-                .title(existingCommunity.getTitle())
-                .createdAt(existingCommunity.getCreatedAt())
-                .updatedAt(existingCommunity.getUpdatedAt())
-                .viewCount(existingCommunity.getViewCount())
-                .content(existingCommunity.getContent())
-                .tags(existingCommunity.getTags())
-                .bookmarkCount(existingCommunity.getBookmarks().size())
-                .build();
+        return CommunityForModifyResponseDto.from(existingCommunity);
     }
 
     @Override

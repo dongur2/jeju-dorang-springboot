@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.donguri.jejudorang.global.common.DateFormat.calculateTime;
 
 @Slf4j
 @Service
