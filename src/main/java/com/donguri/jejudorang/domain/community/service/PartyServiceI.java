@@ -39,7 +39,6 @@ public class PartyServiceI implements PartyService{
 
         // 모든 모임글 (전체)
         if (state == null) {
-
             // 검색어가 존재할 경우
             if (searchWord != null) {
                 allPartyPageCount = communityRepository.findAllPartiesWithSearchWord(BoardType.PARTY, searchWord, pageable).getTotalPages(); // 전체 페이지 수
@@ -53,7 +52,6 @@ public class PartyServiceI implements PartyService{
 
         // 상태 존재 (모집중 or 모집완료)
         } else {
-
             // 검색어가 존재할 경우
             if (searchWord != null) {
                 allPartyPageCount = communityRepository.findAllPartiesWithTypeAndSearchWord(BoardType.PARTY, state, searchWord, pageable).getTotalPages(); // 전체 페이지 수
