@@ -12,10 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.donguri.jejudorang.global.common.DateFormat.calculateTime;
 
 @Slf4j
 @Service
@@ -25,28 +26,46 @@ public class ChatServiceI implements ChatService {
 
     @Override
     @Transactional
-    public Map<String, Object> getChatPostList(Pageable pageable) {
+    public Map<String, Object> getChatPostList(Pageable pageable, String searchWord, String searchTags) {
         Map<String, Object> resultMap = new HashMap<>();
+
+        // 검색어가 null인데 null처리 안되는 경우 처리
+        if (searchWord != null && searchWord.trim().isEmpty()) {
+            searchWord = null;
+        }
+
+        // 태그 공백일 경우 null처리
+        List<String> splitTagsToSearch =
+                (searchTags != null && !searchTags.trim().isEmpty()) ?
+                        Arrays.asList(searchTags.split(","))
+                        : null;
 
         int allChatPageCount;
         Page<Community> chatEntityList;
 
-        // 전체 페이지 수
-        allChatPageCount = communityRepository.findAllByType(BoardType.CHAT, pageable).getTotalPages();
-        // 데이터
-        chatEntityList = communityRepository.findAllByType(BoardType.CHAT, pageable);
+        log.info("word={}, tag={}", searchWord, searchTags);
 
-        Page<ChatListResponseDto> chatListDtoPage =
-                chatEntityList.map(chat -> ChatListResponseDto.builder()
-                        .id(chat.getId())
-                        .type(chat.getType())
-                        .title(chat.getTitle())
-                        .createdAt(calculateTime(chat.getCreatedAt())) // 포맷 변경
-                        .viewCount(chat.getViewCount())
-                        .tags(chat.getTags())
-                        .bookmarkCount(chat.getBookmarks().size())
-                        .build()
-                );
+        if (searchWord == null) {
+            log.info("검색어 없음");
+
+            // tag
+            if (splitTagsToSearch != null) {
+                log.info("태그 존재");
+                allChatPageCount = communityRepository.findAllChatsWithTag(BoardType.CHAT, splitTagsToSearch,pageable).getTotalPages();
+                chatEntityList = communityRepository.findAllChatsWithTag(BoardType.CHAT, splitTagsToSearch, pageable);
+            } else {
+                log.info("태그 없음");
+                allChatPageCount = communityRepository.findAllByType(BoardType.CHAT, pageable).getTotalPages();
+                chatEntityList = communityRepository.findAllByType(BoardType.CHAT, pageable);
+            }
+
+        } else {
+            log.info("검색어 존재");
+            allChatPageCount = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable).getTotalPages();
+            chatEntityList = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable);
+        }
+
+        Page<ChatListResponseDto> chatListDtoPage = chatEntityList.map(ChatListResponseDto::from);
 
         resultMap.put("allChatPageCount", allChatPageCount);
         resultMap.put("chatListDtoPage", chatListDtoPage);
@@ -60,16 +79,6 @@ public class ChatServiceI implements ChatService {
         Community foundChat = communityRepository.findById(communityId).get();
         foundChat.upViewCount();
 
-        return ChatDetailResponseDto.builder()
-                .id(foundChat.getId())
-                .type(foundChat.getType())
-                .title(foundChat.getTitle())
-                .createdAt(foundChat.getCreatedAt())
-                .updatedAt(foundChat.getUpdatedAt())
-                .viewCount(foundChat.getViewCount())
-                .content(foundChat.getContent())
-                .tags(foundChat.getTags())
-                .bookmarkCount(foundChat.getBookmarks().size())
-                .build();
+        return ChatDetailResponseDto.from(foundChat);
     }
 }

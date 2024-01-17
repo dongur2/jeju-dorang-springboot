@@ -4,6 +4,10 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{/fragments/layout}">
 <head>
+    <!--  tagify  -->
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css"/>
+
     <title>모임 - 제주도랑 | 커뮤니티</title>
 </head>
 
@@ -14,7 +18,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item" style="font-size: 20px;">
                     <a class="nav-link active" aria-current="page" href="#" style="color: #696969;"
-                       th:href="@{/community/parties}">모임</a>
+                       th:href="@{/community/parties(state='all')}">모임</a>
                 </li>
                 <li class="nav-item" style="font-size: 20px;">
                     <a class="nav-link" href="#" style="color: #696969;"
@@ -26,41 +30,61 @@
         <div class="board-item board-main">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
-                    th:href="@{/community/parties}">전체</a>
+                    <a th:if="${currentSearchWord} != null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    th:href="@{/community/parties(state='all', search=${currentSearchWord})}">전체</a>
+                    <a th:if="${currentSearchWord} == null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    th:href="@{/community/parties(state='all')}">전체</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" style="font-size: 20px; color: #696969"
-                    th:href="@{/community/parties(state=recruiting)}">모집중</a>
+                    <a th:if="${currentSearchWord} != null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                       th:href="@{/community/parties(state='recruiting', search=${currentSearchWord})}">모집중</a>
+                    <a th:if="${currentSearchWord} == null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                       th:href="@{/community/parties(state='recruiting')}">모집중</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" style="font-size: 20px; color: #696969"
-                       th:href="@{/community/parties(state=done)}">모집완료</a>
+                    <a th:if="${currentSearchWord} != null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                       th:href="@{/community/parties(state='done', search=${currentSearchWord})}">모집완료</a>
+                    <a th:if="${currentSearchWord} == null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                       th:href="@{/community/parties(state='done')}">모집완료</a>
                 </li>
             </ul>
 
-            <div class="search-input-box">
+            <form class="search-input-box" th:method="get" th:action="@{/community/parties(search=${currentSearchWord})}">
                 <div class="search-input-box-sub">
-                    <input class="search-words" name="words"><button type="button" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
+                    <input class="search-words" name="search" th:placeholder="${currentSearchWord}">
+                    <button type="submit" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
                 </div>
                 <div class="search-input-tag-box-sub">
-                    <input class="search-tags" placeholder="태그로 검색하세요" name="tags"><button type="button" class="btn btn-light reset-btn">초기화</button>
+                    <input type="text" class="search-tags" id="search-form-tags" name="tags" placeholder="태그로 검색해보세요">
+                    <button type="button" class="btn btn-light reset-btn">초기화</button>
                 </div>
-            </div>
+            </form>
 
             <div class="sort-and-write-box">
                 <ul class="nav">
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
-                        th:href="@{${currentUrl}}">최신순</a>
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                           class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState}, search=${currentSearchWord})}">최신순</a>
+                        <a th:if="${currentSearchWord} == null"
+                           class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState})}">최신순</a>
                     </li>
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                        th:href="@{${currentUrl}(order=comment)}">댓글많은순</a>
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState}, search=${currentSearchWord}, order='comment')}">댓글많은순</a>
+                        <a th:if="${currentSearchWord} == null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState},order='comment')}">댓글많은순</a>
                     </li>
-                    <li class="nav-item" th:with="currentUrl=(${@currentUrlWithoutParam.apply('order')})">
-                        <a class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                        th:href="@{${currentUrl}(order=bookmark)}">북마크순</a>
+                    <li class="nav-item">
+                        <a th:if="${currentSearchWord} != null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState}, search=${currentSearchWord}, order='bookmark')}">북마크순</a>
+                        <a th:if="${currentSearchWord} == null"
+                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           th:href="@{/community/parties(state=${nowState}, order='bookmark')}">북마크순</a>
                     </li>
                 </ul>
 
@@ -123,6 +147,19 @@
         </div>
     </div>
 
+    <!-- tagify -->
+    <script>
+        var input = document.querySelector('#search-form-tags')
+        var tagify = new Tagify(input, {
+            dropdown: { // dropdown 속성 -> 드롭다운 비활성화
+                enabled: 0
+            },
+            originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
+            texts: {
+                duplicate: "Duplicates are not allowed"
+            },
+        })
+    </script>
 
 </th>
 

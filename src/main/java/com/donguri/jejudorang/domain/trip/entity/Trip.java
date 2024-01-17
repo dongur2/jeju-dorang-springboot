@@ -1,17 +1,13 @@
 package com.donguri.jejudorang.domain.trip.entity;
 
+import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Entity @Getter @RequiredArgsConstructor
-public class Trip {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "trip_id")
-    private Long id; // PK
+public class Trip extends BaseEntity {
 
     @Column(length = 20)
     private String placeId; // CNTS_300000000015996

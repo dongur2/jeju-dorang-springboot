@@ -33,23 +33,42 @@ public class PartyController {
     * 모임글 목록
     * /community/parties
     * GET
-    * Query Parameters: page, state, order, (tag, search)
+    *
+    * > Parameters
+    * @RequestParam
+    * Integer page: 현재 페이지
+    * String state: 정렬 기준 모집 상태
+    * String order: 정렬 기준
+    * String search: 검색어
+    * (tags: 태그 검색어)
+    *
+    *
+    * > Return Model Attributes
+    * String currentSearchWord: 목록 정렬한 모집 상태 - all / recruiting / done
+    * String searchWord: 검색어
+    * int allPartyPageCount: 목록 전체 페이지 수
+    * Page<Community> partyListDtoPage: 글 데이터
     *
     * */
     @GetMapping
     public String getPartyList(@RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
-                                            @RequestParam(name = "state", required = false) String state, // recruiting, done
-                                            @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
-                                            Model model) {
+                               @RequestParam(name = "state", required = false, defaultValue = "all") String state, // all, recruiting, done
+                               @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
+                               @RequestParam(name = "search", required = false) String searchWord,
+                               Model model) {
 
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
         order = convertToProperty(order);
         // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
         Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
-        Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state);
+        log.info("order={}, state={}, search={}", order,state,searchWord);
 
-        // 뷰로 함께 리턴
+        Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state, searchWord);
+
+        model.addAttribute("nowState", state);
+        model.addAttribute("currentSearchWord", searchWord);
+
         model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수
         model.addAttribute("partyListDtoPage", partyListInMap.get("partyListDtoPage")); // 데이터
         return "/community/communityPartyList";

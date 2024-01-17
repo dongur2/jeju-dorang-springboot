@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.donguri.jejudorang.global.common.DateFormat.calculateTime;
 
 @Slf4j
 @Service
@@ -26,52 +25,58 @@ public class PartyServiceI implements PartyService{
 
     @Override
     @Transactional
-    public Map<String, Object> getPartyPostList(Pageable pageable, String partyState) {
+    public Map<String, Object> getPartyPostList(Pageable pageable, String paramState, String searchWord) {
         Map<String, Object> resultMap = new HashMap<>();
+
+        // 넘어온 String state -> null / Enum 변환
+        JoinState state = setStateToSort(paramState);
 
         int allPartyPageCount;
         Page<Community> partyEntityList;
 
-        // 모든 모임글
-        if (partyState == null) {
-            log.info("partyState={}", partyState);
-            // 전체 페이지 수
-            allPartyPageCount = communityRepository.findAllByType(BoardType.PARTY, pageable).getTotalPages();
-            // 데이터
-            partyEntityList = communityRepository.findAllByType(BoardType.PARTY, pageable);
+        // 모든 모임글 (전체)
+        if (state == null) {
+            // 검색어가 존재할 경우
+            if (searchWord != null) {
+                allPartyPageCount = communityRepository.findAllPartiesWithSearchWord(BoardType.PARTY, searchWord, pageable).getTotalPages(); // 전체 페이지 수
+                partyEntityList = communityRepository.findAllPartiesWithSearchWord(BoardType.PARTY, searchWord, pageable); // 데이터
 
-            // 모집중, 모집완료 전체 모임글
-        } else {
-            // String으로 넘어온 state 변환
-            JoinState state;
-            if (partyState.equals("recruiting")) {
-                state = JoinState.RECRUITING;
+            // 검색어가 없을 경우
             } else {
-                state = JoinState.DONE;
+                allPartyPageCount = communityRepository.findAllByType(BoardType.PARTY, pageable).getTotalPages(); // 전체 페이지 수
+                partyEntityList = communityRepository.findAllByType(BoardType.PARTY, pageable); // 데이터
             }
-            log.info("joinstate={}", state);
 
-            allPartyPageCount = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages();
-            partyEntityList = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable);
+        // 상태 존재 (모집중 or 모집완료)
+        } else {
+            // 검색어가 존재할 경우
+            if (searchWord != null) {
+                allPartyPageCount = communityRepository.findAllPartiesWithTypeAndSearchWord(BoardType.PARTY, state, searchWord, pageable).getTotalPages(); // 전체 페이지 수
+                partyEntityList = communityRepository.findAllPartiesWithTypeAndSearchWord(BoardType.PARTY, state, searchWord, pageable); // 데이터
+
+            // 검색어가 없을 경우
+            } else {
+                allPartyPageCount = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages();
+                partyEntityList = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable);
+            }
         }
 
-        Page<PartyListResponseDto> partyListDtoPage =
-                partyEntityList.map(party -> PartyListResponseDto.builder()
-                        .id(party.getId())
-                        .type(party.getType())
-                        .state(party.getState())
-                        .title(party.getTitle())
-                        .createdAt(calculateTime(party.getCreatedAt())) // 포맷 변경
-                        .viewCount(party.getViewCount())
-                        .tags(party.getTags())
-                        .bookmarkCount(party.getBookmarks().size())
-                        .build()
-                );
+        Page<PartyListResponseDto> partyListDtoPage = partyEntityList.map(PartyListResponseDto::from);
 
         resultMap.put("allPartyPageCount", allPartyPageCount);
         resultMap.put("partyListDtoPage", partyListDtoPage);
 
         return resultMap;
+    }
+
+    private static JoinState setStateToSort(String paramState) {
+        if (paramState.equals("all")) {
+            return null;
+        } else if (paramState.equals("recruiting")) {
+            return JoinState.RECRUITING;
+        } else {
+            return JoinState.DONE;
+        }
     }
 
     @Override
@@ -80,18 +85,7 @@ public class PartyServiceI implements PartyService{
         Community foundParty = communityRepository.findById(communityId).get();
         foundParty.upViewCount();
 
-        return PartyDetailResponseDto.builder()
-                .id(foundParty.getId())
-                .type(foundParty.getType())
-                .state(foundParty.getState())
-                .title(foundParty.getTitle())
-                .createdAt(foundParty.getCreatedAt())
-                .updatedAt(foundParty.getUpdatedAt())
-                .viewCount(foundParty.getViewCount())
-                .content(foundParty.getContent())
-                .tags(foundParty.getTags())
-                .bookmarkCount(foundParty.getBookmarks().size())
-                .build();
+        return PartyDetailResponseDto.from(foundParty);
     }
 
     @Override

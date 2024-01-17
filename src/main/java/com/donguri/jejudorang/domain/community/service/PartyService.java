@@ -8,7 +8,7 @@ import java.util.Map;
 public interface PartyService {
 
     //getPartyList
-    Map<String, Object> getPartyPostList(Pageable pageable, String partyState);
+    Map<String, Object> getPartyPostList(Pageable pageable, String partyState, String searchWord);
 
     //getPartyDetail
     PartyDetailResponseDto getPartyPost(Long communityId);

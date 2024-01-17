@@ -1,12 +1,12 @@
 package com.donguri.jejudorang.domain.community.entity;
 
+import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
+import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,12 +15,9 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Community {
-    @Id
-    @Column(name = "community_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Community extends BaseEntity {
 
+//    * 작성자 임시 코드
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "writer_id")
 //    private User writer;
@@ -45,19 +42,17 @@ public class Community {
     private int viewCount;
 
     @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 좋아요(Bookmark)
-            , cascade = CascadeType.ALL // Board 엔티티에 대한 변경이 Bookmark 엔티티에 전파
-            , orphanRemoval = true) //  Board 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
+            , cascade = CascadeType.ALL // Community 엔티티에 대한 변경이 Bookmark 엔티티에 전파
+            , orphanRemoval = true) //  Community 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
     private Set<Bookmark> bookmarks = new HashSet<>();
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    // 페이징 정렬 위한 가상 컬럼
+    @Formula("(SELECT COUNT(*) FROM bookmark b WHERE b.community_id = community_id)")
+    private int bookmarksCount;
+
 
     @Builder
-    public Community(Long id, Long writer, String title, String content, List<String> tags, int viewCount) {
-        this.id = id;
+    public Community(Long writer, String title, String content, List<String> tags, int viewCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;
