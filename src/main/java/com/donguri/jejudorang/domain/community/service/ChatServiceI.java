@@ -66,19 +66,7 @@ public class ChatServiceI implements ChatService {
             chatEntityList = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable);
         }
 
-        Page<ChatListResponseDto> chatListDtoPage =
-                chatEntityList.map(chat -> ChatListResponseDto.builder()
-                        .id(chat.getId())
-                        .type(chat.getType())
-                        .title(chat.getTitle())
-                        .createdAt(calculateTime(chat.getCreatedAt())) // 포맷 변경
-                        .viewCount(chat.getViewCount())
-                        .tags(chat.getTags())
-                        .bookmarkCount(chat.getBookmarks().size())
-                        .build()
-                );
-
-        chatListDtoPage.forEach(chat -> log.info("foundChat = {}", chat.getTitle()));
+        Page<ChatListResponseDto> chatListDtoPage = chatEntityList.map(ChatListResponseDto::from);
 
         resultMap.put("allChatPageCount", allChatPageCount);
         resultMap.put("chatListDtoPage", chatListDtoPage);

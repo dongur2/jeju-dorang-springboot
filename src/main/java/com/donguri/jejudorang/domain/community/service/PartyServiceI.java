@@ -64,18 +64,7 @@ public class PartyServiceI implements PartyService{
             }
         }
 
-        Page<PartyListResponseDto> partyListDtoPage =
-                partyEntityList.map(party -> PartyListResponseDto.builder()
-                        .id(party.getId())
-                        .type(party.getType())
-                        .state(party.getState())
-                        .title(party.getTitle())
-                        .createdAt(calculateTime(party.getCreatedAt())) // 포맷 변경
-                        .viewCount(party.getViewCount())
-                        .tags(party.getTags())
-                        .bookmarkCount(party.getBookmarks().size())
-                        .build()
-                );
+        Page<PartyListResponseDto> partyListDtoPage = partyEntityList.map(PartyListResponseDto::from);
 
         resultMap.put("allPartyPageCount", allPartyPageCount);
         resultMap.put("partyListDtoPage", partyListDtoPage);
