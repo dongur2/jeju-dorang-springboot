@@ -92,16 +92,6 @@ public class ChatServiceI implements ChatService {
         Community foundChat = communityRepository.findById(communityId).get();
         foundChat.upViewCount();
 
-        return ChatDetailResponseDto.builder()
-                .id(foundChat.getId())
-                .type(foundChat.getType())
-                .title(foundChat.getTitle())
-                .createdAt(foundChat.getCreatedAt())
-                .updatedAt(foundChat.getUpdatedAt())
-                .viewCount(foundChat.getViewCount())
-                .content(foundChat.getContent())
-                .tags(foundChat.getTags())
-                .bookmarkCount(foundChat.getBookmarks().size())
-                .build();
+        return ChatDetailResponseDto.from(foundChat);
     }
 }

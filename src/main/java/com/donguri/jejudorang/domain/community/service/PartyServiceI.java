@@ -99,18 +99,7 @@ public class PartyServiceI implements PartyService{
         Community foundParty = communityRepository.findById(communityId).get();
         foundParty.upViewCount();
 
-        return PartyDetailResponseDto.builder()
-                .id(foundParty.getId())
-                .type(foundParty.getType())
-                .state(foundParty.getState())
-                .title(foundParty.getTitle())
-                .createdAt(foundParty.getCreatedAt())
-                .updatedAt(foundParty.getUpdatedAt())
-                .viewCount(foundParty.getViewCount())
-                .content(foundParty.getContent())
-                .tags(foundParty.getTags())
-                .bookmarkCount(foundParty.getBookmarks().size())
-                .build();
+        return PartyDetailResponseDto.from(foundParty);
     }
 
     @Override
