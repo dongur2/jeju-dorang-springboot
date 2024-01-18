@@ -19,12 +19,18 @@ public class CommunityWithTagServiceI implements CommunityWithTagService {
 
     @Override
     public void saveTagToPost(Community community, String tagString) {
-        if (!tagString.trim().isEmpty()) {
+        if (!tagString.trim().isEmpty()) { // 공백이 넘어왔을 경우 한 번 더 필터
+
+            // String -> List<String>으로 변환 후 각 키워드 저장
             Arrays.stream(tagString.split(",")).toList()
+                    // Tag 테이블에 이미 존재하는 키워드인지 중복 확인 후 새로운 키워드라면 저장
                     .stream().map(tag -> tagService.checkDuplicated(tag)
-                            .orElseGet(() -> tagService.saveNewTag(tag)))
+                            .orElseGet(() -> tagService.saveNewTag(tag))
+                    )
+                    // 커뮤니티&태그 쌍이 CommunityWithTag 테이블에 이미 존재하는지 중복 확인 후 아니라면 저장 - 글 수정 메서드
                     .forEach(tag -> checkDuplicatedMap(community, tag)
-                            .orElseGet(() -> saveCommunityWithTagMap(community, tag)));
+                            .orElseGet(() -> saveCommunityWithTagMap(community, tag))
+                    );
         }
     }
 

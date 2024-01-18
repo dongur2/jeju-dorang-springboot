@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -30,11 +28,11 @@ public class CommunityServiceI implements CommunityService {
     @Transactional
     public CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto postToWrite) {
 
+        // 태그 제외 entity 생성 & 저장
         Community communityToWrite = postToWrite.toEntity();
         Community saved = communityRepository.save(communityToWrite);
-        // 태그 제외 entity 생성 & 저장 완료
 
-        // 태그 저장
+        // 작성된 태그가 존재할 경우에만 태그 저장 메서드 실행
         if (postToWrite.tags() != null) {
             communityWithTagService.saveTagToPost(saved, postToWrite.tags());
         }

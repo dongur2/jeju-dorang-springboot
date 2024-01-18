@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.community.service.tag;
 
-import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.tag.Tag;
 import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
 import jakarta.validation.ValidationException;

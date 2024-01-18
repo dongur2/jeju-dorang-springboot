@@ -76,8 +76,6 @@ public class CommunityController {
     @PutMapping("/post/{communityId}/modify")
     public String modifyCommunity(@PathVariable("communityId") Long communityId, CommunityWriteRequestDto postToUpdate, Model model) {
         try {
-            log.info("tags= {}", postToUpdate.tags());
-
             CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
             return "redirect:/community/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
 
