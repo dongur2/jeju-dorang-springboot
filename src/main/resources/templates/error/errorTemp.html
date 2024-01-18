@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/fragments/layout}">
+<head>
+    <title>임시 오류 페이지 | 제주도랑</title>
+</head>
+<th layout:fragment="content">
+    <h1 th:text="${errorMsg}"></h1>
+</th>
+</html>

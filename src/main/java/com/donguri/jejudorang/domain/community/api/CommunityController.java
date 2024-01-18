@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.community.api;
 
-import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
@@ -50,9 +49,14 @@ public class CommunityController {
 
     @PostMapping("/post/new")
     public String postNewCommunity(CommunityWriteRequestDto postToWrite, Model model) {
-        CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
+        try {
+            CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
+            return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
 
-        return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
     }
 
 
@@ -70,9 +74,15 @@ public class CommunityController {
     }
 
     @PutMapping("/post/{communityId}/modify")
-    public String modifyCommunity(@PathVariable("communityId") Long communityId, CommunityUpdateRequestDto postToUpdate) {
-        CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
-        return "redirect:/community/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
+    public String modifyCommunity(@PathVariable("communityId") Long communityId, CommunityWriteRequestDto postToUpdate, Model model) {
+        try {
+            CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
+            return "redirect:/community/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
     }
 
 

@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.entity;
 
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.global.common.BaseEntity;
@@ -62,6 +63,15 @@ public class Community extends BaseEntity {
     // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정
     public void upViewCount() {
         viewCount++;
+    }
+
+    // 글 수정
+    public void update(CommunityWriteRequestDto resource) {
+        title = resource.title();
+        content = resource.content();
+
+        setBoardType(resource.type());
+        setDefaultJoinState();
     }
 
     public void setBoardType(String paramType) {

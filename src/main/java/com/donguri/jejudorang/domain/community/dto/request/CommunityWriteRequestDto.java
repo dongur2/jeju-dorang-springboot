@@ -12,9 +12,13 @@ public record CommunityWriteRequestDto (
     String tags
 ) {
     public Community toEntity() {
-        return Community.builder()
+        Community newEntity = Community.builder()
                 .title(title)
                 .content(content)
                 .build();
+        newEntity.setBoardType(type);
+        newEntity.setDefaultJoinState();
+
+        return newEntity;
     }
 }
