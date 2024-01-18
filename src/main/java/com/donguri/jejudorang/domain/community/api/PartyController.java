@@ -40,7 +40,7 @@ public class PartyController {
     * String state: 정렬 기준 모집 상태
     * String order: 정렬 기준
     * String search: 검색어
-    * (tags: 태그 검색어)
+    * String searchTag: 검색 태그 (A,B,C,...,N개)
     *
     *
     * > Return Model Attributes
@@ -55,6 +55,7 @@ public class PartyController {
                                @RequestParam(name = "state", required = false, defaultValue = "all") String state, // all, recruiting, done
                                @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
                                @RequestParam(name = "search", required = false) String searchWord,
+                               @RequestParam(name = "tags", required = false) String searchTag,
                                Model model) {
 
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
@@ -62,12 +63,15 @@ public class PartyController {
         // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
         Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
-        log.info("order={}, state={}, search={}", order,state,searchWord);
+        log.info("order={}, state={}, search={}, searchTag={}", order,state,searchWord, searchTag);
 
-        Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state, searchWord);
+        Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
 
         model.addAttribute("nowState", state);
+        model.addAttribute("order", order);
+        model.addAttribute("nowPage", nowPage);
         model.addAttribute("currentSearchWord", searchWord);
+        model.addAttribute("currentSearchTag", searchTag);
 
         model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수
         model.addAttribute("partyListDtoPage", partyListInMap.get("partyListDtoPage")); // 데이터

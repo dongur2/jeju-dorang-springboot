@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css"/>
 
-    <title>커뮤니티 작성폼</title>
+    <title>글 작성 - 제주도랑 | 커뮤니티</title>
     <style>
         #contents {
             width:50%;
@@ -25,21 +25,23 @@
 </head>
 
     <div class="board-write-form-whole-box">
-        <form id="board-write-form" th:action method="post" th:object="${boardWriteRequestDto}">
+        <form id="board-write-form" th:action method="post" th:object="${communityWriteRequestDto}">
 
             <div class="board-write-form-top">
                 <div>
                     <ul class="nav nav-tabs" style="margin-bottom: 25px" id="menuTabs">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" onclick="changeType('chat')"
+                            <a th:if="${type=='chat'}" class="nav-link active" aria-current="page" th:href="@{/community/post/new(type='chat')}"
+                               href="#" style="font-size:22px">커뮤니티</a>
+                            <a th:if="${type!='chat'}" class="nav-link" aria-current="page" th:href="@{/community/post/new(type='chat')}"
                                href="#" style="font-size:22px">커뮤니티</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link"  onclick="changeType('party')"
+                            <a th:if="${type=='party'}" class="nav-link active" th:href="@{/community/post/new(type='party')}"
+                               href="#" style="font-size:22px">동행모집</a>
+                            <a th:if="${type!='party'}" class="nav-link" th:href="@{/community/post/new(type='party')}"
                                href="#" style="font-size:22px">동행모집</a>
                         </li>
-                        <!--   글분류값 전달(default: chat)   -->
-                        <input type="hidden" id="postType" name="type" value="chat">
                     </ul>
                 </div>
                 <div class="board-form-input-box">
@@ -54,7 +56,7 @@
 
             <div class="board-write-form-bottom">
                 <button type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
-                        th:onclick="history.back()">취소</button>
+                        th:onclick="|location.href='@{/community/parties}'|">취소</button>
                 <button type="button" class="btn btn-primary"
                         onclick="submitForm()"
                         style="width:150px; height:50px; border-radius: 10px">등록</button>
@@ -98,22 +100,6 @@
                 }
             }
         });
-
-
-        // 글분류 NAV 클릭 -> type value 설정
-        function changeType(type) {
-            var menuTabs = document.getElementById('menuTabs');
-            var links = menuTabs.getElementsByClassName('nav-link');
-
-            // 모든 링크에서 'active' 클래스 제거하고 클릭한 클래스에 추가
-            for (var i = 0; i < links.length; i++) {
-                links[i].classList.remove('active');
-            }
-            event.target.classList.add('active');
-
-            // input hidden에 value 설정 (default: chat)
-            document.getElementById('postType').value = type;
-        }
 
         // 폼 데이터 전달
         function submitForm() {
