@@ -51,11 +51,12 @@
 
             <form class="search-input-box" th:method="get" th:action="@{/community/parties(search=${currentSearchWord})}">
                 <div class="search-input-box-sub">
-                    <input class="search-words" name="search" th:placeholder="${currentSearchWord}">
+                    <input class="search-words" name="search" th:value="${currentSearchWord}" th:placeholder="${currentSearchWord}">
                     <button type="submit" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
                 </div>
                 <div class="search-input-tag-box-sub">
-                    <input type="text" class="search-tags" id="search-form-tags" name="tags" placeholder="태그로 검색해보세요">
+                    <input type="text" class="search-tags" id="search-form-tags" name="tags" placeholder="태그로 검색해보세요"
+                    th:value="${currentSearchTag}">
                     <button type="button" class="btn btn-light reset-btn">초기화</button>
                 </div>
             </form>

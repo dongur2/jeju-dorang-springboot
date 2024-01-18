@@ -69,6 +69,7 @@ public class PartyController {
 
         model.addAttribute("nowState", state);
         model.addAttribute("currentSearchWord", searchWord);
+        model.addAttribute("currentSearchTag", searchTag);
 
         model.addAttribute("allPartyPageCount", partyListInMap.get("allPartyPageCount")); // 총 페이지 수
         model.addAttribute("partyListDtoPage", partyListInMap.get("partyListDtoPage")); // 데이터

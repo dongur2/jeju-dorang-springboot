@@ -35,10 +35,10 @@ public class PartyServiceI implements PartyService{
         JoinState state = setStateToSort(paramState);
 
         // 검색어, 태그 공백 처리 ""
-        if (searchWord.isEmpty()) {
+        if (searchWord != null && searchWord.isEmpty()) {
             searchWord = null;
         }
-        if (searchTag.isEmpty()) {
+        if (searchWord != null && searchTag.isEmpty()) {
             searchTag = null;
         }
 
@@ -49,7 +49,7 @@ public class PartyServiceI implements PartyService{
         if (state == null) {
             partyEntityList =
                     (searchWord != null && searchTag != null) ?
-                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, Arrays.stream(searchTag.split(",")).toList(), pageable)
+                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable)
                             : (searchWord == null && searchTag == null) ?
                             communityRepository.findAllByType(BoardType.PARTY, pageable)
                             : (searchWord != null) ?
@@ -58,7 +58,7 @@ public class PartyServiceI implements PartyService{
 
             allPartyPageCount =
                     (searchWord != null && searchTag != null) ?
-                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, Arrays.stream(searchTag.split(",")).toList(), pageable).getTotalPages()
+                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable).getTotalPages()
                             : (searchWord == null && searchTag == null) ?
                             communityRepository.findAllByType(BoardType.PARTY, pageable).getTotalPages()
                             : (searchWord != null) ?
