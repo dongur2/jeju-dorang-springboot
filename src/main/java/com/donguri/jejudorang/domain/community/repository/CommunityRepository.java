@@ -22,7 +22,15 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     // Party Search with word - no state
     @Query("select c from Community c where c.type=:type and c.title like %:word%")
-    Page<Community> findAllPartiesWithSearchWord(@Param("type") BoardType boardType, @Param("word") String searchWord, Pageable pageable);
+    Page<Community> findAllByTypeContainingWord(@Param("type") BoardType boardType, @Param("word") String searchWord, Pageable pageable);
+
+    // Party Search with tag - no state
+    @Query("select c from Community c left outer join CommunityWithTag cwt on c.id=cwt.community.id left outer join Tag t on cwt.tag.id=t.id where c.type=:type and t.keyword in :tags group by c.id having count(c)>=:tagCount")
+    Page<Community> findAllByTypeContainingTag(@Param("type") BoardType boardType, @Param("tags") List<String> tags, @Param("tagCount") int tagCount, Pageable pageable);
+
+    // Party Search with word and tag - no state
+    @Query("select c from Community c join CommunityWithTag cwt on c.id = cwt.community.id join Tag t on cwt.tag.id=t.id where c.type=:type and c.title like %:word% and t.keyword in :tags")
+    Page<Community> findAllByTypeContainingWordAndTag(@Param("type") BoardType boardType, @Param("word") String searchWord, @Param("tags") List<String> tags, Pageable pageable);
 
     // Party Search with word - state
     @Query("select c from Community c where c.type=:type and c.state=:state and c.title like %:word%")

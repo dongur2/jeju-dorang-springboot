@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.request.CommunityUpdateRequestDto;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
