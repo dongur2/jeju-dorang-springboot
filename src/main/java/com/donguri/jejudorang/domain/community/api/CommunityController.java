@@ -76,9 +76,15 @@ public class CommunityController {
     }
 
     @PutMapping("/post/{communityId}/modify")
-    public String modifyCommunity(@PathVariable("communityId") Long communityId, CommunityUpdateRequestDto postToUpdate) {
-        CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
-        return "redirect:/community/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
+    public String modifyCommunity(@PathVariable("communityId") Long communityId, CommunityUpdateRequestDto postToUpdate, Model model) {
+        try {
+            CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
+            return "redirect:/community/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
     }
 
 
