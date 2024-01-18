@@ -14,7 +14,7 @@ public interface CommunityService {
     CommunityForModifyResponseDto getCommunityPost(Long communityId);
 
     //modifyCommunity
-    CommunityTypeResponseDto updatePost(Long communityId, CommunityUpdateRequestDto postToUpdate);
+    CommunityTypeResponseDto updatePost(Long communityId, CommunityWriteRequestDto postToUpdate);
 
 
 }

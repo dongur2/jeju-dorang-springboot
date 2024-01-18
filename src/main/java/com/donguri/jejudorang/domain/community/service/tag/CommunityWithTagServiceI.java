@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 public class CommunityWithTagServiceI implements CommunityWithTagService {
@@ -22,12 +23,17 @@ public class CommunityWithTagServiceI implements CommunityWithTagService {
             Arrays.stream(tagString.split(",")).toList()
                     .stream().map(tag -> tagService.checkDuplicated(tag)
                             .orElseGet(() -> tagService.saveNewTag(tag)))
-                    .forEach(tag -> saveCommunityWithTagMap(community, tag));
+                    .forEach(tag -> checkDuplicatedMap(community, tag)
+                            .orElseGet(() -> saveCommunityWithTagMap(community, tag)));
         }
     }
 
-    private Long saveCommunityWithTagMap(Community community, Tag tag) {
-        return communityWithTagRepository.save(new CommunityWithTag(community, tag)).getId();
+    private Optional<CommunityWithTag> checkDuplicatedMap(Community community, Tag tag) {
+        return communityWithTagRepository.findByCommunityAndTag(community, tag);
+    }
+
+    private CommunityWithTag saveCommunityWithTagMap(Community community, Tag tag) {
+        return communityWithTagRepository.save(new CommunityWithTag(community, tag));
     }
 
 }

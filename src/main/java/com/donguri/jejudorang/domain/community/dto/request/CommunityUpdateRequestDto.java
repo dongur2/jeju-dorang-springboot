@@ -1,8 +1,5 @@
 package com.donguri.jejudorang.domain.community.dto.request;
 
-import com.donguri.jejudorang.domain.community.entity.Community;
-
-import java.util.Arrays;
 
 public record CommunityUpdateRequestDto (
         Long communityId,
@@ -11,10 +8,5 @@ public record CommunityUpdateRequestDto (
         String type,
         String content
 ) {
-    public Community toEntity() {
-        return Community.builder()
-                .title(title)
-                .content(content)
-                .build();
-    };
+
 }

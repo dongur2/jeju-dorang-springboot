@@ -31,9 +31,6 @@ public class CommunityServiceI implements CommunityService {
     public CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto postToWrite) {
 
         Community communityToWrite = postToWrite.toEntity();
-        communityToWrite.setBoardType(postToWrite.type());
-        communityToWrite.setDefaultJoinState();
-
         Community saved = communityRepository.save(communityToWrite);
         // 태그 제외 entity 생성 & 저장 완료
 
@@ -63,33 +60,21 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public CommunityTypeResponseDto updatePost(Long communityId, CommunityUpdateRequestDto postToUpdate) {
+    public CommunityTypeResponseDto updatePost(Long communityId, CommunityWriteRequestDto postToUpdate) {
 
         Community existingCommunity = communityRepository.findById(communityId)
                 .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
 
+        // 제목, 글분류, 글내용, 모집상태 업데이트 (dirty checking)
+        existingCommunity.update(postToUpdate);
 
-        List<String> splitTagStringToUpdate;
-
-        if (postToUpdate.tags().trim().isEmpty()) {
-            splitTagStringToUpdate = null;
-        } else {
-            splitTagStringToUpdate = Arrays.stream(postToUpdate.tags().split(","))
-                    .toList();
-        }
-
-        Community communityToUpdate = postToUpdate.toEntity();
-        communityToUpdate.setBoardType(postToUpdate.type());
-        communityToUpdate.setDefaultJoinState();
-        communityRepository.save(communityToUpdate);
-        // 태그 제외 업데이트
-
+        // 태그 업데이트
         if (postToUpdate.tags() != null) {
-            communityWithTagService.saveTagToPost(communityToUpdate, postToUpdate.tags());
+            communityWithTagService.saveTagToPost(existingCommunity, postToUpdate.tags());
         }
 
         // 리다이렉트할 때 넣어줄 글타입
-        String typeForDto = setTypeForRedirect(communityToUpdate);
+        String typeForDto = setTypeForRedirect(existingCommunity);
         return new CommunityTypeResponseDto(typeForDto);
     }
 
