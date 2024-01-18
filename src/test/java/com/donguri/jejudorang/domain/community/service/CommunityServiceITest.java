@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
+
 
 @SpringBootTest
 class CommunityServiceITest {
@@ -21,7 +23,7 @@ class CommunityServiceITest {
 
         // given
         CommunityWriteRequestDto writeDto =
-                new CommunityWriteRequestDto("제목5", "parties", "내용5", "태그,테스트,다섯번째");
+                new CommunityWriteRequestDto("제목5", "parties", "내용5", "일이삼사오육칠팔구십일이삼사오육칠팔구십");
         // when
         communityService.saveNewPost(writeDto);
 
@@ -30,6 +32,25 @@ class CommunityServiceITest {
         Assertions.assertThat(savedDto.title()).isEqualTo(writeDto.title());
 
         savedDto.tags().forEach(tag -> System.out.println("tag = " + tag));
+
+    }
+    @Test
+    void 글작성_태그_길이_예외_처리_테스트() {
+
+        // given
+        CommunityWriteRequestDto writeDto =
+                new CommunityWriteRequestDto("제목5", "parties", "내용5", "일이삼사오육칠팔구십일이삼사오육칠팔구십뿅");
+        // when
+        try {
+            communityService.saveNewPost(writeDto);
+            // then
+            CommunityForModifyResponseDto savedDto = communityService.getCommunityPost(6L);
+            Assertions.assertThat(savedDto.title()).isEqualTo(writeDto.title());
+
+            savedDto.tags().forEach(tag -> System.out.println("tag = " + tag));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
     }
 

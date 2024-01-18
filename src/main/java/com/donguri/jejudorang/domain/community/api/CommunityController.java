@@ -8,6 +8,7 @@ import com.donguri.jejudorang.domain.community.service.CommunityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +51,14 @@ public class CommunityController {
 
     @PostMapping("/post/new")
     public String postNewCommunity(CommunityWriteRequestDto postToWrite, Model model) {
-        CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
+        try {
+            CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
+            return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
 
-        return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
     }
 
 
