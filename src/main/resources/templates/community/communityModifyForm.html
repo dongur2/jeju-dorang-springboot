@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css"/>
 
-    <title>커뮤니티 수정폼</title>
+    <title>글 수정 - 제주도랑 | 커뮤니티</title>
     <style>
         #contents {
             width:50%;
@@ -56,7 +56,7 @@
 
             <div class="board-write-form-bottom">
                 <button type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
-                        th:onclick="history.back()">취소</button>
+                        th:onclick="|location.href='@{/community/parties}'|">취소</button>
                 <button type="button" class="btn btn-primary"
                         onclick="submitForm()"
                         style="width:150px; height:50px; border-radius: 10px">수정</button>

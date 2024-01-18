@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css"/>
 
-    <title>커뮤니티 작성폼</title>
+    <title>글 작성 - 제주도랑 | 커뮤니티</title>
     <style>
         #contents {
             width:50%;
@@ -31,11 +31,15 @@
                 <div>
                     <ul class="nav nav-tabs" style="margin-bottom: 25px" id="menuTabs">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" th:href="@{/community/post/new(type='chat')}"
+                            <a th:if="${type=='chat'}" class="nav-link active" aria-current="page" th:href="@{/community/post/new(type='chat')}"
+                               href="#" style="font-size:22px">커뮤니티</a>
+                            <a th:if="${type!='chat'}" class="nav-link" aria-current="page" th:href="@{/community/post/new(type='chat')}"
                                href="#" style="font-size:22px">커뮤니티</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link"   th:href="@{/community/post/new(type='party')}"
+                            <a th:if="${type=='party'}" class="nav-link active" th:href="@{/community/post/new(type='party')}"
+                               href="#" style="font-size:22px">동행모집</a>
+                            <a th:if="${type!='party'}" class="nav-link" th:href="@{/community/post/new(type='party')}"
                                href="#" style="font-size:22px">동행모집</a>
                         </li>
                     </ul>
@@ -52,7 +56,7 @@
 
             <div class="board-write-form-bottom">
                 <button type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
-                        th:onclick="history.back()">취소</button>
+                        th:onclick="|location.href='@{/community/parties}'|">취소</button>
                 <button type="button" class="btn btn-primary"
                         onclick="submitForm()"
                         style="width:150px; height:50px; border-radius: 10px">등록</button>

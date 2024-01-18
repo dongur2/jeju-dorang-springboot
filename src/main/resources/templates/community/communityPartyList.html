@@ -45,7 +45,7 @@
                     <a th:if="${currentSearchWord} != null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
                        th:href="@{/community/parties(state='done', search=${currentSearchWord}, tags=${currentSearchTag})}">모집완료</a>
                     <a th:if="${currentSearchWord} == null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
-                       th:href="@{/community/parties(state='done'), tags=${currentSearchTag}}">모집완료</a>
+                       th:href="@{/community/parties(state='done', tags=${currentSearchTag})}">모집완료</a>
                 </li>
             </ul>
 
