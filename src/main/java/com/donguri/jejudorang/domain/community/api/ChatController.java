@@ -47,6 +47,7 @@ public class ChatController {
 
         log.info(searchWord);
         log.info(searchTag);
+        log.info(order);
 
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
         order = convertToProperty(order);
@@ -57,6 +58,10 @@ public class ChatController {
 
 
         model.addAttribute("currentSearchWord", searchWord);
+        model.addAttribute("currentSearchTag", searchTag);
+
+        model.addAttribute("nowPage", nowPage);
+        model.addAttribute("order", order);
 
         model.addAttribute("allChatPageCount", chatListInMap.get("allChatPageCount")); // 총 페이지 수
         model.addAttribute("chatListDtoPage", chatListInMap.get("chatListDtoPage")); // 데이터

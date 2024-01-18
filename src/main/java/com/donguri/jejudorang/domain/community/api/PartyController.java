@@ -68,6 +68,8 @@ public class PartyController {
         Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
 
         model.addAttribute("nowState", state);
+        model.addAttribute("order", order);
+        model.addAttribute("nowPage", nowPage);
         model.addAttribute("currentSearchWord", searchWord);
         model.addAttribute("currentSearchTag", searchTag);
 

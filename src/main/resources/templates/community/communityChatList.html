@@ -30,11 +30,12 @@
         <div class="board-item board-main">
             <form class="search-input-box" th:method="get" th:action>
                 <div class="search-input-box-sub">
-                    <input class="search-words" name="search" th:placeholder="${currentSearchWord}">
+                    <input class="search-words" name="search" th:placeholder="${currentSearchWord}" th:value="${currentSearchWord}">
                     <button type="submit" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
                 </div>
                 <div class="search-input-tag-box-sub">
-                    <input type="text" class="search-tags" id="search-form-tags" name="tags" placeholder="태그로 검색해보세요">
+                    <input type="text" class="search-tags" id="search-form-tags" name="tags" placeholder="태그로 검색해보세요"
+                    th:value="${currentSearchTag}">
 <!--                    <button type="button" class="btn btn-light reset-btn">초기화</button>-->
                 </div>
             </form>
@@ -46,26 +47,26 @@
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
                             class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{/community/chats(search=${currentSearchWord})}">최신순</a>
+                           th:href="@{/community/chats(search=${currentSearchWord}, tags=${currentSearchTag})}">최신순</a>
                         <a th:if="${currentSearchWord} == null"
                             class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{/community/chats}">최신순</a>
+                           th:href="@{/community/chats(tags=${currentSearchTag})}">최신순</a>
                     </li>
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
                             class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{/community/chats(search=${currentSearchWord}, order='comment')}">댓글많은순</a>
+                           th:href="@{/community/chats(search=${currentSearchWord}, order='comment', tags=${currentSearchTag})}">댓글많은순</a>
                         <a th:if="${currentSearchWord} == null"
                             class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{/community/chats(order='comment')}">댓글많은순</a>
+                           th:href="@{/community/chats(order='comment', tags=${currentSearchTag})}">댓글많은순</a>
                     </li>
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
                            class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{/community/chats(search=${currentSearchWord}, order='bookmark')}">북마크순</a>
+                           th:href="@{/community/chats(search=${currentSearchWord}, order='bookmark', tags=${currentSearchTag})}">북마크순</a>
                         <a th:if="${currentSearchWord} == null"
                            class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{/community/chats(order='bookmark')}">북마크순</a>
+                           th:href="@{/community/chats(order='bookmark', tags=${currentSearchTag})}">북마크순</a>
                     </li>
 
                 </ul>
@@ -108,21 +109,25 @@
             <!-- 페이지 네비게이션 블록 -->
             <div class="board-paging">
                 <nav aria-label="Page navigation example">
-<!--                    <ul class="pagination">-->
-<!--                        <li class="page-item">-->
-<!--                            <a class="page-link" th:href="" href="#" aria-label="Previous">-->
-<!--                                <span aria-hidden="true">&laquo;</span>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                        <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage - 1})}" href="#" th:text="${nowPage - 1}">0</a></li>-->
-<!--                        <li class="page-item"><a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage})}" href="#" th:text="${nowPage}">2</a>-->
-<!--                        <li class="page-item" th:if="${nowPage < postAllPageCount - 1}"><a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/{pageNo}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},pageNo=${nowPage + 1})}" href="#" th:text="${nowPage + 1}">3</a></li>-->
-<!--                        <li class="page-item">-->
-<!--                            <a class="page-link" th:href="@{/templates/community/{boardType}/list/{criteria}/{endPage}(boardType=${nowPostType}, criteria=${nowPostSortCriteria},endPage=${postAllPageCount - 1})}" href="#" aria-label="Next">-->
-<!--                                <span aria-hidden="true">&raquo;</span>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                    </ul>-->
+                    <ul class="pagination">
+
+                        <li class="page-item">
+                            <a class="page-link" th:href="@{/community/chats(page='0', order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/community/chats(page=${nowPage}-1, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage - 1}">0</a></li>
+                        <li class="page-item"><a class="page-link" th:href="@{/community/chats(page=${nowPage}, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage}">2</a>
+                        <li class="page-item" th:if="${nowPage < allChatPageCount - 1}"><a class="page-link" th:href="@{/community/chats(page=${nowPage}+1, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage + 1}">3</a></li>
+
+                        <li class="page-item">
+                            <a class="page-link" th:href="@{/community/chats(page=${allChatPageCount}-1, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                    </ul>
                 </nav>
             </div>
 
