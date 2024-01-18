@@ -26,7 +26,7 @@ public class ChatServiceI implements ChatService {
 
     @Override
     @Transactional
-    public Map<String, Object> getChatPostList(Pageable pageable, String searchWord, String searchTags) {
+    public Map<String, Object> getChatPostList(Pageable pageable, String searchWord, String searchTag) {
         Map<String, Object> resultMap = new HashMap<>();
 
         // 검색어가 null인데 null처리 안되는 경우 처리
@@ -36,33 +36,31 @@ public class ChatServiceI implements ChatService {
 
         // 태그 공백일 경우 null처리
         List<String> splitTagsToSearch =
-                (searchTags != null && !searchTags.trim().isEmpty()) ?
-                        Arrays.asList(searchTags.split(","))
+                (searchTag != null && !searchTag.isEmpty()) ?
+                        Arrays.asList(searchTag.split(","))
                         : null;
 
         int allChatPageCount;
         Page<Community> chatEntityList;
 
-        log.info("word={}, tag={}", searchWord, searchTags);
-
         if (searchWord == null) {
-            log.info("검색어 없음");
-
             // tag
             if (splitTagsToSearch != null) {
-                log.info("태그 존재");
-                allChatPageCount = communityRepository.findAllChatsWithTag(BoardType.CHAT, splitTagsToSearch,pageable).getTotalPages();
-                chatEntityList = communityRepository.findAllChatsWithTag(BoardType.CHAT, splitTagsToSearch, pageable);
+                allChatPageCount = communityRepository.findAllByTypeContainingTag(BoardType.CHAT, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages();
+                chatEntityList = communityRepository.findAllByTypeContainingTag(BoardType.CHAT, splitTagsToSearch, splitTagsToSearch.size(), pageable);
             } else {
-                log.info("태그 없음");
                 allChatPageCount = communityRepository.findAllByType(BoardType.CHAT, pageable).getTotalPages();
                 chatEntityList = communityRepository.findAllByType(BoardType.CHAT, pageable);
             }
 
         } else {
-            log.info("검색어 존재");
-            allChatPageCount = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable).getTotalPages();
-            chatEntityList = communityRepository.findAllChatsWithSearchWord(BoardType.CHAT, searchWord, pageable);
+            if (splitTagsToSearch != null) {
+                allChatPageCount = communityRepository.findAllByTypeContainingWordAndTag(BoardType.CHAT, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages();
+                chatEntityList = communityRepository.findAllByTypeContainingWordAndTag(BoardType.CHAT, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable);
+            } else {
+                allChatPageCount = communityRepository.findAllByTypeContainingWord(BoardType.CHAT, searchWord, pageable).getTotalPages();
+                chatEntityList = communityRepository.findAllByTypeContainingWord(BoardType.CHAT, searchWord, pageable);
+            }
         }
 
 

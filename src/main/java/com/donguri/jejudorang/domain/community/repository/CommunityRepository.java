@@ -20,15 +20,15 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     // Party List with STATE
     Page<Community> findAllByTypeAndState(BoardType boardType, JoinState state, Pageable pageable);
 
-    // Party Search with word - no state
+    // Party Search with word - no state & Chat
     @Query("select c from Community c where c.type=:type and c.title like %:word%")
     Page<Community> findAllByTypeContainingWord(@Param("type") BoardType boardType, @Param("word") String searchWord, Pageable pageable);
 
-    // Party Search with tag - no state
+    // Party Search with tag - no state & Chat
     @Query("select c from Community c left outer join CommunityWithTag cwt on c.id=cwt.community.id left outer join Tag t on cwt.tag.id=t.id where c.type=:type and t.keyword in :tags group by c.id having count(c)>=:tagCount")
     Page<Community> findAllByTypeContainingTag(@Param("type") BoardType boardType, @Param("tags") List<String> tags, @Param("tagCount") int tagCount, Pageable pageable);
 
-    // Party Search with word and tag - no state
+    // Party Search with word and tag - no state & Chat
     @Query("select c from Community c left outer join CommunityWithTag cwt on c.id=cwt.community.id left outer join Tag t on cwt.tag.id=t.id where c.type=:type and c.title like %:word% and t.keyword in :tags group by c.id having count(c)>=:tagCount")
     Page<Community> findAllByTypeContainingWordAndTag(@Param("type") BoardType boardType, @Param("word") String searchWord, @Param("tags") List<String> tags, @Param("tagCount") int tagCount, Pageable pageable);
 
@@ -43,16 +43,5 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     // Party Search with tag - state
     @Query("select c from Community c left outer join CommunityWithTag cwt on c.id=cwt.community.id left outer join Tag t on cwt.tag.id=t.id where c.type=:type and c.state=:state and t.keyword in :tags group by c.id having count(c)>=:tagCount")
     Page<Community> findAllByTypeAndStateContainingTag(@Param("type") BoardType boardType, @Param("state") JoinState state, @Param("tags") List<String> tags, @Param("tagCount") int tagCount, Pageable pageable);
-
-
-
-    // Chat Search with word
-    @Query("select c from Community c where c.type=:type and c.title like %:word%")
-    Page<Community> findAllChatsWithSearchWord(@Param("type") BoardType boardType, @Param("word") String searchWord, Pageable pageable);
-
-
-    // Chat Search with only Tags
-    @Query(nativeQuery = true, value = "SELECT * FROM Community as c JOIN Community_tags as t WHERE c.type = :type AND t.community_tag IN :tags")
-    Page<Community> findAllChatsWithTag(@Param("type") BoardType boardType, @Param("tags") List<String> searchTag, Pageable pageable);
 
 }

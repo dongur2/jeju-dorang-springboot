@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.response.ChatListResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
@@ -34,13 +33,16 @@ public class PartyServiceI implements PartyService{
         // 넘어온 String state -> null / Enum 변환
         JoinState state = setStateToSort(paramState);
 
-        // 검색어, 태그 공백 처리 ""
-        if (searchWord != null && searchWord.isEmpty()) {
+        // 검색어가 null인데 null처리 안되는 경우 처리
+        if (searchWord != null && searchWord.trim().isEmpty()) {
             searchWord = null;
         }
-        if (searchTag != null && searchTag.isEmpty()) {
-            searchTag = null;
-        }
+
+        // 태그 공백일 경우 null처리
+        List<String> splitTagsToSearch =
+                (searchTag != null && !searchTag.isEmpty()) ?
+                        Arrays.asList(searchTag.split(","))
+                        : null;
 
         int allPartyPageCount;
         Page<Community> partyEntityList;
@@ -48,42 +50,42 @@ public class PartyServiceI implements PartyService{
         // 모든 모임글 (전체)
         if (state == null) {
             partyEntityList =
-                    (searchWord != null && searchTag != null) ?
-                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable)
-                            : (searchWord == null && searchTag == null) ?
+                    (searchWord != null && splitTagsToSearch != null) ?
+                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable)
+                            : (searchWord == null && splitTagsToSearch == null) ?
                             communityRepository.findAllByType(BoardType.PARTY, pageable)
                             : (searchWord != null) ?
                             communityRepository.findAllByTypeContainingWord(BoardType.PARTY, searchWord, pageable)
-                            : communityRepository.findAllByTypeContainingTag(BoardType.PARTY, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable);
+                            : communityRepository.findAllByTypeContainingTag(BoardType.PARTY, splitTagsToSearch, splitTagsToSearch.size(), pageable);
 
             allPartyPageCount =
-                    (searchWord != null && searchTag != null) ?
-                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable).getTotalPages()
-                            : (searchWord == null && searchTag == null) ?
+                    (searchWord != null && splitTagsToSearch != null) ?
+                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages()
+                            : (searchWord == null && splitTagsToSearch == null) ?
                             communityRepository.findAllByType(BoardType.PARTY, pageable).getTotalPages()
                             : (searchWord != null) ?
                             communityRepository.findAllByTypeContainingWord(BoardType.PARTY, searchWord, pageable).getTotalPages()
-                            : communityRepository.findAllByTypeContainingTag(BoardType.PARTY, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable).getTotalPages();
+                            : communityRepository.findAllByTypeContainingTag(BoardType.PARTY, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages();
 
         // 상태 존재 (모집중 or 모집완료)
         } else {
             partyEntityList =
-                    (searchWord != null && searchTag != null) ?
-                            communityRepository.findAllByTypeAndStateContainingWordAndTag(BoardType.PARTY, state, searchWord, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable)
-                            : (searchWord == null && searchTag == null) ?
+                    (searchWord != null && splitTagsToSearch != null) ?
+                            communityRepository.findAllByTypeAndStateContainingWordAndTag(BoardType.PARTY, state, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable)
+                            : (searchWord == null && splitTagsToSearch == null) ?
                             communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable)
                             : (searchWord != null) ?
                             communityRepository.findAllByTypeAndStateContainingWord(BoardType.PARTY, state, searchWord, pageable)
-                            : communityRepository.findAllByTypeAndStateContainingTag(BoardType.PARTY, state, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable);
+                            : communityRepository.findAllByTypeAndStateContainingTag(BoardType.PARTY, state, splitTagsToSearch, splitTagsToSearch.size(), pageable);
 
             allPartyPageCount =
-                    (searchWord != null && searchTag != null) ?
-                            communityRepository.findAllByTypeAndStateContainingWordAndTag(BoardType.PARTY, state, searchWord, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable).getTotalPages()
-                            : (searchWord == null && searchTag == null) ?
+                    (searchWord != null && splitTagsToSearch != null) ?
+                            communityRepository.findAllByTypeAndStateContainingWordAndTag(BoardType.PARTY, state, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages()
+                            : (searchWord == null && splitTagsToSearch == null) ?
                             communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages()
                             : (searchWord != null) ?
                             communityRepository.findAllByTypeAndStateContainingWord(BoardType.PARTY, state, searchWord, pageable).getTotalPages()
-                            : communityRepository.findAllByTypeAndStateContainingTag(BoardType.PARTY, state, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable).getTotalPages();
+                            : communityRepository.findAllByTypeAndStateContainingTag(BoardType.PARTY, state, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages();
 
 
         }
