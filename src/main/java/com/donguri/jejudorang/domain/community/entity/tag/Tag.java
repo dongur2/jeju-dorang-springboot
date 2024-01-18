@@ -15,6 +15,7 @@ import java.util.List;
 public class Tag extends BaseEntity {
 
     @Size(max = 20)
+    @Column(nullable = false)
     private String keyword;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)

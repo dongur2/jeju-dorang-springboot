@@ -2,10 +2,7 @@ package com.donguri.jejudorang.domain.community.entity.tag;
 
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.global.common.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,9 +26,11 @@ import lombok.NoArgsConstructor;
 public class CommunityWithTag extends BaseEntity {
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private Community community;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private Tag tag;
 
 }
