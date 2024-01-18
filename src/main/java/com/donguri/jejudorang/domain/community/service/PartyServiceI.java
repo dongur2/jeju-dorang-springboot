@@ -38,7 +38,7 @@ public class PartyServiceI implements PartyService{
         if (searchWord != null && searchWord.isEmpty()) {
             searchWord = null;
         }
-        if (searchWord != null && searchTag.isEmpty()) {
+        if (searchTag != null && searchTag.isEmpty()) {
             searchTag = null;
         }
 
@@ -67,16 +67,25 @@ public class PartyServiceI implements PartyService{
 
         // 상태 존재 (모집중 or 모집완료)
         } else {
-            // 검색어가 존재할 경우
-            if (searchWord != null) {
-                allPartyPageCount = communityRepository.findAllPartiesWithTypeAndSearchWord(BoardType.PARTY, state, searchWord, pageable).getTotalPages(); // 전체 페이지 수
-                partyEntityList = communityRepository.findAllPartiesWithTypeAndSearchWord(BoardType.PARTY, state, searchWord, pageable); // 데이터
+            partyEntityList =
+                    (searchWord != null && searchTag != null) ?
+                            communityRepository.findAllByTypeAndStateContainingWordAndTag(BoardType.PARTY, state, searchWord, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable)
+                            : (searchWord == null && searchTag == null) ?
+                            communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable)
+                            : (searchWord != null) ?
+                            communityRepository.findAllByTypeAndStateContainingWord(BoardType.PARTY, state, searchWord, pageable)
+                            : communityRepository.findAllByTypeAndStateContainingTag(BoardType.PARTY, state, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable);
 
-            // 검색어가 없을 경우
-            } else {
-                allPartyPageCount = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages();
-                partyEntityList = communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable);
-            }
+            allPartyPageCount =
+                    (searchWord != null && searchTag != null) ?
+                            communityRepository.findAllByTypeAndStateContainingWordAndTag(BoardType.PARTY, state, searchWord, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable).getTotalPages()
+                            : (searchWord == null && searchTag == null) ?
+                            communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages()
+                            : (searchWord != null) ?
+                            communityRepository.findAllByTypeAndStateContainingWord(BoardType.PARTY, state, searchWord, pageable).getTotalPages()
+                            : communityRepository.findAllByTypeAndStateContainingTag(BoardType.PARTY, state, Arrays.stream(searchTag.split(",")).toList(), Arrays.stream(searchTag.split(",")).toList().size(), pageable).getTotalPages();
+
+
         }
 
         Page<PartyListResponseDto> partyListDtoPage = partyEntityList.map(
@@ -84,7 +93,6 @@ public class PartyServiceI implements PartyService{
                                 tag -> tag.getTag().getKeyword())
                         .toList())
         );
-        log.info("dto 변환");
 
         resultMap.put("allPartyPageCount", allPartyPageCount);
         resultMap.put("partyListDtoPage", partyListDtoPage);

@@ -34,7 +34,15 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     // Party Search with word - state
     @Query("select c from Community c where c.type=:type and c.state=:state and c.title like %:word%")
-    Page<Community> findAllPartiesWithTypeAndSearchWord(@Param("type") BoardType boardType, @Param("state") JoinState state, @Param("word") String searchWord, Pageable pageable);
+    Page<Community> findAllByTypeAndStateContainingWord(@Param("type") BoardType boardType, @Param("state") JoinState state, @Param("word") String searchWord, Pageable pageable);
+
+    // Party Search with word and tag - state
+    @Query("select c from Community c left outer join CommunityWithTag cwt on c.id=cwt.community.id left outer join Tag t on cwt.tag.id=t.id where c.type=:type and c.state=:state and c.title like %:word% and t.keyword in :tags group by c.id having count(c)>=:tagCount")
+    Page<Community> findAllByTypeAndStateContainingWordAndTag(@Param("type") BoardType boardType, @Param("state") JoinState state, @Param("word") String searchWord, @Param("tags") List<String> tags, @Param("tagCount") int tagCount, Pageable pageable);
+
+    // Party Search with tag - state
+    @Query("select c from Community c left outer join CommunityWithTag cwt on c.id=cwt.community.id left outer join Tag t on cwt.tag.id=t.id where c.type=:type and c.state=:state and t.keyword in :tags group by c.id having count(c)>=:tagCount")
+    Page<Community> findAllByTypeAndStateContainingTag(@Param("type") BoardType boardType, @Param("state") JoinState state, @Param("tags") List<String> tags, @Param("tagCount") int tagCount, Pageable pageable);
 
 
 
