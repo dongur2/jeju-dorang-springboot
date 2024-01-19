@@ -45,10 +45,6 @@ public class ChatController {
                               @RequestParam(name = "tags", required = false) String searchTag,
                               Model model) {
 
-        log.info(searchWord);
-        log.info(searchTag);
-        log.info(order);
-
         // 넘어온 정렬 기준값 -> 컬럼명으로 변환
         order = convertToProperty(order);
         // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스

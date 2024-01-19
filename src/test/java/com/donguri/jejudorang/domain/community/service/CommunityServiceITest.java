@@ -19,6 +19,21 @@ class CommunityServiceITest {
     CommunityService communityService;
 
     @Test
+    void DTO_NotBlank_테스트() {
+        // given
+        CommunityWriteRequestDto writeDto =
+                new CommunityWriteRequestDto("", "parties", "내용5", "일이삼사오육칠팔구십");
+        // when
+        try {
+            communityService.saveNewPost(writeDto);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        // then
+    }
+
+    @Test
     void 글작성_태그_길이_테스트() {
 
         // given

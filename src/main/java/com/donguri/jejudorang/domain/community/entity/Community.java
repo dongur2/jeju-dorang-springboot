@@ -5,7 +5,9 @@ import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -22,10 +24,12 @@ public class Community extends BaseEntity {
 //    * 작성자 임시 코드
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "writer_id")
+//    @Column(nullable = false)
 //    private User writer;
     private Long writer;
 
     // 글 분류 (PARTY: 모임, CHAT: 잡담)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BoardType type;
 
@@ -33,12 +37,18 @@ public class Community extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private JoinState state;
 
+    @Size(max = 60)
+    @Column(nullable = false)
     private String title;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityWithTag> tags;
 
+    @ColumnDefault("0")
+    @Column(nullable = false)
     private int viewCount;
 
     @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 좋아요(Bookmark)
