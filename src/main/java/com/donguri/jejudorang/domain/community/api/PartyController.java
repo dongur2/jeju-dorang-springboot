@@ -63,8 +63,6 @@ public class PartyController {
         // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
         Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
-        log.info("order={}, state={}, search={}, searchTag={}", order,state,searchWord, searchTag);
-
         Map<String, Object> partyListInMap = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
 
         model.addAttribute("nowState", state);
