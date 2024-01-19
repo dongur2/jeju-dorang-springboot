@@ -12,17 +12,16 @@ import org.hibernate.annotations.ColumnDefault;
 public class User {
 
     @Id
-    @Column(name = "user_no", nullable = false)
+    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long num;
 
     @Column(nullable = false)
-    @ColumnDefault(value = "0") // 0: basic, 1: kakao
+    @ColumnDefault(value = "1") // 0: admin, 1: basic, 2: kakao
     private byte loginType;
 
     @Builder
-    public User(Long num, byte loginType) {
-        this.num = num;
+    public User(byte loginType) {
         this.loginType = loginType;
     }
 }

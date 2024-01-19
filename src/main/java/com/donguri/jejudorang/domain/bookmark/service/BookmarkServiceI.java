@@ -23,16 +23,14 @@ public class BookmarkServiceI implements BookmarkService {
 
     @Override
     @Transactional
-    public void changeCommunityLikedState(Long nowUserId, Long nowCommunityId) {
-        if(bookmarkRepository.findByUserIdAndCommunityId(nowUserId, nowCommunityId).isPresent()) {
-            bookmarkRepository.delete(bookmarkRepository.findByUserIdAndCommunityId(nowUserId, nowCommunityId).get());
+    public void changeCommunityLikedState(User nowUser, Long nowCommunityId) {
+        if(bookmarkRepository.findByUserAndCommunityId(nowUser, nowCommunityId).isPresent()) {
+            bookmarkRepository.delete(bookmarkRepository.findByUserAndCommunityId(nowUser, nowCommunityId).get());
             log.info("추천 삭제 완료");
         } else {
-            User foundUser = userRepository.findById(nowUserId).get();
             Community foundCommunity = communityRepository.findById(nowCommunityId).get();
 
             Bookmark LikedToUpdate = Bookmark.builder()
-                    .user(foundUser)
                     .community(foundCommunity)
                     .build();
 
