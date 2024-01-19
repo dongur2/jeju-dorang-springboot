@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.community.entity;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
-import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
+import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;

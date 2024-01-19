@@ -1,14 +1,8 @@
-package com.donguri.jejudorang.domain.community.api.bookmark;
+package com.donguri.jejudorang.domain.bookmark.api;
 
-import com.donguri.jejudorang.domain.community.service.bookmark.BookmarkService;
-import com.donguri.jejudorang.domain.user.entity.User;
+import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j

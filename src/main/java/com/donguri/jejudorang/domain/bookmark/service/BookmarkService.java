@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.community.service.bookmark;
+package com.donguri.jejudorang.domain.bookmark.service;
 
 
 public interface BookmarkService {

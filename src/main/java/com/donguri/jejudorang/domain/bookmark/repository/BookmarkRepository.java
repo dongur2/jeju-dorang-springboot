@@ -1,6 +1,6 @@
-package com.donguri.jejudorang.domain.community.repository.bookmark;
+package com.donguri.jejudorang.domain.bookmark.repository;
 
-import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
+import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

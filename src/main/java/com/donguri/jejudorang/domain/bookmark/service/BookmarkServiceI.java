@@ -1,8 +1,8 @@
-package com.donguri.jejudorang.domain.community.service.bookmark;
+package com.donguri.jejudorang.domain.bookmark.service;
 
-import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
+import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import com.donguri.jejudorang.domain.community.entity.Community;
-import com.donguri.jejudorang.domain.community.repository.bookmark.BookmarkRepository;
+import com.donguri.jejudorang.domain.bookmark.repository.BookmarkRepository;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;

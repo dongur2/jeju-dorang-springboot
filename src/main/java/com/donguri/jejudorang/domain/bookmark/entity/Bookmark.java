@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.community.entity.bookmark;
+package com.donguri.jejudorang.domain.bookmark.entity;
 
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.user.entity.User;
