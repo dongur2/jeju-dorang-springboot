@@ -4,11 +4,13 @@ import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -48,7 +50,12 @@ public class CommunityController {
     }
 
     @PostMapping("/post/new")
-    public String postNewCommunity(CommunityWriteRequestDto postToWrite, Model model) {
+    public String postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult, Model model) {
+        // 유효성 검사 에러
+        if (bindingResult.hasErrors()) {
+            return bindErrorPage(bindingResult, model);
+        }
+
         try {
             CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
             return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
@@ -74,7 +81,15 @@ public class CommunityController {
     }
 
     @PutMapping("/post/{communityId}/modify")
-    public String modifyCommunity(@PathVariable("communityId") Long communityId, CommunityWriteRequestDto postToUpdate, Model model) {
+    public String modifyCommunity(@PathVariable("communityId") Long communityId,
+                                  @Valid CommunityWriteRequestDto postToUpdate,
+                                  BindingResult bindingResult,
+                                  Model model) {
+        // 유효성 검사 에러
+        if (bindingResult.hasErrors()) {
+            return bindErrorPage(bindingResult, model);
+        }
+
         try {
             CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
             return "redirect:/community/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
@@ -83,6 +98,11 @@ public class CommunityController {
             model.addAttribute("errorMsg", e.getMessage());
             return "/error/errorTemp";
         }
+    }
+
+    private static String bindErrorPage(BindingResult bindingResult, Model model) {
+        model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
+        return "/error/errorTemp";
     }
 
 
