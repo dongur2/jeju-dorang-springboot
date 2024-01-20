@@ -19,14 +19,16 @@ public class BookmarkController {
 
     @PutMapping("/{communityId}/bookmark")
     public ResponseEntity<String> updateCommunityBookmarkState(@AuthenticationPrincipal User nowUser,
-                                                            @PathVariable("communityId") Long communityId) {
+                                                                @PathVariable("communityId") Long communityId) {
         if (nowUser == null) {
             log.info("nowUser is NULL");
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비회원은 북마크 불가능");
         } else {
             log.info("nowUser={}", nowUser.toString());
+
             bookmarkService.changeCommunityBookmarkState(nowUser, communityId);
-            return ResponseEntity.ok("북마크 완료");
+            return ResponseEntity.ok("북마크 상태 업데이트 완료");
         }
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Book;
 import java.util.List;
 
 @Service
@@ -61,7 +60,6 @@ public class CommunityServiceI implements CommunityService {
     @Override
     @Transactional
     public CommunityTypeResponseDto updatePost(Long communityId, CommunityWriteRequestDto postToUpdate) {
-
         Community existingCommunity = communityRepository.findById(communityId)
                 .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
 
@@ -80,12 +78,9 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public Community updateBookmarkState(Bookmark bookmark) {
-        Community community = bookmark.getCommunity();
-        community.updateBookmarks(bookmark); // 없으면 추가, 있으면 삭제
-        return community;
+    public void updateBookmarkState(Bookmark bookmark) {
+        bookmark.getCommunity().updateBookmarks(bookmark); // 없으면 추가, 있으면 삭제
     }
-
 
     private static String setTypeForRedirect(Community resultCommunity) {
         if (resultCommunity.getType() == BoardType.PARTY) {
