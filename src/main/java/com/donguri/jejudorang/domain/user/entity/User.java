@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Getter
@@ -17,11 +18,16 @@ public class User {
     private Long num;
 
     @Column(nullable = false)
-    @ColumnDefault(value = "1") // 0: admin, 1: basic, 2: kakao
-    private byte loginType;
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Builder
-    public User(byte loginType) {
+    public User(LoginType loginType, Role role) {
         this.loginType = loginType;
+        this.role = role;
     }
 }
