@@ -18,7 +18,7 @@ public class Bookmark extends BaseEntity {
     private User user;
 
     @JoinColumn(nullable = false)
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     private Community community;
 
     @Builder
