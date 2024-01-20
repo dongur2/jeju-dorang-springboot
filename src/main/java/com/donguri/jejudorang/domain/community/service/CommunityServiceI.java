@@ -80,12 +80,9 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public Community updateBookmark(Bookmark bookmark) {
+    public Community updateBookmarkState(Bookmark bookmark) {
         Community community = bookmark.getCommunity();
-        community.updateBookmarks(bookmark);
-
-        log.info("community bookmarks :: {}",community.getBookmarks().size());
-
+        community.updateBookmarks(bookmark); // 없으면 추가, 있으면 삭제
         return community;
     }
 

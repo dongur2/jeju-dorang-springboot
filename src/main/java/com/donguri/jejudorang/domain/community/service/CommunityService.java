@@ -17,5 +17,5 @@ public interface CommunityService {
     //modifyCommunity
     CommunityTypeResponseDto updatePost(Long communityId, CommunityWriteRequestDto postToUpdate);
 
-    Community updateBookmark(Bookmark bookmark);
+    Community updateBookmarkState(Bookmark bookmark);
 }

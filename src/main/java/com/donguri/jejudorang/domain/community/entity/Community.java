@@ -51,9 +51,9 @@ public class Community extends BaseEntity {
     @Column(nullable = false)
     private int viewCount;
 
-    @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 좋아요(Bookmark)
+    @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 북마크(Bookmark)
             , cascade = CascadeType.ALL // Community 엔티티에 대한 변경이 Bookmark 엔티티에 전파
-            , orphanRemoval = true//  Community 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
+            , orphanRemoval = true //  Community 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
             , fetch = FetchType.EAGER)
     private Set<Bookmark> bookmarks = new HashSet<>();
 
@@ -86,7 +86,11 @@ public class Community extends BaseEntity {
     }
 
     public void updateBookmarks(Bookmark bookmark) {
-        bookmarks.add(bookmark);
+        if (bookmarks.contains(bookmark)) {
+            bookmarks.remove(bookmark);
+        } else {
+            bookmarks.add(bookmark);
+        }
     }
 
     public void setBoardType(String paramType) {

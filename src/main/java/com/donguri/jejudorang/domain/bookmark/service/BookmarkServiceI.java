@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 public class BookmarkServiceI implements BookmarkService {
@@ -28,23 +30,25 @@ public class BookmarkServiceI implements BookmarkService {
 
     @Override
     @Transactional
-    public void changeCommunityLikedState(User nowUser, Long nowCommunityId) {
-        if(bookmarkRepository.findByUserAndCommunityId(nowUser, nowCommunityId).isPresent()) {
-            bookmarkRepository.delete(bookmarkRepository.findByUserAndCommunityId(nowUser, nowCommunityId).get());
-            log.info("추천 삭제 완료");
-        } else {
-            Community foundCommunity = communityRepository.findById(nowCommunityId).get();
+    public void changeCommunityBookmarkState(User nowUser, Long nowCommunityId) {
+        Optional<Bookmark> existing = bookmarkRepository.findByUserAndCommunityId(nowUser, nowCommunityId);
 
+        if (existing.isPresent()) {
+            log.info("북마크 삭제");
+            communityService.updateBookmarkState(existing.get());
+            bookmarkRepository.deleteById(existing.get().getId());
+        } else {
+            log.info("북마크 추가");
+
+            Community foundCommunity = communityRepository.findById(nowCommunityId).get();
             Bookmark LikedToUpdate = Bookmark.builder()
                     .user(nowUser)
                     .community(foundCommunity)
                     .build();
 
-            Bookmark saved = bookmarkRepository.save(LikedToUpdate);
-            communityService.updateBookmark(saved);
-
-            log.info("bookmark count is {}",saved.getCommunity().getBookmarks().size());
-            log.info("추천 추가 완료");
+            communityService.updateBookmarkState(LikedToUpdate);
+            bookmarkRepository.save(LikedToUpdate);
         }
+
     }
 }
