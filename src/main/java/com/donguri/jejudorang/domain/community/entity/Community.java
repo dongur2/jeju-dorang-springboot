@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.community.entity;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
-import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
+import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -51,13 +51,14 @@ public class Community extends BaseEntity {
     @Column(nullable = false)
     private int viewCount;
 
-    @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 좋아요(Bookmark)
+    @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 북마크(Bookmark)
             , cascade = CascadeType.ALL // Community 엔티티에 대한 변경이 Bookmark 엔티티에 전파
-            , orphanRemoval = true) //  Community 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
+            , orphanRemoval = true //  Community 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
+            , fetch = FetchType.EAGER)
     private Set<Bookmark> bookmarks = new HashSet<>();
 
     // 페이징 정렬 위한 가상 컬럼
-    @Formula("(SELECT COUNT(*) FROM bookmark b WHERE b.id = id)")
+    @Formula("(SELECT COUNT(*) FROM bookmark b WHERE b.community_id = id)")
     private int bookmarksCount;
 
 
@@ -82,6 +83,14 @@ public class Community extends BaseEntity {
 
         setBoardType(resource.type());
         setDefaultJoinState();
+    }
+
+    public void updateBookmarks(Bookmark bookmark) {
+        if (bookmarks.contains(bookmark)) {
+            bookmarks.remove(bookmark);
+        } else {
+            bookmarks.add(bookmark);
+        }
     }
 
     public void setBoardType(String paramType) {

@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
@@ -59,7 +60,6 @@ public class CommunityServiceI implements CommunityService {
     @Override
     @Transactional
     public CommunityTypeResponseDto updatePost(Long communityId, CommunityWriteRequestDto postToUpdate) {
-
         Community existingCommunity = communityRepository.findById(communityId)
                 .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
 
@@ -74,6 +74,12 @@ public class CommunityServiceI implements CommunityService {
         // 리다이렉트할 때 넣어줄 글타입
         String typeForDto = setTypeForRedirect(existingCommunity);
         return new CommunityTypeResponseDto(typeForDto);
+    }
+
+    @Override
+    @Transactional
+    public void updateBookmarkState(Bookmark bookmark) {
+        bookmark.getCommunity().updateBookmarks(bookmark); // 없으면 추가, 있으면 삭제
     }
 
     private static String setTypeForRedirect(Community resultCommunity) {

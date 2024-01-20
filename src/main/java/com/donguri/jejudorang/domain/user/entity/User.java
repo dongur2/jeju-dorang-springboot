@@ -1,37 +1,27 @@
 package com.donguri.jejudorang.domain.user.entity;
 
-import com.donguri.jejudorang.domain.community.entity.bookmark.Bookmark;
-import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class User extends BaseEntity {
+public class User {
 
-    private String email;
-    private String nickname;
+    @Id
+    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long num;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Bookmark> boardLiked;
+    @Column(nullable = false)
+    @ColumnDefault(value = "1") // 0: admin, 1: basic, 2: kakao
+    private byte loginType;
 
     @Builder
-    public User(String email, String nickname) {
-        this.email = email;
-        this.nickname = nickname;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                ", email='" + email + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", boardLiked=" + boardLiked +
-                '}';
+    public User(byte loginType) {
+        this.loginType = loginType;
     }
 }

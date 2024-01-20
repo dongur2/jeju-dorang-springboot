@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.community.entity.bookmark;
+package com.donguri.jejudorang.domain.bookmark.entity;
 
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.user.entity.User;
@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 public class Bookmark extends BaseEntity {
 
     @JoinColumn(nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) // user 삭제 -> bookmark 삭제
     private User user;
 
     @JoinColumn(nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REMOVE) // community 삭제 -> bookmark 삭제
     private Community community;
 
     @Builder
