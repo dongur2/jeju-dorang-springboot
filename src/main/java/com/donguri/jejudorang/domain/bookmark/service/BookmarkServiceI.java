@@ -4,6 +4,7 @@ import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.bookmark.repository.BookmarkRepository;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookmarkServiceI implements BookmarkService {
     @Autowired
     private BookmarkRepository bookmarkRepository;
+
     @Autowired
     private CommunityRepository communityRepository;
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CommunityService communityService;
 
     @Override
     @Transactional
@@ -31,10 +36,14 @@ public class BookmarkServiceI implements BookmarkService {
             Community foundCommunity = communityRepository.findById(nowCommunityId).get();
 
             Bookmark LikedToUpdate = Bookmark.builder()
+                    .user(nowUser)
                     .community(foundCommunity)
                     .build();
 
-            bookmarkRepository.save(LikedToUpdate);
+            Bookmark saved = bookmarkRepository.save(LikedToUpdate);
+            communityService.updateBookmark(saved);
+
+            log.info("bookmark count is {}",saved.getCommunity().getBookmarks().size());
             log.info("추천 추가 완료");
         }
     }

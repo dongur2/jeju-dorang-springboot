@@ -15,10 +15,15 @@ public class Bookmark extends BaseEntity {
 
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
+    @JoinColumn(nullable = false)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Community community;
 
     @Builder
-    public Bookmark(Community community) {
+    public Bookmark(User user, Community community) {
+        this.user = user;
         this.community = community;
     }
 }

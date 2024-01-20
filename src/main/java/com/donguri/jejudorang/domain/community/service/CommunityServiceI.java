@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Book;
 import java.util.List;
 
 @Service
@@ -75,6 +77,18 @@ public class CommunityServiceI implements CommunityService {
         String typeForDto = setTypeForRedirect(existingCommunity);
         return new CommunityTypeResponseDto(typeForDto);
     }
+
+    @Override
+    @Transactional
+    public Community updateBookmark(Bookmark bookmark) {
+        Community community = bookmark.getCommunity();
+        community.updateBookmarks(bookmark);
+
+        log.info("community bookmarks :: {}",community.getBookmarks().size());
+
+        return community;
+    }
+
 
     private static String setTypeForRedirect(Community resultCommunity) {
         if (resultCommunity.getType() == BoardType.PARTY) {

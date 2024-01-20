@@ -29,28 +29,22 @@ class BookmarkServiceITest {
     @Autowired
     UserRepository userRepository;
 
-    @BeforeEach
-    void DB리셋() {
-        userRepository.deleteAll();;
-        communityRepository.deleteAll();
-        bookmarkRepository.deleteAll();
-    }
 
     @Test
     void 유저_북마크_테스트() {
         // given
-        User testUser = userRepository.save(new User());
+//        User testUser = userRepository.save(new User());
         Community testCommunity = Community.builder().title("제목").content("본문").build();
         testCommunity.setBoardType("party");
         testCommunity.setDefaultJoinState();
         Community saved = communityRepository.save(testCommunity);
 
         // when
-        System.out.println(saved.getBookmarks().size());
-        bookmarkService.changeCommunityLikedState(testUser, testCommunity.getId());
-        System.out.println(saved.getBookmarks().size());
+        bookmarkService.changeCommunityLikedState(userRepository.findById(1L).get(), testCommunity.getId());
+        Community community = communityRepository.findById(testCommunity.getId()).get();
+
         // then
-        Assertions.assertThat(saved.getBookmarks().size()).isEqualTo(1);
+        Assertions.assertThat(community.getBookmarks().size()).isEqualTo(1);
     }
 
 }
