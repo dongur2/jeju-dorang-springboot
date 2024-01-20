@@ -38,4 +38,17 @@ public class Authentication {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+
+    public void updatePhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    public void updateAgreement(byte no) {
+        this.agreement = no;
+    }
 }

@@ -26,4 +26,13 @@ public class Profile extends BaseEntity {
 
     private String img_url;
 
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateImg(String img_url) {
+        this.img_url = img_url;
+    }
+
 }

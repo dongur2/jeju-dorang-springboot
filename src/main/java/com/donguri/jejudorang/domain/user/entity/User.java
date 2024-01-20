@@ -18,11 +18,11 @@ public class User {
     private Long num;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // BASIC, KAKAO
     private LoginType loginType;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // ADMIN, USER
     private Role role;
 
     @Builder
@@ -30,4 +30,5 @@ public class User {
         this.loginType = loginType;
         this.role = role;
     }
+
 }
