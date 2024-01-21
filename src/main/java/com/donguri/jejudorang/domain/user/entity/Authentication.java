@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.entity;
 
+import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -14,12 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Authentication {
-
-    @Id
-    @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Authentication extends BaseEntity {
 
     @JoinColumn(nullable = false)
     @OneToOne(orphanRemoval = true)
@@ -34,10 +30,6 @@ public class Authentication {
 
     @Column(nullable = false) // 0: No(가입불가) 1:필수동의 2:+선택동의
     private byte agreement;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
 
 
     public void updatePhone(String phone) {
