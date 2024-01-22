@@ -1,10 +1,7 @@
 package com.donguri.jejudorang.domain.user.entity;
 
 import com.donguri.jejudorang.global.common.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Profile extends BaseEntity {
 
     @JoinColumn(nullable = false)
-    @OneToOne(orphanRemoval = true)
+    @OneToOne
     private User user;
 
     @Size(max = 30)

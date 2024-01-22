@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Authentication extends BaseEntity {
 
     @JoinColumn(nullable = false)
-    @OneToOne(orphanRemoval = true)
+    @OneToOne
     private User user;
 
     @Size(max = 11)
@@ -24,16 +24,18 @@ public class Authentication extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false) // 0: No(가입불가) 1:필수동의 2:+선택동의
-    private byte agreement;
+    @Column(nullable = false) // null: No(가입불가) NECESSARY:필수동의 ALL:+선택동의
+    private AgreeRange agreement;
 
     @Builder
-    public Authentication(User user, String phone, String email, byte agreement) {
+    public Authentication(User user, String phone, String email, AgreeRange agreement) {
         this.user = user;
         this.phone = phone;
         this.email = email;
         this.agreement = agreement;
     }
+
+
 
     public void updatePhone(String phone) {
         this.phone = phone;
@@ -43,7 +45,5 @@ public class Authentication extends BaseEntity {
         this.email = email;
     }
 
-    public void updateAgreement(byte no) {
-        this.agreement = no;
-    }
+
 }

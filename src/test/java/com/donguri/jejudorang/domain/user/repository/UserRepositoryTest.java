@@ -4,11 +4,13 @@ import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.auth.PasswordRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +44,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement((byte) 1).build();
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
         //when
@@ -74,8 +76,8 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
         Profile profile = Profile.builder().user(user).nickname("usernickname").build();
-        Authentication authentication = new Authentication(user, "01012341234", "user@mail.com", (byte) 1);
-        Password password = new Password(user, "1234");
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("1234").build();
 
         //when - then
         User savedUser = userRepository.save(user);
@@ -84,6 +86,172 @@ class UserRepositoryTest {
         Password savedPwd = passwordRepository.save(password);
     }
 
+    @Test
+    void 오류_닉네임_없음() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").build();
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("1234").build();
+
+        //when - then
+        User savedUser = userRepository.save(user);
+        Assertions.assertThrows(Exception.class, () -> profileRepository.save(profile));
+        Authentication savedAuth = authenticationRepository.save(authentication);
+        Password savedPwd = passwordRepository.save(password);
+    }
+
+    @Test
+    void 오류_이메일_없음() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("1234").build();
+
+        //when - then
+        User savedUser = userRepository.save(user);
+        Profile savedProfile = profileRepository.save(profile);
+        Assertions.assertThrows(Exception.class, () -> authenticationRepository.save(authentication));
+        Password savedPwd = passwordRepository.save(password);
+    }
+
+    @Test
+    void 오류_동의항목_비동의() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").build();
+        Password password = Password.builder().user(user).password("1234").build();
+
+        //when - then
+        User savedUser = userRepository.save(user);
+        Profile savedProfile = profileRepository.save(profile);
+        Assertions.assertThrows(Exception.class, () -> authenticationRepository.save(authentication));
+        Password savedPwd = passwordRepository.save(password);
+    }
+
+    @Test
+    void 오류_비밀번호_없음() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).build();
+
+        //when - then
+        User savedUser = userRepository.save(user);
+        Profile savedProfile = profileRepository.save(profile);
+        Authentication savedAuth = authenticationRepository.save(authentication);
+        Assertions.assertThrows(Exception.class, () -> passwordRepository.save(password));
+    }
 
 
+    @Test
+    void 회원정보_수정() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("1234").build();
+
+        //when
+        User savedUser = userRepository.save(user);
+        profileRepository.save(profile);
+        authenticationRepository.save(authentication);
+        passwordRepository.save(password);
+
+        User foundUser = userRepository.findById(savedUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다"));
+        Profile foundProf = profileRepository.findByUser(foundUser)
+                .orElseThrow(() -> new EntityNotFoundException("유저에 해당하는 프로필이 없습니다"));
+        Authentication foundAuth = authenticationRepository.findByUser(foundUser)
+                .orElseThrow(() -> new RuntimeException("유저에 해당하는 인증이 없습니다"));
+
+        foundProf.updateNickname("updateNickname");
+        foundProf.updateImg("imgurl.com");
+        foundAuth.updateEmail("new@mail.com");
+        foundAuth.updatePhone("01099999999");
+
+        //then
+        User updatedUser = userRepository.findById(foundUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다"));
+        Profile updatedProf = profileRepository.findByUser(updatedUser)
+                .orElseThrow(() -> new EntityNotFoundException("유저에 해당하는 프로필이 없습니다"));
+        Authentication updatedAuth = authenticationRepository.findByUser(updatedUser)
+                .orElseThrow(() -> new RuntimeException("유저에 해당하는 인증이 없습니다"));
+
+        assertThat(updatedProf.getNickname()).isEqualTo("updateNickname");
+        assertThat(updatedProf.getImg_url()).isEqualTo("imgurl.com");
+        assertThat(updatedAuth.getEmail()).isEqualTo("new@mail.com");
+        assertThat(updatedAuth.getPhone()).isEqualTo("01099999999");
+    }
+
+    @Test
+    void 비밀번호_수정() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("1234").build();
+
+        //when
+        User savedUser = userRepository.save(user);
+        profileRepository.save(profile);
+        authenticationRepository.save(authentication);
+        passwordRepository.save(password);
+
+        User foundUser = userRepository.findById(savedUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다"));
+        Password foundPwd = passwordRepository.findByUser(foundUser)
+                .orElseThrow(() -> new EntityNotFoundException("유저에 해당하는 비밀번호가 없습니다"));
+
+        /*
+        * BCryptPasswordEncoder
+        * Spring Security에서 제공하는 비밀번호 암호화(해싱)를 위한 클래스
+        * > BCrypt: 단방향 해시 함수
+        *
+        * */
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        foundPwd.updatePassword(passwordEncoder, "updatePwd1234");
+
+        //then
+        assertThat(passwordEncoder.matches("updatePwd1234", foundPwd.getPassword())).isTrue();
+    }
+
+    @Test
+    void 회원삭제() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("1234").build();
+
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
+
+        User savedUser = userRepository.save(user);
+        profileRepository.save(profile);
+        authenticationRepository.save(authentication);
+        passwordRepository.save(password);
+
+        //when
+        userRepository.delete(savedUser);
+
+        Assertions.assertThrows(Exception.class,
+                () -> userRepository.findById(savedUser.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("삭제된 유저입니다")));
+
+        Assertions.assertThrows(Exception.class,
+                () -> profileRepository.findByUser(savedUser)
+                        .orElseThrow(() -> new EntityNotFoundException("삭제된 프로필입니다")));
+        Assertions.assertThrows(Exception.class,
+                () -> authenticationRepository.findByUser(savedUser)
+                        .orElseThrow(() -> new EntityNotFoundException("삭제된 인증입니다")));
+        Assertions.assertThrows(Exception.class,
+                () -> passwordRepository.findByUser(savedUser)
+                        .orElseThrow(() -> new EntityNotFoundException("삭제된 비밀번호입니다")));
+
+    }
 }

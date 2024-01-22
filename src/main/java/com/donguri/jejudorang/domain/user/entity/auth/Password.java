@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class Password extends BaseEntity {
 
     @JoinColumn(nullable = false)
-    @OneToOne(orphanRemoval = true)
+    @OneToOne
     private User user;
 
     @Column(nullable = false)
