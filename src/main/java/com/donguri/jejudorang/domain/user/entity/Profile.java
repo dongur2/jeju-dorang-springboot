@@ -6,19 +6,22 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 public class Profile extends BaseEntity {
 
     @JoinColumn(nullable = false)
     @OneToOne(orphanRemoval = true)
     private User user;
+
+    @Size(max = 30)
+    @Column(nullable = false)
+    private String externalId;
 
     @Size(max = 15)
     @Column(nullable = false)
@@ -26,6 +29,13 @@ public class Profile extends BaseEntity {
 
     private String img_url;
 
+    @Builder
+    public Profile(User user, String externalId, String nickname, String img_url) {
+        this.user = user;
+        this.externalId = externalId;
+        this.nickname = nickname;
+        this.img_url = img_url;
+    }
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;

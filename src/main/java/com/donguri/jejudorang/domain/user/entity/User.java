@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Getter
@@ -15,7 +13,7 @@ public class User {
     @Id
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long num;
+    private Long id;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING) // BASIC, KAKAO

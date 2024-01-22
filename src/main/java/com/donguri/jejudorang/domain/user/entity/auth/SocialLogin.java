@@ -3,7 +3,7 @@ package com.donguri.jejudorang.domain.user.entity.auth;
 import com.donguri.jejudorang.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 public class SocialLogin {
 
     @Id
@@ -34,5 +33,11 @@ public class SocialLogin {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-
+    @Builder
+    public SocialLogin(String socialCode, String socialId, String accessToken, User user) {
+        this.socialCode = socialCode;
+        this.socialId = socialId;
+        this.accessToken = accessToken;
+        this.user = user;
+    }
 }

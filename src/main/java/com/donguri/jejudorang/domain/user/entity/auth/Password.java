@@ -1,25 +1,18 @@
 package com.donguri.jejudorang.domain.user.entity.auth;
 
 import com.donguri.jejudorang.domain.user.entity.User;
+import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
-public class Password {
-
-    @Id
-    @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Password extends BaseEntity {
 
     @JoinColumn(nullable = false)
     @OneToOne(orphanRemoval = true)
@@ -31,10 +24,12 @@ public class Password {
 //    @Column(nullable = false)
 //    private String salt;
 
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
 
+    @Builder
+    public Password(User user, String password) {
+        this.user = user;
+        this.password = password;
+    }
 
     public void updatePassword(PasswordEncoder passwordEncoder, String password) {
         this.password = passwordEncoder.encode(password);
