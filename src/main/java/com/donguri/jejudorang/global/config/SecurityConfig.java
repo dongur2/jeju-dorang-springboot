@@ -10,8 +10,8 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration // Config 파일로 설정
-@EnableWebSecurity // WebSecurity 활성화
+@Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     /*
@@ -21,7 +21,7 @@ public class SecurityConfig {
     * in order to decide whether it applies to that request.
     *
     * */
-    @Bean // 임시 전체 경로 접근 허가
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Disables CSRF protection
