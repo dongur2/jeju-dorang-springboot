@@ -14,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -47,28 +46,30 @@ class UserRepositoryTest {
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
+
         //when
+        //cascade = CascadeType.PERSIST -> 영속성 전이로 부모 저장하면 자식까지 저장
         User savedUser = userRepository.save(user);
-        Profile savedProf = profileRepository.save(profile);
-        Authentication savedAuth = authenticationRepository.save(authentication);
-        Password savedPwd = passwordRepository.save(password);
 
         //then
         User foundUser = userRepository.findById(savedUser.getId())
                 .orElseThrow(() -> new RuntimeException("저장된 회원이 없습니다."));
         assertThat(foundUser).isEqualTo(savedUser);
 
-        Profile foundProf = profileRepository.findByUser(savedUser)
+        Profile foundProf = profileRepository.findByUser(foundUser)
                 .orElseThrow(() -> new RuntimeException("저장된 프로필이 없습니다"));
-        assertThat(foundProf).isEqualTo(savedProf);
+        assertThat(foundProf).isEqualTo(savedUser.getProfile());
 
-        Authentication foundAuth = authenticationRepository.findByUser(savedUser)
+        Authentication foundAuth = authenticationRepository.findByUser(foundUser)
                 .orElseThrow(() -> new RuntimeException("저장된 인증이 없습니다"));
-        assertThat(foundAuth).isEqualTo(savedAuth);
+        assertThat(foundAuth).isEqualTo(savedUser.getAuthentication());
 
-        Password foundPwd = passwordRepository.findByUser(savedUser)
+        Password foundPwd = passwordRepository.findByUser(foundUser)
                 .orElseThrow(() -> new RuntimeException("저장된 비밀번호가 없습니다"));
-        assertThat(foundPwd).isEqualTo(savedPwd);
+        assertThat(foundPwd).isEqualTo(savedUser.getPassword());
     }
 
     @Test
@@ -79,11 +80,12 @@ class UserRepositoryTest {
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
+
         //when - then
-        User savedUser = userRepository.save(user);
-        Assertions.assertThrows(Exception.class, () -> profileRepository.save(profile));
-        Authentication savedAuth = authenticationRepository.save(authentication);
-        Password savedPwd = passwordRepository.save(password);
+        Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
     }
 
     @Test
@@ -94,11 +96,12 @@ class UserRepositoryTest {
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
+
         //when - then
-        User savedUser = userRepository.save(user);
-        Assertions.assertThrows(Exception.class, () -> profileRepository.save(profile));
-        Authentication savedAuth = authenticationRepository.save(authentication);
-        Password savedPwd = passwordRepository.save(password);
+        Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
     }
 
     @Test
@@ -109,11 +112,12 @@ class UserRepositoryTest {
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
+
         //when - then
-        User savedUser = userRepository.save(user);
-        Profile savedProfile = profileRepository.save(profile);
-        Assertions.assertThrows(Exception.class, () -> authenticationRepository.save(authentication));
-        Password savedPwd = passwordRepository.save(password);
+        Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
     }
 
     @Test
@@ -124,11 +128,12 @@ class UserRepositoryTest {
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
+
         //when - then
-        User savedUser = userRepository.save(user);
-        Profile savedProfile = profileRepository.save(profile);
-        Assertions.assertThrows(Exception.class, () -> authenticationRepository.save(authentication));
-        Password savedPwd = passwordRepository.save(password);
+        Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
     }
 
     @Test
@@ -139,11 +144,12 @@ class UserRepositoryTest {
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).build();
 
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
+
         //when - then
-        User savedUser = userRepository.save(user);
-        Profile savedProfile = profileRepository.save(profile);
-        Authentication savedAuth = authenticationRepository.save(authentication);
-        Assertions.assertThrows(Exception.class, () -> passwordRepository.save(password));
+        Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
     }
 
 
@@ -155,23 +161,20 @@ class UserRepositoryTest {
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
-        //when
-        User savedUser = userRepository.save(user);
-        profileRepository.save(profile);
-        authenticationRepository.save(authentication);
-        passwordRepository.save(password);
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
 
+        User savedUser = userRepository.save(user);
+
+        //when
         User foundUser = userRepository.findById(savedUser.getId())
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다"));
-        Profile foundProf = profileRepository.findByUser(foundUser)
-                .orElseThrow(() -> new EntityNotFoundException("유저에 해당하는 프로필이 없습니다"));
-        Authentication foundAuth = authenticationRepository.findByUser(foundUser)
-                .orElseThrow(() -> new RuntimeException("유저에 해당하는 인증이 없습니다"));
 
-        foundProf.updateNickname("updateNickname");
-        foundProf.updateImg("imgurl.com");
-        foundAuth.updateEmail("new@mail.com");
-        foundAuth.updatePhone("01099999999");
+        foundUser.getProfile().updateNickname("updateNickname");
+        foundUser.getProfile().updateImg("imgurl.com");
+        foundUser.getAuthentication().updateEmail("new@mail.com");
+        foundUser.getAuthentication().updatePhone("01099999999");
 
         //then
         User updatedUser = userRepository.findById(foundUser.getId())
@@ -195,16 +198,15 @@ class UserRepositoryTest {
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
-        //when
-        User savedUser = userRepository.save(user);
-        profileRepository.save(profile);
-        authenticationRepository.save(authentication);
-        passwordRepository.save(password);
+        user.updateProfile(profile);
+        user.updateAuthentication(authentication);
+        user.updatePassword(password);
 
+        User savedUser = userRepository.save(user);
+
+        //when
         User foundUser = userRepository.findById(savedUser.getId())
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다"));
-        Password foundPwd = passwordRepository.findByUser(foundUser)
-                .orElseThrow(() -> new EntityNotFoundException("유저에 해당하는 비밀번호가 없습니다"));
 
         /*
         * BCryptPasswordEncoder
@@ -213,7 +215,10 @@ class UserRepositoryTest {
         *
         * */
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        foundPwd.updatePassword(passwordEncoder, "updatePwd1234");
+        foundUser.getPassword().updatePassword(passwordEncoder, "updatePwd1234");
+
+        Password foundPwd = passwordRepository.findByUser(foundUser)
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 비밀번호가 없습니다"));
 
         //then
         assertThat(passwordEncoder.matches("updatePwd1234", foundPwd.getPassword())).isTrue();
@@ -232,9 +237,6 @@ class UserRepositoryTest {
         user.updatePassword(password);
 
         User savedUser = userRepository.save(user);
-        profileRepository.save(profile);
-        authenticationRepository.save(authentication);
-        passwordRepository.save(password);
 
         //when
         userRepository.delete(savedUser);

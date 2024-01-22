@@ -27,15 +27,15 @@ public class User {
 
 
     @OneToOne(fetch = FetchType.LAZY,
-            mappedBy = "user", orphanRemoval = true)
+            mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Profile profile;
 
     @OneToOne(fetch = FetchType.LAZY,
-            mappedBy = "user", orphanRemoval = true)
+            mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Authentication authentication;
 
     @OneToOne(fetch = FetchType.LAZY,
-            mappedBy = "user", orphanRemoval = true)
+            mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Password password;
 
     @OneToOne
