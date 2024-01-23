@@ -1,14 +1,23 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.user.entity.User;
-import com.donguri.jejudorang.domain.user.service.UserService;
+import com.donguri.jejudorang.global.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Controller
+@RestController
 public class UserController {
+    @PostMapping("/login")
+    public String login(HttpServletRequest request) {
+        log.info(request.getHeader("username"));
+        return JwtUtil.generateToken(request.getHeader("username"));
+    }
 
+    @GetMapping("/protected")
+    @Secured("USER") // Role-based authorization
+    public String protectedResource() {
+        return "This is a protected resource.";
+    }
 }
