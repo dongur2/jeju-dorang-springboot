@@ -19,6 +19,5 @@ public class JwtFilter extends OncePerRequestFilter {
         String username = request.getHeader("username");
         log.info("Successfully Authenticated : {}", username);
         filterChain.doFilter(request, response);
-
     }
 }
