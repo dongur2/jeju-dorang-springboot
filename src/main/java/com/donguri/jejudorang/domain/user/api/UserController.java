@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @PostMapping("/login")
     public String login(HttpServletRequest request) {
-        log.info(request.getHeader("username"));
-        return JwtUtil.generateToken(request.getHeader("username"));
+        log.info(request.getHeader("Authorization"));
+        JwtUtil jwtUtil = new JwtUtil();
+        return jwtUtil.generateToken(request.getHeader("Authorization"));
     }
 
     @GetMapping("/protected")
