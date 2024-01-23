@@ -6,6 +6,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -38,7 +40,7 @@ public class JwtUtil {
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS256, key())
                 .compact();
     }
 
@@ -46,54 +48,25 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY));
     }
 
-    private Claims parseJwtClaims(String token) {
-        return jwtParser.parseClaimsJws(token).getBody();
+    public String getUserNameFromJwtToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key()).build()
+                .parseClaimsJws(token).getBody().getSubject();
     }
 
-    /*
-    * resolveClaims
-    * HttpRequest를 받아 요청 헤더의 Bearer 토큰에서 Claims를 확인
-    *
-    * */
-    public Claims resolveClaims(HttpServletRequest request) {
+    public boolean validateJwtToken(String authToken) {
         try {
-            String token = resolveToken(request);
-            if (token != null) {
-                return parseJwtClaims(token);
-            }
-            return null;
-        } catch (ExpiredJwtException ex) { // 만료
-            request.setAttribute("expired", ex.getMessage());
-            throw ex;
-        } catch (Exception ex) { // 비유효
-            request.setAttribute("invalid", ex.getMessage());
-            throw ex;
+            Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
+            return true;
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty: {}", e.getMessage());
         }
-    }
-
-    public String resolveToken(HttpServletRequest request) {
-
-        String bearerToken = request.getHeader(TOKEN_HEADER);
-        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
-            return bearerToken.substring(TOKEN_PREFIX.length());
-        }
-        return null;
-    }
-
-    public boolean validateClaims(Claims claims) throws AuthenticationException {
-        try {
-            return claims.getExpiration().after(new Date());
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    public String getExternalId(Claims claims) {
-        return claims.getSubject();
-    }
-
-    private List<String> getRoles(Claims claims) {
-        return (List<String>) claims.get("roles");
+        return false;
     }
 
 
