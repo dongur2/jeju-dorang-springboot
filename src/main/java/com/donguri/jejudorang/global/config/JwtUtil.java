@@ -1,12 +1,17 @@
-package com.donguri.jejudorang.global.util;
+package com.donguri.jejudorang.global.config;
 
+import com.donguri.jejudorang.domain.user.entity.Authentication;
 import com.donguri.jejudorang.domain.user.entity.User;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.List;
 
@@ -19,30 +24,26 @@ public class JwtUtil {
     @Value("${jwtutils.expiration-time}")
     private long EXPIRATION_TIME;
 
-    private final JwtParser jwtParser;
-
-    private final String TOKEN_HEADER = "Authorization";
-    private final String TOKEN_PREFIX = "Bearer ";
-
-    public JwtUtil(){
-        this.jwtParser = Jwts.parser().setSigningKey(SECRET_KEY);
-    }
-
     /*
     * createToken
     * User를 받아서 User의 데이터로 Claims 생성 => JWT Token 빌드
     * - Claims: JWT의 body로 사용
     *
     * */
-    public String createToken(User user) {
-        Claims claims = Jwts.claims().setSubject(user.getProfile().getExternalId());
-        claims.put("email", user.getAuthentication().getEmail());
+    public String createToken(Authentication authentication) {
+
+        UserDetailsI userPrincipal = (UserDetailsI) authentication.getPrincipal();
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setSubject((userPrincipal.getUsername()))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
+    }
+
+    private Key key() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY));
     }
 
     private Claims parseJwtClaims(String token) {
