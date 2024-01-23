@@ -16,7 +16,8 @@ public class JwtUtil {
     @Value("${jwtutils.secret-key}")
     private String SECRET_KEY;
 
-    private static final long EXPIRATION_TIME = 60*60*1000; // 1시간
+    @Value("${jwtutils.expiration-time}")
+    private long EXPIRATION_TIME;
 
     private final JwtParser jwtParser;
 
