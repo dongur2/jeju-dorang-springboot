@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 
 import java.util.Date;
+import java.util.List;
 
 public class JwtUtil {
 
@@ -85,6 +86,10 @@ public class JwtUtil {
 
     public String getExternalId(Claims claims) {
         return claims.getSubject();
+    }
+
+    private List<String> getRoles(Claims claims) {
+        return (List<String>) claims.get("roles");
     }
 
 
