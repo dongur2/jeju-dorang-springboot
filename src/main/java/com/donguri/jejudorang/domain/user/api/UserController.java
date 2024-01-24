@@ -16,21 +16,4 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
 
-    @Autowired
-    private final AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserRepository userRepository;
-
-    private JwtProvider jwtProvider;
-
-    public UserController(AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
-        this.authenticationManager = authenticationManager;
-        this.jwtProvider = jwtProvider;
-    }
-
-    @PostMapping("/login")
-    public String login(LoginRequest loginReq) {
-        return null;
-    }
 }
