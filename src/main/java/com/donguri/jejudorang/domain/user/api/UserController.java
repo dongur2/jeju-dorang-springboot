@@ -22,26 +22,15 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
-    private JwtProvider jwtUtil;
+    private JwtProvider jwtProvider;
 
-    public UserController(AuthenticationManager authenticationManager, JwtProvider jwtUtil) {
+    public UserController(AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
         this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+        this.jwtProvider = jwtProvider;
     }
 
     @PostMapping("/login")
     public String login(LoginRequest loginReq) {
-        try {
-            Authentication authentication =
-                    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReq.externalId(), loginReq.password()));
-            String externalId = authentication.getName();
-            User user = userRepository.findByExternalId(externalId).get();
-            String token = jwtUtil.createToken(user);
-
-            return HttpStatus.OK.toString();
-
-        } catch (Exception e){
-            return HttpStatus.BAD_REQUEST.toString();
-        }
+        return null;
     }
 }

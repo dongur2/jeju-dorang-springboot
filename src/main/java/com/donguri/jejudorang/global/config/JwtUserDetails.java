@@ -1,74 +1,36 @@
 package com.donguri.jejudorang.global.config;
 
 import com.donguri.jejudorang.domain.user.entity.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 
-public class JwtUserDetails implements UserDetails {
+public class JwtUserDetails extends User implements UserDetails {
 
-    private static final long serialVersionUID = 1L;
-
-    private Long id;
-
-    private String externalId;
-
-    @JsonIgnore
-    private String password;
-
-    private Collection<? extends GrantedAuthority> authorities;
-
-    public JwtUserDetails(Long id, String externalId, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.externalId = externalId;
-        this.password = password;
-        this.authorities = authorities;
-    }
-
-    public static JwtUserDetails build(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
-                .collect(Collectors.toList());
-
-        return new JwtUserDetails(
-                user.getId(),
-                user.getProfile().getExternalId(),
-                user.getPassword().getPassword(),
-                authorities);
+    public JwtUserDetails(final User user) {
+        super(user);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public String getEmail() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
+        return getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().toString()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public String getUsername() {
         return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return super.getPwd().getPassword();
     }
 
     @Override
@@ -92,13 +54,14 @@ public class JwtUserDetails implements UserDetails {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(Object obj) {
+        if (obj == this) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
-        JwtUserDetails user = (JwtUserDetails) o;
-        return Objects.equals(id, user.id);
+        }
+        JwtUserDetails that = (JwtUserDetails) obj;
+        return Objects.equals(getId(), that.getId());
     }
-
 }

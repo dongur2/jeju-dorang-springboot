@@ -13,6 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -41,7 +44,7 @@ class UserRepositoryTest {
     @Test
     void 회원가입_성공() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
@@ -75,7 +78,7 @@ class UserRepositoryTest {
     @Test
     void 오류_아이디_없음() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).role(new HashSet<ERole.USER>).build();
         Profile profile = Profile.builder().user(user).nickname("usernickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
@@ -91,7 +94,9 @@ class UserRepositoryTest {
     @Test
     void 오류_닉네임_없음() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        Set<Role> test = new HashSet<>();
+        test.add(new Role(ERole.USER));
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
@@ -107,7 +112,7 @@ class UserRepositoryTest {
     @Test
     void 오류_이메일_없음() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
@@ -123,7 +128,7 @@ class UserRepositoryTest {
     @Test
     void 오류_동의항목_비동의() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").build();
         Password password = Password.builder().user(user).password("1234").build();
@@ -139,7 +144,7 @@ class UserRepositoryTest {
     @Test
     void 오류_비밀번호_없음() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).build();
@@ -156,7 +161,7 @@ class UserRepositoryTest {
     @Test
     void 회원정보_수정() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
@@ -193,7 +198,7 @@ class UserRepositoryTest {
     @Test
     void 비밀번호_수정() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
@@ -227,7 +232,7 @@ class UserRepositoryTest {
     @Test
     void 회원삭제() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(Role.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();

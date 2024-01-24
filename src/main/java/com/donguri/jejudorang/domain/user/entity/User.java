@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -21,9 +24,11 @@ public class User {
     @Enumerated(EnumType.STRING) // BASIC, KAKAO
     private LoginType loginType;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING) // ADMIN, USER
-    private Role role;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
 
     @OneToOne(fetch = FetchType.LAZY,
@@ -32,34 +37,49 @@ public class User {
 
     @OneToOne(fetch = FetchType.LAZY,
             mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private Authentication authentication;
+    private Authentication auth;
 
     @OneToOne(fetch = FetchType.LAZY,
             mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private Password password;
+    private Password pwd;
 
     @OneToOne
     private SocialLogin socialLogin;
 
 
     @Builder
-    public User(LoginType loginType, Role role) {
+    public User(LoginType loginType) {
         this.loginType = loginType;
-        this.role = role;
     }
 
+    public User(User user) {
+        id = user.getId();
+        loginType = user.getLoginType();
+        roles = user.getRoles();
+        profile = user.getProfile();
+        auth = user.getAuth();
+        pwd = user.getPwd();
+        socialLogin = user.getSocialLogin();
+    }
+
+
+
+    // role setter
+    public void addRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 
     // FK setter
     public void updateProfile(Profile profile) {
         this.profile = profile;
     }
 
-    public void updateAuthentication(Authentication authentication) {
-        this.authentication = authentication;
+    public void updateAuth(Authentication authentication) {
+        this.auth = authentication;
     }
 
-    public void updatePassword(Password password) {
-        this.password = password;
+    public void updatePwd(Password password) {
+        this.pwd = password;
     }
 
     public void updateSocialLogin(SocialLogin socialLogin) {
