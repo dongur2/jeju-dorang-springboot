@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.repository;
 
 import com.donguri.jejudorang.domain.user.entity.User;
+import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,4 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u where u.profile.externalId=:eid")
     Optional<User> findByExternalId(@Param("eid") String externalId);
+
+    @Query("select u from User u where u.auth.email=:email")
+    Optional<User> findByEmail(@Param("email") String email);
 }

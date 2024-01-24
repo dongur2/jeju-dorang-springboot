@@ -47,9 +47,17 @@ public class User {
     private SocialLogin socialLogin;
 
 
-    @Builder
     public User(LoginType loginType) {
         this.loginType = loginType;
+    }
+
+    @Builder
+    public User(LoginType loginType, Set<Role> roles, Profile profile, Authentication auth, Password pwd) {
+        this.loginType = loginType;
+        this.roles = roles;
+        this.profile = profile;
+        this.auth = auth;
+        this.pwd = pwd;
     }
 
     public User(User user) {
@@ -65,7 +73,7 @@ public class User {
 
 
     // role setter
-    public void addRoles(Set<Role> roles) {
+    public void updateRole(Set<Role> roles) {
         this.roles = roles;
     }
 

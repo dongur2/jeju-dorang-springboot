@@ -3,13 +3,9 @@ package com.donguri.jejudorang.domain.user.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Set;
 
-@Getter
-@Setter
 public record SignUpRequest (
 
         @NotBlank
@@ -24,7 +20,7 @@ public record SignUpRequest (
         @NotBlank
         String email,
 
-        @NotBlank
+//        @NotBlank
         String agreement,
 
         @NotBlank
