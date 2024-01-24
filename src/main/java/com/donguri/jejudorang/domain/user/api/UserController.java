@@ -3,7 +3,7 @@ package com.donguri.jejudorang.domain.user.api;
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
-import com.donguri.jejudorang.global.config.JwtUtil;
+import com.donguri.jejudorang.global.config.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,9 +22,9 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
-    private JwtUtil jwtUtil;
+    private JwtProvider jwtUtil;
 
-    public UserController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public UserController(AuthenticationManager authenticationManager, JwtProvider jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
     }

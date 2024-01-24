@@ -21,6 +21,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByExternalId(username)
                 .orElseThrow(() -> new EntityNotFoundException("다음 아이디에 해당하는 유저가 없습니다 : " + username));
 
-        return UserDetailsImpl.build(user);
+        return JwtUserDetails.build(user);
     }
 }
