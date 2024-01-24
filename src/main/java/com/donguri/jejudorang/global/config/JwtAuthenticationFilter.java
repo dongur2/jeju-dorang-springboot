@@ -31,9 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtProvider jwtProvider;
 
     @Autowired
-    private JwtTokenValidator jwtTokenValidator;
-
-    @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
     /*
@@ -47,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request); // request로부터 토큰 추출
 
-            if (StringUtils.hasText(jwt) && jwtTokenValidator.validateToken(jwt)) { // 토큰 존재 & 유효성 검증
+            if (StringUtils.hasText(jwt) && jwtProvider.validateJwtToken(jwt)) { // 토큰 존재 & 유효성 검증
 
                 Long userId = jwtProvider.getUserIdFromJWT(jwt); // 토큰에서 userId 추출
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId); // userId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
