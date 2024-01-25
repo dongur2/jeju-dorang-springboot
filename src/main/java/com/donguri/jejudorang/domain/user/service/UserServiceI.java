@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.user.dto.JwtAuthResponse;
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
@@ -10,12 +9,14 @@ import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,18 +24,28 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceI implements UserService{
 
+    @Value("${jwt.expiration-time.refresh}")
+    private long expire_time;
+
+    @Autowired private final RedisTemplate<String, String> redisTemplate;
+
     @Autowired private final AuthenticationManager authenticationManager;
+
     @Autowired private final UserRepository userRepository;
     @Autowired private final RoleRepository roleRepository;
+
     @Autowired private final PasswordEncoder encoder;
+
     @Autowired private final JwtProvider jwtProvider;
 
-    public UserServiceI(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
+    public UserServiceI(RedisTemplate<String, String> redisTemplate, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
+        this.redisTemplate = redisTemplate;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -98,29 +109,35 @@ public class UserServiceI implements UserService{
 
     @Override
     @Transactional
-    public JwtAuthResponse signIn(LoginRequest loginRequest) {
+    public ResponseEntity<?> signIn(LoginRequest loginRequest) {
+
+        // 로그인 아이디, 비밀번호 기반으로 AuthenticationToken 생성해서 인증 수행(authenticate)한 뒤, 성공하면 Authentication 생성
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.externalId(), loginRequest.password()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String jwt = jwtProvider
-                .generateTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
+        // 인증한 정보 기반으로 토큰 생성
+        String jwtAccess = jwtProvider.generateTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
                         .orElseThrow(() -> new RuntimeException("해당 아이디를 가진 유저가 없습니다.")).getId());
 
+        // 인증한 정보 기반으로 refresh token 생성
+        String jwtRefresh = jwtProvider.generateRefreshTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
+                .orElseThrow(() -> new RuntimeException("해당 아이디를 가진 유저가 없습니다.")).getId());
+
+        // 인증된 정보 기반 해당 사용자 세부 정보
         JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+        // Redis 저장
+        redisTemplate.opsForValue().set(
+                userDetails.getProfile().getExternalId(), // key
+                jwtRefresh, // value
+                expire_time, // timeout
+                TimeUnit.MILLISECONDS
+        );
 
-        return JwtAuthResponse.builder()
-                .token(jwt)
-                .type("Bearer")
-                .id(userDetails.getId())
-                .externalId(userDetails.getProfile().getExternalId())
-                .roles(roles)
-                .build();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Authorization", "Bearer " + jwtAccess);
+
+        return new ResponseEntity<>(jwtAccess, httpHeaders, HttpStatus.OK);
     }
 
 

@@ -7,6 +7,7 @@ import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -52,14 +53,8 @@ public class UserController {
         return "/user/login/signInForm";
     }
     @PostMapping("/login")
-    public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
-        }
-
-        JwtAuthResponse jwtAuthResponse = userService.signIn(loginRequest);
-        model.addAttribute("jwtAuth", jwtAuthResponse);
-        return "redirect:/";
+    public ResponseEntity<?> authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult, Model model) {
+        return userService.signIn(loginRequest);
     }
 
 

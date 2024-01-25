@@ -1,7 +1,6 @@
 package com.donguri.jejudorang.global.config;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,12 +21,14 @@ import java.util.stream.Collectors;
 public class JwtProvider {
 
     private static final String AUTHORITIES_CLAIM = "authorities";
-    private final String jwtSecret;
-    private final long jwtExpirationInMs;
 
-    public JwtProvider(@Value("${jwt.secret-key}") String jwtSecret, @Value("${jwt.expiration-time}") long jwtExpirationInMs) {
-        this.jwtSecret = jwtSecret;
-        this.jwtExpirationInMs = jwtExpirationInMs;
+    private final long jwtAccessExpirationInMs;
+    private final long jwtRefreshExpirationInMs;
+
+    public JwtProvider(@Value("${jwt.expiration-time.access}") long jwtAccessExpirationInMs,
+                       @Value("${jwt.expiration-time.refresh}") long jwtRefreshExpirationInMs) {
+        this.jwtAccessExpirationInMs = jwtAccessExpirationInMs;
+        this.jwtRefreshExpirationInMs = jwtRefreshExpirationInMs;
     }
 
 
@@ -36,14 +37,14 @@ public class JwtProvider {
     *
     * */
     public String generateToken(JwtUserDetails userDetails) {
-        Instant expireDate = Instant.now().plusMillis(jwtExpirationInMs);
+        Instant expireDate = Instant.now().plusMillis(jwtAccessExpirationInMs);
         String authorities = getUserAuthorities(userDetails);
 
         return Jwts.builder() // * Claims == JWT body (토큰에 포함되는 속성/정보)
                 .setSubject(Long.toString(userDetails.getId())) // Claims 인스턴스의 sub 값 설정
                 .setIssuedAt(Date.from(Instant.now())) // Claims 인스턴스의 iat 값 설정
                 .setExpiration(Date.from(expireDate)) // Claims 인스턴스의 exp 값 설정
-                .signWith(key(), SignatureAlgorithm.HS512) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
+                .signWith(key()) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
                 .claim(AUTHORITIES_CLAIM, authorities) // JWT Claims에 커스텀 필드, 필드값 지정 - 권한 필드
                 .compact(); // JWT build
     }
@@ -53,12 +54,22 @@ public class JwtProvider {
      *
      * */
     public String generateTokenFromUserId(Long userId) {
-        Instant expireDate = Instant.now().plusMillis(jwtExpirationInMs);
+        Instant expireDate = Instant.now().plusMillis(jwtAccessExpirationInMs);
         return Jwts.builder()
                 .setSubject(Long.toString(userId))
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(expireDate))
-                .signWith(key(), SignatureAlgorithm.HS512)
+                .signWith(key())
+                .compact();
+    }
+
+    public String generateRefreshTokenFromUserId(Long userId) {
+        Instant expireDate = Instant.now().plusMillis(jwtRefreshExpirationInMs);
+        return Jwts.builder()
+                .setSubject(Long.toString(userId))
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(Date.from(expireDate))
+                .signWith(key())
                 .compact();
     }
 
@@ -99,7 +110,7 @@ public class JwtProvider {
     *
     * */
     public long getExpiryDuration() {
-        return jwtExpirationInMs;
+        return jwtAccessExpirationInMs;
     }
 
     /*
