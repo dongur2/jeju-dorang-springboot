@@ -1,13 +1,14 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.user.dto.JwtAuthResponse;
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired private final UserService userService;
+
+    @Value("${jwt.cookie-expire}")
+    private int cookieTime;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -53,8 +57,19 @@ public class UserController {
         return "/user/login/signInForm";
     }
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult, Model model) {
-        return userService.signIn(loginRequest);
+    public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
+                                   HttpServletResponse response) {
+
+        String jwtAccess = userService.signIn(loginRequest);
+
+        Cookie resCookie = new Cookie("access_token", jwtAccess);
+        resCookie.setHttpOnly(true);
+        resCookie.setMaxAge(cookieTime);
+        resCookie.setPath("/");
+
+        response.addCookie(resCookie);
+
+        return "redirect:/";
     }
 
 

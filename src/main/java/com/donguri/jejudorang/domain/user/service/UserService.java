@@ -9,5 +9,5 @@ import org.springframework.http.ResponseEntity;
 public interface UserService {
     void signUp(SignUpRequest signUpRequest);
 
-    ResponseEntity<?> signIn(LoginRequest loginRequest);
+    String signIn(LoginRequest loginRequest);
 }

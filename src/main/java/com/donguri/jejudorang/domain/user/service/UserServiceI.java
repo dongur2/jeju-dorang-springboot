@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,11 +110,14 @@ public class UserServiceI implements UserService{
 
     @Override
     @Transactional
-    public ResponseEntity<?> signIn(LoginRequest loginRequest) {
+    public String signIn(LoginRequest loginRequest) {
 
         // 로그인 아이디, 비밀번호 기반으로 AuthenticationToken 생성해서 인증 수행(authenticate)한 뒤, 성공하면 Authentication 생성
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.externalId(), loginRequest.password()));
+
+        // securityContext에 authentication 설정
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 인증한 정보 기반으로 토큰 생성
         String jwtAccess = jwtProvider.generateTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
@@ -134,10 +138,7 @@ public class UserServiceI implements UserService{
                 TimeUnit.MILLISECONDS
         );
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Authorization", "Bearer " + jwtAccess);
-
-        return new ResponseEntity<>(jwtAccess, httpHeaders, HttpStatus.OK);
+        return jwtAccess;
     }
 
 
