@@ -18,11 +18,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // protected BaseEntity() {}
 public abstract class BaseEntity {
 
-    @Id
-    @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;

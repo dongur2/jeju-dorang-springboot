@@ -10,6 +10,11 @@ import lombok.RequiredArgsConstructor;
 @Entity @Getter @RequiredArgsConstructor
 public class Trip extends BaseEntity {
 
+    @Id
+    @Column(nullable = false, name = "trip_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Size(max = 20)
     private String placeId; // CNTS_300000000015996
 

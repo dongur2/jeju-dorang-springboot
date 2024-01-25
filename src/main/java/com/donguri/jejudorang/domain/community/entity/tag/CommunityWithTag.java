@@ -22,15 +22,23 @@ import lombok.NoArgsConstructor;
         }
 )
 @NoArgsConstructor
-@AllArgsConstructor
 public class CommunityWithTag extends BaseEntity {
 
+    @Id
+    @Column(nullable = false, name = "community_with_tag_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "community_id")
     private Community community;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "tag_id")
     private Tag tag;
 
+    public CommunityWithTag(Community community, Tag tag) {
+        this.community = community;
+        this.tag = tag;
+    }
 }

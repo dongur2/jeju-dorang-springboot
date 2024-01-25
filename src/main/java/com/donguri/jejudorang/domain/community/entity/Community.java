@@ -21,6 +21,11 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 public class Community extends BaseEntity {
 
+    @Id
+    @Column(nullable = false, name = "community_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
 //    * 작성자 임시 코드
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "writer_id")

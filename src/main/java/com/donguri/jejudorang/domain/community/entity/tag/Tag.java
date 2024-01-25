@@ -14,6 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 public class Tag extends BaseEntity {
 
+    @Id
+    @Column(nullable = false, name = "tag_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Size(max = 20)
     @Column(nullable = false)
     private String keyword;
