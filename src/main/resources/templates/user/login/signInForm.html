@@ -7,7 +7,6 @@
     <title>로그인 - 제주도랑</title>
 </head>
 <th layout:fragment="content">
-
     <form id="sign-in-form" th:action th:method="post" th:object="${loginRequest}">
         <label for="externalId" class="form-label">externalId</label>
         <input type="text" id="externalId" name="externalId" class="form-control" aria-describedby="passwordHelpBlock">
@@ -17,6 +16,5 @@
 
         <input class="btn btn-primary" type="submit" value="Submit">
     </form>
-    
 </th>
 </html>
