@@ -1,28 +1,20 @@
 package com.donguri.jejudorang.domain.user.entity;
 
+import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
-public class Authentication {
+public class Authentication extends BaseEntity {
 
-    @Id
-    @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @JoinColumn(nullable = false)
-    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    @OneToOne
     private User user;
 
     @Size(max = 11)
@@ -32,10 +24,26 @@ public class Authentication {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false) // 0: No(가입불가) 1:필수동의 2:+선택동의
-    private byte agreement;
+    @Column(nullable = false) // null: No(가입불가) NECESSARY:필수동의 ALL:+선택동의
+    private AgreeRange agreement;
 
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    @Builder
+    public Authentication(User user, String phone, String email, AgreeRange agreement) {
+        this.user = user;
+        this.phone = phone;
+        this.email = email;
+        this.agreement = agreement;
+    }
+
+
+
+    public void updatePhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+
 }
