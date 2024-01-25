@@ -73,6 +73,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Disables CSRF protection
                 .httpBasic(AbstractHttpConfigurer::disable) // Configures HTTP Basic authentication
                 .formLogin(AbstractHttpConfigurer::disable) // Specifies to support form based authentication
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
 
                 /*
                  * Allows configuring of Session Management
