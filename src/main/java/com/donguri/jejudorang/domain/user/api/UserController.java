@@ -5,10 +5,11 @@ import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 
 
 @Slf4j
@@ -27,8 +28,25 @@ public class UserController {
         return "/user/login/signUpForm";
     }
     @PostMapping("/signup")
-    public String registerUser(@Valid SignUpRequest signUpRequest, Model model) {
-        ResponseEntity<?> result = userService.signUp(signUpRequest);
-        return "/";
+    public String registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult, Model model) {
+        // 유효성 검사 에러
+        if (bindingResult.hasErrors()) {
+            return bindErrorPage(bindingResult, model);
+        }
+
+        try {
+            userService.signUp(signUpRequest);
+            return "/home/home";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
+
+    }
+
+    private static String bindErrorPage(BindingResult bindingResult, Model model) {
+        model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
+        return "/error/errorTemp";
     }
 }

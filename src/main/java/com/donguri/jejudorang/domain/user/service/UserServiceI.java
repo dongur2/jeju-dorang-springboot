@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.user.dto.MessageResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
@@ -8,7 +7,6 @@ import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.config.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,23 +31,17 @@ public class UserServiceI implements UserService{
 
     @Override
     @Transactional
-    public ResponseEntity<?> signUp(SignUpRequest signUpRequest) {
+    public void signUp(SignUpRequest signUpRequest) {
         if (userRepository.findByExternalId(signUpRequest.externalId()).isPresent()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: 이미 존재하는 아이디입니다."));
+            throw new RuntimeException("Error: 이미 존재하는 아이디입니다.");
         }
 
         if (userRepository.findByEmail(signUpRequest.email()).isPresent()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: 이미 존재하는 이메일입니다."));
+            throw new RuntimeException("Error: 이미 존재하는 이메일입니다.");
         }
 
         if (!signUpRequest.password().equals(signUpRequest.passwordForCheck())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: 비밀번호가 일치하지 않습니다."));
+            throw new RuntimeException("Error: 비밀번호가 일치하지 않습니다.");
         }
 
         /*
@@ -89,8 +81,5 @@ public class UserServiceI implements UserService{
         userToSave.updateRole(roles);
 
         userRepository.save(userToSave);
-
-        return ResponseEntity.ok(new MessageResponse("회원 가입이 성공적으로 완료되었습니다."));
-
     }
 }
