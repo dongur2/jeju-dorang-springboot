@@ -55,7 +55,7 @@ public class UserController {
 
     @GetMapping("/login")
     public String signInForm() {
-        return "/user/signInForm";
+        return "/user/login/signInForm";
     }
     @PostMapping("/login")
     public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult, Model model) {
