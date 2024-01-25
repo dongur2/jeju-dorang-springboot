@@ -39,12 +39,11 @@ public class AuthController {
 
     @GetMapping("/signup")
     public String registerForm(Model model) {
-        model.addAttribute("errorMsg", "SIGN UP FORM");
-        return "/error/errorTemp";
+        return "/user/login/signUpForm";
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest) {
         log.info("success");
 
         if (userRepository.findByExternalId(signUpRequest.externalId()).isPresent()) {
@@ -59,7 +58,7 @@ public class AuthController {
                     .body(new MessageResponse("Error: 이미 존재하는 이메일입니다."));
         }
 
-        if (signUpRequest.password().equals(signUpRequest.passwordForCheck())) {
+        if (!signUpRequest.password().equals(signUpRequest.passwordForCheck())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: 비밀번호가 일치하지 않습니다."));
