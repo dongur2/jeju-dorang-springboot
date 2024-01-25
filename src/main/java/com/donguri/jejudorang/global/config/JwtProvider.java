@@ -67,7 +67,7 @@ public class JwtProvider {
     *
     * */
     private Key key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
 
     /*
