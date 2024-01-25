@@ -92,7 +92,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (authorizationManagerRequestMatcherRegistry ->
                                 authorizationManagerRequestMatcherRegistry
-                                        .requestMatchers("/", "/login", "/signup",
+                                        .requestMatchers("/", "/login", "/user/signup",
                                                 "/trip", "/trip/list/*", "/trip/places",
                                                 "/community/chats", "/community/parties",
                                                 "/css/**", "/img/**").permitAll()

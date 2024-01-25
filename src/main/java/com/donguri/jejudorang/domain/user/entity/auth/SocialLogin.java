@@ -26,6 +26,7 @@ public class SocialLogin {
     @Column(nullable = false)
     private String accessToken;
 
+    @JoinColumn(name = "user_id")
     @OneToOne(orphanRemoval = true)
     private User user;
 

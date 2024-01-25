@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Profile extends BaseEntity {
 
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "user_id")
     @OneToOne
     private User user;
 

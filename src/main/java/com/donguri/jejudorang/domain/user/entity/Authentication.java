@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Authentication extends BaseEntity {
 
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "user_id")
     @OneToOne
     private User user;
 

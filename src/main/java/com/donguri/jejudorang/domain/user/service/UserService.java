@@ -1,6 +1,9 @@
 package com.donguri.jejudorang.domain.user.service;
 
 
-public interface UserService {
+import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
+import org.springframework.http.ResponseEntity;
 
+public interface UserService {
+    ResponseEntity<?> signUp(SignUpRequest signUpRequest);
 }
