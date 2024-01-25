@@ -8,6 +8,8 @@ import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
+import com.donguri.jejudorang.global.config.RefreshToken;
+import com.donguri.jejudorang.global.config.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,7 +36,7 @@ public class UserServiceI implements UserService{
     @Value("${jwt.expiration-time.refresh}")
     private long expire_time;
 
-    @Autowired private final RedisTemplate<String, String> redisTemplate;
+    @Autowired private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired private final AuthenticationManager authenticationManager;
 
@@ -45,8 +47,8 @@ public class UserServiceI implements UserService{
 
     @Autowired private final JwtProvider jwtProvider;
 
-    public UserServiceI(RedisTemplate<String, String> redisTemplate, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
-        this.redisTemplate = redisTemplate;
+    public UserServiceI(RefreshTokenRepository refreshTokenRepository, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
+        this.refreshTokenRepository = refreshTokenRepository;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -130,13 +132,8 @@ public class UserServiceI implements UserService{
         // 인증된 정보 기반 해당 사용자 세부 정보
         JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
 
-        // Redis 저장
-        redisTemplate.opsForValue().set(
-                userDetails.getProfile().getExternalId(), // key
-                jwtRefresh, // value
-                expire_time, // timeout
-                TimeUnit.MILLISECONDS
-        );
+        // redis 저장
+        refreshTokenRepository.save(new RefreshToken(jwtRefresh, userDetails.getProfile().getId()));
 
         return jwtAccess;
     }

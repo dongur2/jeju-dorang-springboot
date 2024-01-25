@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.global.config;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+
     /*
     * request header의 유효 토큰 필터링
     *
@@ -41,8 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String jwt = getJwtFromRequest(request); // request로부터 토큰 추출
         try {
-            String jwt = getJwtFromRequest(request); // request로부터 토큰 추출
 
             if (StringUtils.hasText(jwt) && jwtProvider.validateJwtToken(jwt)) { // 토큰 존재 & 유효성 검증
 
@@ -55,6 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication); // SecurityContextHolder에 인증 토큰 설정 => 인증된 사용자 정보 설정
 
             }
+
+        } catch (ExpiredJwtException e) {
+            Long userIdFromJWT = jwtProvider.getUserIdFromJWT(jwt);
+
+
 
         } catch (Exception ex) {
             log.error("Failed to set user authentication in security context: {}", ex.getMessage());
