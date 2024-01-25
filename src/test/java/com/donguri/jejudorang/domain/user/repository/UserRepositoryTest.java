@@ -35,6 +35,7 @@ class UserRepositoryTest {
     @Autowired ProfileRepository profileRepository;
     @Autowired AuthenticationRepository authenticationRepository;
     @Autowired PasswordRepository passwordRepository;
+    @Autowired RoleRepository roleRepository;
 
     @AfterEach
     void after() {
@@ -44,14 +45,20 @@ class UserRepositoryTest {
     @Test
     void 회원가입_성공() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         //when
         //cascade = CascadeType.PERSIST -> 영속성 전이로 부모 저장하면 자식까지 저장
@@ -68,24 +75,30 @@ class UserRepositoryTest {
 
         Authentication foundAuth = authenticationRepository.findByUser(foundUser)
                 .orElseThrow(() -> new RuntimeException("저장된 인증이 없습니다"));
-        assertThat(foundAuth).isEqualTo(savedUser.getAuthentication());
+        assertThat(foundAuth).isEqualTo(savedUser.getAuth());
 
         Password foundPwd = passwordRepository.findByUser(foundUser)
                 .orElseThrow(() -> new RuntimeException("저장된 비밀번호가 없습니다"));
-        assertThat(foundPwd).isEqualTo(savedUser.getPassword());
+        assertThat(foundPwd).isEqualTo(savedUser.getPwd());
     }
 
     @Test
     void 오류_아이디_없음() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(new HashSet<ERole.USER>).build();
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).nickname("usernickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         //when - then
         Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
@@ -94,16 +107,20 @@ class UserRepositoryTest {
     @Test
     void 오류_닉네임_없음() {
         //given
-        Set<Role> test = new HashSet<>();
-        test.add(new Role(ERole.USER));
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         //when - then
         Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
@@ -112,14 +129,20 @@ class UserRepositoryTest {
     @Test
     void 오류_이메일_없음() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         //when - then
         Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
@@ -128,14 +151,20 @@ class UserRepositoryTest {
     @Test
     void 오류_동의항목_비동의() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         //when - then
         Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
@@ -144,14 +173,20 @@ class UserRepositoryTest {
     @Test
     void 오류_비밀번호_없음() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         //when - then
         Assertions.assertThrows(Exception.class, () -> userRepository.save(user));
@@ -161,14 +196,20 @@ class UserRepositoryTest {
     @Test
     void 회원정보_수정() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         User savedUser = userRepository.save(user);
 
@@ -178,15 +219,15 @@ class UserRepositoryTest {
 
         foundUser.getProfile().updateNickname("updateNickname");
         foundUser.getProfile().updateImg("imgurl.com");
-        foundUser.getAuthentication().updateEmail("new@mail.com");
-        foundUser.getAuthentication().updatePhone("01099999999");
+        foundUser.getAuth().updateEmail("new@mail.com");
+        foundUser.getAuth().updatePhone("01099999999");
 
         //then
         User updatedUser = userRepository.findById(foundUser.getId())
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다"));
-        Profile updatedProf = profileRepository.findByUser(updatedUser)
+        Profile updatedProf = profileRepository.findByUser(foundUser)
                 .orElseThrow(() -> new EntityNotFoundException("유저에 해당하는 프로필이 없습니다"));
-        Authentication updatedAuth = authenticationRepository.findByUser(updatedUser)
+        Authentication updatedAuth = authenticationRepository.findByUser(foundUser)
                 .orElseThrow(() -> new RuntimeException("유저에 해당하는 인증이 없습니다"));
 
         assertThat(updatedProf.getNickname()).isEqualTo("updateNickname");
@@ -198,14 +239,20 @@ class UserRepositoryTest {
     @Test
     void 비밀번호_수정() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         User savedUser = userRepository.save(user);
 
@@ -220,7 +267,7 @@ class UserRepositoryTest {
         *
         * */
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        foundUser.getPassword().updatePassword(passwordEncoder, "updatePwd1234");
+        foundUser.getPwd().updatePassword(passwordEncoder, "updatePwd1234");
 
         Password foundPwd = passwordRepository.findByUser(foundUser)
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 비밀번호가 없습니다"));
@@ -232,14 +279,20 @@ class UserRepositoryTest {
     @Test
     void 회원삭제() {
         //given
-        User user = User.builder().loginType(LoginType.BASIC).role(ERole.USER).build();
+        User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
         Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
         user.updateProfile(profile);
-        user.updateAuthentication(authentication);
-        user.updatePassword(password);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
 
         User savedUser = userRepository.save(user);
 
