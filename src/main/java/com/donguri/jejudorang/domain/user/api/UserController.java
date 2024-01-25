@@ -1,15 +1,23 @@
 package com.donguri.jejudorang.domain.user.api;
 
+import com.donguri.jejudorang.domain.user.dto.JwtAuthResponse;
+import com.donguri.jejudorang.domain.user.dto.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -44,6 +52,22 @@ public class UserController {
         }
 
     }
+
+    @GetMapping("/login")
+    public String signInForm() {
+        return "/user/signInForm";
+    }
+    @PostMapping("/login")
+    public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            return bindErrorPage(bindingResult, model);
+        }
+
+        JwtAuthResponse jwtAuthResponse = userService.signIn(loginRequest);
+        model.addAttribute("jwtAuth", jwtAuthResponse);
+        return "/home/home";
+    }
+
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
