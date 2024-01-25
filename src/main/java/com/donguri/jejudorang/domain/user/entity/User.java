@@ -44,6 +44,7 @@ public class User {
     private Password pwd;
 
     @OneToOne
+    @JoinColumn(name = "social_login_code")
     private SocialLogin socialLogin;
 
 

@@ -13,11 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Bookmark extends BaseEntity {
 
-    @JoinColumn(nullable = false)
+    @Id
+    @Column(nullable = false, name = "bookmark_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @JoinColumn(nullable = false, name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) // user 삭제 -> bookmark 삭제
     private User user;
 
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "community_id")
     @ManyToOne(cascade = CascadeType.REMOVE) // community 삭제 -> bookmark 삭제
     private Community community;
 
