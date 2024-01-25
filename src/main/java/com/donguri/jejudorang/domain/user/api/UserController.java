@@ -23,6 +23,12 @@ public class UserController {
 
     @Autowired private final UserService userService;
 
+    @Value("${jwt.header}")
+    private String jwtHeader;
+
+    @Value("${jwt.header.prefix}")
+    private String jwtPrefix;
+
     @Value("${jwt.cookie-expire}")
     private int cookieTime;
 
@@ -68,6 +74,7 @@ public class UserController {
         resCookie.setPath("/");
 
         response.addCookie(resCookie);
+        response.addHeader(jwtHeader, jwtPrefix+jwtAccess);
 
         return "redirect:/";
     }

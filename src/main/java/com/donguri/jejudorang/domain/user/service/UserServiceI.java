@@ -117,7 +117,7 @@ public class UserServiceI implements UserService{
                 new UsernamePasswordAuthenticationToken(loginRequest.externalId(), loginRequest.password()));
 
         // securityContext에 authentication 설정
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 인증한 정보 기반으로 토큰 생성
         String jwtAccess = jwtProvider.generateTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
