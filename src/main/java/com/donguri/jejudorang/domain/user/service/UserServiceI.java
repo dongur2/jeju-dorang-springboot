@@ -8,15 +8,10 @@ import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
-import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,10 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -112,6 +105,8 @@ public class UserServiceI implements UserService{
         userRepository.save(userToSave);
     }
 
+
+
     @Override
     @Transactional
     public String signIn(LoginRequest loginRequest) {
@@ -154,6 +149,13 @@ public class UserServiceI implements UserService{
 //                    .authorities(userDetails.getAuthorities())
 //                    .build());
 //        }
+        }
+        @Override
+        @Transactional
+        public Optional<Authentication> logOut() {
+            log.info("LOGOUT SERVICE IN ========= ");
+            SecurityContextHolder.clearContext(); // securityContext의 인증정보 제거
 
-    }
+            return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
+        }
 }

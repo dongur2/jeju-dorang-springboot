@@ -4,16 +4,19 @@ import com.donguri.jejudorang.domain.user.dto.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 
 
 @Slf4j
@@ -49,7 +52,7 @@ public class UserController {
 
         try {
             userService.signUp(signUpRequest);
-            return "/home/home";
+            return "redirect:/";
 
         } catch (Exception e) {
             model.addAttribute("errorMsg", e.getMessage());
@@ -85,13 +88,26 @@ public class UserController {
 
     }
 
-    @PostMapping("/logout")
-    public String deleteCookie(HttpServletResponse response) {
-        Cookie deleteCookie = new Cookie("access_token", null);
-        deleteCookie.setMaxAge(0);
-        response.addCookie(deleteCookie);
+    @GetMapping("/logout")
+    public String deleteCookie(@CookieValue(value = "access_token", defaultValue = "", required = false) Cookie cookie,
+                               HttpServletResponse response) {
+        log.info("LOGOUT ========= !!");
 
-        return "/home/home";
+        Optional<Authentication> authState = userService.logOut();
+        if (authState.isPresent()) {
+            log.error("로그아웃 실패");
+            return "/error/errorTemp";
+        } else {
+            log.info("로그아웃 성공");
+
+            cookie.setHttpOnly(true);
+            cookie.setValue(null);
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+
+            return "redirect:/";
+        }
+
     }
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
