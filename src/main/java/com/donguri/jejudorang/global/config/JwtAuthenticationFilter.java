@@ -29,6 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${jwt.header.prefix}")
     private String tokenRequestHeaderPrefix;
 
+    @Value("${jwt.cookie-expire}")
+    private int cookieTime;
+
     @Autowired
     private JwtProvider jwtProvider;
 
@@ -114,6 +117,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                             .build()
                             );
                             log.info("REFRESH TOKEN 갱신 ========= {} -> {}", refreshToken, newRefresh);
+
+                            Cookie changeRefresh = new Cookie("refresh_token", newRefresh);
+                            changeRefresh.setHttpOnly(true);
+                            changeRefresh.setMaxAge(cookieTime);
+                            changeRefresh.setPath("/");
+
+                            response.addCookie(changeRefresh);
+                            log.info("REFRESH TOKEN & 쿠키 갱신");
                         }
 
                     } else {
