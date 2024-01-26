@@ -67,7 +67,7 @@ public class UserController {
     }
     @PostMapping("/login")
     public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
-                                   HttpServletResponse response) {
+                                   HttpServletResponse response, Model model) {
 
         String jwtAccess = userService.signIn(loginRequest);
 
@@ -110,8 +110,6 @@ public class UserController {
 
     private static void expireCookie(HttpServletResponse response, String cookieName) {
         Cookie cookie = new Cookie(cookieName, null);
-//        cookie.setHttpOnly(true);
-//        cookie.setValue(null);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
