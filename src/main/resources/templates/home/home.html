@@ -8,14 +8,13 @@
     <title>main1</title>
 </head>
 <div layout:fragment="content">
-    main page(home.html)
 
-    이름<span sec:authentication="name"></span>
+    <h1> MAIN </h1>
 
+    <h1>ID: <span sec:authentication="name" style="color:blue; font-weight: bold"></span></h1>
     <h3 sec:authorize="isAuthenticated()">인증된 사람만 이 글을 볼 수 있습니다.</h3>
-
-    <div sec:authorize="hasRole('USER')">
-        유저
+    <div sec:authorize="isAuthenticated()">
+        <h2>Authority: <span th:text="${#authentication.getAuthorities()}"></span></h2>
     </div>
 
 </div>
