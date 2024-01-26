@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.global.config;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -53,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("권한/인증 검증 시작 -- doFilterInternal");
 
         String token = getJwtFromRequest(request); // 쿠키에서 추출한 토큰
-        log.info("Request Token ==== {}", token);
+        log.info("요청 쿠키에서 추출한 토큰 ==== {}", token);
 
         try {
 
@@ -71,12 +72,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
-        } catch (ExpiredJwtException e) {
-            log.error("JWT 토큰이 만료되었습니다.");
-
         } catch (Exception ex) {
-            log.error("Failed to set user authentication in security context: {}", ex.getMessage());
-            throw ex;
+            log.error("Security Context 유저 인증에 실패: {}", ex.getMessage());
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);

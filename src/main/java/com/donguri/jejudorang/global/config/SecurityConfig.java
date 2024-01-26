@@ -70,7 +70,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // HTTP 기본 인증 비활성화
                 .formLogin(AbstractHttpConfigurer::disable) // 기본 폼 로그인 비활성화
 
-//                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint)) // 예외 처리
 
                 // 세션을 생성하거나 사용하지 않음
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -80,10 +80,10 @@ public class SecurityConfig {
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/", "/home/home",
-                                        "/user/login", "/user/signup",
+                                        "/user/login", "/user/signup", "/user/logout",
                                         "/trip", "/trip/list/*", "/trip/places",
                                         "/community/chats", "/community/parties",
-                                        "/css/**", "/img/**")
+                                        "/css/**", "/img/**", "/error/**")
                                 .permitAll().anyRequest().authenticated()));
 
         http.authenticationProvider(authenticationProvider()); // 사용자의 인증 정보를 제공하는 authenticationProvider 설정: 사용자 로그인 정보 기반 인증 수행

@@ -2,6 +2,7 @@ package com.donguri.jejudorang.global.config;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -20,9 +21,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class JwtProvider {
+    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     private static final String AUTHORITIES_CLAIM = "authorities";
-
     private final long jwtAccessExpirationInMs;
     private final long jwtRefreshExpirationInMs;
 
@@ -41,14 +42,14 @@ public class JwtProvider {
                 .setSubject(userPrincipal.getUsername()) // Claims 인스턴스의 sub 값 설정
                 .setIssuedAt(new Date()) // Claims 인스턴스의 iat 값 설정
                 .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs)) // Claims 인스턴스의 exp 값 설정
-                .signWith(key()) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
+                .signWith(key) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
                 .claim(AUTHORITIES_CLAIM, authorities) // JWT Claims에 커스텀 필드, 필드값 지정 - 권한 필드
                 .compact(); // JWT build
     }
 
     public String getUserNameFromJwtToken(String token) { // externalId
         return Jwts.parserBuilder()
-                .setSigningKey(key()).build()
+                .setSigningKey(key).build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
 
@@ -60,7 +61,7 @@ public class JwtProvider {
                 .setSubject(userDetails.getUsername()) // Claims 인스턴스의 sub 값 설정
                 .setIssuedAt(new Date()) // Claims 인스턴스의 iat 값 설정
                 .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs)) // Claims 인스턴스의 exp 값 설정
-                .signWith(key()) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
+                .signWith(key) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
                 .claim(AUTHORITIES_CLAIM, authorities) // JWT Claims에 커스텀 필드, 필드값 지정 - 권한 필드
                 .compact(); // JWT build
     }
@@ -113,7 +114,7 @@ public class JwtProvider {
     * */
     public Date getTokenExpirationFromJWT(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(key())
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token).getBody().getExpiration();
     }
@@ -135,7 +136,7 @@ public class JwtProvider {
     * */
     public List<GrantedAuthority> getAuthoritiesFromJWT(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key())
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -163,19 +164,17 @@ public class JwtProvider {
     * */
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
+            log.info("AUTHTOKEN == {}", authToken);
+            Jwt parse = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parse(authToken);
+            log.info("PARSE == {}", parse);
             return true;
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty: {}", e.getMessage());
-        }
 
-        return false;
+        } catch (Exception e) {
+            throw new SignatureException("SIGNATURE EXCEPTION");
+        }
     }
 
 }

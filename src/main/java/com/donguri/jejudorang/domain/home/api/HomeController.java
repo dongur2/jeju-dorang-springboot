@@ -13,13 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController {
     @GetMapping
     public String home(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("access_token")) {
-                log.info(cookie.getValue());
-            }
-        }
-
         return "/home/home";
     }
 }

@@ -74,11 +74,18 @@ public class UserController {
         resCookie.setPath("/");
 
         response.addCookie(resCookie);
-        response.addHeader("test", "2");
+
+        return "redirect:/";
+    }
+
+    @PostMapping("/logout")
+    public String deleteCookie(HttpServletResponse response) {
+        Cookie deleteCookie = new Cookie("access_token", null);
+        deleteCookie.setMaxAge(0);
+        response.addCookie(deleteCookie);
 
         return "/home/home";
     }
-
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());

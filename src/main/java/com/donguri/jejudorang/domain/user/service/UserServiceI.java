@@ -115,22 +115,31 @@ public class UserServiceI implements UserService{
     @Override
     @Transactional
     public String signIn(LoginRequest loginRequest) {
+        log.info("USER SERVICE ======== Sign IN");
 
-        // 로그인 아이디, 비밀번호 기반으로 AuthenticationToken 생성해서 인증 수행(authenticate)한 뒤, 성공하면 Authentication 생성
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.externalId(), loginRequest.password()));
+        try {
+            // 로그인 아이디, 비밀번호 기반으로 AuthenticationToken 생성해서 인증 수행(authenticate)한 뒤, 성공하면 Authentication 생성
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.externalId(), loginRequest.password()));
+            log.info("SERVICE AUTHENTICATION 인증 === {}",String.valueOf(authentication));
 
-        // securityContext에 authentication 설정
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.info(String.valueOf(authentication));
+            // securityContext에 authentication 설정
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("SERVICE AUTHENTICATION 인증 CONTEXT 설정 === {}",String.valueOf(authentication));
 
-        // 인증한 정보 기반으로 토큰 생성
-        String jwtAccess = jwtProvider.generateAccessToken(authentication);
-        log.info(jwtAccess);
+            // 인증한 정보 기반으로 토큰 생성
+            String jwtAccess = jwtProvider.generateAccessToken(authentication);
+            log.info("JWT ACCESS TOKEN 생성 ============ {}",jwtAccess);
 
-        // 인증된 정보 기반 해당 사용자 세부 정보
-        JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
-        log.info(userDetails.getUsername());
+            // 인증된 정보 기반 해당 사용자 세부 정보
+            JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
+            log.info("인증 정보 기반 사용자 세부 정보 ============ {}",userDetails.getUsername());
+            return jwtAccess;
+
+        } catch (Exception e) {
+            log.error("인증 실패==========={}", e.getMessage());
+            return null;
+        }
 
         // redis 저장
 //        if (refreshTokenRepository.findByUserId(userDetails.getProfile().getId()).isEmpty()){
@@ -146,8 +155,5 @@ public class UserServiceI implements UserService{
 //                    .build());
 //        }
 
-        return jwtAccess;
     }
-
-
 }
