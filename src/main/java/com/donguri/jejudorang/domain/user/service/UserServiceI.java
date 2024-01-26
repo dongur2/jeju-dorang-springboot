@@ -132,7 +132,7 @@ public class UserServiceI implements UserService{
             Optional<RefreshToken> refreshOp = refreshTokenRepository.findByUserId(authentication.getName());
             if (refreshOp.isPresent()) {
                 jwtRefresh = refreshOp.get().getRefreshToken();
-            } else {
+            } else { // refresh token은 만료기간에 맞춰 redis에서 자동 삭제
                 jwtRefresh = jwtProvider.generateRefreshTokenFromUserId(authentication);
 
                 RefreshToken refreshTokenToSave = RefreshToken.builder()

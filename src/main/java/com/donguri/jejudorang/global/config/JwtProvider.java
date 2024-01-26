@@ -79,10 +79,12 @@ public class JwtProvider {
 
     public String generateRefreshTokenFromUserId(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
+        String authorities = getUserAuthorities(userPrincipal);
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationInMs))
+                .claim(AUTHORITIES_CLAIM, authorities)
                 .signWith(key)
                 .compact();
     }
