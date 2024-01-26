@@ -8,10 +8,13 @@ import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
+import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,9 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -109,7 +110,7 @@ public class UserServiceI implements UserService{
 
     @Override
     @Transactional
-    public String signIn(LoginRequest loginRequest) {
+    public Map<String, String> signIn(LoginRequest loginRequest) {
         log.info("USER SERVICE ======== Sign IN");
 
         try {
@@ -126,11 +127,33 @@ public class UserServiceI implements UserService{
             String jwtAccess = jwtProvider.generateAccessToken(authentication);
             log.info("JWT ACCESS TOKEN 생성 ============ {}",jwtAccess);
 
+            // refresh token
+            String jwtRefresh = null;
+            Optional<RefreshToken> refreshOp = refreshTokenRepository.findByUserId(authentication.getName());
+            if (refreshOp.isPresent()) {
+                jwtRefresh = refreshOp.get().getRefreshToken();
+            } else {
+                jwtRefresh = jwtProvider.generateRefreshTokenFromUserId(authentication);
+
+                RefreshToken refreshTokenToSave = RefreshToken.builder()
+                        .refreshToken(jwtRefresh)
+                        .userId(authentication.getName())
+                        .build();
+
+                refreshTokenRepository.save(refreshTokenToSave);
+                log.info("Redis Refresh Token saved === {}", refreshTokenToSave);
+            }
+
             // 인증된 정보 기반 해당 사용자 세부 정보
             JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
             log.info("인증 정보 기반 사용자 세부 정보 ============ {}",userDetails.getUsername());
 
-            return jwtAccess;
+            Map<String, String> tokens = new HashMap<>();
+            tokens.put("access", jwtAccess);
+            tokens.put("refresh", jwtRefresh);
+
+            return tokens;
+
 
         } catch (Exception e) {
             log.error("인증 실패==========={}", e.getMessage());

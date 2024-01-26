@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -69,19 +70,25 @@ public class UserController {
     public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
                                    HttpServletResponse response, Model model) {
 
-        String jwtAccess = userService.signIn(loginRequest);
+        Map<String, String> tokens = userService.signIn(loginRequest);
 
-        if (jwtAccess == null) {
+        if (tokens == null || tokens.get("access") == null) {
             return "redirect:/user/login";
 
         } else {
 
-            Cookie resCookie = new Cookie("access_token", jwtAccess);
-            resCookie.setHttpOnly(true);
-            resCookie.setMaxAge(cookieTime);
-            resCookie.setPath("/");
+            Cookie accessCookie = new Cookie("access_token", tokens.get("access"));
+            accessCookie.setHttpOnly(true);
+            accessCookie.setMaxAge(cookieTime);
+            accessCookie.setPath("/");
 
-            response.addCookie(resCookie);
+            Cookie refreshCookie = new Cookie("refresh_token", tokens.get("refresh"));
+            refreshCookie.setHttpOnly(true);
+            refreshCookie.setMaxAge(cookieTime);
+            refreshCookie.setPath("/");
+
+            response.addCookie(accessCookie);
+            response.addCookie(refreshCookie);
 
             return "redirect:/";
         }
@@ -102,6 +109,7 @@ public class UserController {
             log.info("로그아웃 성공");
 
             expireCookie(response, "access_token");
+            expireCookie(response, "refresh_token");
 
             return "redirect:/";
         }

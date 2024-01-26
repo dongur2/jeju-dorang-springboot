@@ -12,19 +12,16 @@ import java.util.Collection;
 
 @Getter
 @NoArgsConstructor
-@RedisHash(value = "refreshToken", timeToLive = 14440)
+@RedisHash(value = "refreshToken", timeToLive = 300)
 public class RefreshToken {
     @Id
     private String refreshToken;
 
-    private Long userId;
-
-    private Collection<? extends GrantedAuthority> authorities;
+    private String userId;
 
     @Builder
-    public RefreshToken(String refreshToken, Long userId, Collection<? extends GrantedAuthority> authorities) {
+    public RefreshToken(String refreshToken, String userId) {
         this.refreshToken = refreshToken;
         this.userId = userId;
-        this.authorities = authorities;
     }
 }

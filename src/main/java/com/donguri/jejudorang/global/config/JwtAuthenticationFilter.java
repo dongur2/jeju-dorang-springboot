@@ -76,6 +76,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.error("아이디/비밀번호가 틀립니다: Security Context 유저 인증 실패 {}", e.getMessage());
             SecurityContextHolder.clearContext();
 
+        } catch (ExpiredJwtException e) {
+            log.error("토큰이 만료되었습니다 {}", e.getMessage());
+            SecurityContextHolder.clearContext();
+
         } catch (Exception e) {
             log.error("Security Context 유저 인증에 실패: {}", e.getMessage());
             SecurityContextHolder.clearContext();

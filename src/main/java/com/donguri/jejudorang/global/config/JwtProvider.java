@@ -77,15 +77,15 @@ public class JwtProvider {
 //                .compact();
 //    }
 
-//    public String generateRefreshTokenFromUserId(Long userId) {
-//        Instant expireDate = Instant.now().plusMillis(jwtRefreshExpirationInMs);
-//        return Jwts.builder()
-//                .setSubject(Long.toString(userId))
-//                .setIssuedAt(Date.from(Instant.now()))
-//                .setExpiration(Date.from(expireDate))
-//                .signWith(key())
-//                .compact();
-//    }
+    public String generateRefreshTokenFromUserId(Authentication authentication) {
+        JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationInMs))
+                .signWith(key)
+                .compact();
+    }
 
 
 //    /*
