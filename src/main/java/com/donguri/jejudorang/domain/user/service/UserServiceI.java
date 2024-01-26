@@ -113,7 +113,7 @@ public class UserServiceI implements UserService{
         log.info("USER SERVICE ======== Sign IN");
 
         try {
-            // 로그인 아이디, 비밀번호 기반으로 AuthenticationToken 생성해서 인증 수행(authenticate)한 뒤, 성공하면 Authentication 생성
+            // 로그인 아이디, 비밀번호 기반으로 유저 정보(JwtUserDetails) 찾아서 Authentication 리턴
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.externalId(), loginRequest.password()));
             log.info("SERVICE AUTHENTICATION 인증 === {}",String.valueOf(authentication));
@@ -122,13 +122,14 @@ public class UserServiceI implements UserService{
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.info("SERVICE AUTHENTICATION 인증 CONTEXT 설정 === {}",String.valueOf(authentication));
 
-            // 인증한 정보 기반으로 토큰 생성
+            // 인증한 정보 기반으로 access token 생성
             String jwtAccess = jwtProvider.generateAccessToken(authentication);
             log.info("JWT ACCESS TOKEN 생성 ============ {}",jwtAccess);
 
             // 인증된 정보 기반 해당 사용자 세부 정보
             JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
             log.info("인증 정보 기반 사용자 세부 정보 ============ {}",userDetails.getUsername());
+
             return jwtAccess;
 
         } catch (Exception e) {

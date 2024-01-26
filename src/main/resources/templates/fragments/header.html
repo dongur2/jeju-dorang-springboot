@@ -13,7 +13,9 @@
                 <a class="nav-link" href="#">마이페이지</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" aria-disabled="true">로그아웃</a>
+                <form th:action="@{/user/logout}" th:method="post">
+                    <button type="submit">로그아웃</button>
+                </form>
             </li>
         </ul>
 

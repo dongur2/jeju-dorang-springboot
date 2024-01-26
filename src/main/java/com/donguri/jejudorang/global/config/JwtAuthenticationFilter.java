@@ -62,7 +62,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = jwtProvider.getUserNameFromJwtToken(token); // 토큰에서 externalId 추출
                 log.info("Authentication User ---- {}", username);
 
-                // 로그인
                 UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
                 List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(token); // 토큰에서 사용자 권한 추출
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
@@ -70,6 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 인증된 사용자 설정
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.info("인증 설정 완료 ----- {}", authentication);
             }
 
         } catch (IllegalArgumentException e) {

@@ -88,26 +88,32 @@ public class UserController {
 
     }
 
-    @GetMapping("/logout")
-    public String deleteCookie(@CookieValue(value = "access_token", defaultValue = "", required = false) Cookie cookie,
-                               HttpServletResponse response) {
+    @PostMapping("/logout")
+    public String deleteUser(HttpServletResponse response) {
         log.info("LOGOUT ========= !!");
 
         Optional<Authentication> authState = userService.logOut();
+
         if (authState.isPresent()) {
             log.error("로그아웃 실패");
             return "/error/errorTemp";
+
         } else {
             log.info("로그아웃 성공");
 
-            cookie.setHttpOnly(true);
-            cookie.setValue(null);
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
+            expireCookie(response, "access_token");
 
             return "redirect:/";
         }
 
+    }
+
+    private static void expireCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+//        cookie.setHttpOnly(true);
+//        cookie.setValue(null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {

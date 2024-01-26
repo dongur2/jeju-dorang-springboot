@@ -70,6 +70,13 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // HTTP 기본 인증 비활성화
                 .formLogin(AbstractHttpConfigurer::disable) // 기본 폼 로그인 비활성화
 
+                // 로그아웃 -> 쿠키 삭제
+                .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer
+                        .logoutUrl("/user/logout")
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("access_token")
+                        .invalidateHttpSession(true))
+
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint)) // 예외 처리
 
                 // 세션을 생성하거나 사용하지 않음

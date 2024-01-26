@@ -26,7 +26,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Transactional // loadUserByExternalId
     public UserDetails loadUserByUsername(String externalId) throws UsernameNotFoundException {
         Optional<User> dbUser = userRepository.findByExternalId(externalId);
-        log.info("LOG IN - Fetched User : {} by {}", dbUser, externalId);
+        log.info("아이디로 유저 찾기(loadUserByUsername) : {} by {}", dbUser, externalId);
         return dbUser.map(JwtUserDetails::build)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 아이디를 가진 유저가 없습니다: " + externalId));
     }
@@ -34,7 +34,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(Long id) {
         Optional<User> dbUser = userRepository.findById(id);
-        log.info("LOG IN - Fetched User : {} by {}", dbUser, id);
+        log.info("DB아이디로 유저 찾기(loadUserById) : {} by {}", dbUser, id);
         return dbUser.map(JwtUserDetails::build)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 데이터베이스 아이디를 가진 유저가 없습니다: " + id));
     }
