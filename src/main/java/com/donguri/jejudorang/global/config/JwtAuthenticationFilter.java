@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -77,13 +78,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String refreshToken = getJwtFromRequest(request, "refresh_token"); // 쿠키에서 추출한 토큰
             log.info("요청 쿠키에서 추출한 리프레쉬토큰 ==== {}", refreshToken);
 
-            // refresh token으로 재인증 후 service단으로 가서 access token 새로 발급
-            if (refreshToken != null && jwtProvider.validateJwtToken(refreshToken)) {
-                String username = jwtProvider.getUserNameFromJwtToken(refreshToken); // 토큰에서 externalId 추출
+            try {
 
-                try {
+                // refresh token으로 재인증 후 service단으로 가서 access token 새로 발급
+                if (refreshToken != null) {
+                    String username = jwtProvider.getUserNameFromJwtToken(refreshToken); // 토큰에서 externalId 추출
+                    log.info("REFRESH TOKEN USERNAME ========= {}", username);
+
+                    log.info("RTR TOKEN {} ",refreshTokenRepository.findById(refreshToken).get().getRefreshToken());
                     // redis refresh token
-                    String refreshRepo = refreshTokenRepository.findByUserId(username)
+                    String refreshRepo = refreshTokenRepository.findById(refreshToken)
                             .orElseThrow(() -> new RuntimeException("refresh token이 없습니다 : " + username))
                             .getRefreshToken();
 
@@ -97,16 +101,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         log.info("인증 설정 완료 ----- {}", authentication);
 
+                        // 만료 3분 전 refresh token 갱신
+                        if (jwtProvider.getTokenExpirationFromJWT(refreshToken)
+                                .before(new Date(System.currentTimeMillis() + 60 * 3000))) {
+
+                            String newRefresh = jwtProvider.generateRefreshTokenFromUserId(authentication);
+
+                            refreshTokenRepository.deleteById(refreshToken);
+                            refreshTokenRepository.save(RefreshToken.builder()
+                                            .refreshToken(newRefresh)
+                                            .userId(username)
+                                            .build()
+                            );
+                            log.info("REFRESH TOKEN 갱신 ========= {} -> {}", refreshToken, newRefresh);
+                        }
+
                     } else {
                         log.error("Refresh Token이 일치하지 않습니다 : cookie = {} and repo = {}", refreshToken, refreshRepo);
                     }
-
-                } catch (Exception ex) {
-                    log.error("refresh Token 만료: {}", refreshToken);
-                    SecurityContextHolder.clearContext();
                 }
 
-            };
+            } catch (Exception ex) {
+                log.error("refresh Exception : {}", ex.getMessage());
+                log.error("refresh Token 만료: {}", refreshToken);
+                SecurityContextHolder.clearContext();
+
+            }
 
         } catch (Exception e) {
             log.error("Security Context 유저 인증에 실패: {}", e.getMessage());

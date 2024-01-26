@@ -131,8 +131,11 @@ public class UserServiceI implements UserService{
             String jwtRefresh = null;
             Optional<RefreshToken> refreshOp = refreshTokenRepository.findByUserId(authentication.getName());
             if (refreshOp.isPresent()) {
+                log.info("REDIS findbyuserid {}", refreshOp);
                 jwtRefresh = refreshOp.get().getRefreshToken();
             } else { // refresh token은 만료기간에 맞춰 redis에서 자동 삭제
+                log.info("REDIS findbyuserid 없음");
+
                 jwtRefresh = jwtProvider.generateRefreshTokenFromUserId(authentication);
 
                 RefreshToken refreshTokenToSave = RefreshToken.builder()
@@ -160,26 +163,14 @@ public class UserServiceI implements UserService{
             return null;
         }
 
-        // redis 저장
-//        if (refreshTokenRepository.findByUserId(userDetails.getProfile().getId()).isEmpty()){
-//            log.info("refreshTokenRepository Redis saved");
-//            // 인증한 정보 기반으로 refresh token 생성
-//            String jwtRefresh = jwtProvider.generateRefreshTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
-//                    .orElseThrow(() -> new RuntimeException("해당 아이디를 가진 유저가 없습니다.")).getId());
-//
-//            refreshTokenRepository.save(RefreshToken.builder()
-//                    .refreshToken(jwtRefresh)
-//                    .userId(userDetails.getProfile().getId())
-//                    .authorities(userDetails.getAuthorities())
-//                    .build());
-//        }
-        }
-        @Override
-        @Transactional
-        public Optional<Authentication> logOut() {
-            log.info("LOGOUT SERVICE IN ========= ");
-            SecurityContextHolder.clearContext(); // securityContext의 인증정보 제거
+    }
 
-            return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
-        }
+    @Override
+    @Transactional
+    public Optional<Authentication> logOut() {
+        log.info("LOGOUT SERVICE IN ========= ");
+        SecurityContextHolder.clearContext(); // securityContext의 인증정보 제거
+
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
+    }
 }
