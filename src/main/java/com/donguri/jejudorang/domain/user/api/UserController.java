@@ -74,9 +74,9 @@ public class UserController {
         resCookie.setPath("/");
 
         response.addCookie(resCookie);
-        response.addHeader(jwtHeader, jwtPrefix+jwtAccess);
+        response.addHeader("test", "2");
 
-        return "redirect:/";
+        return "/home/home";
     }
 
 

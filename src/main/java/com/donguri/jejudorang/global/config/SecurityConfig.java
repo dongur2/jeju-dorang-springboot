@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +33,6 @@ public class SecurityConfig {
         this.jwtUserDetailsService = jwtUserDetailsService;
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
     }
-
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -70,20 +70,21 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // HTTP 기본 인증 비활성화
                 .formLogin(AbstractHttpConfigurer::disable) // 기본 폼 로그인 비활성화
 
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
+//                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
 
                 // 세션을 생성하거나 사용하지 않음
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // RequestMatcher를 사용해 HttpServletRequest(요청)에 대한 제한 설정
                 .authorizeHttpRequests(
-                        (authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                                        .requestMatchers("/", "/home/home",
-                                                "/user/login", "/user/signup",
-                                                "/trip", "/trip/list/*", "/trip/places",
-                                                "/community/chats", "/community/parties",
-                                                "/css/**", "/img/**").permitAll()
-                                        .anyRequest().authenticated()));
+                        (authorizationManagerRequestMatcherRegistry
+                                -> authorizationManagerRequestMatcherRegistry.requestMatchers(
+                                        "/", "/home/home",
+                                        "/user/login", "/user/signup",
+                                        "/trip", "/trip/list/*", "/trip/places",
+                                        "/community/chats", "/community/parties",
+                                        "/css/**", "/img/**")
+                                .permitAll().anyRequest().authenticated()));
 
         http.authenticationProvider(authenticationProvider()); // 사용자의 인증 정보를 제공하는 authenticationProvider 설정: 사용자 로그인 정보 기반 인증 수행
 
