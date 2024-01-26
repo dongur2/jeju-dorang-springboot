@@ -19,9 +19,12 @@ public class RefreshToken {
 
     private Long userId;
 
+    private Collection<? extends GrantedAuthority> authorities;
+
     @Builder
-    public RefreshToken(String refreshToken, Long userId) {
+    public RefreshToken(String refreshToken, Long userId, Collection<? extends GrantedAuthority> authorities) {
         this.refreshToken = refreshToken;
         this.userId = userId;
+        this.authorities = authorities;
     }
 }

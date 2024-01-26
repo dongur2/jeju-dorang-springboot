@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -31,47 +32,59 @@ public class JwtProvider {
         this.jwtRefreshExpirationInMs = jwtRefreshExpirationInMs;
     }
 
+    // Authentication -> 토큰 생성
+    public String generateAccessToken(Authentication authentication) {
+        JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
+        String authorities = getUserAuthorities(userPrincipal);
 
-    /*
-    * Principal Object로부터 새로운 JWT 생성
-    *
-    * */
-    public String generateToken(JwtUserDetails userDetails) {
-        Instant expireDate = Instant.now().plusMillis(jwtAccessExpirationInMs);
-        String authorities = getUserAuthorities(userDetails);
-
-        return Jwts.builder() // * Claims == JWT body (토큰에 포함되는 속성/정보)
-                .setSubject(Long.toString(userDetails.getId())) // Claims 인스턴스의 sub 값 설정
-                .setIssuedAt(Date.from(Instant.now())) // Claims 인스턴스의 iat 값 설정
-                .setExpiration(Date.from(expireDate)) // Claims 인스턴스의 exp 값 설정
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername()) // Claims 인스턴스의 sub 값 설정
+                .setIssuedAt(new Date()) // Claims 인스턴스의 iat 값 설정
+                .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs)) // Claims 인스턴스의 exp 값 설정
                 .signWith(key()) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
                 .claim(AUTHORITIES_CLAIM, authorities) // JWT Claims에 커스텀 필드, 필드값 지정 - 권한 필드
                 .compact(); // JWT build
     }
 
-    /*
-     * Principal Object로부터 새로운 JWT 생성
-     *
-     * */
-    public String generateTokenFromUserId(Long userId) {
-        Instant expireDate = Instant.now().plusMillis(jwtAccessExpirationInMs);
-        return Jwts.builder()
-                .setSubject(Long.toString(userId))
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(expireDate))
-                .signWith(key())
-                .compact();
+    public String getUserNameFromJwtToken(String token) { // externalId
+        return Jwts.parserBuilder()
+                .setSigningKey(key()).build()
+                .parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String generateRefreshTokenFromUserId(Long userId) {
-        Instant expireDate = Instant.now().plusMillis(jwtRefreshExpirationInMs);
-        return Jwts.builder()
-                .setSubject(Long.toString(userId))
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(expireDate))
-                .signWith(key())
-                .compact();
+    // Principal -> 토큰 생성
+    public String generateAccessToken(JwtUserDetails userDetails) {
+        String authorities = getUserAuthorities(userDetails);
+
+        return Jwts.builder() // * Claims == JWT body (토큰에 포함되는 속성/정보)
+                .setSubject(userDetails.getUsername()) // Claims 인스턴스의 sub 값 설정
+                .setIssuedAt(new Date()) // Claims 인스턴스의 iat 값 설정
+                .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs)) // Claims 인스턴스의 exp 값 설정
+                .signWith(key()) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
+                .claim(AUTHORITIES_CLAIM, authorities) // JWT Claims에 커스텀 필드, 필드값 지정 - 권한 필드
+                .compact(); // JWT build
     }
+
+//    // userId를 이용한 토큰 생성
+//    public String generateTokenFromUserId(Long userId) {
+//        Instant expireDate = Instant.now().plusMillis(jwtAccessExpirationInMs);
+//        return Jwts.builder()
+//                .setSubject(Long.toString(userId))
+//                .setIssuedAt(Date.from(Instant.now()))
+//                .setExpiration(Date.from(expireDate))
+//                .signWith(key())
+//                .compact();
+//    }
+
+//    public String generateRefreshTokenFromUserId(Long userId) {
+//        Instant expireDate = Instant.now().plusMillis(jwtRefreshExpirationInMs);
+//        return Jwts.builder()
+//                .setSubject(Long.toString(userId))
+//                .setIssuedAt(Date.from(Instant.now()))
+//                .setExpiration(Date.from(expireDate))
+//                .signWith(key())
+//                .compact();
+//    }
 
     /*
     * HMAC-SHA 알고리즘으로 만든 새로운 시크릿 키 리턴
@@ -81,18 +94,18 @@ public class JwtProvider {
         return Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
 
-    /*
-    * 토큰 userId 리턴
-    *
-    * */
-    public Long getUserIdFromJWT(String token) {
-        return Long.parseLong(
-                Jwts.parserBuilder() // 복호화할 키 설정
-                    .setSigningKey(key())
-                    .build()
-                    .parseClaimsJws(token).getBody().getSubject() // JWT의 Claims를 파싱해 body - subject(userId)을 추출해 리턴
-        );
-    }
+//    /*
+//    * 토큰 userId 리턴
+//    *
+//    * */
+//    public Long getUserIdFromJWT(String token) {
+//        return Long.parseLong(
+//                Jwts.parserBuilder() // 복호화할 키 설정
+//                    .setSigningKey(key())
+//                    .build()
+//                    .parseClaimsJws(token).getBody().getSubject() // JWT의 Claims를 파싱해 body - subject(userId)을 추출해 리턴
+//        );
+//    }
 
     /*
     * 토큰 만료날짜 리턴

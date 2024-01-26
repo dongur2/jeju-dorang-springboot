@@ -10,6 +10,7 @@ import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
 import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceI implements UserService{
 
@@ -119,21 +121,30 @@ public class UserServiceI implements UserService{
                 new UsernamePasswordAuthenticationToken(loginRequest.externalId(), loginRequest.password()));
 
         // securityContext에 authentication 설정
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info(String.valueOf(authentication));
 
         // 인증한 정보 기반으로 토큰 생성
-        String jwtAccess = jwtProvider.generateTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
-                        .orElseThrow(() -> new RuntimeException("해당 아이디를 가진 유저가 없습니다.")).getId());
-
-        // 인증한 정보 기반으로 refresh token 생성
-        String jwtRefresh = jwtProvider.generateRefreshTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
-                .orElseThrow(() -> new RuntimeException("해당 아이디를 가진 유저가 없습니다.")).getId());
+        String jwtAccess = jwtProvider.generateAccessToken(authentication);
+        log.info(jwtAccess);
 
         // 인증된 정보 기반 해당 사용자 세부 정보
         JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
+        log.info(userDetails.getUsername());
 
         // redis 저장
-        refreshTokenRepository.save(new RefreshToken(jwtRefresh, userDetails.getProfile().getId()));
+//        if (refreshTokenRepository.findByUserId(userDetails.getProfile().getId()).isEmpty()){
+//            log.info("refreshTokenRepository Redis saved");
+//            // 인증한 정보 기반으로 refresh token 생성
+//            String jwtRefresh = jwtProvider.generateRefreshTokenFromUserId(userRepository.findByExternalId(loginRequest.externalId())
+//                    .orElseThrow(() -> new RuntimeException("해당 아이디를 가진 유저가 없습니다.")).getId());
+//
+//            refreshTokenRepository.save(RefreshToken.builder()
+//                    .refreshToken(jwtRefresh)
+//                    .userId(userDetails.getProfile().getId())
+//                    .authorities(userDetails.getAuthorities())
+//                    .build());
+//        }
 
         return jwtAccess;
     }

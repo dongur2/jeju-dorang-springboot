@@ -24,16 +24,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private final JwtUserDetailsService jwtUserDetailsService;
+    @Autowired private final JwtUserDetailsService jwtUserDetailsService;
 
-    @Autowired
-    private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    @Autowired private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
     public SecurityConfig(JwtUserDetailsService jwtUserDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint) {
         this.jwtUserDetailsService = jwtUserDetailsService;
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
     }
+
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -62,37 +61,23 @@ public class SecurityConfig {
 
     /*
     * securityFilterChain
-    *
-    * Defines a filter chain which is capable of being matched against an HttpServletRequest.
-    * in order to decide whether it applies to that request.
-    *
+    * HttpServletRequest(요청)에 대해 매칭될 수 있는 필터체인을 정의
     * */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disables CSRF protection
-                .httpBasic(AbstractHttpConfigurer::disable) // Configures HTTP Basic authentication
-                .formLogin(AbstractHttpConfigurer::disable) // Specifies to support form based authentication
+                .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화
+                .httpBasic(AbstractHttpConfigurer::disable) // HTTP 기본 인증 비활성화
+                .formLogin(AbstractHttpConfigurer::disable) // 기본 폼 로그인 비활성화
+
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
 
-                /*
-                 * Allows configuring of Session Management
-                 *
-                 * Specifies the various session creation policies for Spring Security
-                 * STATELESS: Spring Security will never create an HttpSession and it will never use it to obtain the SecurityContext
-                 *
-                 * */
-                .sessionManagement(
-                        (sessionManagement) ->
-                                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 세션을 생성하거나 사용하지 않음
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                /*
-                 * Allows restricting access based upon the HttpServletRequest using RequestMatcher implementations
-                 *
-                 * */
+                // RequestMatcher를 사용해 HttpServletRequest(요청)에 대한 제한 설정
                 .authorizeHttpRequests(
-                        (authorizationManagerRequestMatcherRegistry ->
-                                authorizationManagerRequestMatcherRegistry
+                        (authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                                         .requestMatchers("/", "/home/home",
                                                 "/user/login", "/user/signup",
                                                 "/trip", "/trip/list/*", "/trip/places",
@@ -102,7 +87,7 @@ public class SecurityConfig {
 
         http.authenticationProvider(authenticationProvider()); // 사용자의 인증 정보를 제공하는 authenticationProvider 설정: 사용자 로그인 정보 기반 인증 수행
 
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Spring Security Filter Chain에 사용자 정의 필터 추가(JWT 인증 필터)
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // 필터 체인에 사용자 정의 필터 추가(JWT 인증 필터)
 
         return http.build();
     }

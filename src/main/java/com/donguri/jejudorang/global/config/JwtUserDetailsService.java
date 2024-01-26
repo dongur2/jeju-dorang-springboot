@@ -16,19 +16,18 @@ import java.util.Optional;
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private final UserRepository userRepository;
+    @Autowired private final UserRepository userRepository;
 
     public JwtUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    @Transactional
+    @Transactional // loadUserByExternalId
     public UserDetails loadUserByUsername(String externalId) throws UsernameNotFoundException {
         Optional<User> dbUser = userRepository.findByExternalId(externalId);
         log.info("Fetched User : {} by {}", dbUser, externalId);
-        return dbUser.map(JwtUserDetails::new)
+        return dbUser.map(JwtUserDetails::build)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 아이디를 가진 유저가 없습니다: " + externalId));
     }
 
@@ -36,7 +35,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDetails loadUserById(Long id) {
         Optional<User> dbUser = userRepository.findById(id);
         log.info("Fetched User : {} by {}", dbUser, id);
-        return dbUser.map(JwtUserDetails::new)
+        return dbUser.map(JwtUserDetails::build)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 데이터베이스 아이디를 가진 유저가 없습니다: " + id));
     }
 

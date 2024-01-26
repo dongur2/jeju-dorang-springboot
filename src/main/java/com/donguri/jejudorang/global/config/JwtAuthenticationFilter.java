@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RefreshTokenRepository refreshTokenRepository;
 
 
     /*
@@ -47,25 +47,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String jwt = getJwtFromRequest(request); // request로부터 토큰 추출
+        String token = getJwtFromRequest(request); // 요청 헤더에서 토큰 추출
+
         try {
 
-            if (StringUtils.hasText(jwt) && jwtProvider.validateJwtToken(jwt)) { // 토큰 존재 & 유효성 검증
+            if (token != null && jwtProvider.validateJwtToken(token)) {
+                String username = jwtProvider.getUserNameFromJwtToken(token); // 토큰에서 userId 추출
+                log.info("Authentication User ---- {}", username);
 
-                Long userId = jwtProvider.getUserIdFromJWT(jwt); // 토큰에서 userId 추출
-                UserDetails userDetails = jwtUserDetailsService.loadUserById(userId); // userId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
-                List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(jwt); // 토큰에서 사용자 권한 추출
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, jwt, authorities); // 인증 토큰 생성
-
+                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
+                List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(token); // 토큰에서 사용자 권한 추출
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication); // SecurityContextHolder에 인증 토큰 설정 => 인증된 사용자 정보 설정
-
             }
-
-        } catch (ExpiredJwtException e) {
-            Long userIdFromJWT = jwtProvider.getUserIdFromJWT(jwt);
-
-
 
         } catch (Exception ex) {
             log.error("Failed to set user authentication in security context: {}", ex.getMessage());
