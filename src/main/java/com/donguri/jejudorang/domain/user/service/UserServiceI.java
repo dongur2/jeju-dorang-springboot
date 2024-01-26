@@ -143,8 +143,8 @@ public class UserServiceI implements UserService{
                         .userId(authentication.getName())
                         .build();
 
-                refreshTokenRepository.save(refreshTokenToSave);
-                log.info("Redis Refresh Token saved === {}", refreshTokenToSave);
+                RefreshToken saved = refreshTokenRepository.save(refreshTokenToSave);
+                log.info("Redis Refresh Token saved === {}", saved.getRefreshToken());
             }
 
             // 인증된 정보 기반 해당 사용자 세부 정보
