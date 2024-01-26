@@ -1,15 +1,23 @@
 package com.donguri.jejudorang.domain.user.api;
 
+import com.donguri.jejudorang.domain.user.dto.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import java.util.Optional;
 
 
 @Slf4j
@@ -18,6 +26,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired private final UserService userService;
+
+    @Value("${jwt.header}")
+    private String jwtHeader;
+
+    @Value("${jwt.header.prefix}")
+    private String jwtPrefix;
+
+    @Value("${jwt.cookie-expire}")
+    private int cookieTime;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -36,13 +53,73 @@ public class UserController {
 
         try {
             userService.signUp(signUpRequest);
-            return "/home/home";
+            return "redirect:/";
 
         } catch (Exception e) {
             model.addAttribute("errorMsg", e.getMessage());
             return "/error/errorTemp";
         }
 
+    }
+
+    @GetMapping("/login")
+    public String signInForm() {
+        return "/user/login/signInForm";
+    }
+    @PostMapping("/login")
+    public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
+                                   HttpServletResponse response, Model model) {
+
+        Map<String, String> tokens = userService.signIn(loginRequest);
+
+        if (tokens == null || tokens.get("access") == null) {
+            return "redirect:/user/login";
+
+        } else {
+
+            Cookie accessCookie = new Cookie("access_token", tokens.get("access"));
+            accessCookie.setHttpOnly(true);
+            accessCookie.setMaxAge(cookieTime);
+            accessCookie.setPath("/");
+
+            Cookie refreshCookie = new Cookie("refresh_token", tokens.get("refresh"));
+            refreshCookie.setHttpOnly(true);
+            refreshCookie.setMaxAge(cookieTime);
+            refreshCookie.setPath("/");
+
+            response.addCookie(accessCookie);
+            response.addCookie(refreshCookie);
+
+            return "redirect:/";
+        }
+
+    }
+
+    @PostMapping("/logout")
+    public String deleteUser(HttpServletResponse response) {
+        log.info("LOGOUT ========= !!");
+
+        Optional<Authentication> authState = userService.logOut();
+
+        if (authState.isPresent()) {
+            log.error("로그아웃 실패");
+            return "/error/errorTemp";
+
+        } else {
+            log.info("로그아웃 성공");
+
+            expireCookie(response, "access_token");
+            expireCookie(response, "refresh_token");
+
+            return "redirect:/";
+        }
+
+    }
+
+    private static void expireCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {

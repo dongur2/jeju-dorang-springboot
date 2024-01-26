@@ -2,11 +2,21 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
         layout:decorate="~{/fragments/layout}">
 <head>
     <title>main1</title>
 </head>
 <div layout:fragment="content">
-    main page(home.html)
+
+    <h1> MAIN </h1>
+
+    <h1>ID: <span sec:authentication="name" style="color:blue; font-weight: bold"></span></h1>
+    <h3 sec:authorize="isAuthenticated()">인증된 사람만 이 글을 볼 수 있습니다.</h3>
+    <div sec:authorize="isAuthenticated()">
+        <h2>Authority: <span th:text="${#authentication.getAuthorities()}"></span></h2>
+    </div>
+
 </div>
+
 </html>
