@@ -68,14 +68,21 @@ public class UserController {
 
         String jwtAccess = userService.signIn(loginRequest);
 
-        Cookie resCookie = new Cookie("access_token", jwtAccess);
-        resCookie.setHttpOnly(true);
-        resCookie.setMaxAge(cookieTime);
-        resCookie.setPath("/");
+        if (jwtAccess == null) {
+            return "redirect:/user/login";
 
-        response.addCookie(resCookie);
+        } else {
 
-        return "redirect:/";
+            Cookie resCookie = new Cookie("access_token", jwtAccess);
+            resCookie.setHttpOnly(true);
+            resCookie.setMaxAge(cookieTime);
+            resCookie.setPath("/");
+
+            response.addCookie(resCookie);
+
+            return "redirect:/";
+        }
+
     }
 
     @PostMapping("/logout")

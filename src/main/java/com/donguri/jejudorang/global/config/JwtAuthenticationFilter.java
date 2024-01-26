@@ -72,8 +72,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
-        } catch (Exception ex) {
-            log.error("Security Context 유저 인증에 실패: {}", ex.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("아이디/비밀번호가 틀립니다: Security Context 유저 인증 실패 {}", e.getMessage());
+            SecurityContextHolder.clearContext();
+
+        } catch (Exception e) {
+            log.error("Security Context 유저 인증에 실패: {}", e.getMessage());
             SecurityContextHolder.clearContext();
         }
 

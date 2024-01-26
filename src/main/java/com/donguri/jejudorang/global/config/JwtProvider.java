@@ -87,13 +87,6 @@ public class JwtProvider {
 //                .compact();
 //    }
 
-    /*
-    * HMAC-SHA 알고리즘으로 만든 새로운 시크릿 키 리턴
-    *
-    * */
-    private Key key() {
-        return Keys.secretKeyFor(SignatureAlgorithm.HS512);
-    }
 
 //    /*
 //    * 토큰 userId 리턴
@@ -160,20 +153,34 @@ public class JwtProvider {
 
     /*
     * 토큰 검증
-    *
     * */
     public boolean validateJwtToken(String authToken) {
         try {
-            log.info("AUTHTOKEN == {}", authToken);
-            Jwt parse = Jwts.parserBuilder()
+            Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parse(authToken);
-            log.info("PARSE == {}", parse);
             return true;
 
-        } catch (Exception e) {
-            throw new SignatureException("SIGNATURE EXCEPTION");
+        } catch (SignatureException e) {
+            log.error("Unmatched JWT Signature");
+            throw e;
+
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token");
+            throw e;
+
+        } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token");
+            throw e;
+
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT token");
+            throw e;
+
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty.");
+            throw e;
         }
     }
 
