@@ -2,7 +2,6 @@ package com.donguri.jejudorang.global.config;
 
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

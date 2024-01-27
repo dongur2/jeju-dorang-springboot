@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -154,8 +155,12 @@ public class UserServiceI implements UserService{
 
             return tokens;
 
+        } catch (BadCredentialsException e) {
+            log.error("가입된 아이디가 아닙니다 : {}", e.getMessage());
+            return null;
+
         } catch (Exception e) {
-            log.error("인증에 실패했습니다: {}", e.getMessage());
+            log.error("인증에 실패했습니다 : {}", e.getMessage());
             return null;
         }
 

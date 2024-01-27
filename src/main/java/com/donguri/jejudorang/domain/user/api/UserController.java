@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -68,16 +69,21 @@ public class UserController {
             return bindErrorPage(bindingResult, model);
         }
 
-        Map<String, String> tokens = userService.signIn(loginRequest);
+        try {
+            Map<String, String> tokens = userService.signIn(loginRequest);
 
-        if (tokens == null || tokens.get("access_token") == null) {
+            if (tokens == null || tokens.get("access_token") == null) {
+                return "redirect:/user/login";
+
+            } else {
+                setCookieForToken(tokens, response);
+                return "redirect:/";
+            }
+
+        } catch (UnexpectedRollbackException e) {
+            log.error("가입된 아이디가 아닙니다 : {}", e.getMessage());
             return "redirect:/user/login";
-
-        } else {
-            setCookieForToken(tokens, response);
-            return "redirect:/";
         }
-
     }
 
     private void setCookieForToken(Map<String, String> tokens, HttpServletResponse response) {
