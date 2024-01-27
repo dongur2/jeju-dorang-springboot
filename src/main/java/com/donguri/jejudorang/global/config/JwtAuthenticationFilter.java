@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -61,14 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = jwtProvider.getUserNameFromJwtToken(accessToken); // 토큰에서 externalId 추출
                 log.info("Authentication User ---- {}", username);
 
-                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
-                List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(accessToken); // 토큰에서 사용자 권한 추출
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
-
-                // 인증된 사용자 설정
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("인증 설정 완료 ----- {}", authentication);
+                setContextAuthWithToken(request, username, accessToken);
             }
 
         } catch (IllegalArgumentException e) {
@@ -84,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
 
                 // refresh token으로 재인증
-                if (refreshToken != null) {
+                if (refreshToken != null && jwtProvider.validateJwtToken(refreshToken)) {
                     String username = jwtProvider.getUserNameFromJwtToken(refreshToken); // 토큰에서 externalId 추출
                     log.info("REFRESH TOKEN USERNAME ========= {}", username);
 
@@ -94,22 +88,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             .getRefreshToken();
 
                     if (refreshRepo.equals(refreshToken)) {
-                        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
-                        List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(refreshToken); // 토큰에서 사용자 권한 추출
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
+                        UsernamePasswordAuthenticationToken authentication = setContextAuthWithToken(request, username, refreshToken);
 
-                        // 인증된 사용자 설정
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                        log.info("인증 설정 완료 ----- {}", authentication);
-
+                        // access token 재발급
                         String newAccess = jwtProvider.generateAccessToken(authentication);
-                        Cookie changeAccess = new Cookie("access_token", newAccess);
-                        changeAccess.setHttpOnly(true);
-                        changeAccess.setMaxAge(cookieTime);
-                        changeAccess.setPath("/");
 
-                        response.addCookie(changeAccess);
+                        createCookieForUpdateToken("access_token", newAccess, response);
                         log.info("ACCESS TOKEN & 쿠키 갱신");
 
                         // 만료 3분 전 refresh token 갱신
@@ -119,9 +103,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             String newRefresh = jwtProvider.generateRefreshTokenFromUserId(authentication);
 
                             refreshTokenRepository.deleteById(refreshToken);
-                            if(!refreshTokenRepository.existsById(refreshToken)) {
-                                log.info("성공적으로 삭제됨 : {}", refreshToken);
-                            }
                             refreshTokenRepository.save(RefreshToken.builder()
                                     .refreshToken(newRefresh)
                                     .userId(username)
@@ -129,12 +110,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             );
                             log.info("REFRESH TOKEN 갱신 ========= {} -> {}", refreshToken, newRefresh);
 
-                            Cookie changeRefresh = new Cookie("refresh_token", newRefresh);
-                            changeRefresh.setHttpOnly(true);
-                            changeRefresh.setMaxAge(cookieTime);
-                            changeRefresh.setPath("/");
-
-                            response.addCookie(changeRefresh);
+                            createCookieForUpdateToken("refresh_token", newRefresh, response);
                             log.info("REFRESH TOKEN & 쿠키 갱신");
                         }
 
@@ -158,6 +134,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void createCookieForUpdateToken(String cookieName, String regeneratedToken, HttpServletResponse response) {
+        Cookie cookieToUpdate = new Cookie(cookieName, regeneratedToken);
+        cookieToUpdate.setHttpOnly(true);
+        cookieToUpdate.setMaxAge(cookieTime);
+        cookieToUpdate.setPath("/");
+
+        response.addCookie(cookieToUpdate);
+    }
+
+    private UsernamePasswordAuthenticationToken setContextAuthWithToken(HttpServletRequest request, String username, String accessToken) {
+        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
+        List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(accessToken); // 토큰에서 사용자 권한 추출
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
+
+        // 인증된 사용자 설정
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        log.info("인증 설정 완료 ----- {}", authentication);
+
+        return authentication;
     }
 
     /*
