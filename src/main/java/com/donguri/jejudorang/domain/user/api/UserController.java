@@ -4,7 +4,6 @@ import com.donguri.jejudorang.domain.user.dto.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -25,20 +24,15 @@ import java.util.Optional;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired private final UserService userService;
-
-    @Value("${jwt.header}")
-    private String jwtHeader;
-
-    @Value("${jwt.header.prefix}")
-    private String jwtPrefix;
-
     @Value("${jwt.cookie-expire}")
     private int cookieTime;
+
+    @Autowired private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
+
 
     @GetMapping("/signup")
     public String registerForm() {
@@ -69,57 +63,46 @@ public class UserController {
     @PostMapping("/login")
     public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
                                    HttpServletResponse response, Model model) {
+        // 유효성 검사 에러
+        if (bindingResult.hasErrors()) {
+            return bindErrorPage(bindingResult, model);
+        }
 
         Map<String, String> tokens = userService.signIn(loginRequest);
 
-        if (tokens == null || tokens.get("access") == null) {
+        if (tokens == null || tokens.get("access_token") == null) {
             return "redirect:/user/login";
 
         } else {
-
-            Cookie accessCookie = new Cookie("access_token", tokens.get("access"));
-            accessCookie.setHttpOnly(true);
-            accessCookie.setMaxAge(cookieTime);
-            accessCookie.setPath("/");
-
-            Cookie refreshCookie = new Cookie("refresh_token", tokens.get("refresh"));
-            refreshCookie.setHttpOnly(true);
-            refreshCookie.setMaxAge(cookieTime);
-            refreshCookie.setPath("/");
-
-            response.addCookie(accessCookie);
-            response.addCookie(refreshCookie);
-
+            setCookieForToken(tokens, response);
             return "redirect:/";
         }
 
     }
 
+    private void setCookieForToken(Map<String, String> tokens, HttpServletResponse response) {
+        tokens.forEach((index, token) -> {
+            Cookie newCookieToAdd = new Cookie(index, token);
+            newCookieToAdd.setHttpOnly(true);
+            newCookieToAdd.setMaxAge(cookieTime);
+            newCookieToAdd.setPath("/");
+            response.addCookie(newCookieToAdd);
+        });
+    }
+
+    /*
+    *  SecurityConfig의 securityFilterChain() .logout() 설정
+    *  으로 인해서 이 컨트롤러 메서드는 실행되지 않음
+    * */
     @PostMapping("/logout")
     public String deleteUser(HttpServletResponse response) {
-        log.info("LOGOUT ========= !!");
-
         Optional<Authentication> authState = userService.logOut();
 
         if (authState.isPresent()) {
-            log.error("로그아웃 실패");
             return "/error/errorTemp";
-
         } else {
-            log.info("로그아웃 성공");
-
-            expireCookie(response, "access_token");
-            expireCookie(response, "refresh_token");
-
             return "redirect:/";
         }
-
-    }
-
-    private static void expireCookie(HttpServletResponse response, String cookieName) {
-        Cookie cookie = new Cookie(cookieName, null);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
     }
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
