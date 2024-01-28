@@ -80,9 +80,13 @@ public class UserController {
                 return "redirect:/";
             }
 
+        /*
+        * 가입되지 않은 아이디로 로그인할 경우
+        * */
         } catch (UnexpectedRollbackException e) {
             log.error("가입된 아이디가 아닙니다 : {}", e.getMessage());
-            return "redirect:/user/login";
+            model.addAttribute("errorMsg", "가입된 아이디가 없습니다");
+            return "/user/login/signInForm";
         }
     }
 

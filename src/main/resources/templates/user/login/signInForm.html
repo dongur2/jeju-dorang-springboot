@@ -5,6 +5,11 @@
         layout:decorate="~{/fragments/layout}">
 <head>
     <title>로그인 - 제주도랑</title>
+    <script th:inline="javascript">
+        var error = [[${errorMsg}]];
+        console.log("error: " + error);
+        alert(error);
+    </script>
 </head>
 <th layout:fragment="content">
     <form id="sign-in-form" th:action th:method="post" th:object="${loginRequest}">
