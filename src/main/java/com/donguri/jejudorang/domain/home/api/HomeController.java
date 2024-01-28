@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.home.api;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;

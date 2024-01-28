@@ -1,19 +1,16 @@
 package com.donguri.jejudorang.global.config;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
 
 @Getter
 @NoArgsConstructor
-@RedisHash(value = "refreshToken", timeToLive = 300)
+@RedisHash(value = "refreshToken", timeToLive = 3600) // 1시간
 public class RefreshToken {
     @Id
     private String refreshToken;

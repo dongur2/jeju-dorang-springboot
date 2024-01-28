@@ -20,122 +20,96 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    @Value("${jwt.header}")
-    private String tokenRequestHeader;
-
-    @Value("${jwt.header.prefix}")
-    private String tokenRequestHeaderPrefix;
 
     @Value("${jwt.cookie-expire}")
     private int cookieTime;
 
-    @Autowired
-    private JwtProvider jwtProvider;
-
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
-
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    @Autowired private JwtProvider jwtProvider;
+    @Autowired private JwtUserDetailsService jwtUserDetailsService;
+    @Autowired private RefreshTokenRepository refreshTokenRepository;
 
 
     /*
-    * request header의 유효 토큰 필터링
+    * Request Cookie의 유효 토큰 필터링
+    * > 타임리프는 서버사이드 렌더링 -> header 토큰 전달 곤란
+    * > 임시로 쿠키에 토큰 전달
+    *
+    * doFilterInternal은 Request(요청)이 발생할 때마다 컨트롤러 -> JwtAuthFilter.doFilterInternal -> doFilter -> ... -> Service 로 프로세스
+    * => 요청이 발생할 때마다 요청 비즈니스 로직 처리 전에 쿠키의 토큰을 확인해 인증 정보를 확인
     *
     * */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        log.info("권한/인증 검증 시작 -- doFilterInternal");
+        log.info("doFilterInternal: 인증/권한 검증 프로세스 시작");
 
-        String accessToken = getJwtFromRequest(request, "access_token"); // 쿠키에서 추출한 토큰
-        log.info("요청 쿠키에서 추출한 액세스토큰 ==== {}", accessToken);
+        /*
+        * 쿠키의 Access Token 검증
+        * */
+        String accessToken = getJwtFromRequest(request, "access_token"); // Cookie에 같이 가지고 있던 Access Token 추출
+        log.info("쿠키에서 Access Token 추출 완료 : {}", accessToken);
 
         try {
-
             if (accessToken != null && jwtProvider.validateJwtToken(accessToken)) {
                 String username = jwtProvider.getUserNameFromJwtToken(accessToken); // 토큰에서 externalId 추출
-                log.info("Authentication User ---- {}", username);
+                log.info("현재 인증 대상 유저: {}", username);
 
-                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
-                List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(accessToken); // 토큰에서 사용자 권한 추출
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
-
-                // 인증된 사용자 설정
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("인증 설정 완료 ----- {}", authentication);
+                setContextAuthWithToken(request, username, accessToken); // SecurityContext에 인증 정보 설정
             }
 
         } catch (IllegalArgumentException e) {
-            log.error("아이디/비밀번호가 틀립니다: Security Context 유저 인증 실패 {}", e.getMessage());
+            log.error("아이디/비밀번호가 틀립니다: {}", e.getMessage());
             SecurityContextHolder.clearContext();
 
         } catch (ExpiredJwtException e) {
-            log.error("토큰이 만료되었습니다 {}", e.getMessage()); // access token
+            log.error("토큰이 만료되었습니다 : {}", e.getMessage()); // access token 만료
 
-            String refreshToken = getJwtFromRequest(request, "refresh_token"); // 쿠키에서 추출한 토큰
-            log.info("요청 쿠키에서 추출한 리프레쉬토큰 ==== {}", refreshToken);
+            /*
+            * Access Token이 만료되었을 경우 Cookie에 같이 가지고 있던 Refresh Token을 가져와 인증하고 Access Token 재발급
+            * */
+            String refreshToken = getJwtFromRequest(request, "refresh_token"); // Cookie에 같이 가지고 있던 Refresh Token 추출
+            log.info("쿠키에서 Refresh Token 추출 완료 : {}", refreshToken);
 
             try {
-
-                // refresh token으로 재인증
-                if (refreshToken != null) {
+                if (refreshToken != null && jwtProvider.validateJwtToken(refreshToken)) {
                     String username = jwtProvider.getUserNameFromJwtToken(refreshToken); // 토큰에서 externalId 추출
-                    log.info("REFRESH TOKEN USERNAME ========= {}", username);
+                        log.info("현재 Access Token이 만료되어 재발급 & 인증을 시도하는 유저 [Refresh Token]: {}", username);
 
-                    // redis refresh token
-                    String refreshRepo = refreshTokenRepository.findById(refreshToken)
-                            .orElseThrow(() -> new RuntimeException("refresh token이 없습니다 : " + username))
-                            .getRefreshToken();
+                    String refreshRepo = getRefreshTokenFromRedis(refreshToken, username); // Refresh Token from Redis
 
+                    /*
+                    * DB에서 가져온 Refresh Token과 Cookie에서 가져온 Refresh Token이 같을 경우에 재발급 진행
+                    * */
                     if (refreshRepo.equals(refreshToken)) {
-                        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
-                        List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(refreshToken); // 토큰에서 사용자 권한 추출
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
-
-                        // 인증된 사용자 설정
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                        log.info("인증 설정 완료 ----- {}", authentication);
-
+                        UsernamePasswordAuthenticationToken authentication = setContextAuthWithToken(request, username, refreshToken);
                         String newAccess = jwtProvider.generateAccessToken(authentication);
-                        Cookie changeAccess = new Cookie("access_token", newAccess);
-                        changeAccess.setHttpOnly(true);
-                        changeAccess.setMaxAge(cookieTime);
-                        changeAccess.setPath("/");
 
-                        response.addCookie(changeAccess);
-                        log.info("ACCESS TOKEN & 쿠키 갱신");
+                        createCookieForUpdateToken("access_token", newAccess, response);
+                        log.info("Access Token 재발급 & Cookie access_token 갱신 완료");
 
-                        // 만료 3분 전 refresh token 갱신
+                        /*
+                        * Refresh Token 만료 3분 전부터 Refresh Token 갱신
+                        * */
                         if (jwtProvider.getTokenExpirationFromJWT(refreshToken)
                                 .before(new Date(System.currentTimeMillis() + 60 * 3000))) {
 
                             String newRefresh = jwtProvider.generateRefreshTokenFromUserId(authentication);
 
+                            // Redis에 존재하던 이전 토큰 삭제 후 새로운 토큰 저장
                             refreshTokenRepository.deleteById(refreshToken);
-                            if(!refreshTokenRepository.existsById(refreshToken)) {
-                                log.info("성공적으로 삭제됨 : {}", refreshToken);
-                            }
                             refreshTokenRepository.save(RefreshToken.builder()
                                     .refreshToken(newRefresh)
                                     .userId(username)
                                     .build()
                             );
-                            log.info("REFRESH TOKEN 갱신 ========= {} -> {}", refreshToken, newRefresh);
+                            log.info("Refresh Token 재발급 완료 : {} -> {}", refreshToken, newRefresh);
 
-                            Cookie changeRefresh = new Cookie("refresh_token", newRefresh);
-                            changeRefresh.setHttpOnly(true);
-                            changeRefresh.setMaxAge(cookieTime);
-                            changeRefresh.setPath("/");
-
-                            response.addCookie(changeRefresh);
-                            log.info("REFRESH TOKEN & 쿠키 갱신");
+                            createCookieForUpdateToken("refresh_token", newRefresh, response);
+                            log.info("Refresh Token Cookie 갱신 완료");
                         }
 
                     } else {
@@ -144,16 +118,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
             } catch (ExpiredJwtException exx) {
-                log.error("refresh Token 만료: {}", refreshToken);
+                log.error("Refresh Token이 만료되었습니다 : {}", refreshToken);
                 SecurityContextHolder.clearContext();
 
             } catch (Exception ex) {
-                log.error("refresh Exception : {}", ex.getMessage());
-
+                log.error("Refresh Token Exception : {}", ex.getMessage());
             }
 
         } catch (Exception e) {
-            log.error("Security Context 유저 인증에 실패: {}", e.getMessage());
+            log.error("Security Context 유저 인증에 실패했습니다 : {}", e.getMessage());
             SecurityContextHolder.clearContext();
         }
 
@@ -161,7 +134,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /*
-    * 쿠키에서 토큰 추출
+    * Redis에서 RefreshToken 가져오기
+    * */
+    private String getRefreshTokenFromRedis(String refreshToken, String username) {
+        return refreshTokenRepository.findById(refreshToken)
+                .orElseThrow(() -> new RuntimeException("DB에 해당 유저의 유효한 Refresh Token이 없습니다 : " + username))
+                .getRefreshToken();
+    }
+
+    /*
+    * 재발급한 토큰을 Cookie에 갱신
+    * */
+    private void createCookieForUpdateToken(String cookieName, String regeneratedToken, HttpServletResponse response) {
+        Cookie cookieToUpdate = new Cookie(cookieName, regeneratedToken);
+        cookieToUpdate.setHttpOnly(true);
+        cookieToUpdate.setMaxAge(cookieTime);
+        cookieToUpdate.setPath("/");
+
+        response.addCookie(cookieToUpdate);
+    }
+
+    private UsernamePasswordAuthenticationToken setContextAuthWithToken(HttpServletRequest request, String username, String accessToken) {
+        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
+        List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(accessToken); // 토큰에서 사용자 권한 추출
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
+
+        // 인증된 사용자 설정
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        log.info("Security Context에 인증 정보 설정을 완료했습니다 : {}", authentication);
+
+        return authentication;
+    }
+
+    /*
+    * Cookie에서 토큰 추출
     * */
     private String getJwtFromRequest(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();

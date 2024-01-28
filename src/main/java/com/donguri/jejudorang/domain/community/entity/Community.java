@@ -63,7 +63,7 @@ public class Community extends BaseEntity {
     private Set<Bookmark> bookmarks = new HashSet<>();
 
     // 페이징 정렬 위한 가상 컬럼
-    @Formula("(SELECT COUNT(*) FROM bookmark b WHERE b.community_id = id)")
+    @Formula("(SELECT COUNT(*) FROM bookmark b WHERE b.community_id = community_id)")
     private int bookmarksCount;
 
 
