@@ -13,14 +13,22 @@
     </script>
 </head>
 <th layout:fragment="content">
-    <form id="sign-in-form" th:action th:method="post" th:object="${loginRequest}">
-        <label for="externalId" class="form-label">externalId</label>
-        <input type="text" id="externalId" name="externalId" class="form-control" aria-describedby="passwordHelpBlock">
+    <div class="whole-sign-in-box">
+        <form id="sign-in-form" th:action th:method="post" th:object="${loginRequest}">
+            <label for="externalId" class="form-label">externalId</label>
+            <input type="text" id="externalId" name="externalId" class="form-control" aria-describedby="passwordHelpBlock">
 
-        <label for="password" class="form-label">password</label>
-        <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordHelpBlock">
+            <label for="password" class="form-label">password</label>
+            <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordHelpBlock">
 
-        <input class="btn btn-primary" type="submit" value="Submit">
-    </form>
+            <input class="btn btn-primary" type="submit" value="Submit">
+        </form>
+
+        <div>
+            <button type="button" class="btn btn-outline-success" th:onclick="|location.href='@{/user/signup}'|">회원가입</button>
+            <button type="button" class="btn btn-outline-warning">아이디 찾기</button>
+            <button type="button" class="btn btn-outline-warning">비밀번호 찾기</button>
+        </div>
+    </div>
 </th>
 </html>
