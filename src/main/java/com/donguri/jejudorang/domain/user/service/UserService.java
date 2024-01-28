@@ -2,7 +2,10 @@ package com.donguri.jejudorang.domain.user.service;
 
 
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
+import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
@@ -14,4 +17,6 @@ public interface UserService {
     Map<String, String> signIn(LoginRequest loginRequest);
 
     Optional<Authentication> logOut();
+
+    ProfileResponse getProfileData(Cookie cookie);
 }

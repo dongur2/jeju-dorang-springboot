@@ -1,9 +1,11 @@
 package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
+import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -122,8 +125,22 @@ public class UserController {
 
 
     @GetMapping("/settings/profile")
-    public String getProfileForm() {
-        return "/user/mypage/profile";
+    public String getProfileForm(HttpServletRequest request, Model model) {
+        try {
+            Cookie accessToken = Arrays.stream(request.getCookies()).filter(
+                            cookie -> cookie.getName().equals("access_token"))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("로그인이 필요합니다"));
+
+            ProfileResponse profileData = userService.getProfileData(accessToken);
+
+            model.addAttribute(profileData);
+            return "/user/mypage/profile";
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return "redirect:/user/login";
+        }
     }
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
