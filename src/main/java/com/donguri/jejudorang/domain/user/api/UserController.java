@@ -120,6 +120,12 @@ public class UserController {
         }
     }
 
+
+    @GetMapping("/settings/profile")
+    public String getProfileForm() {
+        return "/user/mypage/profile";
+    }
+
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
         return "/error/errorTemp";
