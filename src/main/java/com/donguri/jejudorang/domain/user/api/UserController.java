@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -73,19 +74,23 @@ public class UserController {
             Map<String, String> tokens = userService.signIn(loginRequest);
 
             if (tokens == null || tokens.get("access_token") == null) {
-                return "redirect:/user/login";
+                log.error("해당 아이디의 비밀번호가 올바르지 않습니다: {}", loginRequest.externalId());
+                model.addAttribute("errorMsg", "비밀번호를 확인해주세요");
+                return "/user/login/signInForm";
 
             } else {
                 setCookieForToken(tokens, response);
                 return "redirect:/";
             }
 
-        /*
-        * 가입되지 않은 아이디로 로그인할 경우
-        * */
         } catch (UnexpectedRollbackException e) {
             log.error("가입된 아이디가 아닙니다 : {}", e.getMessage());
             model.addAttribute("errorMsg", "가입된 아이디가 없습니다");
+            return "/user/login/signInForm";
+
+        } catch (Exception e) {
+            log.error("로그인에 실패했습니다: {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
             return "/user/login/signInForm";
         }
     }

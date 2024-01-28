@@ -7,8 +7,9 @@
     <title>로그인 - 제주도랑</title>
     <script th:inline="javascript">
         var error = [[${errorMsg}]];
-        console.log("error: " + error);
-        alert(error);
+        if (error != null) {
+            alert(error);
+        }
     </script>
 </head>
 <th layout:fragment="content">

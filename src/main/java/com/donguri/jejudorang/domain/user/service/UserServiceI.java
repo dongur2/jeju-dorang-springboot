@@ -18,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,15 +113,15 @@ public class UserServiceI implements UserService{
             // 로그인 아이디, 비밀번호 기반으로 유저 정보(JwtUserDetails) 찾아서 Authentication 리턴
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.externalId(), loginRequest.password()));
-            log.info("[SignIn Service] 현재 로그인한 유저 인증 : {}",String.valueOf(authentication));
+            log.info("[SignIn Service] 현재 로그인한 유저 인증 : {}", String.valueOf(authentication));
 
             // securityContext에 authentication 설정
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("[SignIn Service] Security Context에 인증 정보 설정 : {}",String.valueOf(authentication));
+            log.info("[SignIn Service] Security Context에 인증 정보 설정 : {}", String.valueOf(authentication));
 
             // 인증한 정보 기반으로 access token 생성
             String jwtAccess = jwtProvider.generateAccessToken(authentication);
-            log.info("[SignIn Service] Access Token 생성 완료 : {}",jwtAccess);
+            log.info("[SignIn Service] Access Token 생성 완료 : {}", jwtAccess);
 
             // refresh token
             String jwtRefresh = null;
@@ -133,8 +134,8 @@ public class UserServiceI implements UserService{
                 log.info("Redis에 해당 아이디의 Refresh Token이 없음: {}", authentication.getName());
 
                 /*
-                * Refresh Token 생성 후 Redis에 저장
-                * */
+                 * Refresh Token 생성 후 Redis에 저장
+                 * */
                 jwtRefresh = jwtProvider.generateRefreshTokenFromUserId(authentication);
                 RefreshToken refreshTokenToSave = RefreshToken.builder()
                         .refreshToken(jwtRefresh)
@@ -147,7 +148,7 @@ public class UserServiceI implements UserService{
 
             // 인증된 정보 기반 해당 사용자 세부 정보
             JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
-            log.info("인증 정보 기반 사용자 세부 정보 : {}",userDetails.getUsername());
+            log.info("인증 정보 기반 사용자 세부 정보 : {}", userDetails.getUsername());
 
             Map<String, String> tokens = new HashMap<>();
             tokens.put("access_token", jwtAccess);
@@ -156,7 +157,7 @@ public class UserServiceI implements UserService{
             return tokens;
 
         } catch (BadCredentialsException e) {
-            log.error("가입된 아이디가 아닙니다 : {}", e.getMessage());
+            log.error("아이디/비밀번호가 올바르지 않습니다 : {}", e.getMessage());
             return null;
 
         } catch (Exception e) {
