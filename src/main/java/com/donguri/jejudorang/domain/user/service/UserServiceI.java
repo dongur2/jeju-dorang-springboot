@@ -207,9 +207,11 @@ public class UserServiceI implements UserService {
             User nowUser = getNowUser(token);
 
             if (!dataToUpdate.img().isEmpty()) {
-                imageService.putS3Object(dataToUpdate.img());
+                String savedUrl = imageService.putS3Object(dataToUpdate.img());
+                log.info("이미지 업로드 완료 : {}", savedUrl);
+
+                nowUser.getProfile().updateImg(savedUrl);
             }
-            log.info("이미지 업로드 완료");
 
             Profile profile = nowUser.getProfile();
             profile.updateNickname(dataToUpdate.nickname());
