@@ -5,8 +5,11 @@ import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
 import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +34,12 @@ public class UserController {
     private int cookieTime;
 
     @Autowired private final UserService userService;
+    @Autowired private final ImageService imageService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ImageService imageService) {
         this.userService = userService;
+        this.imageService = imageService;
     }
-
 
     @GetMapping("/signup")
     public String registerForm() {
