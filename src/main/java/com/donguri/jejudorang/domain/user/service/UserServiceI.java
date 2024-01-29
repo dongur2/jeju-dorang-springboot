@@ -187,10 +187,10 @@ public class UserServiceI implements UserService {
     }
 
     @Override
-    public ProfileResponse getProfileData(Cookie cookie) {
-
+    @Transactional
+    public ProfileResponse getProfileData(String token) {
         try {
-            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(cookie.getValue());
+            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
 
             User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
                     .orElseThrow(() -> new RuntimeException("아이디에 해당하는 유저가 없습니다: " + userNameFromJwtToken));

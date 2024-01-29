@@ -125,12 +125,10 @@ public class UserController {
 
 
     @GetMapping("/settings/profile")
-    public String getProfileForm(HttpServletRequest request, Model model) {
+    public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
         try {
-            Cookie accessToken = Arrays.stream(request.getCookies()).filter(
-                            cookie -> cookie.getName().equals("access_token"))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("로그인이 필요합니다"));
+            String accessToken = token.getValue();
+            log.info("@CookieValue Cookie's access_token: {}", accessToken);
 
             ProfileResponse profileData = userService.getProfileData(accessToken);
 
@@ -142,6 +140,9 @@ public class UserController {
             return "redirect:/user/login";
         }
     }
+
+
+
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());

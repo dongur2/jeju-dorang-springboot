@@ -18,5 +18,5 @@ public interface UserService {
 
     Optional<Authentication> logOut();
 
-    ProfileResponse getProfileData(Cookie cookie);
+    ProfileResponse getProfileData(String accessToken);
 }
