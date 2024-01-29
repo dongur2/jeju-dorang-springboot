@@ -6,13 +6,11 @@ import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -20,7 +18,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -125,6 +122,9 @@ public class UserController {
     }
 
 
+    /*
+    * 마이페이지 - 프로필 조회
+    * */
     @GetMapping("/settings/profile")
     public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
         try {
@@ -142,6 +142,11 @@ public class UserController {
         }
     }
 
+    /*
+    * 마이페이지 - 프로필 수정
+    * img: S3 url
+    * email: 추가 인증 필요
+    * */
     @PutMapping("/settings/profile")
     public String updateProfile(@CookieValue("access_token") Cookie token,
                                 @Valid ProfileRequest profileRequest, BindingResult bindingResult,
