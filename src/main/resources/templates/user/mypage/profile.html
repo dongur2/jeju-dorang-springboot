@@ -21,14 +21,20 @@
             </div>
 
             <div class="profile-middle">
-                <form>
-                    <label>닉네임</label><input type="text" th:placeholder="${profileResponse.nickname()}" />
-                    <label>이메일</label><input type="email" th:placeholder="${profileResponse.email()}"/>
+                <form id="profile-modify-form" th:action th:method="put" th:object="${profileRequest}">
+                    <label>닉네임</label><input type="text" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"/>
+                    <label>이메일</label><input type="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"/>
                 </form>
-                <button type="submit">수정</button>
+                <button type="button" th:onclick="submitForm()">수정</button>
             </div>
 
         </div>
     </div>
+
+    <script>
+        function submitForm() {
+            document.getElementById("profile-modify-form").submit();
+        }
+    </script>
 </th>
 </html>
