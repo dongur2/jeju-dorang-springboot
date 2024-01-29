@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/fragments/layout}">
+<head>
+    <title>내 프로필 - 제주도랑 | 마이페이지</title>
+</head>
+<th layout:fragment="content">
+    <div>
+        <div>
+            <div class="profile-top">
+                <h3>프로필 이미지</h3>
+                <div class="profile-pic-box">
+                    <div class="profile-img-circle"></div>
+                    <div class="profile-img-btn-box">
+                        <button type="button" class="profile-img-modify-btn">변경</button>
+                        <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-middle">
+                <form id="profile-modify-form" th:action th:method="put" th:object="${profileRequest}">
+                    <label>닉네임</label><input type="text" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"/>
+                    <label>이메일</label><input type="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"/>
+                </form>
+                <button type="button" th:onclick="submitForm()">수정</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function submitForm() {
+            document.getElementById("profile-modify-form").submit();
+        }
+    </script>
+</th>
+</html>

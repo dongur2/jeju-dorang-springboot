@@ -1,6 +1,8 @@
 package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
+import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
+import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -9,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -119,6 +120,58 @@ public class UserController {
             return "redirect:/";
         }
     }
+
+
+    /*
+    * 마이페이지 - 프로필 조회
+    * */
+    @GetMapping("/settings/profile")
+    public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
+        try {
+            String accessToken = token.getValue();
+            log.info("@CookieValue Cookie's access_token: {}", accessToken);
+
+            ProfileResponse profileData = userService.getProfileData(accessToken);
+
+            model.addAttribute(profileData);
+            return "/user/mypage/profile";
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return "redirect:/user/login";
+        }
+    }
+
+    /*
+    * 마이페이지 - 프로필 수정
+    * img: S3 url
+    * email: 추가 인증 필요
+    * */
+    @PutMapping("/settings/profile")
+    public String updateProfile(@CookieValue("access_token") Cookie token,
+                                @Valid ProfileRequest profileRequest, BindingResult bindingResult,
+                                Model model) {
+        // 유효성 검사 에러
+        if (bindingResult.hasErrors()) {
+            return bindErrorPage(bindingResult, model);
+        }
+
+        try {
+            String accessToken = token.getValue();
+            log.info("@CookieValue Cookie's access_token: {}", accessToken);
+
+            userService.updateProfileData(accessToken, profileRequest);
+            return "redirect:/user/settings/profile";
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return "redirect:/user/settings/profile";
+        }
+    }
+
+
+
+
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());

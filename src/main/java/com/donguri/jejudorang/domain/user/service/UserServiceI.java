@@ -1,6 +1,8 @@
 package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
+import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
+import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
@@ -12,13 +14,11 @@ import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,16 +27,22 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class UserServiceI implements UserService{
+public class UserServiceI implements UserService {
 
-    @Autowired private final AuthenticationManager authenticationManager;
-    @Autowired private final RefreshTokenRepository refreshTokenRepository;
+    @Autowired
+    private final AuthenticationManager authenticationManager;
+    @Autowired
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    @Autowired private final UserRepository userRepository;
-    @Autowired private final RoleRepository roleRepository;
+    @Autowired
+    private final UserRepository userRepository;
+    @Autowired
+    private final RoleRepository roleRepository;
 
-    @Autowired private final PasswordEncoder encoder;
-    @Autowired private final JwtProvider jwtProvider;
+    @Autowired
+    private final PasswordEncoder encoder;
+    @Autowired
+    private final JwtProvider jwtProvider;
 
     public UserServiceI(RefreshTokenRepository refreshTokenRepository, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.refreshTokenRepository = refreshTokenRepository;
@@ -103,7 +109,6 @@ public class UserServiceI implements UserService{
     }
 
 
-
     @Override
     @Transactional
     public Map<String, String> signIn(LoginRequest loginRequest) {
@@ -168,12 +173,51 @@ public class UserServiceI implements UserService{
     }
 
     /*
-    * SecurityConfig .logout() 설정으로 실행되지 않음
-    * */
+     * SecurityConfig .logout() 설정으로 실행되지 않음
+     * */
     @Override
     @Transactional
     public Optional<Authentication> logOut() {
         SecurityContextHolder.clearContext();
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
     }
+
+    @Override
+    @Transactional
+    public ProfileResponse getProfileData(String token) {
+        try {
+            User nowUser = getNowUser(token);
+            return ProfileResponse.builder().build()
+                    .from(nowUser);
+
+        } catch (Exception e) {
+            log.error("프로필 조회에 실패했습니다 : {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateProfileData(String token, ProfileRequest dataToUpdate) {
+        try {
+            User nowUser = getNowUser(token);
+
+            Profile profile = nowUser.getProfile();
+            profile.updateNickname(dataToUpdate.nickname());
+            profile.updateImg(dataToUpdate.img()); // s3 url
+
+            nowUser.getAuth().updateEmail(dataToUpdate.email()); // 추가 인증 필요
+
+        } catch (Exception e) {
+            log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
+        }
+    }
+
+    private User getNowUser(String token) {
+        String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
+
+        return userRepository.findByExternalId(userNameFromJwtToken)
+                .orElseThrow(() -> new RuntimeException("아이디에 해당하는 유저가 없습니다: " + userNameFromJwtToken));
+    }
+
 }
