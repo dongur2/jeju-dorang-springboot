@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
+import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
 import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
@@ -140,6 +141,29 @@ public class UserController {
             return "redirect:/user/login";
         }
     }
+
+    @PutMapping("/settings/profile")
+    public String updateProfile(@CookieValue("access_token") Cookie token,
+                                @Valid ProfileRequest profileRequest, BindingResult bindingResult,
+                                Model model) {
+        // 유효성 검사 에러
+        if (bindingResult.hasErrors()) {
+            return bindErrorPage(bindingResult, model);
+        }
+
+        try {
+            String accessToken = token.getValue();
+            log.info("@CookieValue Cookie's access_token: {}", accessToken);
+
+            userService.updateProfileData(accessToken, profileRequest);
+            return "redirect:/user/settings/profile";
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return "redirect:/user/settings/profile";
+        }
+    }
+
 
 
 

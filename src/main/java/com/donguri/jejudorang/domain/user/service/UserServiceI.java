@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.dto.LoginRequest;
+import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
 import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
@@ -190,11 +191,7 @@ public class UserServiceI implements UserService {
     @Transactional
     public ProfileResponse getProfileData(String token) {
         try {
-            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
-
-            User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
-                    .orElseThrow(() -> new RuntimeException("아이디에 해당하는 유저가 없습니다: " + userNameFromJwtToken));
-
+            User nowUser = getNowUser(token);
             return ProfileResponse.builder().build()
                     .from(nowUser);
 
@@ -202,6 +199,30 @@ public class UserServiceI implements UserService {
             log.error("프로필 조회에 실패했습니다 : {}", e.getMessage());
             return null;
         }
-
     }
+
+    @Override
+    @Transactional
+    public void updateProfileData(String token, ProfileRequest dataToUpdate) {
+        try {
+            User nowUser = getNowUser(token);
+
+            Profile profile = nowUser.getProfile();
+            profile.updateNickname(dataToUpdate.nickname());
+            profile.updateImg(dataToUpdate.img()); // s3 url
+
+            nowUser.getAuth().updateEmail(dataToUpdate.email()); // 추가 인증 필요
+
+        } catch (Exception e) {
+            log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
+        }
+    }
+
+    private User getNowUser(String token) {
+        String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
+
+        return userRepository.findByExternalId(userNameFromJwtToken)
+                .orElseThrow(() -> new RuntimeException("아이디에 해당하는 유저가 없습니다: " + userNameFromJwtToken));
+    }
+
 }
