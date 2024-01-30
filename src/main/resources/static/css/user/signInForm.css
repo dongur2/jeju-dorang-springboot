@@ -1,6 +1,7 @@
 
 .whole-sign-in-box {
-    width: 100%;
+    width: 500px;
+    height: 750px;
     display: flex;
     flex-direction: column;
     justify-content: center;
