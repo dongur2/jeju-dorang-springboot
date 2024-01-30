@@ -22,4 +22,5 @@ public interface UserService {
     ProfileResponse getProfileData(String accessToken);
 
     ProfileResponse updateProfileData(String accessToken, ProfileRequest dataToUpdate);
+    ProfileResponse updateProfileData(String accessToken);
 }

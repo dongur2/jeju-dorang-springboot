@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -176,9 +178,23 @@ public class UserController {
         }
     }
 
+    @ResponseBody
+    @DeleteMapping("/settings/profile/deleteimg")
+    public ResponseEntity<HttpStatus> deleteProfileImg(@CookieValue("access_token") Cookie token) {
+        log.info("deleteProfileImg 컨트롤러 실행");
 
+        try {
+            String accessToken = token.getValue();
 
+            userService.updateProfileData(accessToken);
 
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("이미지 삭제 실패: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());

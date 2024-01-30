@@ -15,12 +15,12 @@
                     <div class="profile-pic-box">
                         <h3>프로필 이미지</h3>
                         <div class="profile-img-circle">
-                            <img class="profile-img" id="now-profile" th:if="${profileResponse.img() != null}" th:src="${profileResponse.img()}">
+                            <img class="profile-img" id="now-profile" th:src="${profileResponse.img()}">
                         </div>
                         <div class="profile-img-btn-box">
                             <input type="file" name="img" id="profile-image-file" onchange="changeImg()">
                             <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
-                            <button type="button" th:onclick="deleteImage()">삭제</button>
+                            <button type="button" onclick="deleteImg()">삭제</button>
                         </div>
                     </div>
 
@@ -41,6 +41,22 @@
 
             var img = document.getElementById('now-profile');
             img.src = URL.createObjectURL(imageFile);
+        }
+
+        function deleteImg() {
+            console.log("delete img()")
+            var xhr = new XMLHttpRequest();
+            xhr.open('DELETE', "/user/settings/profile/deleteimg", true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('프로필 사진이 삭제되었습니다.');
+                    window.location.reload();
+                } else {
+                    alert('프로필 사진을 삭제하는 데 오류가 발생했습니다.');
+                }
+            };
+            xhr.send();
         }
 
         function submitForm() {

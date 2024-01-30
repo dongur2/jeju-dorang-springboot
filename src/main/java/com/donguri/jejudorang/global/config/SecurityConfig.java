@@ -91,7 +91,7 @@ public class SecurityConfig {
                                         "/templates/**", "/error/**")
                                 .permitAll()
                                 .requestMatchers(
-                                        "/user/settings/profile"
+                                        "/user/settings/profile/**"
                                 ).authenticated()
                         )
                 )
