@@ -200,17 +200,38 @@ public class UserServiceI implements UserService {
         }
     }
 
+    /*
+    * 프로필 전체 수정
+    * > token, requestDTO
+    * */
     @Override
     @Transactional
-    public void updateProfileData(String token, ProfileRequest dataToUpdate) {
+    public ProfileResponse updateProfileData(String token, ProfileRequest dataToUpdate) {
         try {
             User nowUser = getNowUser(token);
 
             if (!dataToUpdate.img().isEmpty()) {
-                String savedUrl = imageService.putS3Object(dataToUpdate.img());
-                log.info("이미지 업로드 완료 : {}", savedUrl);
 
-                nowUser.getProfile().updateImg(savedUrl);
+                String pastImg = nowUser.getProfile().getImgName();
+                if (pastImg != null) {
+                    imageService.deleteS3Object(pastImg);
+
+                    nowUser.getProfile().updateImgName(null);
+                    nowUser.getProfile().updateImgUrl(null);
+
+                    log.info("이전 이미지 삭제 완료");
+                }
+
+                Map<String, String> uploadedImg = imageService.putS3Object(dataToUpdate.img());
+
+                if (uploadedImg == null) {
+                    throw new IllegalAccessException("사진 업로드 실패");
+
+                } else {
+                    nowUser.getProfile().updateImgName(uploadedImg.get("imgName"));
+                    nowUser.getProfile().updateImgUrl(uploadedImg.get("imgUrl"));
+                    log.info("이미지 업로드 완료 : {}", uploadedImg.get("imgName"));
+                }
             }
 
             Profile profile = nowUser.getProfile();
@@ -218,8 +239,44 @@ public class UserServiceI implements UserService {
 
             nowUser.getAuth().updateEmail(dataToUpdate.email()); // 추가 인증 필요
 
+            log.info("프로필 업데이트를 완료했습니다");
+
+            return ProfileResponse.builder().build()
+                    .from(nowUser);
+
         } catch (Exception e) {
             log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /*
+    * 프로필 사진만 삭제
+    * > params token
+    * */
+    @Override
+    @Transactional
+    public ProfileResponse updateProfileData(String token) {
+        try {
+            User nowUser = getNowUser(token);
+
+            String pastImg = nowUser.getProfile().getImgName();
+            if (pastImg != null) {
+                imageService.deleteS3Object(pastImg);
+
+                nowUser.getProfile().updateImgName(null);
+                nowUser.getProfile().updateImgUrl(null);
+
+                log.info("이전 이미지 삭제 완료");
+            }
+            log.info("프로필 업데이트를 완료했습니다");
+
+            return ProfileResponse.builder().build()
+                    .from(nowUser);
+
+        } catch (Exception e) {
+            log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
+            return null;
         }
     }
 

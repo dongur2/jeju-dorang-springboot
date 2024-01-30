@@ -218,7 +218,7 @@ class UserRepositoryTest {
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다"));
 
         foundUser.getProfile().updateNickname("updateNickname");
-        foundUser.getProfile().updateImg("imgurl.com");
+        foundUser.getProfile().updateImgUrl("imgurl.com");
         foundUser.getAuth().updateEmail("new@mail.com");
         foundUser.getAuth().updatePhone("01099999999");
 
@@ -231,7 +231,7 @@ class UserRepositoryTest {
                 .orElseThrow(() -> new RuntimeException("유저에 해당하는 인증이 없습니다"));
 
         assertThat(updatedProf.getNickname()).isEqualTo("updateNickname");
-        assertThat(updatedProf.getImg_url()).isEqualTo("imgurl.com");
+        assertThat(updatedProf.getImgUrl()).isEqualTo("imgurl.com");
         assertThat(updatedAuth.getEmail()).isEqualTo("new@mail.com");
         assertThat(updatedAuth.getPhone()).isEqualTo("01099999999");
     }

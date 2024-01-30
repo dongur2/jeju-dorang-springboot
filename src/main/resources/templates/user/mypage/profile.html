@@ -7,41 +7,100 @@
     <title>내 프로필 - 제주도랑 | 마이페이지</title>
 </head>
 <th layout:fragment="content">
-    <div>
-        <div>
-            <div class="profile-form">
-                <form id="profile-modify-form" th:action th:method="put" th:object="${profileRequest}">
 
-                    <div class="profile-pic-box">
-                        <h3>프로필 이미지</h3>
-                        <div class="profile-img-circle">
+    <div class="user-prof-form-box"
+         style="width:50%; height:750px; border-radius: 30px; border: 1px solid rgba(152,152,152,0.56); box-shadow: rgba(110,110,110,0.19)
+                ; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%">
 
-                        </div>
-                        <div class="profile-img-btn-box">
-                            <input type="file" name="img" id="profile-image-file">
-                            <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
-                            <button type="button" th:onclick="deleteImage()">삭제</button>
-                        </div>
+        <form id="profile-modify-form" th:action th:method="put" th:object="${profileRequest}"
+                style="width:100%; height:700px; margin-bottom:auto; border-radius: 30px;
+                        display: flex; flex-direction: column; gap: 10px">
+
+            <div class="profile-pic-box" style="margin-top:20px; margin-left:5%">
+                <h3>프로필 이미지</h3>
+                <div class="profile-pic-and-btn" style="margin-top:5%">
+                    <div class="profile-img-circle">
+                        <img class="profile-img" id="now-profile" th:src="${profileResponse.img()}">
                     </div>
-
-                        <label>닉네임</label><input type="text" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"/>
-                        <label>이메일</label><input type="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"/>
-                </form>
-                    <button type="button" th:onclick="submitForm()">수정</button>
+                    <div class="profile-img-btn-box"
+                        style="margin:20px auto; display:flex; flex-direction: row; width:100%; height:50px
+                                  ;justify-content: space-between">
+                        <div>
+                            <input type="file" name="img" id="profile-image-file" onchange="changeImg()">
+                            <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
+                        </div>
+                        <button class="btn btn-primary" type="button" onclick="deleteImg()"
+                                style="width:100px; height:30px; margin-right:5%">삭제</button>
+                    </div>
+                </div>
             </div>
 
-        </div>
+            <div style="margin-top:20px; margin-left:5%; margin-right:5%">
+                <p>닉네임</p>
+                <input type="text" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"
+                        style="width:100%; height:40px; "/>
+            </div>
+
+            <div style="margin-top:20px; margin-left:5%; margin-right:5%">
+                <p>이메일</p>
+                <input type="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
+                       style="width:100%; height:40px; "/>
+            </div>
+
+        </form>
+        <button type="button" class="btn btn-primary" onclick="submitForm()"
+        style="width:90%; height:50px; margin:0 5% 5% 5%;">수정</button>
+
     </div>
 
     <script>
+
+        function changeImg() {
+            var imageFileInput = document.getElementById('profile-image-file');
+            var imageFile = imageFileInput.files[0];
+
+            var img = document.getElementById('now-profile');
+            img.src = URL.createObjectURL(imageFile);
+        }
+
+        function deleteImg() {
+            console.log("delete img()")
+            var xhr = new XMLHttpRequest();
+            xhr.open('DELETE', "/user/settings/profile/deleteimg", true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('프로필 사진이 삭제되었습니다.');
+                    window.location.reload();
+                } else {
+                    alert('프로필 사진을 삭제하는 데 오류가 발생했습니다.');
+                }
+            };
+            xhr.send();
+        }
+
         function submitForm() {
-            var form = document.getElementById('profile-modify-form');
-            var formData = new FormData(form);
+            console.log("SUBMIT FORM()");
+            let form = document.getElementById('profile-modify-form');
+            let formData = new FormData(form);
 
             var imageFileInput = document.getElementById('profile-image-file');
             var imageFile = imageFileInput.files[0];
 
-            if (imageFile) {
+            if (imageFile != null) {
+                var fileSizeInMB = imageFile.size / (1024 * 1024); // 파일 크기를 MB 단위로 계산
+                var validExtensions = ['png', 'jpeg', 'jpg'];
+
+                // 파일 확장자 확인
+                var extension = imageFile.name.split('.').pop().toLowerCase();
+                if (fileSizeInMB > 1) {
+                    alert('이미지 파일 크기는 1MB를 초과할 수 없습니다.');
+                    return;
+                } else if (!validExtensions.includes(extension)) {
+                    alert('png, jpeg, jpg 파일만 업로드할 수 있습니다.');
+                    return;
+                }
+
                 formData.append('img', imageFile);
             }
 
@@ -59,6 +118,9 @@
 
             xhr.send(formData);
         }
+
+
+
     </script>
 </th>
 </html>

@@ -16,7 +16,7 @@ public record ProfileResponse (
                 .nickname(user.getProfile().getNickname())
                 .externalId(user.getProfile().getExternalId())
                 .email(user.getAuth().getEmail())
-                .img(user.getProfile().getImg_url())
+                .img(user.getProfile().getImgUrl())
                 .build();
     }
 
