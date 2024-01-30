@@ -52,7 +52,7 @@
             var imageFile = imageFileInput.files[0];
 
             var fileSizeInMB = imageFile.size / (1024 * 1024); // 파일 크기를 MB 단위로 계산
-            var validExtensions = ['png', 'jpeg', 'jpg'];
+            var validExtensions = ['png', 'jpeg', 'jpg', 'PNG', 'JPEG', 'JPG'];
 
             // 파일 확장자 확인
             var extension = imageFile.name.split('.').pop().toLowerCase();

@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.service.s3;
 import com.donguri.jejudorang.domain.user.repository.ProfileRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,12 +40,23 @@ public class ImageServiceI implements ImageService {
     @Transactional
     public String putS3Object(MultipartFile imgFile) {
         try {
-            if (imgFile.getSize() > 1024 * 1024) {
+            if (imgFile.getSize() > 1000000) {
                 throw new IllegalAccessException("파일 크기는 1MB를 초과할 수 없습니다");
             }
 
+            String originalName = imgFile.getOriginalFilename();
+            log.info("이미지 파일의 사용자 저장 이름 : {}", originalName);
+            String fileType = originalName.substring(originalName.length() - 4);
+            log.info("파일 확장자 : {}", fileType);
+
+            if (!(fileType.contains("png") || fileType.contains("jpg") || fileType.contains("jpeg")
+                || fileType.contains("PNG") || fileType.contains("JPG") || fileType.contains("JPEG"))) {
+
+                throw new IllegalAccessException("파일은 png, jpg, jpeg만 가능합니다");
+            }
+
             UUID uuid = UUID.randomUUID();
-            String objectKey = uuid + imgFile.getOriginalFilename();
+            String objectKey = uuid + originalName;
 
             PutObjectRequest putOb = PutObjectRequest.builder()
                     .bucket(bucketName)
@@ -53,9 +65,8 @@ public class ImageServiceI implements ImageService {
                     .contentLength(imgFile.getSize())
                     .build();
 
-            PutObjectResponse putObjectResponse = s3Client.putObject(putOb, RequestBody.fromBytes(imgFile.getBytes()));
+            s3Client.putObject(putOb, RequestBody.fromBytes(imgFile.getBytes()));
             log.info(" ** S3에 사진 업로드 완료 ** name: {}", objectKey);
-            log.info("Successfully placed {} into bucket {}", imgFile.getOriginalFilename(), bucketName);
 
             GetUrlRequest request = GetUrlRequest.builder()
                     .bucket(bucketName)
@@ -73,7 +84,7 @@ public class ImageServiceI implements ImageService {
             return null;
 
         } catch (IllegalAccessException e) {
-            log.error("사진 크기는 1MB를 초과할 수 없습니다. 현재 사진 크기: {}", imgFile.getSize());
+            log.error("사진 업로드 실패: {}", e.getMessage());
             return null;
 
         } catch (IOException e) {
