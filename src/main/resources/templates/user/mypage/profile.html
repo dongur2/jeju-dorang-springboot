@@ -9,23 +9,25 @@
 <th layout:fragment="content">
     <div>
         <div>
-            <div class="profile-top">
-                <h3>프로필 이미지</h3>
-                <div class="profile-pic-box">
-                    <div class="profile-img-circle"></div>
-                    <div class="profile-img-btn-box">
-                        <button type="button" class="profile-img-modify-btn">변경</button>
-                        <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="profile-middle">
+            <div class="profile-form">
                 <form id="profile-modify-form" th:action th:method="put" th:object="${profileRequest}">
-                    <label>닉네임</label><input type="text" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"/>
-                    <label>이메일</label><input type="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"/>
+
+                    <div class="profile-pic-box">
+                        <h3>프로필 이미지</h3>
+                        <div class="profile-img-circle">
+
+                        </div>
+                        <div class="profile-img-btn-box">
+                            <input type="file" name="img" id="profile-image-file">
+                            <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
+                            <button type="button" th:onclick="deleteImage()">삭제</button>
+                        </div>
+                    </div>
+
+                        <label>닉네임</label><input type="text" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"/>
+                        <label>이메일</label><input type="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"/>
                 </form>
-                <button type="button" th:onclick="submitForm()">수정</button>
+                    <button type="button" th:onclick="submitForm()">수정</button>
             </div>
 
         </div>
@@ -33,7 +35,29 @@
 
     <script>
         function submitForm() {
-            document.getElementById("profile-modify-form").submit();
+            var form = document.getElementById('profile-modify-form');
+            var formData = new FormData(form);
+
+            var imageFileInput = document.getElementById('profile-image-file');
+            var imageFile = imageFileInput.files[0];
+
+            if (imageFile) {
+                formData.append('img', imageFile);
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', form.action, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('프로필이 수정되었습니다.');
+                    window.location.reload();
+                } else {
+                    alert('프로필 수정에 실패했습니다.');
+                }
+            };
+
+            xhr.send(formData);
         }
     </script>
 </th>

@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
 import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -31,11 +32,12 @@ public class UserController {
     private int cookieTime;
 
     @Autowired private final UserService userService;
+    @Autowired private final ImageService imageService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ImageService imageService) {
         this.userService = userService;
+        this.imageService = imageService;
     }
-
 
     @GetMapping("/signup")
     public String registerForm() {
@@ -128,6 +130,8 @@ public class UserController {
     @GetMapping("/settings/profile")
     public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
         try {
+            log.info("컨트롤러 진입");
+
             String accessToken = token.getValue();
             log.info("@CookieValue Cookie's access_token: {}", accessToken);
 
@@ -165,7 +169,7 @@ public class UserController {
 
         } catch (Exception e) {
             log.error(e.getMessage());
-            return "redirect:/user/settings/profile";
+            return "/user/mypage/profile";
         }
     }
 

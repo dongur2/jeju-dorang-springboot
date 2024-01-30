@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import org.springframework.web.multipart.MultipartFile;
 
 @Builder
 public record ProfileRequest (
@@ -17,6 +18,6 @@ public record ProfileRequest (
         @NotBlank(message = "이메일은 비울 수 없습니다.")
         String email,
 
-        String img
+        MultipartFile img
 
 ){}

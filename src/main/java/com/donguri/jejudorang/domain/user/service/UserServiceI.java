@@ -8,6 +8,7 @@ import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
+import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
 import com.donguri.jejudorang.global.config.RefreshToken;
@@ -28,6 +29,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserServiceI implements UserService {
+
+    @Autowired
+    private ImageService imageService;
 
     @Autowired
     private final AuthenticationManager authenticationManager;
@@ -202,9 +206,15 @@ public class UserServiceI implements UserService {
         try {
             User nowUser = getNowUser(token);
 
+            if (!dataToUpdate.img().isEmpty()) {
+                String savedUrl = imageService.putS3Object(dataToUpdate.img());
+                log.info("이미지 업로드 완료 : {}", savedUrl);
+
+                nowUser.getProfile().updateImg(savedUrl);
+            }
+
             Profile profile = nowUser.getProfile();
             profile.updateNickname(dataToUpdate.nickname());
-            profile.updateImg(dataToUpdate.img()); // s3 url
 
             nowUser.getAuth().updateEmail(dataToUpdate.email()); // 추가 인증 필요
 

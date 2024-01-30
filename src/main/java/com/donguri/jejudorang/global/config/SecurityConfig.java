@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.global.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
 
     @Autowired private final JwtUserDetailsService jwtUserDetailsService;
@@ -32,6 +35,7 @@ public class SecurityConfig {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(); // 사용자 정보 조회, 인증 수행 구현체
 
+        log.info("DAO authenticationProvier 생성");
         authProvider.setUserDetailsService(jwtUserDetailsService); // DB 사용자 정보 조회에 사용될 UserDetailsService 설정 - 사용자 제공한 인증 정보와 데이터베이스에 저장된 사용자 정보를 비교해 인증
         authProvider.setPasswordEncoder(passwordEncoder()); // 사용자 비밀번호 인코딩에 사용될 PasswordEncoder 설정
 
@@ -59,6 +63,8 @@ public class SecurityConfig {
     * */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.info("** init of http security START ** ");
+
         http
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable) // HTTP 기본 인증 비활성화
@@ -71,8 +77,6 @@ public class SecurityConfig {
                         .deleteCookies("access_token", "refresh_token")
                         .invalidateHttpSession(true))
 
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint)) // 예외 처리
-
                 // 세션을 생성하거나 사용하지 않음
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
@@ -80,18 +84,35 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
-                                        "/", "/home/home",
+                                        "/",
                                         "/user/login", "/user/signup", "/user/logout",
                                         "/trip", "/trip/list/*", "/trip/places",
                                         "/community/chats", "/community/parties",
-                                        "/css/**", "/img/**", "/error/**")
-                                .permitAll().anyRequest().authenticated()));
+                                        "/templates/**", "/error/**")
+                                .permitAll()
+                                .requestMatchers(
+                                        "/user/settings/profile"
+                                ).authenticated()
+                        )
+                )
 
-        http.authenticationProvider(authenticationProvider()); // 사용자의 인증 정보를 제공하는 authenticationProvider 설정: 사용자 로그인 정보 기반 인증 수행
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint)) // 예외 처리
 
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // 필터 체인에 사용자 정의 필터 추가(JWT 인증 필터)
+                .authenticationProvider(authenticationProvider())// 사용자의 인증 정보를 제공하는 authenticationProvider 설정: 사용자 로그인 정보 기반 인증 수행
+
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    /*
+    * 필터 무시
+    * */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web
+                .ignoring()
+                .requestMatchers("/img/**", "/css/**", "/js/**");
     }
 
 }

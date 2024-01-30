@@ -20,6 +20,7 @@ bin/
 ### IntelliJ IDEA ###
 application.properties
 application-API-KEY.properties
+application-AWS.properties
 .idea
 *.iws
 *.iml
