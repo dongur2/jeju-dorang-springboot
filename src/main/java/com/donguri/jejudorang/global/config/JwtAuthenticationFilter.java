@@ -45,6 +45,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        /*
+        * 컨트롤러 외 요청 리턴
+        * */
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/css/") || requestURI.startsWith("/img/") || requestURI.startsWith("/js/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        log.info("요청: {}",request.getRequestURI());
         log.info("doFilterInternal: 인증/권한 검증 프로세스 시작");
 
         /*
@@ -63,7 +73,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (IllegalArgumentException e) {
             log.error("아이디/비밀번호가 틀립니다: {}", e.getMessage());
-            SecurityContextHolder.clearContext();
 
         } catch (ExpiredJwtException e) {
             log.error("토큰이 만료되었습니다 : {}", e.getMessage()); // access token 만료
@@ -77,13 +86,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 if (refreshToken != null && jwtProvider.validateJwtToken(refreshToken)) {
                     String username = jwtProvider.getUserNameFromJwtToken(refreshToken); // 토큰에서 externalId 추출
-                        log.info("현재 Access Token이 만료되어 재발급 & 인증을 시도하는 유저 [Refresh Token]: {}", username);
+                    log.info("현재 Access Token이 만료되어 재발급 & 인증을 시도하는 유저 [Refresh Token]: {}", username);
 
                     String refreshRepo = getRefreshTokenFromRedis(refreshToken, username); // Refresh Token from Redis
 
                     /*
-                    * DB에서 가져온 Refresh Token과 Cookie에서 가져온 Refresh Token이 같을 경우에 재발급 진행
-                    * */
+                     * DB에서 가져온 Refresh Token과 Cookie에서 가져온 Refresh Token이 같을 경우에 재발급 진행
+                     * */
                     if (refreshRepo.equals(refreshToken)) {
                         UsernamePasswordAuthenticationToken authentication = setContextAuthWithToken(request, username, refreshToken);
                         String newAccess = jwtProvider.generateAccessToken(authentication);
@@ -92,8 +101,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         log.info("Access Token 재발급 & Cookie access_token 갱신 완료");
 
                         /*
-                        * Refresh Token 만료 3분 전부터 Refresh Token 갱신
-                        * */
+                         * Refresh Token 만료 3분 전부터 Refresh Token 갱신
+                         * */
                         if (jwtProvider.getTokenExpirationFromJWT(refreshToken)
                                 .before(new Date(System.currentTimeMillis() + 60 * 3000))) {
 
@@ -119,7 +128,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             } catch (ExpiredJwtException exx) {
                 log.error("Refresh Token이 만료되었습니다 : {}", refreshToken);
-                SecurityContextHolder.clearContext();
 
             } catch (Exception ex) {
                 log.error("Refresh Token Exception : {}", ex.getMessage());
@@ -127,10 +135,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             log.error("Security Context 유저 인증에 실패했습니다 : {}", e.getMessage());
-            SecurityContextHolder.clearContext();
         }
 
-        filterChain.doFilter(request, response);
+        doFilter(request, response, filterChain);
     }
 
     /*
@@ -182,4 +189,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
 }

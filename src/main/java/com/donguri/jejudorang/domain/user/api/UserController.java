@@ -7,9 +7,7 @@ import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,6 +130,8 @@ public class UserController {
     @GetMapping("/settings/profile")
     public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
         try {
+            log.info("컨트롤러 진입");
+
             String accessToken = token.getValue();
             log.info("@CookieValue Cookie's access_token: {}", accessToken);
 
@@ -169,7 +169,7 @@ public class UserController {
 
         } catch (Exception e) {
             log.error(e.getMessage());
-            return "redirect:/user/settings/profile";
+            return "/user/mypage/profile";
         }
     }
 
