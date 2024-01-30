@@ -160,12 +160,15 @@ public class UserController {
             return bindErrorPage(bindingResult, model);
         }
 
+        log.info("UPDATE CONTROLLER !! ");
+
         try {
             String accessToken = token.getValue();
             log.info("@CookieValue Cookie's access_token: {}", accessToken);
 
-            userService.updateProfileData(accessToken, profileRequest);
-            return "redirect:/user/settings/profile";
+            ProfileResponse profileResponse = userService.updateProfileData(accessToken, profileRequest);
+            model.addAttribute("profileResponse", profileResponse);
+            return "/user/mypage/profile";
 
         } catch (Exception e) {
             log.error(e.getMessage());

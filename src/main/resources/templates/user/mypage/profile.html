@@ -15,10 +15,10 @@
                     <div class="profile-pic-box">
                         <h3>프로필 이미지</h3>
                         <div class="profile-img-circle">
-
+                            <img class="profile-img" id="now-profile" th:if="${profileResponse.img() != null}" th:src="${profileResponse.img()}">
                         </div>
                         <div class="profile-img-btn-box">
-                            <input type="file" name="img" id="profile-image-file">
+                            <input type="file" name="img" id="profile-image-file" onchange="changeImg()">
                             <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
                             <button type="button" th:onclick="deleteImage()">삭제</button>
                         </div>
@@ -34,31 +34,56 @@
     </div>
 
     <script>
+
+        function changeImg() {
+            var imageFileInput = document.getElementById('profile-image-file');
+            var imageFile = imageFileInput.files[0];
+
+            var img = document.getElementById('now-profile');
+            img.src = URL.createObjectURL(imageFile);
+        }
+
         function submitForm() {
+            console.log("SUBMIT FORM()");
             var form = document.getElementById('profile-modify-form');
             var formData = new FormData(form);
 
             var imageFileInput = document.getElementById('profile-image-file');
             var imageFile = imageFileInput.files[0];
 
-            if (imageFile) {
+            var fileSizeInMB = imageFile.size / (1024 * 1024); // 파일 크기를 MB 단위로 계산
+            var validExtensions = ['png', 'jpeg', 'jpg'];
+
+            // 파일 확장자 확인
+            var extension = imageFile.name.split('.').pop().toLowerCase();
+
+            if (fileSizeInMB > 1) {
+                alert('이미지 파일 크기는 1MB를 초과할 수 없습니다.');
+
+            } else if (!validExtensions.includes(extension)) {
+                alert('png, jpeg, jpg 파일만 업로드할 수 있습니다.');
+
+            } else {
                 formData.append('img', imageFile);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('PUT', form.action, true);
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        alert('프로필이 수정되었습니다.');
+                        window.location.reload();
+                    } else {
+                        alert('프로필 수정에 실패했습니다.');
+                    }
+                };
+
+                xhr.send(formData);
+
             }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('PUT', form.action, true);
-
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    alert('프로필이 수정되었습니다.');
-                    window.location.reload();
-                } else {
-                    alert('프로필 수정에 실패했습니다.');
-                }
-            };
-
-            xhr.send(formData);
         }
+
+
     </script>
 </th>
 </html>

@@ -202,15 +202,19 @@ public class UserServiceI implements UserService {
 
     @Override
     @Transactional
-    public void updateProfileData(String token, ProfileRequest dataToUpdate) {
+    public ProfileResponse updateProfileData(String token, ProfileRequest dataToUpdate) {
         try {
             User nowUser = getNowUser(token);
 
             if (!dataToUpdate.img().isEmpty()) {
                 String savedUrl = imageService.putS3Object(dataToUpdate.img());
-                log.info("이미지 업로드 완료 : {}", savedUrl);
 
-                nowUser.getProfile().updateImg(savedUrl);
+                if (savedUrl == null) {
+                    throw new IllegalAccessException("사진 업로드 실패");
+                } else {
+                    log.info("이미지 업로드 완료 : {}", savedUrl);
+                    nowUser.getProfile().updateImg(savedUrl);
+                }
             }
 
             Profile profile = nowUser.getProfile();
@@ -218,8 +222,14 @@ public class UserServiceI implements UserService {
 
             nowUser.getAuth().updateEmail(dataToUpdate.email()); // 추가 인증 필요
 
+            log.info("프로필 업데이트를 완료했습니다");
+
+            return ProfileResponse.builder().build()
+                    .from(nowUser);
+
         } catch (Exception e) {
             log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
+            return null;
         }
     }
 

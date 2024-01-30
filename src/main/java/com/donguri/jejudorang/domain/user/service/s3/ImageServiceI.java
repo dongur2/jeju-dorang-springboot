@@ -39,6 +39,10 @@ public class ImageServiceI implements ImageService {
     @Transactional
     public String putS3Object(MultipartFile imgFile) {
         try {
+            if (imgFile.getSize() > 1024 * 1024) {
+                throw new IllegalAccessException("파일 크기는 1MB를 초과할 수 없습니다");
+            }
+
             UUID uuid = UUID.randomUUID();
             String objectKey = uuid + imgFile.getOriginalFilename();
 
@@ -66,6 +70,10 @@ public class ImageServiceI implements ImageService {
         } catch (S3Exception e) {
             log.error("사진 업로드 실패: S3 통신 오류 {}", e.getMessage());
             System.exit(1);
+            return null;
+
+        } catch (IllegalAccessException e) {
+            log.error("사진 크기는 1MB를 초과할 수 없습니다. 현재 사진 크기: {}", imgFile.getSize());
             return null;
 
         } catch (IOException e) {
