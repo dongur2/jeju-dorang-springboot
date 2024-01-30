@@ -116,10 +116,10 @@ public class ImageServiceI implements ImageService {
             s3Client.deleteObjects(dor);
 
         } catch (S3Exception e) {
-            System.err.println(e.awsErrorDetails().errorMessage());
+            log.error("S3의 이미지 삭제 실패 : {}", e.awsErrorDetails().errorMessage());
             System.exit(1);
         }
 
-        System.out.println("Done!");
+        log.info("S3의 이미지 삭제 완료");
     }
 }

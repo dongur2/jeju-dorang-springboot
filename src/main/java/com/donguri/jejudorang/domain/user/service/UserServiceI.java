@@ -207,6 +207,16 @@ public class UserServiceI implements UserService {
             User nowUser = getNowUser(token);
 
             if (!dataToUpdate.img().isEmpty()) {
+                String pastImg = nowUser.getProfile().getImgName();
+                if (!pastImg.isEmpty()) {
+                    imageService.deleteS3Object(pastImg);
+
+                    nowUser.getProfile().updateImgName(null);
+                    nowUser.getProfile().updateImgUrl(null);
+
+                    log.info("이전 이미지 삭제 완료");
+                }
+
                 Map<String, String> uploadedImg = imageService.putS3Object(dataToUpdate.img());
 
                 if (uploadedImg == null) {
