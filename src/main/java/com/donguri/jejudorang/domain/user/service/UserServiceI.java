@@ -207,13 +207,15 @@ public class UserServiceI implements UserService {
             User nowUser = getNowUser(token);
 
             if (!dataToUpdate.img().isEmpty()) {
-                String savedUrl = imageService.putS3Object(dataToUpdate.img());
+                Map<String, String> uploadedImg = imageService.putS3Object(dataToUpdate.img());
 
-                if (savedUrl == null) {
+                if (uploadedImg == null) {
                     throw new IllegalAccessException("사진 업로드 실패");
+
                 } else {
-                    log.info("이미지 업로드 완료 : {}", savedUrl);
-                    nowUser.getProfile().updateImg(savedUrl);
+                    nowUser.getProfile().updateImgName(uploadedImg.get("imgName"));
+                    nowUser.getProfile().updateImgUrl(uploadedImg.get("imgUrl"));
+                    log.info("이미지 업로드 완료 : {}", uploadedImg.get("imgName"));
                 }
             }
 

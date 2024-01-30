@@ -1,0 +1,16 @@
+
+.profile-img-circle {
+    width:250px;
+    height:250px;
+    border-radius: 50%;
+    border: 1px solid rgba(105,105,105,0.57);
+    background-color:rgba(105,105,105,0.57);
+    overflow: hidden;
+}
+
+.profile-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

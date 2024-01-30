@@ -11,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetUrlRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -38,7 +38,7 @@ public class ImageServiceI implements ImageService {
 
     @Override
     @Transactional
-    public String putS3Object(MultipartFile imgFile) {
+    public Map<String, String> putS3Object(MultipartFile imgFile) {
         try {
             if (imgFile.getSize() > 1000000) {
                 throw new IllegalAccessException("파일 크기는 1MB를 초과할 수 없습니다");
@@ -76,7 +76,12 @@ public class ImageServiceI implements ImageService {
             URL url = s3Client.utilities().getUrl(request);
             log.info(" ** S3에 저장된 사진 URL 불러오기 완료 ** ");
             log.info("The URL for {} is {}", objectKey, url);
-            return url.toString();
+
+            Map<String, String> result = new HashMap<>();
+            result.put("imgName", objectKey);
+            result.put("imgUrl", url.toString());
+
+            return result;
 
         } catch (S3Exception e) {
             log.error("사진 업로드 실패: S3 통신 오류 {}", e.getMessage());
@@ -91,5 +96,30 @@ public class ImageServiceI implements ImageService {
             log.error("사진 업로드 실패");
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteS3Object(String objectName) {
+        ArrayList<ObjectIdentifier> toDelete = new ArrayList<>();
+        toDelete.add(ObjectIdentifier.builder()
+                .key(objectName)
+                .build());
+
+        try {
+            DeleteObjectsRequest dor = DeleteObjectsRequest.builder()
+                    .bucket(bucketName)
+                    .delete(Delete.builder()
+                            .objects(toDelete).build())
+                    .build();
+
+            s3Client.deleteObjects(dor);
+
+        } catch (S3Exception e) {
+            System.err.println(e.awsErrorDetails().errorMessage());
+            System.exit(1);
+        }
+
+        System.out.println("Done!");
     }
 }

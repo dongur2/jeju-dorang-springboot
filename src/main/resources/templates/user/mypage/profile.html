@@ -27,7 +27,7 @@
                         <label>닉네임</label><input type="text" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"/>
                         <label>이메일</label><input type="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"/>
                 </form>
-                    <button type="button" th:onclick="submitForm()">수정</button>
+                    <button type="button" onclick="submitForm()">수정</button>
             </div>
 
         </div>
@@ -45,43 +45,44 @@
 
         function submitForm() {
             console.log("SUBMIT FORM()");
-            var form = document.getElementById('profile-modify-form');
-            var formData = new FormData(form);
+            let form = document.getElementById('profile-modify-form');
+            let formData = new FormData(form);
 
             var imageFileInput = document.getElementById('profile-image-file');
             var imageFile = imageFileInput.files[0];
 
-            var fileSizeInMB = imageFile.size / (1024 * 1024); // 파일 크기를 MB 단위로 계산
-            var validExtensions = ['png', 'jpeg', 'jpg', 'PNG', 'JPEG', 'JPG'];
+            if (imageFile != null) {
+                var fileSizeInMB = imageFile.size / (1024 * 1024); // 파일 크기를 MB 단위로 계산
+                var validExtensions = ['png', 'jpeg', 'jpg'];
 
-            // 파일 확장자 확인
-            var extension = imageFile.name.split('.').pop().toLowerCase();
+                // 파일 확장자 확인
+                var extension = imageFile.name.split('.').pop().toLowerCase();
+                if (fileSizeInMB > 1) {
+                    alert('이미지 파일 크기는 1MB를 초과할 수 없습니다.');
+                    return;
+                } else if (!validExtensions.includes(extension)) {
+                    alert('png, jpeg, jpg 파일만 업로드할 수 있습니다.');
+                    return;
+                }
 
-            if (fileSizeInMB > 1) {
-                alert('이미지 파일 크기는 1MB를 초과할 수 없습니다.');
-
-            } else if (!validExtensions.includes(extension)) {
-                alert('png, jpeg, jpg 파일만 업로드할 수 있습니다.');
-
-            } else {
                 formData.append('img', imageFile);
-
-                var xhr = new XMLHttpRequest();
-                xhr.open('PUT', form.action, true);
-
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        alert('프로필이 수정되었습니다.');
-                        window.location.reload();
-                    } else {
-                        alert('프로필 수정에 실패했습니다.');
-                    }
-                };
-
-                xhr.send(formData);
-
             }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', form.action, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('프로필이 수정되었습니다.');
+                    window.location.reload();
+                } else {
+                    alert('프로필 수정에 실패했습니다.');
+                }
+            };
+
+            xhr.send(formData);
         }
+
 
 
     </script>

@@ -29,22 +29,26 @@ public class Profile extends BaseEntity {
     @Column(nullable = false)
     private String nickname;
 
-    private String img_url;
+    private String imgName;
+    private String imgUrl;
 
     @Builder
-    public Profile(User user, String externalId, String nickname, String img_url) {
+    public Profile(User user, String externalId, String nickname, String imgName, String imgUrl) {
         this.user = user;
         this.externalId = externalId;
         this.nickname = nickname;
-        this.img_url = img_url;
+        this.imgName = imgName;
+        this.imgUrl = imgUrl;
     }
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    public void updateImg(String img_url) {
-        this.img_url = img_url;
+    public void updateImgName(String imgName) { this.imgName = imgName; }
+
+    public void updateImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
     }
 
 }
