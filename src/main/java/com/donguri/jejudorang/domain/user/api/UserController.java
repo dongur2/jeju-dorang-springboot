@@ -41,8 +41,8 @@ public class UserController {
     }
 
     @ResponseBody
-    @PostMapping("/send")
-    public ResponseEntity<?> sendEmailAuthNum(@Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
+    @PostMapping("/signup/verify")
+    public ResponseEntity<?> sendEmailAuthNum(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
                 throw new NullPointerException(bindingResult.toString());

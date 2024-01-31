@@ -85,7 +85,7 @@ public class SecurityConfig {
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
-                                        "/user/login", "/user/signup", "/user/logout",
+                                        "/user/login", "/user/signup/**", "/user/logout",
                                         "/trip", "/trip/list/*", "/trip/places",
                                         "/community/chats", "/community/parties",
                                         "/templates/**", "/error/**")
@@ -112,7 +112,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web
                 .ignoring()
-                .requestMatchers("/img/**", "/css/**", "/js/**");
+                .requestMatchers("/img/**", "/css/**", "/js/**", "/favicon.ico");
     }
 
 }

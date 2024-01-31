@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.user.service.s3;
+package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.service.MailService;
 import lombok.extern.slf4j.Slf4j;

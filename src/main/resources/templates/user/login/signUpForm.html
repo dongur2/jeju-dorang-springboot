@@ -16,6 +16,13 @@
 
         <label for="email" class="form-label">email</label>
         <input type="email" id="email" name="email" class="form-control" aria-describedby="passwordHelpBlock">
+        <button type="button" class="btn btn-outline-secondary" onclick="checkMail()">인증번호 전송</button>
+
+        <div>
+            <label for="email-verify" class="form-label disabled">이메일 인증번호 확인</label>
+            <input type="text" id="email-verify" name="code" class="form-control disabled" aria-describedby="passwordHelpBlock">
+            <button type="button" class="btn btn-outline-secondary">인증번호 확인</button>
+        </div>
 
         <input class="form-check-input" type="checkbox" name="agreement" value="" id="flexCheckDefault">
         <label class="form-check-label" for="flexCheckDefault">
@@ -32,6 +39,38 @@
         <input class="btn btn-primary" type="submit" value="Submit">
     </form>
 
+    <script>
+
+        function checkMail() {
+            var mailVerifyRequest = {
+                email: document.getElementById("email").value
+            };
+
+            if (mailVerifyRequest.email == null
+                    || mailVerifyRequest.email.trim() === "") {
+                alert("이메일을 입력해주세요.");
+
+            } else {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/user/signup/verify", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            alert("이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.");
+
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }
+                };
+
+                xhr.send(JSON.stringify(mailVerifyRequest));
+            }
+        }
+
+    </script>
 
 </th>
 </html>
