@@ -1,9 +1,6 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.user.dto.LoginRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
-import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
+import com.donguri.jejudorang.domain.user.dto.*;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
@@ -13,6 +10,7 @@ import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
 import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 
 @Slf4j
@@ -31,7 +31,9 @@ import java.util.*;
 public class UserServiceI implements UserService {
 
     @Autowired
-    private ImageService imageService;
+    private final ImageService imageService;
+    @Autowired
+    private final MailService mailService;
 
     @Autowired
     private final AuthenticationManager authenticationManager;
@@ -48,9 +50,11 @@ public class UserServiceI implements UserService {
     @Autowired
     private final JwtProvider jwtProvider;
 
-    public UserServiceI(RefreshTokenRepository refreshTokenRepository, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
-        this.refreshTokenRepository = refreshTokenRepository;
+    public UserServiceI(ImageService imageService, MailService mailService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
+        this.imageService = imageService;
+        this.mailService = mailService;
         this.authenticationManager = authenticationManager;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
@@ -58,6 +62,53 @@ public class UserServiceI implements UserService {
     }
 
 
+
+    /*
+    * 이메일 확인 - 중복 확인 후 인증 번호 전송
+    * */
+    public void checkMail(MailVerifyRequest mailVerifyRequest) {
+        try {
+            checkMailDuplicated(mailVerifyRequest.email());
+
+            String subject = "[제주도랑] 인증 번호입니다.";
+            mailService.sendAuthMail(mailVerifyRequest.email(), subject, createNumber());
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    // 이메일 중복 확인
+    private void checkMailDuplicated(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            log.debug("이미 가입된 이메일입니다 : {}", email);
+            throw new RuntimeException("이미 가입된 이메일입니다.");
+        }
+    }
+
+    // 이메일 인증 번호 생성
+    private static String createNumber() {
+        int length = 6;
+
+        try {
+            Random random = SecureRandom.getInstanceStrong();
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                builder.append(random.nextInt(10));
+            }
+            return builder.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            log.debug("이메일 인증 번호 생성을 실패했습니다 : {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    /*
+    * 회원 가입
+    * */
     @Override
     @Transactional
     public void signUp(SignUpRequest signUpRequest) {
@@ -69,12 +120,13 @@ public class UserServiceI implements UserService {
             throw new RuntimeException("Error: 이미 존재하는 이메일입니다.");
         }
 
+
         if (!signUpRequest.password().equals(signUpRequest.passwordForCheck())) {
             throw new RuntimeException("Error: 비밀번호가 일치하지 않습니다.");
         }
 
         /*
-         * Create a new User
+         * 새로운 회원(User) 생성
          * */
         User userToSave = signUpRequest.toEntity();
 
@@ -113,6 +165,9 @@ public class UserServiceI implements UserService {
     }
 
 
+    /*
+    * 로그인
+    * */
     @Override
     @Transactional
     public Map<String, String> signIn(LoginRequest loginRequest) {

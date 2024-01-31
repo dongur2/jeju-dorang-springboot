@@ -1,14 +1,12 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.user.dto.LoginRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
-import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
+import com.donguri.jejudorang.domain.user.dto.*;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Null;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,6 +38,29 @@ public class UserController {
     public UserController(UserService userService, ImageService imageService) {
         this.userService = userService;
         this.imageService = imageService;
+    }
+
+    @ResponseBody
+    @PostMapping("/send")
+    public ResponseEntity<?> sendEmailAuthNum(@Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                throw new NullPointerException(bindingResult.toString());
+            }
+
+            userService.checkMail(mailVerifyRequest);
+
+            log.info("이메일 인증 번호 전송 완료");
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (NullPointerException e) {
+            log.error("이메일 인증 번호 전송 실패: {}", e.getMessage());
+            return new ResponseEntity<>("이메일을 입력해주세요.", HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e) {
+            log.error("이메일 인증 번호 전송 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/signup")
@@ -178,6 +200,9 @@ public class UserController {
         }
     }
 
+    /*
+    * 마이페이지 - 프로필 사진 삭제
+    * */
     @ResponseBody
     @DeleteMapping("/settings/profile/deleteimg")
     public ResponseEntity<HttpStatus> deleteProfileImg(@CookieValue("access_token") Cookie token) {
