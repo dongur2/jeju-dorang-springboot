@@ -140,7 +140,7 @@ public class UserServiceI implements UserService {
 
 
         if (!signUpRequest.password().equals(signUpRequest.passwordForCheck())) {
-            throw new RuntimeException("Error: 비밀번호가 일치하지 않습니다.");
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
         /*

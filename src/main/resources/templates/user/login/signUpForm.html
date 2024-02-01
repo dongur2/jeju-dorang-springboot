@@ -36,11 +36,14 @@
         <label for="passwordForCheck" class="form-label">passwordForCheck</label>
         <input type="password" id="passwordForCheck" name="passwordForCheck" class="form-control" aria-describedby="passwordHelpBlock">
 
-        <input class="btn btn-primary" type="submit" value="Submit">
+        <input class="btn btn-primary" type="button" value="가입" onclick="submitSignUpForm()">
     </form>
 
     <script>
 
+        /*
+        * 인증 번호 전송
+        * */
         function sendMail() {
             var mailSendRequest = {
                 email: document.getElementById("email").value
@@ -73,6 +76,9 @@
             }
         }
 
+        /*
+        * 인증 번호 확인
+        * */
         function checkMail() {
             var mailVerifyRequest = {
                 email: document.getElementById("email").value,
@@ -115,6 +121,31 @@
 
                 xhr.send(JSON.stringify(mailVerifyRequest));
             }
+        }
+
+        /*
+        * 폼 제출 (회원 가입)
+        * */
+        function submitSignUpForm() {
+            var form = document.getElementById('sign-up-form');
+            var formData = new FormData(form);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/user/signup", true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("회원 가입이 완료되었습니다.");
+                        window.location.href = "/";
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            };
+
+            xhr.send(formData);
         }
 
     </script>

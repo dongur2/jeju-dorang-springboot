@@ -95,24 +95,36 @@ public class UserController {
         }
     }
 
+    /*
+    * 회원 가입
+    * */
     @GetMapping("/signup")
     public String registerForm() {
         return "/user/login/signUpForm";
     }
+    @ResponseBody
     @PostMapping("/signup")
-    public String registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult, Model model) {
+    public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult, Model model) {
+
+        log.info("아이디 {}", signUpRequest.externalId());
+        log.info("닉네임 {}", signUpRequest.nickname());
+        log.info("이메일 {}", signUpRequest.email());
+        log.info("비번 {}", signUpRequest.password());
+        log.info("비번 확인 {}", signUpRequest.passwordForCheck());
+
         // 유효성 검사 에러
         if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
+            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
 
         try {
             userService.signUp(signUpRequest);
-            return "redirect:/";
+            log.info("회원 가입 완료");
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            log.error("회원 가입 실패");
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
 
     }
