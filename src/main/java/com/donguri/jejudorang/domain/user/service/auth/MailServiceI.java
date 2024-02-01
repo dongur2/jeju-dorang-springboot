@@ -27,9 +27,17 @@ public class MailServiceI implements MailService {
         try {
             mailSender.send(message);
 
-            // 이메일 : 인증 번호 Redis에 저장
+            /*
+            * {이메일 : 인증 번호} Redis에 저장
+            * */
             ValueOperations<String, String> vop = redisTemplate.opsForValue();
-            vop.set(to, text);
+            if(vop.get(to) != null) {
+                vop.set(to, text);
+            } else {
+                // 인증 되지 않은 이메일 키가 존재할 경우 삭제 후 새로운 코드 저장
+                vop.getAndDelete(to);
+                vop.set(to, text);
+            }
             log.info("Redis에 인증 번호 저장 완료 key {} : value {}", to, vop.get(to));
 
         } catch (Exception e) {
