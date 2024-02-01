@@ -12,8 +12,10 @@ import java.util.Set;
 @Builder
 public record SignUpRequest (
 
+        @Pattern(regexp=("^[a-zA-Z0-9]{5,20}$")
+                ,message="아이디는 5자 이상 20자 이하의 영문자와 숫자 조합만 가능합니다.")
         @NotBlank(message = "아이디를 작성해주세요.")
-        @Size(min = 5, max = 30, message = "아이디는 5자 이상 30자 이하만 가능합니다.")
+        @Size(min = 5, max = 20, message = "아이디는 5자 이상 30자 이하만 가능합니다.")
         String externalId,
 
         @NotBlank(message = "닉네임을 작성해주세요.")

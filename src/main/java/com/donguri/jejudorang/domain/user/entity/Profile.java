@@ -21,7 +21,7 @@ public class Profile extends BaseEntity {
     @OneToOne
     private User user;
 
-    @Size(max = 30)
+    @Size(max = 20)
     @Column(nullable = false)
     private String externalId;
 

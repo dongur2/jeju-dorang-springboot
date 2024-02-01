@@ -50,10 +50,166 @@ class UserControllerTest {
     }
 
     @Test
+    void DTO_실패_이메일_누락() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId1212")
+                .nickname("nickname")
+                .email(null)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일을 작성해주세요.");
+    }
+
+    @Test
+    void DTO_실패_아이디_누락() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId(null)
+                .nickname("nickname")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("아이디를 작성해주세요.");
+    }
+
+    @Test
+    void DTO_실패_아이디_글자수_부족() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("user")
+                .nickname("nickname")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("아이디는 5자 이상 20자 이하의 영문자와 숫자 조합만 가능합니다.");
+    }
+
+    @Test
+    void DTO_실패_아이디_글자수_초과() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("usernameisusernameisusernameWHAT")
+                .nickname("nickname")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("아이디는 5자 이상 20자 이하의 영문자와 숫자 조합만 가능합니다.");
+    }
+
+    @Test
+    void DTO_실패_아이디_특수문자_포함() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("user!!")
+                .nickname("nickname")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("아이디는 5자 이상 20자 이하의 영문자와 숫자 조합만 가능합니다.");
+    }
+
+    @Test
+    void DTO_실패_아이디_한글_포함() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("use휴ㅋㅋ")
+                .nickname("nickname")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("아이디는 5자 이상 20자 이하의 영문자와 숫자 조합만 가능합니다.");
+    }
+
+    @Test
     void DTO_실패_이메일_형식_미충족() {
         //given
         SignUpRequest request = SignUpRequest.builder()
-                .externalId("userId")
+                .externalId("userId12")
                 .nickname("nickname")
                 .email("email") // eamil@ error , email@w none-error
                 .password("abcde@@123")
@@ -79,7 +235,7 @@ class UserControllerTest {
     void DTO_성공_비밀번호_충족() {
         //given
         SignUpRequest request = SignUpRequest.builder()
-                .externalId("userId")
+                .externalId("userId12")
                 .nickname("nickname")
                 .email("email@mail.com")
                 .password("abcde@@123")
@@ -102,10 +258,36 @@ class UserControllerTest {
     }
 
     @Test
-    void DTO_실패_비밀번호_확인_미작성() {
+    void DTO_실패_비밀번호_누락() {
         //given
         SignUpRequest request = SignUpRequest.builder()
-                .externalId("userId")
+                .externalId("userId12")
+                .nickname("nickname")
+                .email("email@mail.com")
+                .password(null)
+                .passwordForCheck(null)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("비밀번호를 작성해주세요.", "비밀번호를 한 번 더 입력해주세요.");
+    }
+
+    @Test
+    void DTO_실패_비밀번호_확인_누락() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId12")
                 .nickname("nickname")
                 .email("email@mail.com")
                 .password("abcde@@123")
@@ -131,7 +313,7 @@ class UserControllerTest {
     void DTO_실패_비밀번호_글자수_부족() {
         //given
         SignUpRequest request = SignUpRequest.builder()
-                .externalId("userId")
+                .externalId("userId12")
                 .nickname("nickname")
                 .email("email@mail.com")
                 .password("123!w")
