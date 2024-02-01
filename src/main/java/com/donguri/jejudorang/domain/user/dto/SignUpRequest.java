@@ -1,10 +1,7 @@
 package com.donguri.jejudorang.domain.user.dto;
 
 import com.donguri.jejudorang.domain.user.entity.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 
 import java.util.Set;
@@ -19,21 +16,24 @@ public record SignUpRequest (
         String externalId,
 
         @Pattern(regexp = ("^[a-zA-Z0-9가-힣]{2,15}$")
-                ,message = "닉네임은 특수문자, 이모티콘을 제외한 2자 이상 15자 이하만 가능합니다.")
+                ,message = "닉네임은 공백을 포함하는 특수문자, 이모티콘을 제외한 2자 이상 15자 이하만 가능합니다.")
         @NotBlank(message = "닉네임을 작성해주세요.")
         @Size(min = 2, max = 15, message = "닉네임은 2자 이상 15자 이하만 가능합니다.")
         String nickname,
 
         @Email(message = "이메일 형식으로 작성해주세요.")
         @NotBlank(message = "이메일을 작성해주세요.")
-        String email,
+        String emailToSend,
+
+        @AssertTrue(message = "이메일 인증이 필요합니다.")
+        boolean isVerified,
 
 //        @NotBlank
         String agreement,
 
         @Pattern(regexp=("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$")
                 ,message="비밀번호는 특수 문자와 숫자가 적어도 하나가 포함된 8자 이상 20자 이하만 가능합니다.")
-        @Size(min = 8, max = 20)
+        @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하만 가능합니다.")
         @NotBlank(message = "비밀번호를 작성해주세요.")
         String password,
 
@@ -57,7 +57,7 @@ public record SignUpRequest (
                 Authentication auth = Authentication.builder()
                         .user(user)
                         .agreement(AgreeRange.ALL) // temp
-                        .email(email)
+                        .email(emailToSend)
                         .build();
 
                 user.updateProfile(prof);

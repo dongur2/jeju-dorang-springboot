@@ -104,14 +104,7 @@ public class UserController {
     }
     @ResponseBody
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult, Model model) {
-
-        log.info("아이디 {}", signUpRequest.externalId());
-        log.info("닉네임 {}", signUpRequest.nickname());
-        log.info("이메일 {}", signUpRequest.email());
-        log.info("비번 {}", signUpRequest.password());
-        log.info("비번 확인 {}", signUpRequest.passwordForCheck());
-
+    public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
         // 유효성 검사 에러
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
@@ -126,7 +119,6 @@ public class UserController {
             log.error("회원 가입 실패");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
-
     }
 
     @GetMapping("/login")

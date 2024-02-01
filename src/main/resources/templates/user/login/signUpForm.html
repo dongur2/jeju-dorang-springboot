@@ -9,19 +9,21 @@
 <th layout:fragment="content">
     <form id="sign-up-form" th:action th:method="post" th:object="${signUpRequest}">
         <label for="externalId" class="form-label">externalId</label>
-        <input type="text" id="externalId" name="externalId" class="form-control" aria-describedby="passwordHelpBlock">
+        <input type="text" id="externalId" name="externalId" class="form-control">
 
         <label for="nickname" class="form-label">nickname</label>
-        <input type="text" id="nickname" name="nickname" class="form-control" aria-describedby="passwordHelpBlock">
+        <input type="text" id="nickname" name="nickname" class="form-control">
 
         <label for="email" class="form-label">email</label>
-        <input type="email" id="email" name="email" class="form-control btn-verify" aria-describedby="passwordHelpBlock">
+        <input type="email" id="email" name="email" class="form-control btn-verify">
+        <input type="text" id="email-verify-dto" name="emailToSend" class="form-control" style="display: none">
         <button type="button" class="btn btn-outline-secondary btn-verify" onclick="sendMail()">인증번호 전송</button>
 
         <div id="email-verify-container" style="display: none;">
-            <label for="email-verify" class="form-label disabled">이메일 인증번호 확인</label>
-            <input type="text" id="email-verify" name="code" class="form-control disabled btn-verify" aria-describedby="passwordHelpBlock">
+            <label for="email-verify" class="form-label">이메일 인증번호 확인</label>
+            <input type="text" id="email-verify" name="code" class="form-control btn-verify">
             <button type="button" class="btn btn-outline-secondary btn-verify" onclick="checkMail()">인증번호 확인</button>
+            <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
         </div>
 
         <input class="form-check-input" type="checkbox" name="agreement" value="" id="flexCheckDefault">
@@ -62,7 +64,6 @@
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             alert("이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.");
-
                             // 인증 번호 입력란, 인증 번호 확인 버튼 노출
                             document.getElementById("email-verify-container").style.display = "block";
 
@@ -70,7 +71,7 @@
                             alert(xhr.responseText);
                         }
                     }
-                };
+                }
 
                 xhr.send(JSON.stringify(mailSendRequest));
             }
@@ -85,11 +86,11 @@
                 code: document.getElementById("email-verify").value
             };
 
-            if (mailVerifyRequest.email == null
+            if (mailVerifyRequest.email === null
                 || mailVerifyRequest.email.trim() === "") {
                 alert("이메일을 입력해주세요.");
 
-            } else if (mailVerifyRequest.code == null
+            } else if (mailVerifyRequest.code === null
                 || mailVerifyRequest.code.trim() === "") {
                 alert("인증 번호를 입력해주세요.")
 
@@ -107,6 +108,12 @@
                         if (xhr.status === 200) {
                             alert("이메일 인증이 완료되었습니다.");
 
+                            // 컨트롤러로 전달할 이메일 인증 상태 저장
+                            document.getElementById('email-verify-status').value = true;
+
+                            // 컨트롤러로 전달할 이메일 값 저장
+                            document.getElementById("email-verify-dto").value = document.getElementById("email").value;
+
                             // 이메일 인증 완료 -> 이메일 수정, 인증 번호 전송/수정/확인 불가
                             let elements = document.getElementsByClassName("btn-verify");
                             for (var i = 0; i < elements.length; i++) {
@@ -117,7 +124,7 @@
                             alert(xhr.responseText);
                         }
                     }
-                };
+                }
 
                 xhr.send(JSON.stringify(mailVerifyRequest));
             }
@@ -129,6 +136,23 @@
         function submitSignUpForm() {
             var form = document.getElementById('sign-up-form');
             var formData = new FormData(form);
+
+            // 값 입력 누락 필터
+            let keys = formData.keys();
+            for(var key of keys) {
+                if (formData.get(key) === null || formData.get(key).trim() === "" || formData.get(key) === false) {
+                    switch (key) {
+                        case 'externalId': alert("아이디를 입력해주세요."); break;
+                        case 'nickname': alert("닉네임을 입력해주세요."); break;
+                        case 'emailToSend': alert("이메일을 인증해주세요."); break;
+                        case 'isVerified': alert("이메일을 인증해주세요."); break;
+                        case 'password': alert("비밀번호를 입력해주세요."); break;
+                        case 'passwordForCheck': alert("비밀번호를 한 번 더 입력해주세요."); break;
+                        default: continue;
+                    }
+                    return;
+                }
+            }
 
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/user/signup", true);
@@ -143,7 +167,7 @@
                         alert(xhr.responseText);
                     }
                 }
-            };
+            }
 
             xhr.send(formData);
         }

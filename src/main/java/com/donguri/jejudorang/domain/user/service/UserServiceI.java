@@ -134,7 +134,7 @@ public class UserServiceI implements UserService {
             throw new DuplicateRequestException("이미 존재하는 아이디입니다.");
         }
 
-        if (userRepository.findByEmail(signUpRequest.email()).isPresent()) {
+        if (userRepository.findByEmail(signUpRequest.emailToSend()).isPresent()) {
             throw new DuplicateRequestException("이미 가입된 이메일입니다.");
         }
 
