@@ -8,38 +8,188 @@
 </head>
 <th layout:fragment="content">
     <form id="sign-up-form" th:action th:method="post" th:object="${signUpRequest}">
-        <label for="externalId" class="form-label">externalId</label>
-        <input type="text" id="externalId" name="externalId" class="form-control">
-
-        <label for="nickname" class="form-label">nickname</label>
-        <input type="text" id="nickname" name="nickname" class="form-control">
-
-        <label for="email" class="form-label">email</label>
-        <input type="email" id="email" name="email" class="form-control btn-verify">
-        <input type="text" id="email-verify-dto" name="emailToSend" class="form-control" style="display: none">
-        <button type="button" class="btn btn-outline-secondary btn-verify" onclick="sendMail()">인증번호 전송</button>
-
-        <div id="email-verify-container" style="display: none;">
-            <label for="email-verify" class="form-label">이메일 인증번호 확인</label>
-            <input type="text" id="email-verify" name="code" class="form-control btn-verify">
-            <button type="button" class="btn btn-outline-secondary btn-verify" onclick="checkMail()">인증번호 확인</button>
-            <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
+        <div>
+            <label for="externalId" class="form-label">아이디</label>
+            <input type="text" id="externalId" name="externalId" class="form-control">
         </div>
 
-        <input class="form-check-input" type="checkbox" name="agreement" value="" id="flexCheckDefault">
-        <label class="form-check-label" for="flexCheckDefault">
-            agreement
-        </label>
-        <br>
+        <div>
+            <label for="nickname" class="form-label">닉네임</label>
+            <input type="text" id="nickname" name="nickname" class="form-control">
+        </div>
 
-        <label for="password" class="form-label">password</label>
-        <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordHelpBlock">
+        <div>
+            <label for="email" class="form-label">이메일</label>
+            <input type="email" id="email" name="email" class="form-control btn-verify">
+        </div>
 
-        <label for="passwordForCheck" class="form-label">passwordForCheck</label>
-        <input type="password" id="passwordForCheck" name="passwordForCheck" class="form-control" aria-describedby="passwordHelpBlock">
+        <div>
+            <input type="text" id="email-verify-dto" name="emailToSend" class="form-control" style="display: none">
+            <button type="button" class="btn btn-outline-secondary btn-verify" onclick="sendMail()">인증번호 전송</button>
+        </div>
+
+        <div id="email-verify-container" style="display: none;">
+            <div>
+                <label for="email-verify" class="form-label">이메일 인증번호 확인</label>
+                <input type="text" id="email-verify" name="code" class="form-control btn-verify">
+            </div>
+
+            <div>
+                <button type="button" class="btn btn-outline-secondary btn-verify" onclick="checkMail()">인증번호 확인</button>
+                <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
+            </div>
+        </div>
+
+        <div>
+            <label for="password" class="form-label">비밀번호</label>
+            <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordHelpBlock">
+        </div>
+
+        <div>
+            <label for="passwordForCheck" class="form-label">비밀번호 확인</label>
+            <input type="password" id="passwordForCheck" name="passwordForCheck" class="form-control" aria-describedby="passwordHelpBlock">
+        </div>
+
+        <!-- 약관 항목 동의 -->
+        <div class="form-check" style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault" style="font-size:20px; font-weight: bolder">
+                    전체 동의하기
+                </label>
+            </div>
+
+            <div>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault" style="font-size:20px">
+                    <span style="color: #FB7A51; font-weight: bolder">[필수]</span> 제주도랑 이용약관
+                </label>
+                <div class="overflow-auto"
+                     style="width:400px; height:100px; padding:15px; border: 1px solid #d0d0d0; border-radius: 10px; margin: 10px 0; background: #f8f8f8; color:#767678">
+                    <h5 style="color: #303038">제주도랑 이용약관</h5><br>
+                    <h6 style="color: #303038">제1조 (목적)</h6>
+                    <p>1. 이 약관은 제주도랑(jeju-dorang) 서비스(이하 "서비스")를 이용하는 자(이하 "이용자")와 제주도랑 운영자(이하 "운영자") 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p><br>
+                    <h6 style="color: #303038">제2조 (정의)</h6>
+                    <p>"서비스"라 함은 제주도랑에서 제공하는 제주도 여행지 정보 제공 및 커뮤니티 서비스를 의미합니다. "이용자"라 함은 제주도랑의 서비스에 접속하여 이 약관에 따라 제주도랑이 제공하는 서비스를 이용하는 자를 말합니다.
+                        "운영자"라 함은 제주도랑의 운영자를 의미합니다.</p><br>
+                    <h6 style="color: #303038">제3조 (약관의 효력과 변경)</h6>
+                    <p>본 약관은 제주도랑의 서비스를 이용하는 모든 이용자에게 적용됩니다. 운영자는 필요한 경우 본 약관을 변경할 수 있으며, 변경된 약관은 제주도랑 내에 공지함으로써 효력을 발생합니다.</p><br>
+                    <h6 style="color: #303038">제4조 (서비스의 제공 및 중단)</h6>
+                    <p>운영자는 이용자에게 제주도랑 서비스를 지속적으로 제공할 것을 원칙으로 합니다.<br><br>
+                        운영자는 다음 각 호에 해당하는 경우 서비스의 제공을 중단할 수 있습니다.<br><br>
+                        가. 시스템 점검 및 보수 등 운영상의 필요성이 있는 경우<br>
+                        나. 서비스 제공에 관한 장애가 발생한 경우<br>
+                        다. 기타 운영자가 서비스 제공을 지속하는 것이 기술적으로 어려운 경우
+                    </p><br>
+                    <h6 style="color: #303038">제5조 (이용자의 의무)</h6>
+                    <p>이용자는 본 약관 및 관계 법령을 준수하여 제주도랑의 서비스를 이용하여야 합니다.<br><br>
+                        이용자는 제주도랑의 서비스를 이용할 때 다음 각 호의 행위를 해서는 안됩니다.<br><br>
+                        가. 타인의 개인정보를 부정하게 사용하는 행위<br>
+                        나. 제주도랑의 서비스 운영에 지장을 주거나 제주도랑의 명예를 손상시키는 행위<br>
+                        다. 범죄 및 불법적인 행위를 유도하거나 참여하는 행위<br>
+                        라. 제주도랑의 서비스를 이용하여 얻은 정보를 상업적으로 이용하는 행위
+                    </p><br>
+                </div>
+            </div>
+
+            <div>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault" style="font-size:20px; font-weight: bolder">
+                    <span style="color: #FB7A51; font-weight: bolder">[필수] </span>개인정보 수집 및 이용
+                </label>
+                <div class="overflow-auto"
+                     style="width:400px; height:100px; padding:15px; border: 1px solid #d0d0d0; border-radius: 10px; margin: 10px 0; background: #f8f8f8; color:#767678">
+
+                    <h5 style="color: #303038">제주도랑 필수 개인정보수집 및 이용약관</h5><br>
+                    <p>제주도랑은 제주도 여행 정보를 제공하고 커뮤니티를 운영하기 위해 회원님의 개인정보를 수집하고 있습니다. 회원님의 개인정보를 소중히 다루며, 관련 법령에 따라 안전하게 보호하고 있습니다.</p><br>
+
+                    <h6 style="color: #303038">1. 수집하는 개인정보 항목</h6>
+                    <p>필수 항목: 이름, 이메일 주소, 비밀번호</p>
+                    <br>
+
+                    <h6 style="color: #303038">2. 개인정보의 수집 및 이용 목적</h6>
+                    <p>제주도랑은 다음과 같은 목적으로 회원님의 개인정보를 수집하고 이용합니다.</p>
+
+                    <p>
+                    회원 가입 및 관리<br>
+                    서비스 제공에 따른 본인 확인<br>
+                    고객 상담 및 불만 처리<br>
+                    신규 서비스 및 이벤트 안내<br>
+                    </p><br>
+
+                    <h6 style="color: #303038">3. 개인정보의 보유 및 이용기간</h6>
+                    <p>회원님의 개인정보는 회원 탈퇴 시까지 보관됩니다. 단, 관련 법령에 따라 보존이 필요한 경우 해당 법령에서 정한 기간 동안 보관될 수 있습니다.</p>
+                    <br>
+
+                    <h6 style="color: #303038">4. 개인정보의 제공 및 공유</h6>
+                    <p>제주도랑은 회원님의 개인정보를 본 약관에서 고지된 목적 이외의 용도로 사용하거나 외부에 제공하지 않습니다. 다만, 아래의 경우에는 예외로 합니다.</p>
+
+                    <p>
+                        회원님의 동의가 있는 경우<br>
+                        관련 법령에 따라 필요한 경우<br>
+                    </p><br>
+
+                    <h6 style="color: #303038">5. 개인정보의 파기 절차 및 방법</h6>
+                    <p>회원님의 개인정보는 수집 및 이용 목적이 달성된 후 즉시 파기됩니다. 파기 절차 및 방법은 다음과 같습니다.</p>
+
+                    <p>
+                        전자적 파일 형태: 복구 및 재생이 불가능한 방법으로 안전하게 삭제됩니다.<br>
+                        종이 문서 형태: 분쇄기로 분쇄하거나 소각 처리됩니다.<br>
+                    </p><br>
+
+                    <h6 style="color: #303038">6. 개인정보의 안전성 확보 조치</h6>
+                    <p>제주도랑은 회원님의 개인정보를 안전하게 보호하기 위해 다음과 같은 조치를 취하고 있습니다.</p>
+
+                    <p>
+                        개인정보 처리시스템에 대한 접근 제한<br>
+                        개인정보 처리 직원의 교육 및 감독<br>
+                        외부 보안 전문기관에 의한 시스템 모니터링<br>
+                    </p><br>
+
+                    <h6 style="color: #303038">7. 회원의 권리와 의무</h6>
+                    <p>
+                        회원님은 언제든지 자신의 개인정보를 열람하고 수정할 수 있습니다.<br>
+                        회원님은 제주도랑에 제공한 개인정보에 대해 언제든지 동의 철회 및 삭제를 요청할 수 있습니다.<br>
+                        회원님은 본 약관에 명시된 내용을 준수하여야 합니다.<br>
+                    </p>
+                </div>
+            </div>
+
+            <div>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault" style="font-size:20px; font-weight: bolder">
+                    <span style="color:#a4a4a4">[선택] </span> 개인정보 수집 및 이용
+                </label>
+                <div class="overflow-auto"
+                     style="width:400px; height:100px; padding:15px; border: 1px solid #d0d0d0; border-radius: 10px; margin: 10px 0; background: #f8f8f8; color:#767678">
+
+                    <h5 style="color: #303038">제주도랑 선택 개인정보 수집 및 이용약관</h5><br>
+
+                    <h6 style="color: #303038">1. 선택적으로 수집하는 개인정보 항목</h6>
+                    <p>
+                        프로필 사진<br>
+                        생년월일<br>
+                        성별<br>
+                        전화번호<br>
+                        주소 등 추가 정보<br>
+                    </p>
+
+                    <h6 style="color: #303038">2. 선택적 개인정보의 수집 및 이용 목적</h6>
+                    <p>
+                        위의 선택적 개인정보는 아래와 같은 목적으로 수집 및 이용됩니다.<br><br>
+
+                        서비스 개선 및 맞춤화<br>
+                        이벤트 참여 및 혜택 제공
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
 
         <input class="btn btn-primary" type="button" value="가입" onclick="submitSignUpForm()">
     </form>
+
 
     <script>
 
