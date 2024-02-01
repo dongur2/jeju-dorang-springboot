@@ -11,7 +11,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
@@ -32,9 +31,9 @@ public class MailServiceI implements MailService {
     @Override
     @Transactional
     public void sendAuthMail(String to, String subject, String text) {
-        SimpleMailMessage message = createMailMessage(to, subject, text);
 
         try {
+            SimpleMailMessage message = createMailMessage(to, subject, text);
             mailSender.send(message);
 
             /*
@@ -67,7 +66,6 @@ public class MailServiceI implements MailService {
             String originalCode = vop.get(mailVerifyRequest.email());
             return originalCode.equals(mailVerifyRequest.code());
 
-
         } catch (NullPointerException e) {
             log.error("인증 번호가 만료되었습니다.");
             throw new NullPointerException("인증 번호가 만료되었습니다.");
@@ -75,7 +73,6 @@ public class MailServiceI implements MailService {
         } catch (Exception e) {
             log.error("이메일 인증 실패 : {}", e.getMessage());
             throw e;
-
         }
     }
 

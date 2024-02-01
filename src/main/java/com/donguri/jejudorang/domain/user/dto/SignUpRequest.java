@@ -3,29 +3,34 @@ package com.donguri.jejudorang.domain.user.dto;
 import com.donguri.jejudorang.domain.user.entity.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 import java.util.Set;
 
+@Builder
 public record SignUpRequest (
 
-        @NotBlank(message = "아이디는 비울 수 없습니다.")
+        @NotBlank(message = "아이디를 작성해주세요.")
         @Size(min = 5, max = 30, message = "아이디는 5자 이상 30자 이하만 가능합니다.")
         String externalId,
 
-        @NotBlank(message = "닉네임은 비울 수 없습니다.")
+        @NotBlank(message = "닉네임을 작성해주세요.")
         @Size(min = 2, max = 15, message = "닉네임은 2자 이상 15자 이하만 가능합니다.")
         String nickname,
 
-        @Email
-        @NotBlank(message = "이메일은 비울 수 없습니다.")
+        @Email(message = "이메일 형식으로 작성해주세요.")
+        @NotBlank(message = "이메일을 작성해주세요.")
         String email,
 
 //        @NotBlank
         String agreement,
 
-        @NotBlank(message = "비밀번호는 비울 수 없습니다.")
-        @Size(min = 6, max = 40)
+        @Pattern(regexp=("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$")
+                ,message="비밀번호는 특수 문자와 숫자가 적어도 하나가 포함된 8자 이상 20자 이하만 가능합니다.")
+        @Size(min = 8, max = 20)
+        @NotBlank(message = "비밀번호를 작성해주세요.")
         String password,
 
         @NotBlank(message = "비밀번호를 한 번 더 입력해주세요.")

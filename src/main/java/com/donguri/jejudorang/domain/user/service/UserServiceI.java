@@ -11,6 +11,7 @@ import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
 import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
+import com.sun.jdi.request.DuplicateRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -130,11 +131,11 @@ public class UserServiceI implements UserService {
     @Transactional
     public void signUp(SignUpRequest signUpRequest) {
         if (userRepository.findByExternalId(signUpRequest.externalId()).isPresent()) {
-            throw new RuntimeException("Error: 이미 존재하는 아이디입니다.");
+            throw new DuplicateRequestException("이미 존재하는 아이디입니다.");
         }
 
         if (userRepository.findByEmail(signUpRequest.email()).isPresent()) {
-            throw new RuntimeException("Error: 이미 존재하는 이메일입니다.");
+            throw new DuplicateRequestException("이미 가입된 이메일입니다.");
         }
 
 
