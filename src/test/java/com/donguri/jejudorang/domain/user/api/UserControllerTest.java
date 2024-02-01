@@ -50,6 +50,32 @@ class UserControllerTest {
     }
 
     @Test
+    void DTO_실패_이메일_형식_미충족() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId")
+                .nickname("nickname")
+                .email("email") // eamil@ error , email@w none-error
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일 형식으로 작성해주세요.");
+    }
+
+    @Test
     void DTO_성공_비밀번호_충족() {
         //given
         SignUpRequest request = SignUpRequest.builder()
