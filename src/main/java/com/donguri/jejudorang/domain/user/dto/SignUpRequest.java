@@ -28,8 +28,13 @@ public record SignUpRequest (
         @AssertTrue(message = "이메일 인증이 필요합니다.")
         boolean isVerified,
 
-//        @NotBlank
-        String agreement,
+        @AssertTrue(message = "제주도랑 이용약관에 동의해야 가입이 가능합니다.")
+        boolean agreeForUsage,
+
+        @AssertTrue(message = "필수 개인정보 수집 및 이용에 동의해야 가입이 가능합니다.")
+        boolean agreeForPrivateNecessary,
+
+        boolean agreeForPrivateOptional,
 
         @Pattern(regexp=("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$")
                 ,message="비밀번호는 특수 문자와 숫자가 적어도 하나가 포함된 8자 이상 20자 이하만 가능합니다.")
@@ -56,7 +61,7 @@ public record SignUpRequest (
 
                 Authentication auth = Authentication.builder()
                         .user(user)
-                        .agreement(AgreeRange.ALL) // temp
+                        .agreement(setAgreeRangeFromRequest())
                         .email(emailToSend)
                         .build();
 
@@ -65,4 +70,14 @@ public record SignUpRequest (
 
                 return user;
         }
+
+        // 약관 동의 항목 범위 설정해 리턴
+        private AgreeRange setAgreeRangeFromRequest() {
+                if (agreeForPrivateOptional == agreeForPrivateNecessary == agreeForUsage) {
+                        return AgreeRange.ALL;
+                } else {
+                        return AgreeRange.NECESSARY;
+                }
+        }
+
 }
