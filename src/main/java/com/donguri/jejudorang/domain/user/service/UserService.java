@@ -9,7 +9,8 @@ import java.util.Optional;
 
 public interface UserService {
 
-    void checkMail(MailSendRequest mailSendRequest);
+    void sendVerifyMail(MailSendRequest mailSendRequest);
+    boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest);
     void signUp(SignUpRequest signUpRequest);
 
     Map<String, String> signIn(LoginRequest loginRequest);

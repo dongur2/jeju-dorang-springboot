@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,7 @@ public class UserController {
                 throw new NullPointerException(bindingResult.toString());
             }
 
-            userService.checkMail(mailSendRequest);
+            userService.sendVerifyMail(mailSendRequest);
 
             log.info("이메일 인증 번호 전송 완료");
             return new ResponseEntity<>(HttpStatus.OK);
@@ -67,19 +68,37 @@ public class UserController {
     /*
     * 이메일 인증 번호 확인
     * */
-//    @ResponseBody
-//    @GetMapping("/signup/verify")
-//    public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
-//        try {
-//            if (bindingResult.hasErrors()) {
-//                throw new NullPointerException(bindingResult.toString());
-//            }
-//
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//        }
-//        return null;
-//    }
+    @ResponseBody
+    @GetMapping("/signup/verify")
+    public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                throw new BadRequestException(bindingResult.toString());
+            }
+
+            boolean checkRes = userService.checkVerifyMail(mailVerifyRequest);
+            if (checkRes) {
+                log.info("이메일 인증 완료 : 인증 번호 일치");
+                return new ResponseEntity<>(HttpStatus.OK);
+
+            } else {
+                log.error("이메일 인증 실패 : 인증 번호 불일치");
+                return new ResponseEntity<>("인증 번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (BadRequestException e) {
+            log.error("이메일 인증 실패: {}", e.getMessage());
+            return new ResponseEntity<>(bindingResult, HttpStatus.BAD_REQUEST);
+
+        } catch (NullPointerException e) {
+            log.error("이메일 인증 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
+        }
+    }
 
     @GetMapping("/signup")
     public String registerForm() {

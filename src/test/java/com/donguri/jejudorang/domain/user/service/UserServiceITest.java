@@ -92,7 +92,7 @@ class UserServiceITest {
                 .build();
 
         //when, then
-        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> userService.checkMail(mailRequest));
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> userService.sendVerifyMail(mailRequest));
     }
 
     @Test
@@ -103,7 +103,7 @@ class UserServiceITest {
                 .build();
 
         //when, then
-        assertThrows(Exception.class, () -> userService.checkMail(mailRequest));
+        assertThrows(Exception.class, () -> userService.sendVerifyMail(mailRequest));
     }
 
     @Test
@@ -132,7 +132,7 @@ class UserServiceITest {
                 .build();
 
         //then
-        assertThrows(Exception.class, () -> userService.checkMail(mailRequest));
+        assertThrows(Exception.class, () -> userService.sendVerifyMail(mailRequest));
     }
 
 }

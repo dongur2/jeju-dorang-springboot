@@ -62,11 +62,12 @@ public class UserServiceI implements UserService {
     }
 
 
-
     /*
     * 이메일 확인 - 중복 확인 후 인증 번호 전송
     * */
-    public void checkMail(MailSendRequest mailSendRequest) {
+    @Override
+    @Transactional
+    public void sendVerifyMail(MailSendRequest mailSendRequest) {
         try {
             checkMailDuplicated(mailSendRequest.email());
 
@@ -75,6 +76,22 @@ public class UserServiceI implements UserService {
 
         } catch (Exception e) {
             log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest) {
+        try {
+            return mailService.checkAuthMail(mailVerifyRequest);
+
+        }  catch (NullPointerException e) {
+            log.error("인증 번호가 만료되었습니다.");
+            throw e;
+
+        } catch (Exception e) {
+            log.error("인증 번호 확인 실패 : {}",e.getMessage());
             throw e;
         }
     }
