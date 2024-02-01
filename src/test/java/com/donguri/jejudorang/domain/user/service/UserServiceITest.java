@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.service;
 
+import com.donguri.jejudorang.domain.user.dto.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
@@ -86,7 +87,7 @@ class UserServiceITest {
     @Test
     void 이메일_인증_메일_전송() {
         //given
-        MailVerifyRequest mailRequest = MailVerifyRequest.builder()
+        MailSendRequest mailRequest = MailSendRequest.builder()
                 .email(testmail)
                 .build();
 
@@ -97,7 +98,7 @@ class UserServiceITest {
     @Test
     void 오류_이메일_인증_공백() {
         //given
-        MailVerifyRequest mailRequest = MailVerifyRequest.builder()
+        MailSendRequest mailRequest = MailSendRequest.builder()
                 .email(null)
                 .build();
 
@@ -126,7 +127,7 @@ class UserServiceITest {
         userRepository.save(user);
 
         //when
-        MailVerifyRequest mailRequest = MailVerifyRequest.builder()
+        MailSendRequest mailRequest = MailSendRequest.builder()
                 .email(testmail)
                 .build();
 

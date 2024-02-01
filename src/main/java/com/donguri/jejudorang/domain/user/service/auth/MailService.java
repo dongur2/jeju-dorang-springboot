@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.user.service;
+package com.donguri.jejudorang.domain.user.service.auth;
 
 
 public interface MailService {

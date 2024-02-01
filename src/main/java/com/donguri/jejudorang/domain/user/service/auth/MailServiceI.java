@@ -1,8 +1,9 @@
-package com.donguri.jejudorang.domain.user.service;
+package com.donguri.jejudorang.domain.user.service.auth;
 
-import com.donguri.jejudorang.domain.user.service.MailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -13,11 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MailServiceI implements MailService {
 
-    @Autowired private final JavaMailSender mailSender;
+    @Autowired private JavaMailSender mailSender;
+    @Autowired private RedisTemplate<String, String> redisTemplate;
 
-    public MailServiceI(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+
 
     @Override
     @Transactional
@@ -26,6 +26,11 @@ public class MailServiceI implements MailService {
 
         try {
             mailSender.send(message);
+
+            // 이메일 : 인증 번호 Redis에 저장
+            ValueOperations<String, String> vop = redisTemplate.opsForValue();
+            vop.set(to, text);
+            log.info("Redis에 인증 번호 저장 완료 key {} : value {}", to, vop.get(to));
 
         } catch (Exception e) {
             log.error("이메일 전송에 실패했습니다 : {}", e.getMessage());

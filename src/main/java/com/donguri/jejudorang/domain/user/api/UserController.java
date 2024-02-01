@@ -6,7 +6,6 @@ import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Null;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,15 +38,18 @@ public class UserController {
         this.imageService = imageService;
     }
 
+    /*
+    * 이메일 인증 번호 전송 (+ 중복 확인)
+    * */
     @ResponseBody
     @PostMapping("/signup/verify")
-    public ResponseEntity<?> sendEmailAuthNum(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> sendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
                 throw new NullPointerException(bindingResult.toString());
             }
 
-            userService.checkMail(mailVerifyRequest);
+            userService.checkMail(mailSendRequest);
 
             log.info("이메일 인증 번호 전송 완료");
             return new ResponseEntity<>(HttpStatus.OK);
@@ -62,6 +63,23 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    /*
+    * 이메일 인증 번호 확인
+    * */
+//    @ResponseBody
+//    @GetMapping("/signup/verify")
+//    public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
+//        try {
+//            if (bindingResult.hasErrors()) {
+//                throw new NullPointerException(bindingResult.toString());
+//            }
+//
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//        }
+//        return null;
+//    }
 
     @GetMapping("/signup")
     public String registerForm() {

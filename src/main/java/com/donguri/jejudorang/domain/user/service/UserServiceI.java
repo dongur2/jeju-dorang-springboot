@@ -5,12 +5,12 @@ import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
+import com.donguri.jejudorang.domain.user.service.auth.MailService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
 import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -66,12 +66,12 @@ public class UserServiceI implements UserService {
     /*
     * 이메일 확인 - 중복 확인 후 인증 번호 전송
     * */
-    public void checkMail(MailVerifyRequest mailVerifyRequest) {
+    public void checkMail(MailSendRequest mailSendRequest) {
         try {
-            checkMailDuplicated(mailVerifyRequest.email());
+            checkMailDuplicated(mailSendRequest.email());
 
             String subject = "[제주도랑] 인증 번호입니다.";
-            mailService.sendAuthMail(mailVerifyRequest.email(), subject, createNumber());
+            mailService.sendAuthMail(mailSendRequest.email(), subject, createNumber());
 
         } catch (Exception e) {
             log.error(e.getMessage());

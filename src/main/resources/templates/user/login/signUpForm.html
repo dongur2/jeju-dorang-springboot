@@ -16,12 +16,12 @@
 
         <label for="email" class="form-label">email</label>
         <input type="email" id="email" name="email" class="form-control" aria-describedby="passwordHelpBlock">
-        <button type="button" class="btn btn-outline-secondary" onclick="checkMail()">인증번호 전송</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="sendMail()">인증번호 전송</button>
 
         <div id="email-verify-container" style="display: none;">
             <label for="email-verify" class="form-label disabled">이메일 인증번호 확인</label>
             <input type="text" id="email-verify" name="code" class="form-control disabled" aria-describedby="passwordHelpBlock">
-            <button type="button" class="btn btn-outline-secondary">인증번호 확인</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="checkMail()">인증번호 확인</button>
         </div>
 
         <input class="form-check-input" type="checkbox" name="agreement" value="" id="flexCheckDefault">
@@ -41,13 +41,13 @@
 
     <script>
 
-        function checkMail() {
-            var mailVerifyRequest = {
+        function sendMail() {
+            var mailSendRequest = {
                 email: document.getElementById("email").value
             };
 
-            if (mailVerifyRequest.email == null
-                    || mailVerifyRequest.email.trim() === "") {
+            if (mailSendRequest.email == null
+                    || mailSendRequest.email.trim() === "") {
                 alert("이메일을 입력해주세요.");
 
             } else {
@@ -66,9 +66,46 @@
                     }
                 };
 
-                xhr.send(JSON.stringify(mailVerifyRequest));
+                xhr.send(JSON.stringify(mailSendRequest));
             }
         }
+
+        // function checkMail() {
+        //     var mailVerifyRequest = {
+        //         email: document.getElementById("email").value,
+        //         code: document.getElementById("email-verify").value
+        //     };
+        //
+        //     console.log(mai)
+        //
+        //     if (mailVerifyRequest.email == null
+        //         || mailVerifyRequest.email.trim() === "") {
+        //         alert("이메일을 입력해주세요.");
+        //
+        //     } else if (mailVerifyRequest.code == null
+        //         || mailVerifyRequest.code.trim() === "") {
+        //         alert("인증 번호를 입력해주세요.")
+        //
+        //     } else {
+        //         var xhr = new XMLHttpRequest();
+        //         xhr.open("GET", "/user/signup/verify", true);
+        //         xhr.setRequestHeader("Content-Type", "application/json");
+        //
+        //         xhr.onreadystatechange = function() {
+        //             if (xhr.readyState === 4) {
+        //                 if (xhr.status === 200) {
+        //                     alert("이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.");
+        //                     document.getElementById("email-verify-container").style.display = "block";
+        //
+        //                 } else {
+        //                     alert(xhr.responseText);
+        //                 }
+        //             }
+        //         };
+        //
+        //         xhr.send(JSON.stringify(mailVerifyRequest));
+        //     }
+        // }
 
     </script>
 
