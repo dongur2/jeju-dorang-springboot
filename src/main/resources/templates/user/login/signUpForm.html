@@ -18,7 +18,7 @@
         <input type="email" id="email" name="email" class="form-control" aria-describedby="passwordHelpBlock">
         <button type="button" class="btn btn-outline-secondary" onclick="checkMail()">인증번호 전송</button>
 
-        <div>
+        <div id="email-verify-container" style="display: none;">
             <label for="email-verify" class="form-label disabled">이메일 인증번호 확인</label>
             <input type="text" id="email-verify" name="code" class="form-control disabled" aria-describedby="passwordHelpBlock">
             <button type="button" class="btn btn-outline-secondary">인증번호 확인</button>
@@ -59,7 +59,7 @@
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             alert("이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.");
-
+                            document.getElementById("email-verify-container").style.display = "block";
                         } else {
                             alert(xhr.responseText);
                         }
