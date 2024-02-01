@@ -20,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -69,11 +70,11 @@ public class UserController {
     * 이메일 인증 번호 확인
     * */
     @ResponseBody
-    @GetMapping("/signup/verify")
+    @PostMapping("/signup/verify-check")
     public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
-                throw new BadRequestException(bindingResult.toString());
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
 
             boolean checkRes = userService.checkVerifyMail(mailVerifyRequest);
@@ -85,10 +86,6 @@ public class UserController {
                 log.error("이메일 인증 실패 : 인증 번호 불일치");
                 return new ResponseEntity<>("인증 번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
             }
-
-        } catch (BadRequestException e) {
-            log.error("이메일 인증 실패: {}", e.getMessage());
-            return new ResponseEntity<>(bindingResult, HttpStatus.BAD_REQUEST);
 
         } catch (NullPointerException e) {
             log.error("이메일 인증 실패: {}", e.getMessage());

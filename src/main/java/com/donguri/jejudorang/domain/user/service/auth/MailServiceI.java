@@ -70,7 +70,7 @@ public class MailServiceI implements MailService {
 
         } catch (NullPointerException e) {
             log.error("인증 번호가 만료되었습니다.");
-            throw new NullPointerException("인증 번호가 만료되었습니다");
+            throw new NullPointerException("인증 번호가 만료되었습니다.");
 
         } catch (Exception e) {
             log.error("이메일 인증 실패 : {}", e.getMessage());
