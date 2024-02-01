@@ -15,13 +15,13 @@
         <input type="text" id="nickname" name="nickname" class="form-control" aria-describedby="passwordHelpBlock">
 
         <label for="email" class="form-label">email</label>
-        <input type="email" id="email" name="email" class="form-control" aria-describedby="passwordHelpBlock">
-        <button type="button" class="btn btn-outline-secondary" onclick="sendMail()">인증번호 전송</button>
+        <input type="email" id="email" name="email" class="form-control btn-verify" aria-describedby="passwordHelpBlock">
+        <button type="button" class="btn btn-outline-secondary btn-verify" onclick="sendMail()">인증번호 전송</button>
 
         <div id="email-verify-container" style="display: none;">
             <label for="email-verify" class="form-label disabled">이메일 인증번호 확인</label>
-            <input type="text" id="email-verify" name="code" class="form-control disabled" aria-describedby="passwordHelpBlock">
-            <button type="button" class="btn btn-outline-secondary" onclick="checkMail()">인증번호 확인</button>
+            <input type="text" id="email-verify" name="code" class="form-control disabled btn-verify" aria-describedby="passwordHelpBlock">
+            <button type="button" class="btn btn-outline-secondary btn-verify" onclick="checkMail()">인증번호 확인</button>
         </div>
 
         <input class="form-check-input" type="checkbox" name="agreement" value="" id="flexCheckDefault">
@@ -59,7 +59,10 @@
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             alert("이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.");
+
+                            // 인증 번호 입력란, 인증 번호 확인 버튼 노출
                             document.getElementById("email-verify-container").style.display = "block";
+
                         } else {
                             alert(xhr.responseText);
                         }
@@ -97,7 +100,12 @@
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             alert("이메일 인증이 완료되었습니다.");
-                            document.getElementById("email-verify-container").style.display = "block";
+
+                            // 이메일 인증 완료 -> 이메일 수정, 인증 번호 전송/수정/확인 불가
+                            let elements = document.getElementsByClassName("btn-verify");
+                            for (var i = 0; i < elements.length; i++) {
+                                elements[i].disabled = true;
+                            }
 
                         } else {
                             alert(xhr.responseText);
