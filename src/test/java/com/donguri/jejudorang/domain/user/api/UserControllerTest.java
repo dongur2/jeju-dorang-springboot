@@ -206,6 +206,162 @@ class UserControllerTest {
     }
 
     @Test
+    void DTO_성공_닉네임() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("user1212")
+                .nickname("간zIkings2")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).isEmpty();
+    }
+
+    @Test
+    void DTO_실패_닉네임_특수문자_포함() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("user1212")
+                .nickname("nickname!")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("닉네임은 특수문자, 이모티콘을 제외한 2자 이상 15자 이하만 가능합니다.");
+    }
+
+    @Test
+    void DTO_실패_닉네임_이모티콘_포함() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("user1212")
+                .nickname("nickname🧸")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("닉네임은 특수문자, 이모티콘을 제외한 2자 이상 15자 이하만 가능합니다.");
+    }
+
+    @Test
+    void DTO_실패_닉네임_글자수_부족() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("user1212")
+                .nickname("n")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("닉네임은 특수문자, 이모티콘을 제외한 2자 이상 15자 이하만 가능합니다.", "닉네임은 2자 이상 15자 이하만 가능합니다.");
+    }
+
+    @Test
+    void DTO_실패_닉네임_글자수_초과() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("user1212")
+                .nickname("넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘넘")
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("닉네임은 특수문자, 이모티콘을 제외한 2자 이상 15자 이하만 가능합니다.", "닉네임은 2자 이상 15자 이하만 가능합니다.");
+    }
+
+    @Test
+    void DTO_실패_닉네임_누락() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("user1212")
+                .nickname(null)
+                .email("email@mail.com")
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("닉네임을 작성해주세요.");
+    }
+
+    @Test
     void DTO_실패_이메일_형식_미충족() {
         //given
         SignUpRequest request = SignUpRequest.builder()
