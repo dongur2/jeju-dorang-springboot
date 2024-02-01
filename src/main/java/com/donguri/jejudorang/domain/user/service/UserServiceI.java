@@ -13,6 +13,7 @@ import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -146,40 +148,47 @@ public class UserServiceI implements UserService {
         /*
          * 새로운 회원(User) 생성
          * */
-        User userToSave = signUpRequest.toEntity();
+        try {
+            User userToSave = signUpRequest.toEntity();
 
-        // set password
-        Password pwdToSet = Password.builder()
-                .user(userToSave)
-                .build();
-        pwdToSet.updatePassword(encoder, signUpRequest.password()); // encode pwd
-        userToSave.updatePwd(pwdToSet);
+            // set password
+            Password pwdToSet = Password.builder()
+                    .user(userToSave)
+                    .build();
+            pwdToSet.updatePassword(encoder, signUpRequest.password()); // encode pwd
+            userToSave.updatePwd(pwdToSet);
 
-        // set role
-        Set<String> strRoles = signUpRequest.role();
-        Set<Role> roles = new HashSet<>();
+            // set role
+            Set<String> strRoles = signUpRequest.role();
+            Set<Role> roles = new HashSet<>();
 
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.USER)
-                    .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다"));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                if (role.equals("admin")) {
-                    Role adminRole = roleRepository.findByName(ERole.ADMIN)
-                            .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
-                    roles.add(adminRole);
-                } else {
-                    Role userRole = roleRepository.findByName(ERole.USER)
-                            .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
-                    roles.add(userRole);
-                }
-            });
+            if (strRoles == null) {
+                Role userRole = roleRepository.findByName(ERole.USER)
+                        .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다"));
+                roles.add(userRole);
+
+            } else {
+                strRoles.forEach(role -> {
+                    if (role.equals("admin")) {
+                        Role adminRole = roleRepository.findByName(ERole.ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
+                        roles.add(adminRole);
+                    } else {
+                        Role userRole = roleRepository.findByName(ERole.USER)
+                                .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
+                        roles.add(userRole);
+                    }
+                });
+            }
+
+            userToSave.updateRole(roles);
+
+            userRepository.save(userToSave);
+
+        } catch (Exception e) {
+            log.error("회원 가입에 실패했습니다: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
-
-        userToSave.updateRole(roles);
-
-        userRepository.save(userToSave);
     }
 
 

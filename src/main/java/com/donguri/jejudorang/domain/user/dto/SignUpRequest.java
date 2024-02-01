@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.dto;
 import com.donguri.jejudorang.domain.user.entity.*;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
+import org.apache.coyote.BadRequestException;
 
 import java.util.Set;
 
@@ -48,7 +49,7 @@ public record SignUpRequest (
         Set<String> role
 
 ){
-        public User toEntity() {
+        public User toEntity() throws BadRequestException {
                 User user = User.builder()
                         .loginType(LoginType.BASIC) // temp
                         .build();
@@ -72,9 +73,13 @@ public record SignUpRequest (
         }
 
         // 약관 동의 항목 범위 설정해 리턴
-        private AgreeRange setAgreeRangeFromRequest() {
-                if (agreeForPrivateOptional == agreeForPrivateNecessary == agreeForUsage) {
+        private AgreeRange setAgreeRangeFromRequest() throws BadRequestException {
+                if (!agreeForUsage || !agreeForPrivateNecessary) {
+                        throw new RuntimeException("필수 동의 항목에 동의해야 가입이 가능합니다.");
+
+                } else if (agreeForPrivateOptional == agreeForPrivateNecessary == agreeForUsage) {
                         return AgreeRange.ALL;
+
                 } else {
                         return AgreeRange.NECESSARY;
                 }

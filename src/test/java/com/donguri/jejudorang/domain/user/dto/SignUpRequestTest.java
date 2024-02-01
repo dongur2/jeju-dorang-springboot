@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.dto;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +52,66 @@ class SignUpRequestTest {
         }
 
         org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일을 작성해주세요.", "이메일 인증이 필요합니다.");
+    }
+
+    @Test
+    void DTO_실패_이메일_인증_미완료() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId12")
+                .nickname("nickname")
+                .emailToSend("email") // eamil@ error , email@w none-error
+                .isVerified(false)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .agreeForUsage(true)
+                .agreeForPrivateNecessary(true)
+                .agreeForPrivateOptional(false)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일 인증이 필요합니다.");
+    }
+
+    @Test
+    void DTO_실패_이메일_형식_미충족() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId12")
+                .nickname("nickname")
+                .emailToSend("email") // eamil@ error , email@w none-error
+                .isVerified(true)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .agreeForUsage(true)
+                .agreeForPrivateNecessary(true)
+                .agreeForPrivateOptional(false)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일 형식으로 작성해주세요.");
     }
 
     @Test
@@ -383,65 +444,8 @@ class SignUpRequestTest {
         org.assertj.core.api.Assertions.assertThat(msgList).contains("닉네임을 작성해주세요.");
     }
 
-    @Test
-    void DTO_실패_이메일_형식_미충족() {
-        //given
-        SignUpRequest request = SignUpRequest.builder()
-                .externalId("userId12")
-                .nickname("nickname")
-                .emailToSend("email") // eamil@ error , email@w none-error
-                .isVerified(true)
-                .password("abcde@@123")
-                .passwordForCheck("abcde@@123")
-                .agreeForUsage(true)
-                .agreeForPrivateNecessary(true)
-                .agreeForPrivateOptional(false)
-                .build();
 
-        //when
-        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
 
-        //then
-        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
-        List<String> msgList = new ArrayList<>();
-
-        while(iterator.hasNext()) {
-            String message = iterator.next().getMessage();
-            msgList.add(message);
-        }
-
-        org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일 형식으로 작성해주세요.");
-    }
-
-    @Test
-    void DTO_실패_이메일_인증_미완료() {
-        //given
-        SignUpRequest request = SignUpRequest.builder()
-                .externalId("userId12")
-                .nickname("nickname")
-                .emailToSend("email") // eamil@ error , email@w none-error
-                .isVerified(false)
-                .password("abcde@@123")
-                .passwordForCheck("abcde@@123")
-                .agreeForUsage(true)
-                .agreeForPrivateNecessary(true)
-                .agreeForPrivateOptional(false)
-                .build();
-
-        //when
-        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
-
-        //then
-        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
-        List<String> msgList = new ArrayList<>();
-
-        while(iterator.hasNext()) {
-            String message = iterator.next().getMessage();
-            msgList.add(message);
-        }
-
-        org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일 인증이 필요합니다.");
-    }
 
     @Test
     void DTO_성공_비밀번호_충족() {
@@ -713,5 +717,184 @@ class SignUpRequestTest {
         org.assertj.core.api.Assertions.assertThat(msgList).contains("비밀번호는 특수 문자와 숫자가 적어도 하나가 포함된 8자 이상 20자 이하만 가능합니다.");
     }
 
+    @Test
+    void DTO_성공_약관동의_모두() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId")
+                .nickname("nickname")
+                .emailToSend("email@mail.com")
+                .isVerified(true)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .agreeForUsage(true)
+                .agreeForPrivateNecessary(true)
+                .agreeForPrivateOptional(true)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        Assertions.assertThat(msgList).isEmpty();
+    }
+
+    @Test
+    void DTO_성공_약관동의_선택() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId")
+                .nickname("nickname")
+                .emailToSend("email@mail.com")
+                .isVerified(true)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .agreeForUsage(true)
+                .agreeForPrivateNecessary(true)
+                .agreeForPrivateOptional(false)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        Assertions.assertThat(msgList).isEmpty();
+    }
+
+    @Test
+    void DTO_성공_약관동의_필수_이용약관_미동의() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId")
+                .nickname("nickname")
+                .emailToSend("email@mail.com")
+                .isVerified(true)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .agreeForUsage(false)
+                .agreeForPrivateNecessary(true)
+                .agreeForPrivateOptional(true)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        Assertions.assertThat(msgList).contains("제주도랑 이용약관에 동의해야 가입이 가능합니다.");
+    }
+
+    @Test
+    void DTO_성공_약관동의_필수_개인정보_미동의() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId")
+                .nickname("nickname")
+                .emailToSend("email@mail.com")
+                .isVerified(true)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .agreeForUsage(true)
+                .agreeForPrivateNecessary(false)
+                .agreeForPrivateOptional(false)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        Assertions.assertThat(msgList).contains("필수 개인정보 수집 및 이용에 동의해야 가입이 가능합니다.");
+    }
+
+    @Test
+    void DTO_성공_약관동의_필수_미동의_선택_동의() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId")
+                .nickname("nickname")
+                .emailToSend("email@mail.com")
+                .isVerified(true)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .agreeForUsage(false)
+                .agreeForPrivateNecessary(false)
+                .agreeForPrivateOptional(true)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        Assertions.assertThat(msgList).contains("제주도랑 이용약관에 동의해야 가입이 가능합니다.", "필수 개인정보 수집 및 이용에 동의해야 가입이 가능합니다.");
+    }
+
+    @Test
+    void DTO_성공_약관동의_모두_미동의() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+                .externalId("userId")
+                .nickname("nickname")
+                .emailToSend("email@mail.com")
+                .isVerified(true)
+                .password("abcde@@123")
+                .passwordForCheck("abcde@@123")
+                .agreeForUsage(false)
+                .agreeForPrivateNecessary(false)
+                .agreeForPrivateOptional(false)
+                .build();
+
+        //when
+        Set<ConstraintViolation<SignUpRequest>> validate = validator.validate(request);
+
+        //then
+        Iterator<ConstraintViolation<SignUpRequest>> iterator = validate.iterator();
+        List<String> msgList = new ArrayList<>();
+
+        while(iterator.hasNext()) {
+            String message = iterator.next().getMessage();
+            msgList.add(message);
+        }
+
+        Assertions.assertThat(msgList).contains("제주도랑 이용약관에 동의해야 가입이 가능합니다.", "필수 개인정보 수집 및 이용에 동의해야 가입이 가능합니다.");
+    }
 
 }
