@@ -92,7 +92,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(
                                         "/user/settings/profile/**",
-                                        "/community/post/new", "/community/tui-editor/**"
+                                        "/community/post/new", "/tui-editor/**"
                                 ).authenticated()
                         )
                 )
