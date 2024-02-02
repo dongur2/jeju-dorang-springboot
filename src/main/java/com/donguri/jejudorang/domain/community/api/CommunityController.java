@@ -4,6 +4,7 @@ import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +14,22 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.AuthenticationException;
+
 
 @Slf4j
 @Controller
 @RequestMapping("/community")
 public class CommunityController {
-    @Autowired
-    private CommunityService communityService;
 
-    @Value("${kakao-api-key}")
-    private String kakaoApiKey;
+    private final String kakaoApiKey;
+
+    @Autowired private final CommunityService communityService;
+
+    public CommunityController(CommunityService communityService, @Value("${kakao-api-key}") String kakaoApiKey) {
+        this.communityService = communityService;
+        this.kakaoApiKey = kakaoApiKey;
+    }
 
 
     // default: api package 내에서만 사용 가능 - getPartyList, getCharList
@@ -50,7 +57,9 @@ public class CommunityController {
     }
 
     @PostMapping("/post/new")
-    public String postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult, Model model) {
+    public String postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult,
+                                   @CookieValue("access_token") Cookie token,
+                                   Model model) {
         // 유효성 검사 에러
         if (bindingResult.hasErrors()) {
             return bindErrorPage(bindingResult, model);
