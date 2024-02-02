@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -56,22 +58,21 @@ public class CommunityController {
     }
 
     @PostMapping("/post/new")
-    public String postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult,
-                                   @CookieValue("access_token") Cookie token, Model model) {
+    public ResponseEntity<?> postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult,
+                                              @CookieValue("access_token") Cookie token) {
 
         if (bindingResult.hasErrors()) {
-            throw new IllegalArgumentException(bindingResult.getFieldError().getDefaultMessage());
+            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
 
         try {
             CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite, token.getValue());
-            return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
+            return new ResponseEntity<>(communityTypeResponseDto.typeForRedirect(), HttpStatus.OK);
 
         } catch (Exception e) {
             log.error("게시글 작성에 실패했습니다 : {}", e.getMessage());
-            throw new RuntimeException(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
     }
 
 

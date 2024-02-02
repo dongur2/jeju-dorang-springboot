@@ -85,13 +85,14 @@ public class SecurityConfig {
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
-                                        "/user/login", "/user/signup/**", "/user/logout",
+                                        "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
                                         "/trip", "/trip/list/*", "/trip/places",
                                         "/community/chats", "/community/parties","/community/parties/{communityId}",
                                         "/templates/**", "/error/**")
                                 .permitAll()
                                 .requestMatchers(
-                                        "/user/settings/profile/**", "/community/post/new"
+                                        "/user/settings/profile/**",
+                                        "/community/post/new", "/community/tui-editor/**"
                                 ).authenticated()
                         )
                 )

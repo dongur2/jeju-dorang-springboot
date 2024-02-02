@@ -4,7 +4,6 @@ package com.donguri.jejudorang.domain.community.dto.request;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
@@ -16,7 +15,7 @@ public record CommunityWriteRequestDto (
         @Size(min= 2, max = 60, message = "제목은 2자 이상 60자 이하만 가능합니다.")
         String title,
 
-        @NotBlank(message = "Error")
+        @NotBlank(message = "[오류] 글 타입이 필요합니다.")
         String type,
 
         @NotBlank(message = "글 내용을 작성해주세요.")
