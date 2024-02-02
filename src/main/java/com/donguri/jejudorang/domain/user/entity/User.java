@@ -62,7 +62,6 @@ public class User {
     }
 
     public User(User user) {
-//        id = user.getId();
         loginType = user.getLoginType();
         roles = user.getRoles();
         profile = user.getProfile();

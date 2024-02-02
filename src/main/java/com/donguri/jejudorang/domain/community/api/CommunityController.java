@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 
 
 @Slf4j
@@ -58,21 +57,21 @@ public class CommunityController {
 
     @PostMapping("/post/new")
     public String postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult,
-                                   @CookieValue("access_token") Cookie token,
-                                   Model model) {
-        // 유효성 검사 에러
+                                   @CookieValue("access_token") Cookie token, Model model) {
+
         if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
+            throw new IllegalArgumentException(bindingResult.getFieldError().getDefaultMessage());
         }
 
         try {
-            CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
+            CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite, token.getValue());
             return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
 
         } catch (Exception e) {
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            log.error("게시글 작성에 실패했습니다 : {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
+
     }
 
 

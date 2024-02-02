@@ -8,7 +8,7 @@ import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeRespons
 public interface CommunityService {
 
     //postNewCommunity
-    CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto postToSave);
+    CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto postToSave, String accessToken);
 
     //getBoardModifyForm
     CommunityForModifyResponseDto getCommunityPost(Long communityId);

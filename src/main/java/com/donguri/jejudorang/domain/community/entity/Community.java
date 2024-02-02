@@ -28,7 +28,7 @@ public class Community extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY) // 한 사람 당 게시글 여러 개
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id") // 회원 탈퇴 -> 삭제되지 않고 NULL 전환
     private User writer;
 
     // 글 분류 (PARTY: 모임, CHAT: 잡담)
@@ -118,6 +118,10 @@ public class Community extends BaseEntity {
         } else {
             state = JoinState.RECRUITING;
         }
+    }
+
+    public void deleteWriter() {
+        writer = null;
     }
 
 }
