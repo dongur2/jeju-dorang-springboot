@@ -47,7 +47,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("12345678").build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -87,7 +87,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).nickname("usernickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("12345678").build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -109,7 +109,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("12345678").build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -131,7 +131,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("12345678").build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -153,7 +153,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").build();
         Password password = Password.builder().user(user).password("12345678").build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -175,7 +175,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -198,7 +198,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("12345678").build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -220,7 +220,6 @@ class UserRepositoryTest {
         foundUser.getProfile().updateNickname("updateNickname");
         foundUser.getProfile().updateImgUrl("imgurl.com");
         foundUser.getAuth().updateEmail("new@mail.com");
-        foundUser.getAuth().updatePhone("01099999999");
 
         //then
         User updatedUser = userRepository.findById(foundUser.getId())
@@ -233,7 +232,6 @@ class UserRepositoryTest {
         assertThat(updatedProf.getNickname()).isEqualTo("updateNickname");
         assertThat(updatedProf.getImgUrl()).isEqualTo("imgurl.com");
         assertThat(updatedAuth.getEmail()).isEqualTo("new@mail.com");
-        assertThat(updatedAuth.getPhone()).isEqualTo("01099999999");
     }
 
     @Test
@@ -241,7 +239,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("12345678").build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -281,7 +279,7 @@ class UserRepositoryTest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).phone("01012341234").email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("12345678").build();
 
         Set<Role> testRoles = new HashSet<>();
