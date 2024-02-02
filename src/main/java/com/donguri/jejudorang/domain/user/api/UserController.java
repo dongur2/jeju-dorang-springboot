@@ -1,9 +1,6 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.user.dto.LoginRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
-import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
+import com.donguri.jejudorang.domain.user.dto.*;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import jakarta.servlet.http.Cookie;
@@ -41,26 +38,87 @@ public class UserController {
         this.imageService = imageService;
     }
 
+    /*
+    * 이메일 인증 번호 전송 (+ 중복 확인)
+    * */
+    @ResponseBody
+    @PostMapping("/signup/verify")
+    public ResponseEntity<?> sendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                throw new NullPointerException(bindingResult.toString());
+            }
+
+            userService.sendVerifyMail(mailSendRequest);
+
+            log.info("이메일 인증 번호 전송 완료");
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (NullPointerException e) {
+            log.error("이메일 인증 번호 전송 실패: {}", e.getMessage());
+            return new ResponseEntity<>("이메일을 입력해주세요.", HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e) {
+            log.error("이메일 인증 번호 전송 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /*
+    * 이메일 인증 번호 확인
+    * */
+    @ResponseBody
+    @PostMapping("/signup/verify-check")
+    public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
+
+            boolean checkRes = userService.checkVerifyMail(mailVerifyRequest);
+            if (checkRes) {
+                log.info("이메일 인증 완료 : 인증 번호 일치");
+                return new ResponseEntity<>(HttpStatus.OK);
+
+            } else {
+                log.error("이메일 인증 실패 : 인증 번호 불일치");
+                return new ResponseEntity<>("인증 번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (NullPointerException e) {
+            log.error("이메일 인증 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
+        }
+    }
+
+    /*
+    * 회원 가입
+    * */
     @GetMapping("/signup")
     public String registerForm() {
         return "/user/login/signUpForm";
     }
+    @ResponseBody
     @PostMapping("/signup")
-    public String registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult, Model model) {
+    public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
         // 유효성 검사 에러
         if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
+            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
 
         try {
             userService.signUp(signUpRequest);
-            return "redirect:/";
+            log.info("회원 가입 완료");
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            log.error("회원 가입 실패");
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
-
     }
 
     @GetMapping("/login")
@@ -178,6 +236,9 @@ public class UserController {
         }
     }
 
+    /*
+    * 마이페이지 - 프로필 사진 삭제
+    * */
     @ResponseBody
     @DeleteMapping("/settings/profile/deleteimg")
     public ResponseEntity<HttpStatus> deleteProfileImg(@CookieValue("access_token") Cookie token) {

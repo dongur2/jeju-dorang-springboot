@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.entity.auth;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,9 +26,6 @@ public class Password extends BaseEntity {
 
     @Column(nullable = false)
     private String password;
-
-//    @Column(nullable = false)
-//    private String salt;
 
 
     @Builder

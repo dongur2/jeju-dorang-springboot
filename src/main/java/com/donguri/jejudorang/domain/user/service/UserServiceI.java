@@ -1,19 +1,19 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.user.dto.LoginRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileResponse;
-import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
+import com.donguri.jejudorang.domain.user.dto.*;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
+import com.donguri.jejudorang.domain.user.service.auth.MailService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import com.donguri.jejudorang.global.config.JwtProvider;
 import com.donguri.jejudorang.global.config.JwtUserDetails;
 import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
+import com.sun.jdi.request.DuplicateRequestException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,7 +23,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 
 @Slf4j
@@ -31,7 +34,9 @@ import java.util.*;
 public class UserServiceI implements UserService {
 
     @Autowired
-    private ImageService imageService;
+    private final ImageService imageService;
+    @Autowired
+    private final MailService mailService;
 
     @Autowired
     private final AuthenticationManager authenticationManager;
@@ -48,9 +53,11 @@ public class UserServiceI implements UserService {
     @Autowired
     private final JwtProvider jwtProvider;
 
-    public UserServiceI(RefreshTokenRepository refreshTokenRepository, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
-        this.refreshTokenRepository = refreshTokenRepository;
+    public UserServiceI(ImageService imageService, MailService mailService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
+        this.imageService = imageService;
+        this.mailService = mailService;
         this.authenticationManager = authenticationManager;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
@@ -58,61 +65,136 @@ public class UserServiceI implements UserService {
     }
 
 
+    /*
+    * 이메일 확인 - 중복 확인 후 인증 번호 전송
+    * */
+    @Override
+    @Transactional
+    public void sendVerifyMail(MailSendRequest mailSendRequest) {
+        try {
+            checkMailDuplicated(mailSendRequest.email());
+
+            String subject = "[제주도랑] 인증 번호입니다.";
+            mailService.sendAuthMail(mailSendRequest.email(), subject, createNumber());
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest) {
+        try {
+            return mailService.checkAuthMail(mailVerifyRequest);
+
+        }  catch (NullPointerException e) {
+            log.error("인증 번호가 만료되었습니다.");
+            throw e;
+
+        } catch (Exception e) {
+            log.error("인증 번호 확인 실패 : {}",e.getMessage());
+            throw e;
+        }
+    }
+
+    // 이메일 중복 확인
+    private void checkMailDuplicated(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            log.debug("이미 가입된 이메일입니다 : {}", email);
+            throw new RuntimeException("이미 가입된 이메일입니다.");
+        }
+    }
+
+    // 이메일 인증 번호 생성
+    private static String createNumber() {
+        int length = 6;
+
+        try {
+            Random random = SecureRandom.getInstanceStrong();
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                builder.append(random.nextInt(10));
+            }
+            return builder.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            log.debug("이메일 인증 번호 생성을 실패했습니다 : {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    /*
+    * 회원 가입
+    * */
     @Override
     @Transactional
     public void signUp(SignUpRequest signUpRequest) {
         if (userRepository.findByExternalId(signUpRequest.externalId()).isPresent()) {
-            throw new RuntimeException("Error: 이미 존재하는 아이디입니다.");
+            throw new DuplicateRequestException("이미 존재하는 아이디입니다.");
         }
 
-        if (userRepository.findByEmail(signUpRequest.email()).isPresent()) {
-            throw new RuntimeException("Error: 이미 존재하는 이메일입니다.");
+        if (userRepository.findByEmail(signUpRequest.emailToSend()).isPresent()) {
+            throw new DuplicateRequestException("이미 가입된 이메일입니다.");
         }
+
 
         if (!signUpRequest.password().equals(signUpRequest.passwordForCheck())) {
-            throw new RuntimeException("Error: 비밀번호가 일치하지 않습니다.");
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
         /*
-         * Create a new User
+         * 새로운 회원(User) 생성
          * */
-        User userToSave = signUpRequest.toEntity();
+        try {
+            User userToSave = signUpRequest.toEntity();
 
-        // set password
-        Password pwdToSet = Password.builder()
-                .user(userToSave)
-                .build();
-        pwdToSet.updatePassword(encoder, signUpRequest.password()); // encode pwd
-        userToSave.updatePwd(pwdToSet);
+            // set password
+            Password pwdToSet = Password.builder()
+                    .user(userToSave)
+                    .build();
+            pwdToSet.updatePassword(encoder, signUpRequest.password()); // encode pwd
+            userToSave.updatePwd(pwdToSet);
 
-        // set role
-        Set<String> strRoles = signUpRequest.role();
-        Set<Role> roles = new HashSet<>();
+            // set role
+            Set<String> strRoles = signUpRequest.role();
+            Set<Role> roles = new HashSet<>();
 
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.USER)
-                    .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다"));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                if (role.equals("admin")) {
-                    Role adminRole = roleRepository.findByName(ERole.ADMIN)
-                            .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
-                    roles.add(adminRole);
-                } else {
-                    Role userRole = roleRepository.findByName(ERole.USER)
-                            .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
-                    roles.add(userRole);
-                }
-            });
+            if (strRoles == null) {
+                Role userRole = roleRepository.findByName(ERole.USER)
+                        .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다"));
+                roles.add(userRole);
+
+            } else {
+                strRoles.forEach(role -> {
+                    if (role.equals("admin")) {
+                        Role adminRole = roleRepository.findByName(ERole.ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
+                        roles.add(adminRole);
+                    } else {
+                        Role userRole = roleRepository.findByName(ERole.USER)
+                                .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
+                        roles.add(userRole);
+                    }
+                });
+            }
+
+            userToSave.updateRole(roles);
+
+            userRepository.save(userToSave);
+
+        } catch (Exception e) {
+            log.error("회원 가입에 실패했습니다: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
-
-        userToSave.updateRole(roles);
-
-        userRepository.save(userToSave);
     }
 
 
+    /*
+    * 로그인
+    * */
     @Override
     @Transactional
     public Map<String, String> signIn(LoginRequest loginRequest) {
