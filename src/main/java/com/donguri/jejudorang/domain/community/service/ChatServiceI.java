@@ -20,8 +20,10 @@ import java.util.Map;
 @Slf4j
 @Service
 public class ChatServiceI implements ChatService {
-    @Autowired
-    CommunityRepository communityRepository;
+    @Autowired private final CommunityRepository communityRepository;
+    public ChatServiceI(CommunityRepository communityRepository) {
+        this.communityRepository = communityRepository;
+    }
 
     @Override
     @Transactional
