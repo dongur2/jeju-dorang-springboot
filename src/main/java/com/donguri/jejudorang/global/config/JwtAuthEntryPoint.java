@@ -31,6 +31,7 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
         // HTTP 응답 헤더 설정: JSON, 상태 코드 401(unauthorized)
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.sendRedirect("/user/login");
 
         // HTTP 응답 바디 설정: 상태 코드 401, 에러 메세지, 요청 경로 포함 맵 생성
         final Map<String, Object> body = new HashMap<>();

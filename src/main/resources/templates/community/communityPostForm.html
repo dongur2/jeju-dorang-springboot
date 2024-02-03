@@ -43,6 +43,7 @@
                                href="#" style="font-size:22px">동행모집</a>
                         </li>
                     </ul>
+                    <input type="text" id="community-dto-type" name="type" value="" style="display: none">
                 </div>
                 <div class="board-form-input-box">
                     <input type="text" class="board-title" id="board-form-title" name="title" placeholder="제목을 입력하세요">
@@ -104,8 +105,38 @@
         // 폼 데이터 전달
         function submitForm() {
             let formContent = editor.getHTML();
+
+            // 공백 기본값 <p><br></p> 제거 후 공백 확인
+            formContent = formContent.replace(/<p><br><\/p>/gi, '').trim();
             document.getElementById("board-form-content").setAttribute("value", formContent);
-            document.getElementById("board-write-form").submit();
+
+            // 글 타입 전달
+            let nowType = "[[${type}]]";
+            if (typeof nowType !== 'undefined') {
+                document.getElementById("community-dto-type").value = nowType;
+            } else {
+                console.log("nowType is not defined");
+            }
+
+            var form = document.getElementById('board-write-form');
+            var formData = new FormData(form);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/community/post/new", true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("게시글 작성이 완료되었습니다.");
+                        window.location.href = "/community/"+xhr.responseText;
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+
+            xhr.send(formData);
         }
 
         // tagify
@@ -119,6 +150,8 @@
                 duplicate: "Duplicates are not allowed"
             },
         })
+
+
     </script>
 
 

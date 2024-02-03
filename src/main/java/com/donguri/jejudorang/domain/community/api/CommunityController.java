@@ -4,25 +4,33 @@ import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
+
 @Slf4j
 @Controller
 @RequestMapping("/community")
 public class CommunityController {
-    @Autowired
-    private CommunityService communityService;
 
-    @Value("${kakao-api-key}")
-    private String kakaoApiKey;
+    private final String kakaoApiKey;
+
+    @Autowired private final CommunityService communityService;
+
+    public CommunityController(CommunityService communityService, @Value("${kakao-api-key}") String kakaoApiKey) {
+        this.communityService = communityService;
+        this.kakaoApiKey = kakaoApiKey;
+    }
 
 
     // default: api package 내에서만 사용 가능 - getPartyList, getCharList
@@ -50,19 +58,20 @@ public class CommunityController {
     }
 
     @PostMapping("/post/new")
-    public String postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult, Model model) {
-        // 유효성 검사 에러
+    public ResponseEntity<?> postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult,
+                                              @CookieValue("access_token") Cookie token) {
+
         if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
+            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
 
         try {
-            CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite);
-            return "redirect:/community/" + communityTypeResponseDto.typeForRedirect();
+            CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite, token.getValue());
+            return new ResponseEntity<>(communityTypeResponseDto.typeForRedirect(), HttpStatus.OK);
 
         } catch (Exception e) {
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            log.error("게시글 작성에 실패했습니다 : {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

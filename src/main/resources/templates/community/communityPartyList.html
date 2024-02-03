@@ -89,13 +89,13 @@
                     </li>
                 </ul>
 
-                <a class="btn btn-primary write-btn"
-                   href="#" role="button" style="background: #696969"
+                <a class="btn btn-primary write-btn" href="#" role="button"
+                   style="background: #696969"
                    th:href="@{/community/post/new(type=party)}">글쓰기</a>
             </div>
 
+            <!--     게시글 카드       -->
             <div class="board-cards-box">
-
                 <div th:each="post : ${partyListDtoPage}" class="card w-75 mb-3" style="min-width:100%; max-height:170px;">
                     <div class="card-body" style="width:100%;" th:onclick="|location.href='@{/community/parties/{communityId}(communityId=${post.id})}'|">
                         <h5 class="card-title" style="font-weight: bold;" th:text="${post.title}">Card title</h5>
@@ -121,7 +121,6 @@
 
                     </div>
                 </div>
-
             </div>
 
             <!-- 페이지 네비게이션 블록 -->

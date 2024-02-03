@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.community.entity;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
+import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -26,12 +27,9 @@ public class Community extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    * 작성자 임시 코드
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "writer_id")
-//    @Column(nullable = false)
-//    private User writer;
-    private Long writer;
+    @ManyToOne(fetch = FetchType.LAZY) // 한 사람 당 게시글 여러 개
+    @JoinColumn(name = "user_id") // 회원 탈퇴 -> 삭제되지 않고 NULL 전환
+    private User writer;
 
     // 글 분류 (PARTY: 모임, CHAT: 잡담)
     @Column(nullable = false)
@@ -68,7 +66,7 @@ public class Community extends BaseEntity {
 
 
     @Builder
-    public Community(Long writer, String title, String content, List<CommunityWithTag> tags, int viewCount) {
+    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;
@@ -120,6 +118,10 @@ public class Community extends BaseEntity {
         } else {
             state = JoinState.RECRUITING;
         }
+    }
+
+    public void deleteWriter() {
+        writer = null;
     }
 
 }
