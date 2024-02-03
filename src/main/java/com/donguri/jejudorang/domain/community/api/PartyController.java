@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.donguri.jejudorang.domain.community.api.CommunityController.convertToProperty;
 
@@ -96,13 +97,8 @@ public class PartyController {
                                  HttpServletRequest request, HttpServletResponse response,
                                  Model model) {
 
-        // 쿠키 확인 후 조회수 증가
-        if (request.getCookies() == null ||
-            Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals(communityId.toString())).toList().isEmpty()) {
-
-            updateCookieAndView(communityId, response);
-        }
+        // 쿠키 체크 & 조회수 업데이트 여부 결정 & 조건 충족할 경우 조회수, 쿠키 업데이트
+        checkIsAlreadyReadForUpdateView(communityId, request, response);
 
         PartyDetailResponseDto foundPartyPost = partyService.getPartyPost(communityId);
 
@@ -111,15 +107,67 @@ public class PartyController {
         return "/community/communityDetail";
     }
 
-    private void updateCookieAndView(Long postId, HttpServletResponse response) {
-            partyService.updatePartyView(postId);
+    /*
+     * 조회수 중복 필터링 (쿠키 확인)
+     *
+     * # 조회수 증가
+     * 1. 비회원: 쿠키가 아예 없는 경우  [ isRead 쿠키 생성 ]
+     * 2. 회원: 글 조회 목록 쿠키(isRead)가 없는 경우   [ isRead 쿠키 생성 ]
+     * 3. 회원: 글 조회 목록 쿠키(isRead)는 존재하지만, 현재 글 아이디가 포함되지 않은 경우   [ isRead 쿠키 업데이트 ]
+     *
+     * # 조회수, 쿠키 고정
+     * 글 조회 목록 쿠키(isRead)에 현재 글 아이디가 포함될 경우
+     *
+     * */
+    private void checkIsAlreadyReadForUpdateView(Long communityId, HttpServletRequest request, HttpServletResponse response) {
 
-            Cookie newCookieToAdd = new Cookie(postId.toString(), "already_read");
-            newCookieToAdd.setHttpOnly(true);
-            newCookieToAdd.setMaxAge(viewCookieTime);
-            newCookieToAdd.setPath("/");
-            response.addCookie(newCookieToAdd);
+        Optional<Cookie[]> cookies = Optional.ofNullable(request.getCookies());
+
+        // 쿠키가 아예 없거나(비회원) 상세글 조회 목록 쿠키가 없는 경우(회원: 액세스 토큰 쿠키 존재)
+        if (cookies.isEmpty() || Arrays.stream(cookies.get()).filter(cookie -> cookie.getName().equals("isRead")).toList().isEmpty()) {
+
+            Cookie newCookie = new Cookie("isRead", String.valueOf(communityId));
+            updateCookie(response, newCookie);
+            log.info("새로운 쿠키 생성  {} : {}", newCookie.getName(), newCookie.getValue());
+
+            partyService.updatePartyView(communityId);
+            log.info("조회수 증가 완료");
+
+
+        // 상세글 조회 목록 쿠키가 있는 경우
+        } else {
+            Cookie isReadCookie = Arrays.stream(cookies.get())
+                    .filter(coo -> coo.getName().equals("isRead"))
+                    .toList().get(0);
+
+            boolean communityIdExists = Arrays.asList(isReadCookie.getValue().split("/")).contains(String.valueOf(communityId));
+
+            // 현재 communityId가 쿠키 값에 포함되어 있지 않은 경우
+            if (!communityIdExists) {
+                StringBuilder newValueBuilder = new StringBuilder();
+                newValueBuilder.append(isReadCookie.getValue()).append("/").append(communityId);
+
+                isReadCookie.setValue(newValueBuilder.toString());
+                updateCookie(response, isReadCookie);
+                log.info("쿠키에 새로운 communityId 추가: {} -> {}", communityId, newValueBuilder);
+
+                partyService.updatePartyView(communityId);
+                log.info("조회수 증가 완료");
+
+            // 현재 communityId가 쿠키 값에 포함된 경우
+            } else {
+                log.info("이미 조회한 글입니다.");
+            }
+        }
     }
+
+    private void updateCookie(HttpServletResponse response, Cookie newCookie) {
+        newCookie.setHttpOnly(true);
+        newCookie.setMaxAge(viewCookieTime);
+        newCookie.setPath("/");
+        response.addCookie(newCookie);
+    }
+
 
     /*
     * 모집상태 변경

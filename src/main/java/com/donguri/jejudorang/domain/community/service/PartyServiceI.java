@@ -116,13 +116,13 @@ public class PartyServiceI implements PartyService{
     @Override
     @Transactional
     public PartyDetailResponseDto getPartyPost(Long communityId) {
-        Community foundParty = communityRepository.findById(communityId).get();
+        Community foundParty = communityRepository.findById(communityId)
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
 
         List<String> tagsToStringList = null;
         if (foundParty.getTags() != null) {
             tagsToStringList = foundParty.getTags().stream().map(
-                            communityWithTag -> communityWithTag.getTag().getKeyword())
-                    .toList();
+                            communityWithTag -> communityWithTag.getTag().getKeyword()).toList();
         }
 
         return PartyDetailResponseDto.from(foundParty, tagsToStringList);
