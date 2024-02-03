@@ -19,7 +19,7 @@ public record CommunityWriteRequestDto (
         String type,
 
         @NotBlank(message = "글 내용을 작성해주세요.")
-        @Size(min= 2, max = 4000, message = "글 내용은 2자 이상 4000자 이하만 가능합니다.")
+        @Size(max = 4000, message = "글 내용은 4000자 이하만 가능합니다.")
         String content,
 
         String tags

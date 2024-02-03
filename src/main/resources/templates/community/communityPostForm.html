@@ -105,6 +105,9 @@
         // 폼 데이터 전달
         function submitForm() {
             let formContent = editor.getHTML();
+
+            // 공백 기본값 <p><br></p> 제거 후 공백 확인
+            formContent = formContent.replace(/<p><br><\/p>/gi, '').trim();
             document.getElementById("board-form-content").setAttribute("value", formContent);
 
             // 글 타입 전달
