@@ -7,5 +7,9 @@ import java.util.Map;
 
 public interface ChatService {
     Map<String, Object> getChatPostList(Pageable pageable, String searchWord, String searchTag);
+
     ChatDetailResponseDto getChatPost(Long id);
+
+    //updateChatView
+    void updateChatView(Long communityId);
 }
