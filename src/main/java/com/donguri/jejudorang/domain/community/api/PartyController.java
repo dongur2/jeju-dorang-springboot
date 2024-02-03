@@ -2,6 +2,9 @@ package com.donguri.jejudorang.domain.community.api;
 
 import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.service.PartyService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static com.donguri.jejudorang.domain.community.api.CommunityController.convertToProperty;
@@ -27,6 +32,9 @@ public class PartyController {
 
     @Value("${kakao-api-key}")
     private String kakaoApiKey;
+
+    @Value("${view.cookie-expire}")
+    private int viewCookieTime;
 
 
     /*
@@ -84,12 +92,33 @@ public class PartyController {
      *
      * */
     @GetMapping("/{communityId}")
-    public String getPartyDetail(@PathVariable("communityId") Long communityId, Model model) {
+    public String getPartyDetail(@PathVariable("communityId") Long communityId,
+                                 HttpServletRequest request, HttpServletResponse response,
+                                 Model model) {
+
+        // 쿠키 확인 후 조회수 증가
+        if (request.getCookies() == null ||
+            Arrays.stream(request.getCookies())
+                    .filter(cookie -> cookie.getName().equals(communityId.toString())).toList().isEmpty()) {
+
+            updateCookieAndView(communityId, response);
+        }
+
         PartyDetailResponseDto foundPartyPost = partyService.getPartyPost(communityId);
 
         model.addAttribute("post", foundPartyPost);
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/community/communityDetail";
+    }
+
+    private void updateCookieAndView(Long postId, HttpServletResponse response) {
+            partyService.updatePartyView(postId);
+
+            Cookie newCookieToAdd = new Cookie(postId.toString(), "already_read");
+            newCookieToAdd.setHttpOnly(true);
+            newCookieToAdd.setMaxAge(viewCookieTime);
+            newCookieToAdd.setPath("/");
+            response.addCookie(newCookieToAdd);
     }
 
     /*

@@ -13,6 +13,9 @@ public interface PartyService {
     //getPartyDetail
     PartyDetailResponseDto getPartyPost(Long communityId);
 
+    //updatePartyView
+    void updatePartyView(Long communityId);
+
     //modifyBoardJoinState
     void changePartyJoinState(Long communityId);
 
