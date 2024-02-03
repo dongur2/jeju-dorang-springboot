@@ -87,7 +87,7 @@ public class SecurityConfig {
                                         "/",
                                         "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
                                         "/trip", "/trip/list/*", "/trip/places",
-                                        "/community/chats", "/community/parties","/community/parties/{communityId}",
+                                        "/community/chats", "/community/chats/{communityId}","/community/parties", "/community/parties/{communityId}",
                                         "/templates/**", "/error/**")
                                 .permitAll()
                                 .requestMatchers(
