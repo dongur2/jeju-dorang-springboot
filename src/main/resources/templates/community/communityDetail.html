@@ -2,6 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
         layout:decorate="~{/fragments/layout}">
 <head>
     <!-- 카카오톡 공유  -->
@@ -61,12 +62,21 @@
 
             <!--    버튼    -->
             <div class="board-post-features">
+                <!-- 모집상태 -->
                 <div th:if="${post.type.name()} == 'PARTY'" class="board-post-feature board-state">
-                    <button th:if="${post.state.name()} == 'RECRUITING'" class="feature-row board-state-btn"
-                            th:onclick="'changeJoinState(' + ${post.id} + ')'">모집중</button>
-                    <button th:if="${post.state.name()} == 'DONE'" class="feature-row board-state-btn"
-                            th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
+                    <div th:if="${post.writerId == #authentication.name}">
+                        <button th:if="${post.state.name()} == 'RECRUITING'" class="feature-row board-state-btn"
+                                th:onclick="'changeJoinState(' + ${post.id} + ')'">모집중</button>
+                        <button th:if="${post.state.name()} == 'DONE'" class="feature-row board-state-btn"
+                                th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
+                    </div>
+
+                    <div th:if="${post.writerId != #authentication.name || !#authentication.isAuthenticated()}">
+                        <button th:if="${post.state.name()} == 'RECRUITING'" class="feature-row board-state-btn" disabled>모집중</button>
+                        <button th:if="${post.state.name()} == 'DONE'" class="feature-row board-state-btn" disabled>모집완료</button>
+                    </div>
                 </div>
+
                 <div class="board-post-feature board-liked">
                     <button class="feature-row board-liked-btn"
                             th:onclick="'changeLikedState(' + ${post.id} + ')'">북마크</button>
@@ -77,6 +87,7 @@
                 </div>
                 <div class="board-post-feature board-modify">
                     <button class="feature-row board-modify-btn"
+                    th:if="${post.writerId == #authentication.name}"
                     th:onclick="|location.href='@{/community/post/{communityId}/modify(communityId=${post.id})}'|">수정</button>
                 </div>
                 <div class="board-post-feature board-back-to-list">
