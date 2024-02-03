@@ -135,11 +135,18 @@
 
     <script>
         function changeJoinState(communityId) {
+            alert("changeJoinState()" + communityId);
+
             let xhr = new XMLHttpRequest();
             xhr.open('PUT', '/community/parties/' + communityId + '/state', true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) { //  XMLHttpRequest 객체가 통신을 완료하여 응답이 완전히 수신되었을 때
-                    window.location.href = '/community/parties/' + communityId;
+                    if (xhr.status === 200) {
+                        alert("상태 변경 완료");
+                        window.location.href = '/community/boards/parties/' + communityId;
+                    } else {
+                        alert("상태 변경 실패");
+                    }
                 }
             };
             xhr.send();

@@ -87,13 +87,13 @@ public class SecurityConfig {
                                         "/",
                                         "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
                                         "/trip", "/trip/list/*", "/trip/places",
-                                        "/community/chats", "/community/chats/{communityId}","/community/parties", "/community/parties/{communityId}",
                                         "/community/boards/**",
                                         "/templates/**", "/error/**")
                                 .permitAll()
                                 .requestMatchers(
                                         "/user/settings/profile/**",
-                                        "/community/post/new", "/tui-editor/**"
+                                        "/community/post/**", "/tui-editor/**",
+                                        "/community/parties//{communityId}/state"
                                 ).authenticated()
                         )
                 )
