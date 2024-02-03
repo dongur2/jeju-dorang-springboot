@@ -293,6 +293,9 @@ public class UserServiceI implements UserService {
             User nowUser = getNowUser(token);
 
             if (!dataToUpdate.img().isEmpty()) {
+                if (dataToUpdate.img().getSize() > 1000000) {
+                    throw new IllegalAccessException("파일 크기는 1MB를 초과할 수 없습니다");
+                }
 
                 String pastImg = nowUser.getProfile().getImgName();
                 if (pastImg != null) {

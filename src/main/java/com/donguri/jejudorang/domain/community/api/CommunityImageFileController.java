@@ -36,6 +36,9 @@ public class CommunityImageFileController {
         try {
             if (image.isEmpty()) {
                 throw new BadRequestException("첨부된 이미지가 없습니다.");
+
+            } else if (image.getSize() > 3000000) {
+                throw new IllegalAccessException("파일 크기는 3MB를 초과할 수 없습니다");
             }
 
             Map<String, String> resultMap = imageService.putS3Object(image);
@@ -46,4 +49,5 @@ public class CommunityImageFileController {
             return e.getMessage();
         }
     }
+
 }

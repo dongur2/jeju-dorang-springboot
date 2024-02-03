@@ -83,6 +83,11 @@
                         const formData = new FormData();
                         formData.append('image', blob);
 
+                        if(formData.get("image").size > 3000000) {
+                            alert("파일 크기는 3MB를 초과할 수 없습니다.");
+                            return;
+                        }
+
                         const response = await fetch('/tui-editor/img-upload', {
                             method: 'POST',
                             body: formData,
