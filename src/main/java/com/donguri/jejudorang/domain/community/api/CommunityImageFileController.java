@@ -1,6 +1,8 @@
 package com.donguri.jejudorang.domain.community.api;
 
+import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -10,59 +12,38 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.UUID;
 
+
+/*
+* Community Toast 에디터 이미지 첨부 - S3
+*
+* */
 @Slf4j
 @RestController
 @RequestMapping("/tui-editor")
 public class CommunityImageFileController {
 
-    @Value("${file.upload-directory}")
-    private String uploadDir;
+    private final ImageService imageService;
+    public CommunityImageFileController(ImageService imageService) {
+        this.imageService = imageService;
+    }
 
     @PostMapping("/img-upload")
     public String uploadEditorImage(@RequestParam("image") final MultipartFile image) {
-        if (image.isEmpty()) {
-            return "";
-        }
-
-        String originalName = image.getOriginalFilename();
-        String extension = originalName.substring(originalName.lastIndexOf(".") + 1); // 파일 확장자 (png..)
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        String saveFileName = uuid + "." + extension;
-        String fileFullPath = Paths.get(uploadDir, saveFileName).toString();
-
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
 
         try {
-            File uploadFile = new File(fileFullPath);
-            if (!uploadFile.getParentFile().exists()) {
-                uploadFile.getParentFile().mkdirs(); // Create parent directories if they do not exist
+            if (image.isEmpty()) {
+                throw new BadRequestException("첨부된 이미지가 없습니다.");
             }
-            image.transferTo(uploadFile); // 서버에 저장
-            return saveFileName; // 서버에 저장된 파일명
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+            Map<String, String> resultMap = imageService.putS3Object(image);
+            return resultMap.get("imgUrl");
+
+        } catch (Exception e) {
+            log.error("이미지 첨부 실패: {}", e.getMessage());
+            return e.getMessage();
         }
     }
-
-    @GetMapping(value = "/img-print", produces = { MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE })
-    public byte[] printEditorImage(@RequestParam("filename") final String filename) {
-        String fileFullPath = Paths.get(uploadDir, filename).toString();
-
-        File uploadedFile = new File(fileFullPath);
-        if (!uploadedFile.exists()) {
-            throw new RuntimeException();
-        }
-
-        try {
-            return Files.readAllBytes(uploadedFile.toPath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

@@ -88,11 +88,10 @@
                             body: formData,
                         });
 
-                        const filename = await response.text(); // public String uploadEditorImage()
-                        console.log('서버에 저장된 파일명 : ', filename);
+                        const imageUrl = await response.text(); // public String uploadEditorImage()
+                        console.log('서버에 저장된 파일의 url : ', imageUrl);
 
-                        const imageUrl = `/tui-editor/img-print?filename=${filename}`; // public byte[] printEditorImage
-                        console.log(imageUrl);
+                        // 이미지 삽입 콜백 호출
                         callback(imageUrl, 'imgUrl');
 
                     } catch (error) {
