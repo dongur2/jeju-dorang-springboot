@@ -1,11 +1,9 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.response.ChatDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.ChatListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -77,28 +75,4 @@ public class ChatServiceI implements ChatService {
         return resultMap;
     }
 
-    @Override
-    @Transactional
-    public ChatDetailResponseDto getChatPost(Long communityId) {
-        Community foundChat = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));;
-
-        List<String> tagsToStringList = null;
-        if (foundChat.getTags() != null) {
-            tagsToStringList = foundChat.getTags().stream().map(
-                            communityWithTag -> communityWithTag.getTag().getKeyword())
-                    .toList();
-        }
-
-        return ChatDetailResponseDto.from(foundChat, tagsToStringList);
-    }
-
-    @Override
-    @Transactional
-    public void updateChatView(Long communityId) {
-        Community postToUpdate = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
-
-        postToUpdate.upViewCount();
-    }
 }

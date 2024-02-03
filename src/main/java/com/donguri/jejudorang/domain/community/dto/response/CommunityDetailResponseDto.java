@@ -2,27 +2,30 @@ package com.donguri.jejudorang.domain.community.dto.response;
 
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
+import com.donguri.jejudorang.domain.community.entity.JoinState;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record ChatDetailResponseDto (
-        Long id,
-        BoardType type,
-        String title,
-        String nickname,
-        String writerId,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        int viewCount,
-        String content,
-        List<String> tags,
-        int bookmarkCount
+public record CommunityDetailResponseDto(
+    Long id,
+    BoardType type,
+    JoinState state,
+    String title,
+    String nickname,
+    String writerId,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+    int viewCount,
+    String content,
+    List<String> tags,
+    int bookmarkCount
 ) {
-    public static ChatDetailResponseDto from(Community community, List<String> tagList) {
-        return new ChatDetailResponseDto(
+    public static CommunityDetailResponseDto from(Community community, List<String> tagList) {
+        return new CommunityDetailResponseDto(
                 community.getId(),
                 community.getType(),
+                community.getState(),
                 community.getTitle(),
                 community.getWriter().getProfile().getNickname(),
                 community.getWriter().getProfile().getExternalId(),

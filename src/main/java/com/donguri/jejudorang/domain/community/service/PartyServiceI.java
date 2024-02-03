@@ -1,12 +1,10 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -111,30 +109,6 @@ public class PartyServiceI implements PartyService{
         } else {
             return JoinState.DONE;
         }
-    }
-
-    @Override
-    @Transactional
-    public PartyDetailResponseDto getPartyPost(Long communityId) {
-        Community foundParty = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
-
-        List<String> tagsToStringList = null;
-        if (foundParty.getTags() != null) {
-            tagsToStringList = foundParty.getTags().stream().map(
-                            communityWithTag -> communityWithTag.getTag().getKeyword()).toList();
-        }
-
-        return PartyDetailResponseDto.from(foundParty, tagsToStringList);
-    }
-
-    @Override
-    @Transactional
-    public void updatePartyView(Long communityId) {
-        Community postToUpdate = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
-
-        postToUpdate.upViewCount();
     }
 
 

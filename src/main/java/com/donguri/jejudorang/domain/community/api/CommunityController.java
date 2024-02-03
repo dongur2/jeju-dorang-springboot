@@ -1,10 +1,7 @@
 package com.donguri.jejudorang.domain.community.api;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
-import com.donguri.jejudorang.domain.community.dto.response.ChatDetailResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.*;
 import com.donguri.jejudorang.domain.community.service.ChatService;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.community.service.PartyService;
@@ -92,7 +89,9 @@ public class CommunityController {
     * */
     @GetMapping("/post/{communityId}/modify")
     public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
-        CommunityForModifyResponseDto foundPost = communityService.getCommunityPost(communityId);
+        CommunityForModifyResponseDto foundPost =
+                (CommunityForModifyResponseDto) communityService.getCommunityPost(communityId, true).get("result");
+
         model.addAttribute("post", foundPost);
         return "/community/communityModifyForm";
     }
@@ -221,14 +220,10 @@ public class CommunityController {
         // 쿠키 체크 & 조회수 업데이트 여부 결정 & 조건 충족할 경우 조회수, 쿠키 업데이트
         checkIsAlreadyReadForUpdateView(communityId, request, response);
 
-        if (type.equals("parties")) {
-            PartyDetailResponseDto foundPartyPost = partyService.getPartyPost(communityId);
-            model.addAttribute("post", foundPartyPost);
-        } else {
-            ChatDetailResponseDto foundChatPost = chatService.getChatPost(communityId);
-            model.addAttribute("post", foundChatPost);
-        }
+        CommunityDetailResponseDto foundPPost =
+                (CommunityDetailResponseDto) communityService.getCommunityPost(communityId, false).get("result");
 
+        model.addAttribute("post", foundPPost);
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/community/communityDetail";
     }
@@ -256,7 +251,7 @@ public class CommunityController {
             updateCookie(response, newCookie);
             log.info("새로운 쿠키 생성  {} : {}", newCookie.getName(), newCookie.getValue());
 
-            partyService.updatePartyView(communityId);
+            communityService.updateView(communityId);
             log.info("조회수 증가 완료");
 
 
@@ -277,7 +272,7 @@ public class CommunityController {
                 updateCookie(response, isReadCookie);
                 log.info("쿠키에 새로운 communityId 추가: {} -> {}", communityId, newValueBuilder);
 
-                partyService.updatePartyView(communityId);
+                communityService.updateView(communityId);
                 log.info("조회수 증가 완료");
 
                 // 현재 communityId가 쿠키 값에 포함된 경우
