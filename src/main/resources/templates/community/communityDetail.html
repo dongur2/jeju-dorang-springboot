@@ -142,11 +142,16 @@
 
 
     <script>
+
+        /*
+        * 모집글 - 모집 상태 변경
+        *
+        * */
         function changeJoinState(communityId) {
             let xhr = new XMLHttpRequest();
             xhr.open('PUT', '/community/parties/' + communityId + '/state', true);
             xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) { //  XMLHttpRequest 객체가 통신을 완료하여 응답이 완전히 수신되었을 때
+                if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         alert("모집 상태 변경 완료");
                         window.location.href = '/community/boards/parties/' + communityId;
@@ -159,25 +164,31 @@
             xhr.send();
         }
 
+
+        /*
+        * 북마크
+        *
+        * */
+        // 로그인 하지 않은 경우
         function cantBookmark() {
             alert("북마크하려면 로그인이 필요합니다.");
         }
-
+        // 로그인한 경우
         function createBookmark(communityId) {
             let xhr = new XMLHttpRequest();
             xhr.open('POST', '/bookmarks/communities/' + communityId, true);
 
             xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) { // XMLHttpRequest 객체가 통신을 완료하여 응답이 완전히 수신되었을 때
-                    if (xhr.status === 200) { // 성공적인 응답인 경우
-                        alert("북마크 완료"); // 사용자에게 알림
-                        // 여기에 필요한 작업 추가
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert(xhr.responseText);
+
                     } else { // 그 외의 경우
-                        alert("북마크 실패"); // 사용자에게 알림
+                        alert(xhr.responseText);
                     }
                 }
             };
-            xhr.send(); // 요청 전송
+            xhr.send();
         }
 
         function openSnsModal() {

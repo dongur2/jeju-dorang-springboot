@@ -55,8 +55,11 @@
             <input type="hidden" id="board-form-content" name="content" value="" th:value="${post.content}">
 
             <div class="board-write-form-bottom">
-                <button type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
-                        th:onclick="|location.href='@{/community/parties}'|">취소</button>
+                <button th:if="${post.type.name().toLowerCase() == 'party'}" type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
+                        th:onclick="|location.href='@{/community/boards/parties}'|">취소</button>
+                <button th:if="${post.type.name().toLowerCase() == 'chat'}" type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
+                        th:onclick="|location.href='@{/community/boards/chats}'|">취소</button>
+
                 <button type="button" class="btn btn-primary"
                         onclick="submitForm()"
                         style="width:150px; height:50px; border-radius: 10px">수정</button>

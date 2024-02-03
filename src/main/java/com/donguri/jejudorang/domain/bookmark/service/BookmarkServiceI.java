@@ -57,7 +57,7 @@ public class BookmarkServiceI implements BookmarkService {
 
         } catch (BadRequestException e) {
             log.error("북마크 생성 실패 -- 중복: {}", e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("이미 북마크한 글입니다.");
 
         } catch (Exception e) {
             log.error("북마크 생성 실패: {}", e.getMessage());
