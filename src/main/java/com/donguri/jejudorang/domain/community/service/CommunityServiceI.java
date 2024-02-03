@@ -73,22 +73,28 @@ public class CommunityServiceI implements CommunityService {
     @Transactional
     public Map<String, Object> getCommunityPost(Long communityId, boolean forModify) {
 
-        Map<String, Object> resMap = new HashMap<>();
+        try {
+            Map<String, Object> resMap = new HashMap<>();
 
-        Community found = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+            Community found = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
 
-        List<String> tagsToStringList = found.getTags().stream()
-                .map(communityWithTag -> communityWithTag.getTag().getKeyword())
-                .toList();
+            List<String> tagsToStringList = found.getTags().stream()
+                    .map(communityWithTag -> communityWithTag.getTag().getKeyword())
+                    .toList();
 
-        if (forModify) {
-            resMap.put("result", CommunityForModifyResponseDto.from(found, tagsToStringList));
-            return resMap;
+            if (forModify) {
+                resMap.put("result", CommunityForModifyResponseDto.from(found, tagsToStringList));
+                return resMap;
 
-        } else {
-            resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
-            return resMap;
+            } else {
+                resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
+                return resMap;
+            }
+
+        } catch (Exception e) {
+            log.error("게시글 불러오기를 실패했습니다. {}", e.getMessage());
+            throw e;
         }
     }
 
@@ -96,30 +102,42 @@ public class CommunityServiceI implements CommunityService {
     @Override
     @Transactional
     public CommunityTypeResponseDto updatePost(Long communityId, CommunityWriteRequestDto postToUpdate) {
-        Community existingCommunity = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+        try {
+            Community existingCommunity = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
 
-        // 제목, 글분류, 글내용, 모집상태 업데이트 (dirty checking)
-        existingCommunity.update(postToUpdate);
+            // 제목, 글분류, 글내용, 모집상태 업데이트 (dirty checking)
+            existingCommunity.update(postToUpdate);
 
-        // 태그 업데이트
-        if (postToUpdate.tags() != null) {
-            communityWithTagService.saveTagToPost(existingCommunity, postToUpdate.tags());
+            // 태그 업데이트
+            if (postToUpdate.tags() != null) {
+                communityWithTagService.saveTagToPost(existingCommunity, postToUpdate.tags());
+            }
+
+            // 리다이렉트할 때 넣어줄 글타입
+            String typeForDto = setTypeForRedirect(existingCommunity);
+            return new CommunityTypeResponseDto(typeForDto);
+
+        } catch (Exception e) {
+            log.error("게시글 업데이트 실패: {}", e.getMessage());
+            throw e;
         }
-
-        // 리다이렉트할 때 넣어줄 글타입
-        String typeForDto = setTypeForRedirect(existingCommunity);
-        return new CommunityTypeResponseDto(typeForDto);
     }
 
 
     @Override
     @Transactional
     public void updateView(Long communityId) {
-        Community postToUpdate = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+        try {
+            Community postToUpdate = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
 
-        postToUpdate.upViewCount();
+            postToUpdate.upViewCount();
+
+        } catch (Exception e) {
+            log.error("조회수 업데이트 실패: {}", e.getMessage());
+            throw e;
+        }
     }
 
 

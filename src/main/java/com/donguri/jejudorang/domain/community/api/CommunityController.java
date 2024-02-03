@@ -89,11 +89,18 @@ public class CommunityController {
     * */
     @GetMapping("/post/{communityId}/modify")
     public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
-        CommunityForModifyResponseDto foundPost =
-                (CommunityForModifyResponseDto) communityService.getCommunityPost(communityId, true).get("result");
+        try {
+            CommunityForModifyResponseDto foundPost =
+                    (CommunityForModifyResponseDto) communityService.getCommunityPost(communityId, true).get("result");
 
-        model.addAttribute("post", foundPost);
-        return "/community/communityModifyForm";
+            model.addAttribute("post", foundPost);
+            return "/community/communityModifyForm";
+
+        } catch (Exception e) {
+            log.error("수정 데이터 불러오기 실패: {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
     }
 
     @PutMapping("/post/{communityId}/modify")
@@ -101,12 +108,12 @@ public class CommunityController {
                                   @Valid CommunityWriteRequestDto postToUpdate,
                                   BindingResult bindingResult,
                                   Model model) {
-        // 유효성 검사 에러
-        if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
-        }
 
         try {
+            if (bindingResult.hasErrors()) {
+                throw new IllegalArgumentException(bindingResult.getFieldError().getDefaultMessage());
+            }
+
             CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
             return "redirect:/community/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
 
@@ -114,11 +121,6 @@ public class CommunityController {
             model.addAttribute("errorMsg", e.getMessage());
             return "/error/errorTemp";
         }
-    }
-
-    private static String bindErrorPage(BindingResult bindingResult, Model model) {
-        model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
-        return "/error/errorTemp";
     }
 
 
@@ -158,36 +160,43 @@ public class CommunityController {
                                    @RequestParam(name = "tags", required = false) String searchTag,
                                    Model model) {
 
-        // 넘어온 정렬 기준값 -> 컬럼명으로 변환
-        order = convertToProperty(order);
-        // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
-        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
+        try {
+            // 넘어온 정렬 기준값 -> 컬럼명으로 변환
+            order = convertToProperty(order);
+            // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
+            Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
-        Map<String, Object> listInMap;
-        if(type.equals("parties")) {
-            listInMap = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
-        } else {
-            listInMap = chatService.getChatPostList(pageable, searchWord, searchTag);
+            Map<String, Object> listInMap;
+            if (type.equals("parties")) {
+                listInMap = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
+            } else {
+                listInMap = chatService.getChatPostList(pageable, searchWord, searchTag);
+            }
+
+            model.addAttribute("nowType", type);
+
+            model.addAttribute("order", order);
+            model.addAttribute("nowPage", nowPage);
+
+            model.addAttribute("currentSearchWord", searchWord);
+            model.addAttribute("currentSearchTag", searchTag);
+
+            if (type.equals("parties")) {
+                model.addAttribute("nowState", state);
+                model.addAttribute("allPartyPageCount", listInMap.get("allPartyPageCount")); // 총 페이지 수
+                model.addAttribute("partyListDtoPage", listInMap.get("partyListDtoPage")); // 데이터
+            } else {
+                model.addAttribute("allChatPageCount", listInMap.get("allChatPageCount")); // 총 페이지 수
+                model.addAttribute("chatListDtoPage", listInMap.get("chatListDtoPage")); // 데이터
+            }
+
+            return "/community/communityList";
+
+        } catch (Exception e) {
+            log.error("게시글 목록 불러오기 실패: {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
         }
-
-        model.addAttribute("nowType", type);
-
-        model.addAttribute("order", order);
-        model.addAttribute("nowPage", nowPage);
-
-        model.addAttribute("currentSearchWord", searchWord);
-        model.addAttribute("currentSearchTag", searchTag);
-
-        if(type.equals("parties")) {
-            model.addAttribute("nowState", state);
-            model.addAttribute("allPartyPageCount", listInMap.get("allPartyPageCount")); // 총 페이지 수
-            model.addAttribute("partyListDtoPage", listInMap.get("partyListDtoPage")); // 데이터
-        } else {
-            model.addAttribute("allChatPageCount", listInMap.get("allChatPageCount")); // 총 페이지 수
-            model.addAttribute("chatListDtoPage", listInMap.get("chatListDtoPage")); // 데이터
-        }
-
-        return "/community/communityList";
     }
 
     /*
@@ -212,20 +221,26 @@ public class CommunityController {
      *
      * */
     @GetMapping("/boards/{type}/{communityId}")
-    public String getPartyDetail(@PathVariable(name = "type") String type,
-                                 @PathVariable("communityId") Long communityId,
-                                 HttpServletRequest request, HttpServletResponse response,
-                                 Model model) {
+    public String getCommunityDetail(@PathVariable("communityId") Long communityId,
+                                     HttpServletRequest request, HttpServletResponse response,
+                                     Model model) {
 
-        // 쿠키 체크 & 조회수 업데이트 여부 결정 & 조건 충족할 경우 조회수, 쿠키 업데이트
-        checkIsAlreadyReadForUpdateView(communityId, request, response);
+        try {
+            // 쿠키 체크 & 조회수 업데이트 여부 결정 & 조건 충족할 경우 조회수, 쿠키 업데이트
+            checkIsAlreadyReadForUpdateView(communityId, request, response);
 
-        CommunityDetailResponseDto foundPPost =
-                (CommunityDetailResponseDto) communityService.getCommunityPost(communityId, false).get("result");
+            CommunityDetailResponseDto foundPPost =
+                    (CommunityDetailResponseDto) communityService.getCommunityPost(communityId, false).get("result");
 
-        model.addAttribute("post", foundPPost);
-        model.addAttribute("kakaoApiKey", kakaoApiKey);
-        return "/community/communityDetail";
+            model.addAttribute("post", foundPPost);
+            model.addAttribute("kakaoApiKey", kakaoApiKey);
+            return "/community/communityDetail";
+
+        } catch (Exception e) {
+            log.error("상세글 불러오기 실패: {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
     }
 
     /*
