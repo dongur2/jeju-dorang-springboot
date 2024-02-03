@@ -3,12 +3,17 @@ package com.donguri.jejudorang.domain.community.api;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
+import com.donguri.jejudorang.domain.community.service.ChatService;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.domain.community.service.PartyService;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,6 +21,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Slf4j
@@ -26,12 +33,15 @@ public class CommunityController {
     private final String kakaoApiKey;
 
     @Autowired private final CommunityService communityService;
+    @Autowired private final ChatService chatService;
+    @Autowired private final PartyService partyService;
 
-    public CommunityController(CommunityService communityService, @Value("${kakao-api-key}") String kakaoApiKey) {
-        this.communityService = communityService;
+    public CommunityController(@Value("${kakao-api-key}") String kakaoApiKey, CommunityService communityService, ChatService chatService, PartyService partyService) {
         this.kakaoApiKey = kakaoApiKey;
+        this.communityService = communityService;
+        this.chatService = chatService;
+        this.partyService = partyService;
     }
-
 
     // default: api package 내에서만 사용 가능 - getPartyList, getCharList
     static String convertToProperty(String order) {
@@ -114,5 +124,64 @@ public class CommunityController {
         return "/error/errorTemp";
     }
 
+
+
+    /*
+    * 게시글 메인 - 목록 불러오기
+    * /community/boards/{type} // parties, chats
+    * GET
+    *
+    * > Parameters
+    * @PathVariable
+    * String type: 글 목록 타입
+    *
+    * @RequestParam
+    * Integer page: 현재 페이지
+    * String state: 정렬 기준 모집 상태 - party
+    * String order: 정렬 기준
+    * String search: 검색어
+    * String searchTag: 검색 태그 (A,B,C,...,N개)
+    *
+    * */
+    @GetMapping("/boards/{type}")
+    public String getCommunityList(@PathVariable(name = "type") String type,
+                                   @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
+                                   @RequestParam(name = "state", required = false, defaultValue = "all") String state, // all, recruiting, done
+                                   @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
+                                   @RequestParam(name = "search", required = false) String searchWord,
+                                   @RequestParam(name = "tags", required = false) String searchTag,
+                                   Model model) {
+
+        // 넘어온 정렬 기준값 -> 컬럼명으로 변환
+        order = convertToProperty(order);
+        // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
+        Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
+
+        Map<String, Object> listInMap;
+        if(type.equals("parties")) {
+            listInMap = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
+        } else {
+            listInMap = chatService.getChatPostList(pageable, searchWord, searchTag);
+        }
+
+        model.addAttribute("nowType", type);
+
+        model.addAttribute("order", order);
+        model.addAttribute("nowPage", nowPage);
+
+        model.addAttribute("currentSearchWord", searchWord);
+        model.addAttribute("currentSearchTag", searchTag);
+
+        if(type.equals("parties")) {
+            model.addAttribute("nowState", state);
+            model.addAttribute("allPartyPageCount", listInMap.get("allPartyPageCount")); // 총 페이지 수
+            model.addAttribute("partyListDtoPage", listInMap.get("partyListDtoPage")); // 데이터
+        } else {
+            model.addAttribute("allChatPageCount", listInMap.get("allChatPageCount")); // 총 페이지 수
+            model.addAttribute("chatListDtoPage", listInMap.get("chatListDtoPage")); // 데이터
+        }
+
+        return "/community/communityList";
+    }
 
 }
