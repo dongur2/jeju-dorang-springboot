@@ -40,10 +40,6 @@ public class ImageServiceI implements ImageService {
     @Transactional
     public Map<String, String> putS3Object(MultipartFile imgFile) {
         try {
-            if (imgFile.getSize() > 1000000) {
-                throw new IllegalAccessException("파일 크기는 1MB를 초과할 수 없습니다");
-            }
-
             String originalName = imgFile.getOriginalFilename();
             log.info("이미지 파일의 사용자 저장 이름 : {}", originalName);
             String fileType = originalName.substring(originalName.length() - 4);

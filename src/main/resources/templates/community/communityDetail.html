@@ -2,6 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
         layout:decorate="~{/fragments/layout}">
 <head>
     <!-- 카카오톡 공유  -->
@@ -25,7 +26,7 @@
             <div class="board-sub-header">
                 <div class="board-sub-title">
                     <h6 class="sub-title-box user-name">
-                        <a href="#">닉네임</a>
+                        <a href="#" th:text="${post.nickname}">닉네임</a>
                     </h6>
                     <div class="sub-title-box content-date">
                         <span class="sub-title sub-title-created-at">
@@ -61,12 +62,21 @@
 
             <!--    버튼    -->
             <div class="board-post-features">
+                <!-- 모집상태 -->
                 <div th:if="${post.type.name()} == 'PARTY'" class="board-post-feature board-state">
-                    <button th:if="${post.state.name()} == 'RECRUITING'" class="feature-row board-state-btn"
-                            th:onclick="'changeJoinState(' + ${post.id} + ')'">모집중</button>
-                    <button th:if="${post.state.name()} == 'DONE'" class="feature-row board-state-btn"
-                            th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
+                    <div th:if="${post.writerId == #authentication.name}">
+                        <button th:if="${post.state.name()} == 'RECRUITING'" class="feature-row board-state-btn"
+                                th:onclick="'changeJoinState(' + ${post.id} + ')'">모집중</button>
+                        <button th:if="${post.state.name()} == 'DONE'" class="feature-row board-state-btn"
+                                th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
+                    </div>
+
+                    <div th:if="${post.writerId != #authentication.name || !#authentication.isAuthenticated()}">
+                        <button th:if="${post.state.name()} == 'RECRUITING'" class="feature-row board-state-btn" disabled>모집중</button>
+                        <button th:if="${post.state.name()} == 'DONE'" class="feature-row board-state-btn" disabled>모집완료</button>
+                    </div>
                 </div>
+
                 <div class="board-post-feature board-liked">
                     <button class="feature-row board-liked-btn"
                             th:onclick="'changeLikedState(' + ${post.id} + ')'">북마크</button>
@@ -77,6 +87,7 @@
                 </div>
                 <div class="board-post-feature board-modify">
                     <button class="feature-row board-modify-btn"
+                    th:if="${post.writerId == #authentication.name}"
                     th:onclick="|location.href='@{/community/post/{communityId}/modify(communityId=${post.id})}'|">수정</button>
                 </div>
                 <div class="board-post-feature board-back-to-list">
@@ -124,11 +135,18 @@
 
     <script>
         function changeJoinState(communityId) {
+            alert("changeJoinState()" + communityId);
+
             let xhr = new XMLHttpRequest();
             xhr.open('PUT', '/community/parties/' + communityId + '/state', true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) { //  XMLHttpRequest 객체가 통신을 완료하여 응답이 완전히 수신되었을 때
-                    window.location.href = '/community/parties/' + communityId;
+                    if (xhr.status === 200) {
+                        alert("모집 상태 변경 완료");
+                        window.location.href = '/community/boards/parties/' + communityId;
+                    } else {
+                        alert("모집 상태 변경 실패");
+                    }
                 }
             };
             xhr.send();
@@ -141,6 +159,7 @@
                 if (xhr.readyState === 4) {
                     if (xhr.status === 401) {
                         alert("로그인 필요: 비회원은 북마크할 수 없음");
+                        
                     } else {
                         alert("북마크 완료");
                     }

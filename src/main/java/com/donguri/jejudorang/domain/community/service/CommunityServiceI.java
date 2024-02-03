@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.service;
 
 import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -64,39 +67,79 @@ public class CommunityServiceI implements CommunityService {
             throw e;
         }
     }
+    
 
     @Override
     @Transactional
-    public CommunityForModifyResponseDto getCommunityPost(Long communityId) {
-        Community existingCommunity = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
-        existingCommunity.upViewCount();
+    public Map<String, Object> getCommunityPost(Long communityId, boolean forModify) {
 
-        List<String> tagsToStringList = existingCommunity.getTags().stream().map(
-                        communityWithTag -> communityWithTag.getTag().getKeyword())
-                        .toList();
+        try {
+            Map<String, Object> resMap = new HashMap<>();
 
-        return CommunityForModifyResponseDto.from(existingCommunity, tagsToStringList);
+            Community found = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+
+            List<String> tagsToStringList = found.getTags().stream()
+                    .map(communityWithTag -> communityWithTag.getTag().getKeyword())
+                    .toList();
+
+            if (forModify) {
+                resMap.put("result", CommunityForModifyResponseDto.from(found, tagsToStringList));
+                return resMap;
+
+            } else {
+                resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
+                return resMap;
+            }
+
+        } catch (Exception e) {
+            log.error("게시글 불러오기를 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
     }
+
 
     @Override
     @Transactional
     public CommunityTypeResponseDto updatePost(Long communityId, CommunityWriteRequestDto postToUpdate) {
-        Community existingCommunity = communityRepository.findById(communityId)
-                .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+        try {
+            Community existingCommunity = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
 
-        // 제목, 글분류, 글내용, 모집상태 업데이트 (dirty checking)
-        existingCommunity.update(postToUpdate);
+            // 제목, 글분류, 글내용, 모집상태 업데이트 (dirty checking)
+            existingCommunity.update(postToUpdate);
 
-        // 태그 업데이트
-        if (postToUpdate.tags() != null) {
-            communityWithTagService.saveTagToPost(existingCommunity, postToUpdate.tags());
+            // 태그 업데이트
+            if (postToUpdate.tags() != null) {
+                communityWithTagService.saveTagToPost(existingCommunity, postToUpdate.tags());
+            }
+
+            // 리다이렉트할 때 넣어줄 글타입
+            String typeForDto = setTypeForRedirect(existingCommunity);
+            return new CommunityTypeResponseDto(typeForDto);
+
+        } catch (Exception e) {
+            log.error("게시글 업데이트 실패: {}", e.getMessage());
+            throw e;
         }
-
-        // 리다이렉트할 때 넣어줄 글타입
-        String typeForDto = setTypeForRedirect(existingCommunity);
-        return new CommunityTypeResponseDto(typeForDto);
     }
+
+
+    @Override
+    @Transactional
+    public void updateView(Long communityId) {
+        try {
+            Community postToUpdate = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+
+            postToUpdate.upViewCount();
+
+        } catch (Exception e) {
+            log.error("조회수 업데이트 실패: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     @Override
     @Transactional

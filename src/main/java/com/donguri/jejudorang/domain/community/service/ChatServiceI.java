@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.response.ChatDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.ChatListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
@@ -21,8 +20,10 @@ import java.util.Map;
 @Slf4j
 @Service
 public class ChatServiceI implements ChatService {
-    @Autowired
-    CommunityRepository communityRepository;
+    @Autowired private final CommunityRepository communityRepository;
+    public ChatServiceI(CommunityRepository communityRepository) {
+        this.communityRepository = communityRepository;
+    }
 
     @Override
     @Transactional
@@ -76,19 +77,4 @@ public class ChatServiceI implements ChatService {
         return resultMap;
     }
 
-    @Override
-    @Transactional
-    public ChatDetailResponseDto getChatPost(Long communityId) {
-        Community foundChat = communityRepository.findById(communityId).get();
-        foundChat.upViewCount();
-
-        List<String> tagsToStringList = null;
-        if (foundChat.getTags() != null) {
-            tagsToStringList = foundChat.getTags().stream().map(
-                            communityWithTag -> communityWithTag.getTag().getKeyword())
-                    .toList();
-        }
-
-        return ChatDetailResponseDto.from(foundChat, tagsToStringList);
-    }
 }

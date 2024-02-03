@@ -7,11 +7,13 @@ import com.donguri.jejudorang.domain.community.entity.JoinState;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record PartyDetailResponseDto (
+public record CommunityDetailResponseDto(
     Long id,
     BoardType type,
     JoinState state,
     String title,
+    String nickname,
+    String writerId,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     int viewCount,
@@ -19,12 +21,14 @@ public record PartyDetailResponseDto (
     List<String> tags,
     int bookmarkCount
 ) {
-    public static PartyDetailResponseDto from(Community community, List<String> tagList) {
-        return new PartyDetailResponseDto(
+    public static CommunityDetailResponseDto from(Community community, List<String> tagList) {
+        return new CommunityDetailResponseDto(
                 community.getId(),
                 community.getType(),
                 community.getState(),
                 community.getTitle(),
+                community.getWriter().getProfile().getNickname(),
+                community.getWriter().getProfile().getExternalId(),
                 community.getCreatedAt(),
                 community.getUpdatedAt(),
                 community.getViewCount(),

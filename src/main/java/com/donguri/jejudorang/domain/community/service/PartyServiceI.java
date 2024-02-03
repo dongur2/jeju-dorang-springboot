@@ -1,11 +1,11 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.response.PartyDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,8 +22,10 @@ import java.util.Map;
 @Slf4j
 @Service
 public class PartyServiceI implements PartyService{
-    @Autowired
-    CommunityRepository communityRepository;
+    @Autowired private final CommunityRepository communityRepository;
+    public PartyServiceI(CommunityRepository communityRepository) {
+        this.communityRepository = communityRepository;
+    }
 
     @Override
     @Transactional
@@ -112,26 +114,20 @@ public class PartyServiceI implements PartyService{
         }
     }
 
-    @Override
-    @Transactional
-    public PartyDetailResponseDto getPartyPost(Long communityId) {
-        Community foundParty = communityRepository.findById(communityId).get();
-        foundParty.upViewCount();
-
-        List<String> tagsToStringList = null;
-        if (foundParty.getTags() != null) {
-            tagsToStringList = foundParty.getTags().stream().map(
-                            communityWithTag -> communityWithTag.getTag().getKeyword())
-                    .toList();
-        }
-
-        return PartyDetailResponseDto.from(foundParty, tagsToStringList);
-    }
 
     @Override
     @Transactional
     public void changePartyJoinState(Long communityId) {
-        Community toUpdateState = communityRepository.findById(communityId).get();
-        toUpdateState.changeJoinState();
+        try {
+            Community toUpdateState = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 존재하지 않습니다."));
+            toUpdateState.changeJoinState();
+
+        } catch (Exception e) {
+            log.error("모집상태 변경 실패: {}", e.getMessage());
+            throw e;
+        }
     }
+
+
 }
