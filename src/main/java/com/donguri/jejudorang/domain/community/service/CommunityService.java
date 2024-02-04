@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
+import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,5 +21,5 @@ public interface CommunityService {
     //updateView
     void updateView(Long communityId);
 
-    void updateBookmarkState(Bookmark bookmark);
+    void updateBookmarkState(CommunityBookmark bookmark);
 }

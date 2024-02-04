@@ -15,6 +15,27 @@ public class TripDetailResponseDto {
     private String tags;
     private String image;
 
+    private boolean isBookmarked;
+
+    @Builder
+    public TripDetailResponseDto(Trip trip, String nowViewer) {
+        this.id = trip.getId();
+        this.category = trip.getCategory();
+        this.name = trip.getName();
+        this.introduction = trip.getIntroduction();
+        this.address = trip.getAddress();
+        this.tel = trip.getTel();
+        this.tags = trip.getTags();
+        this.image = trip.getImage();
+
+        // 로그인 된 유저의 북마크 여부 확인
+        if(trip.getBookmarks().stream()
+                .anyMatch(bookmark ->
+                        bookmark.getUser().getProfile().getExternalId().equals(nowViewer))) {
+            this.isBookmarked = true;
+        }
+    }
+
     @Builder
     public TripDetailResponseDto(Trip trip) {
         this.id = trip.getId();
@@ -25,5 +46,7 @@ public class TripDetailResponseDto {
         this.tel = trip.getTel();
         this.tags = trip.getTags();
         this.image = trip.getImage();
+
+        this.isBookmarked = false;
     }
 }

@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.bookmark.entity;
 
-import com.donguri.jejudorang.domain.community.entity.Community;
+import com.donguri.jejudorang.domain.trip.entity.Trip;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Bookmark extends BaseEntity {
+public class TripBookmark extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "bookmark_id")
+    @Column(nullable = false, name = "trip_bookmark_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -22,13 +22,13 @@ public class Bookmark extends BaseEntity {
     @ManyToOne
     private User user;
 
-    @JoinColumn(nullable = false, name = "community_id")
+    @JoinColumn(nullable = false, name = "trip_id")
     @ManyToOne
-    private Community community;
+    private Trip trip;
 
     @Builder
-    public Bookmark(User user, Community community) {
+    public TripBookmark(User user, Trip trip) {
         this.user = user;
-        this.community = community;
+        this.trip = trip;
     }
 }

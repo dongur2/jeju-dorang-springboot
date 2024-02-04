@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
+import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
@@ -181,7 +181,7 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public void updateBookmarkState(Bookmark bookmark) {
+    public void updateBookmarkState(CommunityBookmark bookmark) {
         bookmark.getCommunity().updateBookmarks(bookmark); // 없으면 추가, 있으면 삭제
     }
 

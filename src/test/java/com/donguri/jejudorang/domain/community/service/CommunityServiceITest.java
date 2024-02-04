@@ -1,27 +1,22 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
-import com.donguri.jejudorang.domain.bookmark.repository.BookmarkRepository;
+import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
+import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
-import com.donguri.jejudorang.domain.community.entity.tag.Tag;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRepository;
 import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
 import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
-import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ValidationException;
-import jakarta.validation.Validator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +42,8 @@ class CommunityServiceITest {
     @Autowired CommunityWithTagRepository communityWithTagRepository;
     @Autowired TagRepository tagRepository;
 
-    @Autowired BookmarkRepository bookmarkRepository;
+    @Autowired
+    CommunityBookmarkRepository bookmarkRepository;
 
     @AfterEach
     void after() {
@@ -284,10 +280,10 @@ class CommunityServiceITest {
                     .toList();
         }
 
-        Bookmark newBookmark = Bookmark.builder()
+        CommunityBookmark newBookmark = CommunityBookmark.builder()
                 .user(savedUser1).community(savedCommunity)
                 .build();
-        Bookmark savedBookmark = bookmarkRepository.save(newBookmark);
+        CommunityBookmark savedBookmark = bookmarkRepository.save(newBookmark);
         savedCommunity.updateBookmarks(savedBookmark);
 
         CommunityDetailResponseDto dtoToReturn = CommunityDetailResponseDto.from(savedCommunity, tags, savedUser1.getProfile().getExternalId());
