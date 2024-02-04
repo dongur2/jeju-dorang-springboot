@@ -20,7 +20,7 @@ public class TripController {
     @Autowired
     TripService tripService;
 
-    @GetMapping("/list/{nowPage}")
+    @GetMapping("/lists/{nowPage}")
     public String tripHome(@PathVariable("nowPage") Integer nowPage, Model model) {
         Pageable pageable = PageRequest.of(nowPage, 10);
         Page<TripListResponseDto> trips = tripService.getAllTripsOnPage(pageable);

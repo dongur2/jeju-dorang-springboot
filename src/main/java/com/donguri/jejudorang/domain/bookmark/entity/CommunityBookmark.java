@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Bookmark extends BaseEntity {
+public class CommunityBookmark extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "bookmark_id")
+    @Column(nullable = false, name = "community_bookmark_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,7 +27,7 @@ public class Bookmark extends BaseEntity {
     private Community community;
 
     @Builder
-    public Bookmark(User user, Community community) {
+    public CommunityBookmark(User user, Community community) {
         this.user = user;
         this.community = community;
     }

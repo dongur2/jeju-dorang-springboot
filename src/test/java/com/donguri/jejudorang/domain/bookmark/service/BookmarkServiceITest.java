@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.bookmark.service;
 
-import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
-import com.donguri.jejudorang.domain.bookmark.repository.BookmarkRepository;
+import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
+import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
@@ -31,7 +31,8 @@ class BookmarkServiceITest {
     @Autowired CommunityService communityService;
 
     @Autowired CommunityRepository communityRepository;
-    @Autowired BookmarkRepository bookmarkRepository;
+    @Autowired
+    CommunityBookmarkRepository bookmarkRepository;
     @Autowired UserRepository userRepository;
     @Autowired RoleRepository roleRepository;
 
@@ -87,7 +88,7 @@ class BookmarkServiceITest {
         Long saved = communityRepository.save(testCommunity).getId();
 
         // when
-        Bookmark newBookmark = Bookmark.builder().user(savedUser1).community(communityRepository.findById(saved)
+        CommunityBookmark newBookmark = CommunityBookmark.builder().user(savedUser1).community(communityRepository.findById(saved)
                         .orElseThrow(() -> new RuntimeException("글 없음")))
                 .build();
 
@@ -143,15 +144,15 @@ class BookmarkServiceITest {
 
         Long savedCommunityId = communityRepository.save(testCommunity).getId();
 
-        Bookmark newBookmark = Bookmark.builder().user(savedUser1).community(communityRepository.findById(savedCommunityId)
+        CommunityBookmark newBookmark = CommunityBookmark.builder().user(savedUser1).community(communityRepository.findById(savedCommunityId)
                         .orElseThrow(() -> new RuntimeException("글 없음")))
                 .build();
 
-        Bookmark savedBookmark = bookmarkRepository.save(newBookmark);
+        CommunityBookmark savedBookmark = bookmarkRepository.save(newBookmark);
         testCommunity.updateBookmarks(savedBookmark);
 
         //when
-        Optional<Bookmark> opBookmark = bookmarkRepository.findByUserAndCommunityId(savedUser1, savedCommunityId);
+        Optional<CommunityBookmark> opBookmark = bookmarkRepository.findByUserAndCommunityId(savedUser1, savedCommunityId);
 
         Long idForCheck = opBookmark.get().getId();
 
