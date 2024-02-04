@@ -1,8 +1,11 @@
 package com.donguri.jejudorang.domain.bookmark.service;
 
 import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
+import com.donguri.jejudorang.domain.bookmark.entity.TripBookmark;
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
+import com.donguri.jejudorang.domain.bookmark.repository.TripBookmarkRepository;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.trip.repository.TripRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.config.JwtProvider;
@@ -21,37 +24,31 @@ public class BookmarkServiceI implements BookmarkService {
     @Autowired private final JwtProvider jwtProvider;
 
     @Autowired private final UserRepository userRepository;
-    @Autowired private final CommunityBookmarkRepository communityBookmarkRepository;
+    @Autowired private final TripRepository tripRepository;
     @Autowired private final CommunityRepository communityRepository;
+    @Autowired private final TripBookmarkRepository tripBookmarkRepository;
+    @Autowired private final CommunityBookmarkRepository communityBookmarkRepository;
 
-    public BookmarkServiceI(JwtProvider jwtProvider, UserRepository userRepository, CommunityBookmarkRepository communityBookmarkRepository, CommunityRepository communityRepository) {
+    public BookmarkServiceI(JwtProvider jwtProvider, UserRepository userRepository, TripRepository tripRepository, CommunityBookmarkRepository communityBookmarkRepository, TripBookmarkRepository tripBookmarkRepository, CommunityRepository communityRepository) {
         this.jwtProvider = jwtProvider;
         this.userRepository = userRepository;
-        this.communityBookmarkRepository = communityBookmarkRepository;
+        this.tripRepository = tripRepository;
         this.communityRepository = communityRepository;
+        this.tripBookmarkRepository = tripBookmarkRepository;
+        this.communityBookmarkRepository = communityBookmarkRepository;
     }
 
     @Override
     @Transactional
-    public void addBookmarkOnCommunity(String accessToken, Long communityId) {
+    public void addBookmark(String accessToken, String boardName, Long boardId) {
 
         try {
-            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
-            User userForBookmark = userRepository.findByExternalId(userNameFromJwtToken)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다."));
+            User userForBookmark = getViewerFromJwt(accessToken);
 
-            if (communityBookmarkRepository.findByUserAndCommunityId(userForBookmark, communityId).isPresent()) {
-                log.error("이미 북마크한 글입니다.");
-                throw new BadRequestException("이미 북마크한 글입니다");
+            switch (boardName) {
+                case "communities": addCommunityBookmark(boardId, userForBookmark); break;
+                case "trips": addTripBookmark(boardId, userForBookmark); break;
             }
-
-            CommunityBookmark newBookmark = CommunityBookmark.builder()
-                    .user(userForBookmark)
-                    .community(communityRepository.findById(communityId)
-                            .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다")))
-                    .build();
-
-            communityBookmarkRepository.save(newBookmark);
 
         } catch (BadRequestException e) {
             log.error("북마크 생성 실패 -- 중복: {}", e.getMessage());
@@ -64,14 +61,50 @@ public class BookmarkServiceI implements BookmarkService {
 
     }
 
+    private User getViewerFromJwt(String accessToken) {
+        String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
+        return userRepository.findByExternalId(userNameFromJwtToken)
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다."));
+    }
+
+    private void addTripBookmark(Long boardId, User userForBookmark) throws BadRequestException {
+        if (tripBookmarkRepository.findByUserAndTripId(userForBookmark, boardId).isPresent()) {
+            log.error("이미 북마크한 글입니다.");
+            throw new BadRequestException("이미 북마크한 글입니다");
+        }
+
+        TripBookmark newBookmark = TripBookmark.builder()
+                .user(userForBookmark)
+                .trip(tripRepository.findById(boardId)
+                        .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다")))
+                .build();
+
+        tripBookmarkRepository.save(newBookmark);
+    }
+
+    private void addCommunityBookmark(Long boardId, User userForBookmark) throws BadRequestException {
+        if (communityBookmarkRepository.findByUserAndCommunityId(userForBookmark, boardId).isPresent()) {
+            log.error("이미 북마크한 글입니다.");
+            throw new BadRequestException("이미 북마크한 글입니다");
+        }
+
+        CommunityBookmark newBookmark = CommunityBookmark.builder()
+                .user(userForBookmark)
+                .community(communityRepository.findById(boardId)
+                        .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다")))
+                .build();
+
+        communityBookmarkRepository.save(newBookmark);
+    }
+
+
+
     @Override
     @Transactional
     public void deleteBookmarkOnCommunity(String accessToken, Long communityId) {
 
         try {
-            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
-            User userForBookmark = userRepository.findByExternalId(userNameFromJwtToken)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다."));
+            User userForBookmark = getViewerFromJwt(accessToken);
 
             Optional<CommunityBookmark> nullableBookmark = communityBookmarkRepository.findByUserAndCommunityId(userForBookmark, communityId);
             if(nullableBookmark.isEmpty()) {

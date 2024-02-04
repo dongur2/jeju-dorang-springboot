@@ -17,13 +17,15 @@ public class BookmarkController {
         this.bookmarkService = bookmarkService;
     }
 
-    @PostMapping("/communities/{communityId}")
+    @PostMapping("/{boardName}/{boardId}")
     public ResponseEntity<String> createCommunityBookmark(@CookieValue("access_token") Cookie accessToken,
-                                                          @PathVariable("communityId") Long communityId) {
+                                                          @PathVariable("boardName") String boardName,
+                                                          @PathVariable("boardId") Long boardId) {
 
         try {
-            bookmarkService.addBookmarkOnCommunity(accessToken.getValue(), communityId);
-            log.info("북마크 설정 완료: {}", communityId);
+            bookmarkService.addBookmark(accessToken.getValue(), boardName, boardId);
+
+            log.info("북마크 설정 완료: {}", boardId);
             return new ResponseEntity<>("북마크가 설정되었습니다", HttpStatus.OK);
 
         } catch (Exception e) {
@@ -46,6 +48,8 @@ public class BookmarkController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+
 
 
 }
