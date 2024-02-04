@@ -16,9 +16,11 @@
              display:flex; flex-direction:column; align-content:center; justify-content:center; gap: 2%">
 
             <div style="width:100%; height:10%; padding:5%; display:flex; justify-content: flex-end; align-content: flex-end">
-                <i sec:authorize="!isAuthenticated()" class="fa-regular fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
-                <i sec:authorize="isAuthenticated()" th:if="${trip.isBookmarked == false}" class="fa-regular fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
-                <i sec:authorize="isAuthenticated()" th:if="${trip.isBookmarked == true}" class="fa-solid fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
+                <i sec:authorize="!isAuthenticated()" onclick="cantBookmark()" class="fa-regular fa-heart" style="font-size: 45px; color:#FB7A51; cursor: pointer"></i>
+                <i sec:authorize="isAuthenticated()" th:if="${!trip.isBookmarked()}" th:onclick="'createBookmark('+${trip.id}+')'" class="fa-regular fa-heart"
+                   style="font-size: 45px; color:#FB7A51; cursor: pointer"></i>
+                <i sec:authorize="isAuthenticated()" th:if="${trip.isBookmarked()}" th:onclick="'deleteBookmark('+${trip.id}+')'" class="fa-solid fa-heart"
+                   style="font-size: 45px; color:#FB7A51; cursor: pointer"></i>
             </div>
 
             <div style="width:100%; height:80%; padding:4%; background: rgba(175,175,175,0.35)">
@@ -33,6 +35,59 @@
             </div>
         </div>
     </div>
+
+    <script>
+
+        /*
+        * 북마크
+        *
+        * */
+
+        // 로그인 하지 않은 경우
+        function cantBookmark() {
+            alert("북마크하려면 로그인이 필요합니다.");
+        }
+        // 로그인한 경우 - 북마크 하지 않은 글
+        function createBookmark(communityId) {
+            alert('create');
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/bookmarks/trips/' + communityId, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert(xhr.responseText);
+                        window.location.reload();
+
+                    } else { // 그 외의 경우
+                        alert(xhr.responseText);
+                    }
+                }
+            };
+            xhr.send();
+        }
+        // 로그인한 경우 - 북마크 한 글
+        function deleteBookmark(communityId) {
+            alert('delete');
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('DELETE', '/bookmarks/trips/' + communityId, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert(xhr.responseText);
+                        window.location.reload();
+
+                    } else { // 그 외의 경우
+                        alert(xhr.responseText);
+                    }
+                }
+            };
+            xhr.send();
+        }
+    </script>
 
 </th>
 </html>
