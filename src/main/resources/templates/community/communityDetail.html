@@ -203,21 +203,21 @@
         function deleteBookmark(communityId) {
             alert('delete');
 
-            // let xhr = new XMLHttpRequest();
-            // xhr.open('DELETE', '/bookmarks/communities/' + communityId, true);
-            //
-            // xhr.onreadystatechange = function () {
-            //     if (xhr.readyState === 4) {
-            //         if (xhr.status === 200) {
-            //             alert(xhr.responseText);
-            //             window.location.reload();
-            //
-            //         } else { // 그 외의 경우
-            //             alert(xhr.responseText);
-            //         }
-            //     }
-            // };
-            // xhr.send();
+            let xhr = new XMLHttpRequest();
+            xhr.open('DELETE', '/bookmarks/communities/' + communityId, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert(xhr.responseText);
+                        window.location.reload();
+
+                    } else { // 그 외의 경우
+                        alert(xhr.responseText);
+                    }
+                }
+            };
+            xhr.send();
         }
 
         function openSnsModal() {

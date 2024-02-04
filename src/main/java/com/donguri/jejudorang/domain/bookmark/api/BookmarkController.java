@@ -22,12 +22,27 @@ public class BookmarkController {
                                                           @PathVariable("communityId") Long communityId) {
 
         try {
-            bookmarkService.makeBookmarkOnCommunity(accessToken.getValue(), communityId);
-            log.info("북마크 완료: {}", communityId);
-            return new ResponseEntity<>("북마크가 완료되었습니다", HttpStatus.OK);
+            bookmarkService.addBookmarkOnCommunity(accessToken.getValue(), communityId);
+            log.info("북마크 설정 완료: {}", communityId);
+            return new ResponseEntity<>("북마크가 설정되었습니다", HttpStatus.OK);
 
         } catch (Exception e) {
-            log.error("북마크 생성 실패: {}", e.getMessage());
+            log.error("북마크 설정 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/communities/{communityId}")
+    public ResponseEntity<String> deleteCommunityBookmark(@CookieValue("access_token") Cookie accessToken,
+                                                          @PathVariable("communityId") Long communityId) {
+
+        try {
+            bookmarkService.deleteBookmarkOnCommunity(accessToken.getValue(), communityId);
+            log.info("북마크 해제 완료");
+            return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("북마크 해제 실패: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

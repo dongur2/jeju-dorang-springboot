@@ -20,22 +20,22 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class BookmarkServiceI implements BookmarkService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private BookmarkRepository bookmarkRepository;
-    @Autowired
-    private CommunityRepository communityRepository;
+    @Autowired private final JwtProvider jwtProvider;
 
-    @Autowired
-    private CommunityService communityService;
+    @Autowired private final UserRepository userRepository;
+    @Autowired private final BookmarkRepository bookmarkRepository;
+    @Autowired private final CommunityRepository communityRepository;
 
-    @Autowired
-    private JwtProvider jwtProvider;
+    public BookmarkServiceI(JwtProvider jwtProvider, UserRepository userRepository, BookmarkRepository bookmarkRepository, CommunityRepository communityRepository) {
+        this.jwtProvider = jwtProvider;
+        this.userRepository = userRepository;
+        this.bookmarkRepository = bookmarkRepository;
+        this.communityRepository = communityRepository;
+    }
 
     @Override
     @Transactional
-    public void makeBookmarkOnCommunity(String accessToken, Long communityId) {
+    public void addBookmarkOnCommunity(String accessToken, Long communityId) {
 
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
@@ -66,40 +66,32 @@ public class BookmarkServiceI implements BookmarkService {
 
     }
 
-//    @Override
-//    @Transactional
-//    public void changeCommunityBookmarkState(String token, Long nowCommunityId) {
+    @Override
+    @Transactional
+    public void deleteBookmarkOnCommunity(String accessToken, Long communityId) {
 
-//        String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
-//        User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
-//                .orElseThrow(() -> new EntityNotFoundException("해당 아이디를 가진 유저가 없습니다."));
-//
-//        Bookmark existingBookmark = bookmarkRepository.findByUserAndCommunityId(nowUser, nowCommunityId)
-//                .orElseThrow(() -> new EntityNotFoundException("해당하는 북마크가 없습니다."));
-//
-//        log.info("북마크 삭제");
-//        communityService.updateBookmarkState(existingBookmark);
-//        bookmarkRepository.deleteById(existingBookmark.getId());
-//
-//
-//        } else {
-//            log.info("북마크 추가");
-//            Community foundCommunity = communityRepository.findById(nowCommunityId)
-//                    .orElseThrow(() -> new EntityNotFoundException("해당 글을 찾을 수 없습니다."));
-//
-//            Bookmark LikedToUpdate = Bookmark.builder()
-//                    .user(nowUser)
-//                    .community(foundCommunity)
-//                    .build();
-//
-//            communityService.updateBookmarkState(LikedToUpdate);
-//            bookmarkRepository.save(LikedToUpdate);
-////        }
-//
-//    }
-//
-//    @Override
-//    public void changeCommunityBookmarkState(User nowUser, Long nowBoardId) {
-//
-//    }
+        try {
+            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
+            User userForBookmark = userRepository.findByExternalId(userNameFromJwtToken)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다."));
+
+            Optional<Bookmark> nullableBookmark = bookmarkRepository.findByUserAndCommunityId(userForBookmark, communityId);
+            if(nullableBookmark.isEmpty()) {
+                log.error("북마크한 글이 아닙니다.");
+                throw new BadRequestException("북마크한 글이 아닙니다");
+            }
+
+            // Community bookmarks: orphanReoval=true -> Community엔티티에서 북마크 삭제 -> 엔티티 자동 삭제
+            communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다"))
+                            .updateBookmarks(nullableBookmark.get());
+            log.info("북마크 삭제 완료");
+
+        } catch (Exception e) {
+            log.error("북마크 삭제 실패: {}", e.getMessage());
+            throw (RuntimeException) e;
+        }
+    }
+
+
 }
