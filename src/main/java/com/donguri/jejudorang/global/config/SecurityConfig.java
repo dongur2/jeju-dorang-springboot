@@ -93,7 +93,8 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/user/settings/profile/**",
                                         "/community/post/**", "/tui-editor/**",
-                                        "/community/parties/{communityId}/state"
+                                        "/community/parties/{communityId}/state",
+                                        "/bookmarks/communities/{communityId}"
                                 ).authenticated()
                         )
                 )

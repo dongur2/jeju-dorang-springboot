@@ -1,8 +1,13 @@
 package com.donguri.jejudorang.domain.bookmark.service;
 
 
-import com.donguri.jejudorang.domain.user.entity.User;
 
 public interface BookmarkService {
-    void changeCommunityBookmarkState(User nowUser, Long nowBoardId);
+
+    // 북마크 생성
+    void addBookmarkOnCommunity(String accessToken, Long communityId);
+
+    // 북마크 삭제
+    void deleteBookmarkOnCommunity(String accessToken, Long communityId);
+
 }

@@ -88,6 +88,7 @@ public class Community extends BaseEntity {
         setDefaultJoinState();
     }
 
+    // 북마크 업데이트
     public void updateBookmarks(Bookmark bookmark) {
         if (bookmarks.contains(bookmark)) {
             bookmarks.remove(bookmark);

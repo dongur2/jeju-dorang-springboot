@@ -56,8 +56,11 @@
             <input type="hidden" id="board-form-content" name="content" value="">
 
             <div class="board-write-form-bottom">
-                <button type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
-                        th:onclick="|location.href='@{/community/parties}'|">취소</button>
+                <button th:if="${type=='party'}" type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
+                        th:onclick="|location.href='@{/community/boards/parties}'|">취소</button>
+                <button th:if="${type=='chat'}" type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
+                        th:onclick="|location.href='@{/community/boards/chats}'|">취소</button>
+
                 <button type="button" class="btn btn-primary"
                         onclick="submitForm()"
                         style="width:150px; height:50px; border-radius: 10px">등록</button>
@@ -132,7 +135,7 @@
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         alert("게시글 작성이 완료되었습니다.");
-                        window.location.href = "/community/"+xhr.responseText;
+                        window.location.href = "/community/boards/"+xhr.responseText;
 
                     } else {
                         alert(xhr.responseText);

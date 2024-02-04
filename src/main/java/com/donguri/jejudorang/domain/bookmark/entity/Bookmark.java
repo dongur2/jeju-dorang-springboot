@@ -19,11 +19,11 @@ public class Bookmark extends BaseEntity {
     private Long id;
 
     @JoinColumn(nullable = false, name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) // user 삭제 -> bookmark 삭제
+    @ManyToOne
     private User user;
 
     @JoinColumn(nullable = false, name = "community_id")
-    @ManyToOne(cascade = CascadeType.REMOVE) // community 삭제 -> bookmark 삭제
+    @ManyToOne
     private Community community;
 
     @Builder

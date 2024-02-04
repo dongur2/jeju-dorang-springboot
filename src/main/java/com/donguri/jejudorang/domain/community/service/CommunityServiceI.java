@@ -12,12 +12,16 @@ import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagServi
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.config.JwtProvider;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +75,7 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public Map<String, Object> getCommunityPost(Long communityId, boolean forModify) {
+    public Map<String, Object> getCommunityPost(Long communityId, boolean forModify, HttpServletRequest request) {
 
         try {
             Map<String, Object> resMap = new HashMap<>();
@@ -83,12 +87,46 @@ public class CommunityServiceI implements CommunityService {
                     .map(communityWithTag -> communityWithTag.getTag().getKeyword())
                     .toList();
 
+            /* 수정폼으로 데이터 불러오기
+            * */
             if (forModify) {
                 resMap.put("result", CommunityForModifyResponseDto.from(found, tagsToStringList));
                 return resMap;
 
+            /* 상세글 조회
+            * */
             } else {
-                resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
+
+                // 1. Access Token 쿠키가 존재하는 경우
+                if(request.getCookies() != null
+                        && Arrays.stream(request.getCookies())
+                        .anyMatch(cookie -> cookie.getName().equals("access_token"))) {
+
+                    log.info("액세스 쿠키가 존재합니다.");
+                    Cookie accessToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("access_token")).findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다"));
+
+                    // 1-1. Access Token이 유효한지 확인 -> catch: 유효하지 않은 경우
+                    StringBuilder idFromJwt = new StringBuilder();
+                    try {
+                        idFromJwt.append(jwtProvider.getUserNameFromJwtToken(accessToken.getValue()));
+                    } catch (SignatureException e) {
+                        log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
+                        resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
+                        return resMap;
+                    }
+
+                    // 1-2. Access Token이 유효 -> from(.., idFromJwt) 북마크 여부 확인
+                    resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList, idFromJwt.toString()));
+                    log.info("{}가 북마크한 글입니다. isBookmarked == {}", idFromJwt,
+                            CommunityDetailResponseDto.from(found, tagsToStringList, idFromJwt.toString()).isBookmarked());
+
+                // 2. Access Token 쿠키가 없는 경우
+                } else {
+                    log.info("비회원은 북마크 여부를 확인할 수 없습니다.");
+                    resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
+                }
+
                 return resMap;
             }
 
