@@ -30,17 +30,17 @@
     <nav aria-label="Page navigation example">
         <ul class="pagination">
             <li class="page-item">
-                <a class="page-link" th:href="@{/trip/list/0}" href="#" aria-label="Previous">
+                <a class="page-link" th:href="@{/trip/lists/0}" href="#" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
-            <li class="page-item" th:if="${nowPage > 1}"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage - 2})}" href="#" th:text="${nowPage - 2}">0</a></li>
-            <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage - 1})}" href="#" th:text="${nowPage - 1}">0</a></li>
-            <li class="page-item"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage})}" href="#" th:text="${nowPage}">2</a>
-            <li class="page-item" th:if="${nowPage < 356}"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage + 1})}" href="#" th:text="${nowPage + 1}">3</a></li>
-            <li class="page-item" th:if="${nowPage < 355}"><a class="page-link" th:href="@{/trip/list/{pageNo}(pageNo=${nowPage + 2})}" href="#" th:text="${nowPage + 2}">3</a></li>
+            <li class="page-item" th:if="${nowPage > 1}"><a class="page-link" th:href="@{/trip/lists/{pageNo}(pageNo=${nowPage - 2})}" href="#" th:text="${nowPage - 2}">0</a></li>
+            <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/trip/lists/{pageNo}(pageNo=${nowPage - 1})}" href="#" th:text="${nowPage - 1}">0</a></li>
+            <li class="page-item"><a class="page-link" th:href="@{/trip/lists/{pageNo}(pageNo=${nowPage})}" href="#" th:text="${nowPage}">2</a>
+            <li class="page-item" th:if="${nowPage < totalPage - 1}"><a class="page-link" th:href="@{/trip/lists/{pageNo}(pageNo=${nowPage + 1})}" href="#" th:text="${nowPage + 1}">3</a></li>
+            <li class="page-item" th:if="${nowPage < totalPage - 2}"><a class="page-link" th:href="@{/trip/lists/{pageNo}(pageNo=${nowPage + 2})}" href="#" th:text="${nowPage + 2}">3</a></li>
             <li class="page-item">
-                <a class="page-link" th:href="@{/trip/list/356}" href="#" aria-label="Next">
+                <a class="page-link" th:href="@{/trip/lists/{tot}(tot=${totalPage}-1)}" href="#" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>

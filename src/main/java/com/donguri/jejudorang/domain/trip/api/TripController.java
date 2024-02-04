@@ -16,20 +16,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Map;
+
 
 @Slf4j
 @Controller
 @RequestMapping("/trip")
 public class TripController {
-    @Autowired
-    TripService tripService;
+    @Autowired private final TripService tripService;
+
+    public TripController(TripService tripService) {
+        this.tripService = tripService;
+    }
+
 
     @GetMapping("/lists/{nowPage}")
     public String tripHome(@PathVariable("nowPage") Integer nowPage, Model model) {
         Pageable pageable = PageRequest.of(nowPage, 10);
-        Page<TripListResponseDto> trips = tripService.getAllTripsOnPage(pageable);
+        Map<String, Object> result = tripService.getAllTripsOnPage(pageable);
 
-        model.addAttribute("trips", trips);
+        model.addAttribute("trips", result.get("trips"));
+        model.addAttribute("totalPage", result.get("totalPages"));
         return "/trip/tripList";
     }
 

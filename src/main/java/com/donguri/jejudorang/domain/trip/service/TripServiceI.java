@@ -6,7 +6,6 @@ import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.entity.Trip;
 import com.donguri.jejudorang.domain.trip.repository.TripRepository;
 import com.donguri.jejudorang.global.config.JwtProvider;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -31,9 +32,15 @@ public class TripServiceI implements TripService{
 
 
     @Override
-    public Page<TripListResponseDto> getAllTripsOnPage(Pageable pageable) {
+    public Map<String, Object> getAllTripsOnPage(Pageable pageable) {
         Page<Trip> tripEntityList =  tripRepository.findAll(pageable);
-        return tripEntityList.map(TripListResponseDto::new);
+        int totalPages = tripRepository.findAll(pageable).getTotalPages();
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("trips", tripEntityList.map(TripListResponseDto::new)) ;
+        resultMap.put("totalPages", totalPages);
+
+        return resultMap;
     }
 
     @Override
