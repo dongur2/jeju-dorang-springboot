@@ -81,7 +81,7 @@ public class BookmarkServiceI implements BookmarkService {
                 throw new BadRequestException("북마크한 글이 아닙니다");
             }
 
-            // Community bookmarks: orphanReoval=true -> Community엔티티에서 북마크 삭제 -> 엔티티 자동 삭제
+            // Community bookmarks: orphanRemoval=true -> Community엔티티에서 북마크 삭제 -> 엔티티 자동 삭제
             communityRepository.findById(communityId)
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다"))
                             .updateBookmarks(nullableBookmark.get());
