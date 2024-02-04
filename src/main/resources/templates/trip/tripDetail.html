@@ -2,6 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
         layout:decorate="~{/fragments/layout}">
 <head>
     <title>여행 상세</title>
@@ -15,8 +16,9 @@
              display:flex; flex-direction:column; align-content:center; justify-content:center; gap: 2%">
 
             <div style="width:100%; height:10%; padding:5%; display:flex; justify-content: flex-end; align-content: flex-end">
-                <i th:if="${trip.isBookmarked == true}" class="fa-solid fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
-                <i th:if="${trip.isBookmarked == false}" class="fa-regular fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
+                <i sec:authorize="!isAuthenticated()" class="fa-regular fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
+                <i sec:authorize="isAuthenticated()" th:if="${trip.isBookmarked == false}" class="fa-regular fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
+                <i sec:authorize="isAuthenticated()" th:if="${trip.isBookmarked == true}" class="fa-solid fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
             </div>
 
             <div style="width:100%; height:80%; padding:4%; background: rgba(175,175,175,0.35)">

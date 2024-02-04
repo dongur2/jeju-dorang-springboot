@@ -9,8 +9,11 @@ import reactor.core.publisher.Mono;
 
 
 public interface TripService {
+
     void saveApiTrips(Mono<TripApiDataDto> response);
+
     Page<TripListResponseDto> getAllTripsOnPage(Pageable pageable);
 
-    TripDetailResponseDto getTripDetail(Long tripId);
+    // 여행 상세글 조회
+    TripDetailResponseDto getTripDetail(String accessToken, Long tripId);
 }
