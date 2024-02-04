@@ -91,7 +91,7 @@ public class CommunityController {
     public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
         try {
             CommunityForModifyResponseDto foundPost =
-                    (CommunityForModifyResponseDto) communityService.getCommunityPost(communityId, true).get("result");
+                    (CommunityForModifyResponseDto) communityService.getCommunityPost(communityId, true, null).get("result");
 
             model.addAttribute("post", foundPost);
             return "/community/communityModifyForm";
@@ -229,10 +229,10 @@ public class CommunityController {
             // 쿠키 체크 & 조회수 업데이트 여부 결정 & 조건 충족할 경우 조회수, 쿠키 업데이트
             checkIsAlreadyReadForUpdateView(communityId, request, response);
 
-            CommunityDetailResponseDto foundPPost =
-                    (CommunityDetailResponseDto) communityService.getCommunityPost(communityId, false).get("result");
+            CommunityDetailResponseDto foundPost =
+                    (CommunityDetailResponseDto) communityService.getCommunityPost(communityId, false, request).get("result");
 
-            model.addAttribute("post", foundPPost);
+            model.addAttribute("post", foundPost);
             model.addAttribute("kakaoApiKey", kakaoApiKey);
             return "/community/communityDetail";
 
