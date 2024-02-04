@@ -12,14 +12,23 @@
         <img src="..." th:src="${trip.getImage()}" class="card-img" alt="...">
         <div class="card-img-overlay"
              style="width:35%; background:rgba(20,34,35,0.59); color:white; margin-left:auto;
-             display:flex; flex-direction:column; align-content:center; justify-content:center">
-            <h5 class="card-text" th:text="${trip.getCategory()}" style="color:#FB7A51">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</h5>
-            <h1 class="card-title" th:text="${trip.getName()}">Card title</h1>
-            <h5 class="card-text" th:text="${trip.getTags()}"></h5>
-            <p class="card-text" th:text="${trip.getIntroduction()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-            <br><br>
-            <p class="card-text" th:text="${trip.getAddress()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-            <p class="card-text" th:text="${trip.getTel()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+             display:flex; flex-direction:column; align-content:center; justify-content:center; gap: 2%">
+
+            <div style="width:100%; height:10%; padding:5%; display:flex; justify-content: flex-end; align-content: flex-end">
+                <i th:if="${trip.isBookmarked == true}" class="fa-solid fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
+                <i th:if="${trip.isBookmarked == false}" class="fa-regular fa-heart" style="font-size: 45px; color:#FB7A51;"></i>
+            </div>
+
+            <div style="width:100%; height:80%; padding:4%; background: rgba(175,175,175,0.35)">
+                <h5 class="card-text" th:text="${trip.getCategory()}" style="color:#FB7A51">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</h5>
+                <h1 class="card-title" th:text="${trip.getName()}">Card title</h1>
+                <p class="card-text" th:text="${trip.getIntroduction()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                <br>
+                <p class="card-text" th:text="${trip.getAddress()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                <p class="card-text" th:text="${trip.getTel()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                <br><br>
+                <h5 class="card-text" th:text="${trip.getTags()}"></h5>
+            </div>
         </div>
     </div>
 
