@@ -17,8 +17,15 @@ public class BookmarkController {
         this.bookmarkService = bookmarkService;
     }
 
+
+    /*
+    * 북마크 생성
+    * /bookmarks/{boardName}/{boardId}
+    * POST
+    *
+    * */
     @PostMapping("/{boardName}/{boardId}")
-    public ResponseEntity<String> createCommunityBookmark(@CookieValue("access_token") Cookie accessToken,
+    public ResponseEntity<String> createBookmark(@CookieValue("access_token") Cookie accessToken,
                                                           @PathVariable("boardName") String boardName,
                                                           @PathVariable("boardId") Long boardId) {
 
@@ -34,12 +41,20 @@ public class BookmarkController {
         }
     }
 
-    @DeleteMapping("/communities/{communityId}")
-    public ResponseEntity<String> deleteCommunityBookmark(@CookieValue("access_token") Cookie accessToken,
-                                                          @PathVariable("communityId") Long communityId) {
+
+    /*
+    * 북마크 삭제
+    * /bookmarks/{boardName}/{boardId}
+    * DELETE
+    *
+    *  */
+    @DeleteMapping("/{boardName}/{boardId}")
+    public ResponseEntity<String> deleteBookmark(@CookieValue("access_token") Cookie accessToken,
+                                                          @PathVariable("boardName") String boardName,
+                                                          @PathVariable("boardId") Long boardId) {
 
         try {
-            bookmarkService.deleteBookmarkOnCommunity(accessToken.getValue(), communityId);
+            bookmarkService.deleteBookmark(accessToken.getValue(), boardName, boardId);
             log.info("북마크 해제 완료");
             return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
 
