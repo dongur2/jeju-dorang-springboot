@@ -44,7 +44,7 @@ class BookmarkServiceITest {
 
     @Test
     @Transactional
-    void 유저_북마크_생성_테스트() {
+    void 북마크_생성() {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
@@ -98,31 +98,5 @@ class BookmarkServiceITest {
         Assertions.assertThat(bookmarkRepository.findByUserAndCommunityId(savedUser1,saved).get().getCommunity().getId())
                 .isEqualTo(saved);
     }
-
-//    @Test
-//    void 북마크_삭제() {
-//        //given
-//        User testUser = userRepository.findById(1L).get();
-//        Long existing = communityRepository.findById(4L).get().getId();
-//
-//        //when
-//        bookmarkService.changeCommunityBookmarkState(testUser, existing);
-//
-//        //then
-//        Community updated = communityRepository.findById(existing).get();
-//        System.out.println(updated.getBookmarksCount());
-//        Assertions.assertThat(updated.getBookmarksCount()).isEqualTo(0);
-//    }
-//
-//    @Test
-//    void 북마크_개수_테스트() {
-//        //given
-//        Community community = communityRepository.findById(7L).get();
-//        //when
-//        PartyDetailResponseDto dto = PartyDetailResponseDto.from(community, null);
-//        //then
-//        Assertions.assertThat(community.getBookmarksCount()).isEqualTo(1);
-//        Assertions.assertThat(dto.bookmarkCount()).isEqualTo(1);
-//    }
 
 }

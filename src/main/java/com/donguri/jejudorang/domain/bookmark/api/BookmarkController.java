@@ -26,9 +26,6 @@ public class BookmarkController {
             log.info("북마크 완료: {}", communityId);
             return new ResponseEntity<>("북마크가 완료되었습니다", HttpStatus.OK);
 
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-
         } catch (Exception e) {
             log.error("북마크 생성 실패: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

@@ -1,9 +1,13 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.bookmark.entity.Bookmark;
+import com.donguri.jejudorang.domain.bookmark.repository.BookmarkRepository;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
+import com.donguri.jejudorang.domain.community.entity.tag.Tag;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRepository;
 import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
@@ -43,6 +47,8 @@ class CommunityServiceITest {
     @Autowired CommunityWithTagRepository communityWithTagRepository;
     @Autowired TagRepository tagRepository;
 
+    @Autowired BookmarkRepository bookmarkRepository;
+
     @AfterEach
     void after() {
         em.clear();
@@ -50,6 +56,7 @@ class CommunityServiceITest {
         userRepository.flush();
         communityWithTagRepository.flush();
         tagRepository.flush();
+        bookmarkRepository.flush();
     }
 
     @Test
@@ -222,5 +229,177 @@ class CommunityServiceITest {
         org.junit.jupiter.api.Assertions.assertThrows(ValidationException.class,
                 () -> communityWithTagService.saveTagToPost(savedCommunity, postToWrite.tags()));
     }
+
+    @Test
+    @Transactional
+    void 상세글_조회_북마크_여부_확인_로그인한_경우_북마크_함() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User user1 = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile1 = Profile.builder().user(user1).externalId("userId1").nickname("userNickname").build();
+        Authentication authentication1 = Authentication.builder().user(user1).email("user1@mail.com").agreement(AgreeRange.ALL).build();
+        Password password1 = Password.builder().user(user1).password("12345678").build();
+
+        Set<Role> testRoles1 = new HashSet<>();
+        Role userRole1 = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles1.add(userRole1);
+
+        user1.updateRole(testRoles1);
+        user1.updateProfile(profile1);
+        user1.updateAuth(authentication1);
+        user1.updatePwd(password1);
+
+        User savedUser = userRepository.save(user); // 게시글 작성자
+        User savedUser1 = userRepository.save(user1); // 로그인한 유저
+
+        Community testCommunity = Community.builder().title("제목").writer(savedUser).content("본문").build();
+        testCommunity.setBoardType("party");
+        testCommunity.setDefaultJoinState();
+
+        Long saved = communityRepository.save(testCommunity).getId();
+
+        // when
+        Community savedCommunity = communityRepository.findById(saved)
+                .orElseThrow(() -> new EntityNotFoundException("게시글 없음"));
+
+        List<String> tags = null;
+        if(savedCommunity.getTags() != null) {
+             tags = savedCommunity.getTags().stream()
+                    .map(cwt -> cwt.getTag().getKeyword())
+                    .toList();
+        }
+
+        Bookmark newBookmark = Bookmark.builder()
+                .user(savedUser1).community(savedCommunity)
+                .build();
+        Bookmark savedBookmark = bookmarkRepository.save(newBookmark);
+        savedCommunity.updateBookmarks(savedBookmark);
+
+        CommunityDetailResponseDto dtoToReturn = CommunityDetailResponseDto.from(savedCommunity, tags, savedUser1.getProfile().getExternalId());
+
+        //then
+        Assertions.assertThat(dtoToReturn.isBookmarked()).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void 상세글_조회_북마크_여부_확인_로그인한_경우_북마크_안함() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User user1 = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile1 = Profile.builder().user(user1).externalId("userId1").nickname("userNickname").build();
+        Authentication authentication1 = Authentication.builder().user(user1).email("user1@mail.com").agreement(AgreeRange.ALL).build();
+        Password password1 = Password.builder().user(user1).password("12345678").build();
+
+        Set<Role> testRoles1 = new HashSet<>();
+        Role userRole1 = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles1.add(userRole1);
+
+        user1.updateRole(testRoles1);
+        user1.updateProfile(profile1);
+        user1.updateAuth(authentication1);
+        user1.updatePwd(password1);
+
+        User savedUser = userRepository.save(user); // 게시글 작성자
+        User savedUser1 = userRepository.save(user1); // 로그인한 유저
+
+        Community testCommunity = Community.builder().title("제목").writer(savedUser).content("본문").build();
+        testCommunity.setBoardType("party");
+        testCommunity.setDefaultJoinState();
+
+        Long saved = communityRepository.save(testCommunity).getId();
+
+        // when
+        Community savedCommunity = communityRepository.findById(saved)
+                .orElseThrow(() -> new EntityNotFoundException("게시글 없음"));
+
+        List<String> tags = null;
+        if(savedCommunity.getTags() != null) {
+            tags = savedCommunity.getTags().stream()
+                    .map(cwt -> cwt.getTag().getKeyword())
+                    .toList();
+        }
+
+        CommunityDetailResponseDto dtoToReturn = CommunityDetailResponseDto.from(savedCommunity, tags, savedUser1.getProfile().getExternalId());
+
+        //then
+        Assertions.assertThat(dtoToReturn.isBookmarked()).isFalse();
+    }
+
+    @Test
+    @Transactional
+    void 상세글_조회_북마크_여부_확인_비회원() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User savedUser = userRepository.save(user); // 게시글 작성자
+
+        Community testCommunity = Community.builder().title("제목").writer(savedUser).content("본문").build();
+        testCommunity.setBoardType("party");
+        testCommunity.setDefaultJoinState();
+
+        Long saved = communityRepository.save(testCommunity).getId();
+
+        // when
+        Community savedCommunity = communityRepository.findById(saved)
+                .orElseThrow(() -> new EntityNotFoundException("게시글 없음"));
+
+        List<String> tags = null;
+        if(savedCommunity.getTags() != null) {
+            tags = savedCommunity.getTags().stream()
+                    .map(cwt -> cwt.getTag().getKeyword())
+                    .toList();
+        }
+
+        CommunityDetailResponseDto dtoToReturn = CommunityDetailResponseDto.from(savedCommunity, tags);
+
+        //then
+        Assertions.assertThat(dtoToReturn.isBookmarked()).isFalse();
+    }
+
+
 
 }
