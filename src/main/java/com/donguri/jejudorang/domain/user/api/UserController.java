@@ -338,15 +338,14 @@ public class UserController {
     *
     * */
     @DeleteMapping("/settings/profile/quit")
-    public String deleteUser(@CookieValue("access_token") Cookie token, Model model) {
+    public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token) {
         try {
             userService.withdrawUser(token.getValue());
-            return "redirect:/";
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
             log.error("회원 삭제 실패: {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
