@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.user.dto;
+package com.donguri.jejudorang.domain.user.dto.response;
 
 import com.donguri.jejudorang.domain.user.entity.User;
 import lombok.Builder;

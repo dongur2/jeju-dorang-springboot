@@ -1,19 +1,22 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.user.dto.*;
+import com.donguri.jejudorang.domain.user.dto.request.*;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.domain.user.service.auth.MailService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
-import com.donguri.jejudorang.global.config.JwtProvider;
-import com.donguri.jejudorang.global.config.JwtUserDetails;
-import com.donguri.jejudorang.global.config.RefreshToken;
-import com.donguri.jejudorang.global.config.RefreshTokenRepository;
+import com.donguri.jejudorang.global.config.jwt.JwtProvider;
+import com.donguri.jejudorang.global.config.jwt.JwtUserDetails;
+import com.donguri.jejudorang.global.config.jwt.RefreshToken;
+import com.donguri.jejudorang.global.config.jwt.RefreshTokenRepository;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,7 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -288,7 +290,7 @@ public class UserServiceI implements UserService {
     * */
     @Override
     @Transactional
-    public ProfileResponse updateProfileData(String token, ProfileRequest dataToUpdate) {
+    public void updateProfileData(String token, ProfileRequest dataToUpdate) throws IllegalAccessException {
         try {
             User nowUser = getNowUser(token);
 
@@ -310,7 +312,7 @@ public class UserServiceI implements UserService {
                 Map<String, String> uploadedImg = imageService.putS3Object(dataToUpdate.img());
 
                 if (uploadedImg == null) {
-                    throw new IllegalAccessException("사진 업로드 실패");
+                    throw new IllegalAccessException("사진 업로드에 실패했습니다.");
 
                 } else {
                     nowUser.getProfile().updateImgName(uploadedImg.get("imgName"));
@@ -322,16 +324,11 @@ public class UserServiceI implements UserService {
             Profile profile = nowUser.getProfile();
             profile.updateNickname(dataToUpdate.nickname());
 
-            nowUser.getAuth().updateEmail(dataToUpdate.email()); // 추가 인증 필요
-
             log.info("프로필 업데이트를 완료했습니다");
-
-            return ProfileResponse.builder().build()
-                    .from(nowUser);
 
         } catch (Exception e) {
             log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
-            return null;
+            throw e;
         }
     }
 
@@ -341,7 +338,7 @@ public class UserServiceI implements UserService {
     * */
     @Override
     @Transactional
-    public ProfileResponse updateProfileData(String token) {
+    public void deleteProfileImg(String token) {
         try {
             User nowUser = getNowUser(token);
 
@@ -356,12 +353,57 @@ public class UserServiceI implements UserService {
             }
             log.info("프로필 업데이트를 완료했습니다");
 
-            return ProfileResponse.builder().build()
-                    .from(nowUser);
-
         } catch (Exception e) {
             log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
-            return null;
+            throw e;
+        }
+    }
+
+
+    /*
+    * 비밀번호 변경
+    * > token
+    * > pwdToUpdate
+    *
+    * */
+    @Override
+    @Transactional
+    public void updatePassword(String token, PasswordRequest pwdToUpdate) throws Exception {
+        try {
+            User nowUser = getNowUser(token);
+
+            if (!encoder.matches(pwdToUpdate.oldPwd(), nowUser.getPwd().getPassword())) {
+                log.error("현재 비밀번호가 일치하지 않습니다.");
+                throw new BadCredentialsException("현재 비밀번호가 일치하지 않습니다.");
+
+            } else if (!pwdToUpdate.newPwd().equals(pwdToUpdate.newPwdToCheck())) {
+                log.error("입력한 비밀번호가 일치하지 않습니다.");
+                throw new Exception("입력한 비밀번호가 일치하지 않습니다.");
+
+            } else {
+                nowUser.getPwd().updatePassword(encoder, pwdToUpdate.newPwd());
+                log.info("비밀번호 변경을 완료했습니다.");
+            }
+
+        } catch (Exception e) {
+            log.error("패스워드 업데이트에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateEmail(String token, MailChangeRequest emailToUpdate) {
+
+        try {
+            User nowUser = getNowUser(token);
+
+            nowUser.getAuth().updateEmail(emailToUpdate.emailToSend());
+            log.info("이메일 변경이 완료되었습니다. 변경된 이메일: {}", nowUser.getAuth().getEmail());
+
+        } catch (Exception e) {
+            log.error("이메일 변경에 실패했습니다. {}", e.getMessage());
+            throw e;
         }
     }
 

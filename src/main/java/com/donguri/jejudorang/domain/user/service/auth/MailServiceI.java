@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.service.auth;
 
-import com.donguri.jejudorang.domain.user.dto.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

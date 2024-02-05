@@ -1,5 +1,8 @@
 package com.donguri.jejudorang.global.config;
 
+import com.donguri.jejudorang.global.config.jwt.JwtAuthEntryPoint;
+import com.donguri.jejudorang.global.config.jwt.JwtAuthenticationFilter;
+import com.donguri.jejudorang.global.config.jwt.JwtUserDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -85,7 +88,7 @@ public class SecurityConfig {
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
-                                        "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
+                                        "/user/login", "/user/signup", "/user/signup/**", "/user/logout", "/user/email/**",
                                         "/trip/lists/*", "/trip/places/*",
                                         "/community/boards/**",
                                         "/templates/**", "/error/**")

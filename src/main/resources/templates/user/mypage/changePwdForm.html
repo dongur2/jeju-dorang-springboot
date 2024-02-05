@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/fragments/layout}">
+<head>
+    <title>비밀번호 변경 - 제주도랑 | 마이페이지</title>
+</head>
+<th layout:fragment="content">
+
+    <div class="board-whole-box">
+
+
+        <!-- 마이페이지 좌측 탭  -->
+        <div class="board-item board-tab" style="width: 300px; gap: 10%;">
+            <ul class="nav flex-column">
+                <li class="nav-item" style="font-size: 20px;">
+                    <a class="nav-link active" aria-current="page" href="#" style="color: #696969;"
+                       th:href="@{/user/settings/profile}">프로필</a>
+                </li>
+                <li class="nav-item" style="font-size: 20px;">
+                    <a class="nav-link" href="#" style="color: #696969;"
+                       th:href="@{/user/settings/profile/pwd}">비밀번호 수정</a>
+                </li>
+            </ul>
+        </div>
+
+
+
+        <!-- 컨텐츠 블록  -->
+        <div class="board-item board-main"
+             style="width: 70%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%;
+                    border: 1px solid rgba(134,134,134,0.37); border-radius: 15px;">
+
+            <form id="profile-modify-form-pwd" th:action th:method="put" th:object="${passwordRequest}"
+                  style="width:100%; height:400px; margin-bottom:auto;
+                            display: flex; flex-direction: column; gap: 5%; justify-content: center; align-items: center;">
+
+                <div style="width:90%;">
+                    <label for="nowPassword">현재 비밀번호</label>
+                    <input type="password" id="nowPassword" name="oldPwd" style="width:100%; height:40px; "/>
+                </div>
+
+                <div style="width:90%; margin-top: 3%">
+                    <label for="newPassword">새로운 비밀번호</label>
+                    <input type="password" id="newPassword" name="newPwd" style="width:100%; height:40px; "/>
+                </div>
+
+                <div style="width:90%; margin-top: 1%">
+                    <label for="newPasswordForCheck">새로운 비밀번호 확인</label>
+                    <input type="password" id="newPasswordForCheck" name="newPwdToCheck" style="width:100%; height:40px; "/>
+                </div>
+
+                <button type="button" class="btn btn-success" onclick="submitForm()"
+                        style="width:90%; height:60px; margin-top:5%;">비밀번호 변경</button>
+
+            </form>
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function submitForm() {
+            var form = document.getElementById('profile-modify-form-pwd');
+            var formData = new FormData(form);
+
+            alert("submitForm()");
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', form.action, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('비밀번호 변경이 완료되었습니다.');
+                    window.location.reload();
+
+                } else {
+                    alert(xhr.responseText);
+                }
+            };
+            xhr.send(formData);
+        }
+
+    </script>
+
+
+</th>
+</html>

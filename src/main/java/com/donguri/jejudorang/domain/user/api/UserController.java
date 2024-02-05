@@ -1,8 +1,11 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.user.dto.*;
+import com.donguri.jejudorang.domain.user.dto.request.*;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
-import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -31,23 +34,17 @@ public class UserController {
     private int cookieTime;
 
     @Autowired private final UserService userService;
-    @Autowired private final ImageService imageService;
-
-    public UserController(UserService userService, ImageService imageService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.imageService = imageService;
     }
 
     /*
     * 이메일 인증 번호 전송 (+ 중복 확인)
     * */
-    @ResponseBody
-    @PostMapping("/signup/verify")
+    @PostMapping("/email/verify")
     public ResponseEntity<?> sendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
-            if (bindingResult.hasErrors()) {
-                throw new NullPointerException(bindingResult.toString());
-            }
+            checkValidationAndReturnException(bindingResult);
 
             userService.sendVerifyMail(mailSendRequest);
 
@@ -67,13 +64,10 @@ public class UserController {
     /*
     * 이메일 인증 번호 확인
     * */
-    @ResponseBody
-    @PostMapping("/signup/verify-check")
+    @PostMapping("/email/verify-check")
     public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
         try {
-            if (bindingResult.hasErrors()) {
-                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
-            }
+            checkValidationAndReturnException(bindingResult);
 
             boolean checkRes = userService.checkVerifyMail(mailVerifyRequest);
             if (checkRes) {
@@ -102,15 +96,12 @@ public class UserController {
     public String registerForm() {
         return "/user/login/signUpForm";
     }
-    @ResponseBody
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
-        // 유효성 검사 에러
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
-        }
 
         try {
+            checkValidationAndReturnException(bindingResult);
+
             userService.signUp(signUpRequest);
             log.info("회원 가입 완료");
             return new ResponseEntity<>(HttpStatus.OK);
@@ -190,8 +181,6 @@ public class UserController {
     @GetMapping("/settings/profile")
     public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
         try {
-            log.info("컨트롤러 진입");
-
             String accessToken = token.getValue();
             log.info("@CookieValue Cookie's access_token: {}", accessToken);
 
@@ -208,38 +197,31 @@ public class UserController {
 
     /*
     * 마이페이지 - 프로필 수정
+    * nickname
     * img: S3 url
-    * email: 추가 인증 필요
+    *
     * */
     @PutMapping("/settings/profile")
-    public String updateProfile(@CookieValue("access_token") Cookie token,
-                                @Valid ProfileRequest profileRequest, BindingResult bindingResult,
-                                Model model) {
-        // 유효성 검사 에러
-        if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
-        }
-
-        log.info("UPDATE CONTROLLER !! ");
+    public ResponseEntity<?> updateProfile(@CookieValue("access_token") Cookie token,
+                                           @Valid ProfileRequest profileRequest, BindingResult bindingResult) {
 
         try {
-            String accessToken = token.getValue();
-            log.info("@CookieValue Cookie's access_token: {}", accessToken);
+            checkValidationAndReturnException(bindingResult);
 
-            ProfileResponse profileResponse = userService.updateProfileData(accessToken, profileRequest);
-            model.addAttribute("profileResponse", profileResponse);
-            return "/user/mypage/profile";
+            String accessToken = token.getValue();
+
+            userService.updateProfileData(accessToken, profileRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
-            log.error(e.getMessage());
-            return "/user/mypage/profile";
+            log.error("프로필 수정 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     /*
     * 마이페이지 - 프로필 사진 삭제
     * */
-    @ResponseBody
     @DeleteMapping("/settings/profile/deleteimg")
     public ResponseEntity<HttpStatus> deleteProfileImg(@CookieValue("access_token") Cookie token) {
         log.info("deleteProfileImg 컨트롤러 실행");
@@ -247,7 +229,7 @@ public class UserController {
         try {
             String accessToken = token.getValue();
 
-            userService.updateProfileData(accessToken);
+            userService.deleteProfileImg(accessToken);
 
             return new ResponseEntity<>(HttpStatus.OK);
 
@@ -256,6 +238,60 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+
+    /*
+    * 비밀번호 수정
+    * */
+    @GetMapping("/settings/profile/pwd")
+    public String getUpdatePasswordForm() {
+        return "/user/mypage/changePwdForm";
+    }
+    @PutMapping("/settings/profile/pwd")
+    public ResponseEntity<?> updatePassword(@CookieValue("access_token") Cookie token,
+                                 @Valid PasswordRequest passwordRequest, BindingResult bindingResult) {
+
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.updatePassword(token.getValue(), passwordRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("비밀번호 수정 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /*
+    * 이메일 수정
+    * */
+    @PutMapping("/email/change")
+    public ResponseEntity<?> updateEmail(@CookieValue("access_token") Cookie token,
+                                         @RequestBody @Valid MailChangeRequest mailChangeRequest, BindingResult bindingResult) {
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.updateEmail(token.getValue(), mailChangeRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("이메일 변경 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    /*
+    * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
+    * */
+    private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {
+        if (bindingResult.hasErrors()) {
+            log.error("실패: {}", bindingResult.getFieldError().getDefaultMessage());
+            throw new Exception(bindingResult.getFieldError().getDefaultMessage());
+        }
+    }
+
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
