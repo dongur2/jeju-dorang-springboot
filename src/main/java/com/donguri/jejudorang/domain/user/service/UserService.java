@@ -27,5 +27,5 @@ public interface UserService {
     void deleteProfileImg(String accessToken);
 
     // 비밀번호 수정
-    void updatePassword(String accessToken, PasswordRequest pwdToUpdate) throws BadRequestException;
+    void updatePassword(String accessToken, PasswordRequest pwdToUpdate) throws Exception;
 }

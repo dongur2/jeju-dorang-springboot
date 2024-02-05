@@ -371,7 +371,7 @@ public class UserServiceI implements UserService {
     * */
     @Override
     @Transactional
-    public void updatePassword(String token, PasswordRequest pwdToUpdate) throws BadRequestException {
+    public void updatePassword(String token, PasswordRequest pwdToUpdate) throws Exception {
         try {
             User nowUser = getNowUser(token);
 
@@ -381,7 +381,7 @@ public class UserServiceI implements UserService {
 
             } else if (!pwdToUpdate.newPwd().equals(pwdToUpdate.newPwdToCheck())) {
                 log.error("입력한 비밀번호가 일치하지 않습니다.");
-                throw new BadRequestException("입력한 비밀번호가 일치하지 않습니다.");
+                throw new Exception("입력한 비밀번호가 일치하지 않습니다.");
 
             } else {
                 nowUser.getPwd().updatePassword(encoder, pwdToUpdate.newPwd());
