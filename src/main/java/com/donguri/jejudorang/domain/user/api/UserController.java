@@ -334,6 +334,23 @@ public class UserController {
 
 
     /*
+    * 회원 탈퇴
+    *
+    * */
+    @DeleteMapping("/settings/profile/quit")
+    public String deleteUser(@CookieValue("access_token") Cookie token, Model model) {
+        try {
+            userService.withdrawUser(token.getValue());
+            return "redirect:/";
+
+        } catch (Exception e) {
+            log.error("회원 삭제 실패: {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
+    }
+
+    /*
     * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
     * */
     private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {

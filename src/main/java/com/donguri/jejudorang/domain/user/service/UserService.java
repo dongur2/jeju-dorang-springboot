@@ -54,4 +54,8 @@ public interface UserService {
 
     // 비밀번호 재설정
      void changePwdRandomlyAndSendMail(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException;
+
+
+    // 회원 탈퇴
+    void withdrawUser(String accessToken);
 }

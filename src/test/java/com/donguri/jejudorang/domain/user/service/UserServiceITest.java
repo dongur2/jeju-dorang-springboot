@@ -419,4 +419,33 @@ class UserServiceITest {
         //then
         Assertions.assertThat(passwordEncoder.matches(randomPwd, userToUpdate.getPwd().getPassword())).isTrue();
     }
+
+    @Test
+    @Transactional
+    void 회원_탈퇴() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("abcde!!1234").build();
+        password.updatePassword(passwordEncoder, password.getPassword());
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User saved = userRepository.save(user);
+
+        //when
+        userRepository.deleteById(saved.getId());
+
+        //then
+        Assertions.assertThat(userRepository.findByExternalId("userId")).isEmpty();
+    }
 }

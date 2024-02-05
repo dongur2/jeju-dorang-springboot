@@ -518,6 +518,24 @@ public class UserServiceI implements UserService {
         }
     }
 
+    /*
+    * 회원 탈퇴
+    * > token
+    *
+    * */
+    @Override
+    @Transactional
+    public void withdrawUser(String token) {
+        try {
+            Long idFromJwtToken = jwtProvider.getIdFromJwtToken(token);
+            userRepository.deleteById(idFromJwtToken);
+
+        } catch (Exception e) {
+            log.error("회원을 삭제하지 못했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     private User getNowUser(String token) {
         String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
