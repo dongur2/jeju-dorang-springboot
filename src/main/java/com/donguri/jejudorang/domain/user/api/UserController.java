@@ -262,6 +262,10 @@ public class UserController {
     /*
     * 비밀번호 수정
     * */
+    @GetMapping("/settings/profile/pwd")
+    public String getUpdatePasswordForm() {
+        return "/user/mypage/changePwdForm";
+    }
     @ResponseBody
     @PutMapping("/settings/profile/pwd")
     public String updatePassword(@CookieValue("access_token") Cookie token,
