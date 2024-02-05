@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
@@ -291,6 +292,23 @@ public class UserController {
             checkValidationAndReturnException(bindingResult);
 
             userService.sendMailWithId(mailSendRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("아이디 찾기 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /*
+    * 비밀번호 찾기 이메일 전송
+    * */
+    @PostMapping("/email/find-pwd")
+    public ResponseEntity<?> findId(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.checkUserAndSendVerifyCode(mailSendForPwdRequest);
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {

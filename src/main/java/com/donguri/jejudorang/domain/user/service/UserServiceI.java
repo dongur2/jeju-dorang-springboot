@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
@@ -80,7 +81,7 @@ public class UserServiceI implements UserService {
         try {
             checkMailDuplicated(mailSendRequest.email());
 
-            String subject = "[제주도랑] 인증 번호입니다.";
+            String subject = "[제주도랑] 인증번호입니다.";
             mailService.sendAuthMail(mailSendRequest.email(), subject, createNumber());
 
         } catch (Exception e) {
@@ -101,11 +102,11 @@ public class UserServiceI implements UserService {
             return mailService.checkAuthMail(mailVerifyRequest);
 
         }  catch (NullPointerException e) {
-            log.error("인증 번호가 만료되었습니다.");
+            log.error("인증번호가 만료되었습니다.");
             throw e;
 
         } catch (Exception e) {
-            log.error("인증 번호 확인 실패 : {}",e.getMessage());
+            log.error("인증번호 확인 실패 : {}",e.getMessage());
             throw e;
         }
     }
@@ -132,7 +133,7 @@ public class UserServiceI implements UserService {
             return builder.toString();
 
         } catch (NoSuchAlgorithmException e) {
-            log.debug("이메일 인증 번호 생성을 실패했습니다 : {}", e.getMessage());
+            log.debug("이메일 인증번호 생성을 실패했습니다 : {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -456,6 +457,30 @@ public class UserServiceI implements UserService {
 
         } catch (Exception e) {
             log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 비밀번호 찾기
+    * : 인증번호 전송
+    * > MailSendForPwdRequest
+    *
+    * */
+    @Override
+    @Transactional
+    public void checkUserAndSendVerifyCode(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
+        try {
+            userRepository.findByEmailAndExternalId(mailSendForPwdRequest.email(), mailSendForPwdRequest.externalId())
+                    .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
+
+            String subject = "[제주도랑] 비밀번호 찾기 인증번호입니다.";
+            String mailBody = "<h3> 하단의 인증번호를 정확하게 입력해주세요.</h3>"
+                    + "<p>인증번호: <b style='color:#FB7A51'>" + createNumber() + "</b></p><br><br>";
+            mailService.sendMail(mailSendForPwdRequest.email(), subject, mailBody);
+
+        } catch (Exception e) {
+            log.error("인증번호 전송에 실패했습니다. {}", e.getMessage());
             throw e;
         }
     }

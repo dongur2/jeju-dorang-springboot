@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
@@ -47,4 +48,7 @@ public interface UserService {
 
     // 아이디 찾기
     void sendMailWithId(MailSendRequest mailSendRequest) throws MessagingException;
+
+    // 비밀번호 찾기
+    void checkUserAndSendVerifyCode(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException;
 }

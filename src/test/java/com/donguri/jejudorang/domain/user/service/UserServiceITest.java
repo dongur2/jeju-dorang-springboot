@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.PasswordRequest;
 import com.donguri.jejudorang.domain.user.dto.request.ProfileRequest;
@@ -324,6 +325,62 @@ class UserServiceITest {
 
         //then
         org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> userService.sendMailWithId(request));
+    }
+
+    @Test
+    void 비밀번호_찾기_이메일_인증번호_전송() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("abcde!!1234").build();
+        password.updatePassword(passwordEncoder, password.getPassword());
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        userRepository.save(user);
+
+        //when
+        MailSendForPwdRequest request = MailSendForPwdRequest.builder().email(testMail).externalId("userId").build();
+
+        //then
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> userService.checkUserAndSendVerifyCode(request));
+    }
+
+    @Test
+    void 비밀번호_찾기_이메일_인증번호_전송_실패_일치하는_정보_없음() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("abcde!!1234").build();
+        password.updatePassword(passwordEncoder, password.getPassword());
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        userRepository.save(user);
+
+        //when
+        MailSendForPwdRequest request = MailSendForPwdRequest.builder().email(testMail).externalId("userId22").build();
+
+        //then
+        org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> userService.checkUserAndSendVerifyCode(request));
     }
 
 }
