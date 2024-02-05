@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
@@ -16,6 +17,8 @@ import com.donguri.jejudorang.global.config.jwt.JwtUserDetails;
 import com.donguri.jejudorang.global.config.jwt.RefreshToken;
 import com.donguri.jejudorang.global.config.jwt.RefreshTokenRepository;
 import com.sun.jdi.request.DuplicateRequestException;
+import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -69,15 +72,20 @@ public class UserServiceI implements UserService {
 
     /*
     * 이메일 확인 - 중복 확인 후 인증 번호 전송
+    * > MailSendRequest
+    *
     * */
     @Override
     @Transactional
-    public void sendVerifyMail(MailSendRequest mailSendRequest) {
+    public void checkMailDuplicatedAndSendVerifyCode(MailSendRequest mailSendRequest) throws MessagingException {
         try {
             checkMailDuplicated(mailSendRequest.email());
 
-            String subject = "[제주도랑] 인증 번호입니다.";
-            mailService.sendAuthMail(mailSendRequest.email(), subject, createNumber());
+            String subject = "[제주도랑] 회원 가입 인증번호입니다.";
+            String code = createNumber();
+            String mailBody = "<h3> 하단의 인증번호를 정확하게 입력해주세요.</h3>"
+                    + "<p>인증번호: <b style='color:#FB7A51'>" + code + "</b></p><br><br>";
+            mailService.sendAuthMail(mailSendRequest.email(), subject, mailBody, code);
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -85,6 +93,11 @@ public class UserServiceI implements UserService {
         }
     }
 
+    /*
+    * 이메일 인증 번호 확인
+    * > MailVerifyRequest
+    *
+    * */
     @Override
     @Transactional
     public boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest) {
@@ -92,11 +105,11 @@ public class UserServiceI implements UserService {
             return mailService.checkAuthMail(mailVerifyRequest);
 
         }  catch (NullPointerException e) {
-            log.error("인증 번호가 만료되었습니다.");
+            log.error("인증번호가 만료되었습니다.");
             throw e;
 
         } catch (Exception e) {
-            log.error("인증 번호 확인 실패 : {}",e.getMessage());
+            log.error("인증번호 확인 실패 : {}",e.getMessage());
             throw e;
         }
     }
@@ -123,13 +136,16 @@ public class UserServiceI implements UserService {
             return builder.toString();
 
         } catch (NoSuchAlgorithmException e) {
-            log.debug("이메일 인증 번호 생성을 실패했습니다 : {}", e.getMessage());
+            log.debug("이메일 인증번호 생성을 실패했습니다 : {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
 
+
     /*
     * 회원 가입
+    * > SignUpRequest
+    *
     * */
     @Override
     @Transactional
@@ -196,6 +212,8 @@ public class UserServiceI implements UserService {
 
     /*
     * 로그인
+    * > LoginRequest
+    *
     * */
     @Override
     @Transactional
@@ -270,6 +288,10 @@ public class UserServiceI implements UserService {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
     }
 
+    /*
+    * 프로필 조회
+    * > token
+    * */
     @Override
     @Transactional
     public ProfileResponse getProfileData(String token) {
@@ -286,7 +308,9 @@ public class UserServiceI implements UserService {
 
     /*
     * 프로필 전체 수정
-    * > token, requestDTO
+    * > token
+    * > ProfileRequest
+    *
     * */
     @Override
     @Transactional
@@ -334,7 +358,8 @@ public class UserServiceI implements UserService {
 
     /*
     * 프로필 사진만 삭제
-    * > params token
+    * > token
+    *
     * */
     @Override
     @Transactional
@@ -363,7 +388,7 @@ public class UserServiceI implements UserService {
     /*
     * 비밀번호 변경
     * > token
-    * > pwdToUpdate
+    * > PasswordRequest
     *
     * */
     @Override
@@ -391,6 +416,12 @@ public class UserServiceI implements UserService {
         }
     }
 
+    /*
+    * 이메일 변경
+    * > token
+    * > MailChangeRequest
+    *
+    * */
     @Override
     @Transactional
     public void updateEmail(String token, MailChangeRequest emailToUpdate) {
@@ -406,6 +437,87 @@ public class UserServiceI implements UserService {
             throw e;
         }
     }
+
+
+    /*
+     * 아이디 찾기
+     * : 아이디 전송
+     * > MailSendRequest
+     *
+     * */
+    @Override
+    @Transactional
+    public void sendMailWithId(MailSendRequest mailSendRequest) throws MessagingException {
+        try {
+            String foundId = userRepository.findByEmail(mailSendRequest.email())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 이메일로 가입한 아이디가 없습니다."))
+                    .getProfile().getExternalId();
+
+            String subject = "[제주도랑] 아이디 찾기 결과입니다.";
+            String mailBody = "<h3> 아이디 찾기 결과를 보내드립니다.</h3>"
+                                + "<p>아이디: <b style='color:#FB7A51'>" + foundId + "</b></p><br><br>";
+            mailService.sendMail(mailSendRequest.email(), subject, mailBody);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 비밀번호 찾기
+    * : 인증번호 전송
+    * > MailSendForPwdRequest
+    *
+    * */
+    @Override
+    @Transactional
+    public void checkUserAndSendVerifyCode(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
+        try {
+            userRepository.findByEmailAndExternalId(mailSendForPwdRequest.email(), mailSendForPwdRequest.externalId())
+                    .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
+
+            String subject = "[제주도랑] 비밀번호 찾기 인증번호입니다.";
+            String code = createNumber();
+            String mailBody = "<h3> 하단의 인증번호를 정확하게 입력해주세요.</h3>"
+                    + "<p>인증번호: <b style='color:#FB7A51'>" + code + "</b></p><br><br>";
+            mailService.sendAuthMail(mailSendForPwdRequest.email(), subject, mailBody, code);
+
+        } catch (Exception e) {
+            log.error("인증번호 전송에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 랜덤 비밀번호 생성 & 비밀번호 변경 후 이메일 전송
+    * > MailSendForPwdRequest
+    *
+    * */
+    @Override
+    @Transactional
+    public void changePwdRandomlyAndSendMail(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
+        try {
+            User userToUpdatePwd = userRepository.findByEmailAndExternalId(mailSendForPwdRequest.email(), mailSendForPwdRequest.externalId())
+                    .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
+
+            // 임시 비밀번호 생성
+            String randomPwd = createNumber();
+
+            // 임시 비밀번호로 비밀번호 수정
+            userToUpdatePwd.getPwd().updatePassword(encoder, randomPwd);
+
+            String subject = "[제주도랑] 임시 비밀번호입니다.";
+            String mailBody = "<h3>임시 비밀번호를 보내드립니다. 로그인하신 후 비밀번호를 재설정해주세요.</h3>"
+                    + "<p>임시 비밀번호: <b style='color:#FB7A51'>" + randomPwd + "</b></p><br><br>";
+            mailService.sendMail(mailSendForPwdRequest.email(), subject, mailBody);
+
+        } catch (Exception e) {
+            log.error("임시 비밀번호 생성에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     private User getNowUser(String token) {
         String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);

@@ -1,9 +1,7 @@
 package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.dto.request.*;
-import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
-import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
-import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.*;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -42,11 +40,11 @@ public class UserController {
     * 이메일 인증 번호 전송 (+ 중복 확인)
     * */
     @PostMapping("/email/verify")
-    public ResponseEntity<?> sendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> checkDuplicatedAndSendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
 
-            userService.sendVerifyMail(mailSendRequest);
+            userService.checkMailDuplicatedAndSendVerifyCode(mailSendRequest);
 
             log.info("이메일 인증 번호 전송 완료");
             return new ResponseEntity<>(HttpStatus.OK);
@@ -277,6 +275,59 @@ public class UserController {
 
         } catch (Exception e) {
             log.error("이메일 변경 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    /*
+    * 아이디 찾기 이메일 전송
+    * */
+    @PostMapping("/email/find-id")
+    public ResponseEntity<?> findId(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.sendMailWithId(mailSendRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("아이디 찾기 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /*
+    * 비밀번호 찾기 이메일 전송
+    * */
+    @PostMapping("/email/find-pwd")
+    public ResponseEntity<?> findPwd(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.checkUserAndSendVerifyCode(mailSendForPwdRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("아이디 찾기 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    /*
+    * 랜덤 비밀번호 설정: 이메일 전송
+    * */
+    @PostMapping("/email/change-pwd")
+    public ResponseEntity<?> changePwd(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.changePwdRandomlyAndSendMail(mailSendForPwdRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("비밀번호 재설정 실패: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

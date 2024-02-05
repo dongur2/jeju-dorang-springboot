@@ -3,9 +3,11 @@ package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
+import jakarta.mail.MessagingException;
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
@@ -14,7 +16,7 @@ import java.util.Optional;
 public interface UserService {
 
     // 이메일 인증번호 전송, 확인
-    void sendVerifyMail(MailSendRequest mailSendRequest);
+    void checkMailDuplicatedAndSendVerifyCode(MailSendRequest mailSendRequest) throws MessagingException;
     boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest);
 
     // 회원가입
@@ -42,4 +44,14 @@ public interface UserService {
 
     // 이메일 변경
     void updateEmail(String accessToken, MailChangeRequest emailToUpdate);
+
+
+    // 아이디 찾기
+    void sendMailWithId(MailSendRequest mailSendRequest) throws MessagingException;
+
+    // 비밀번호 찾기
+    void checkUserAndSendVerifyCode(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException;
+
+    // 비밀번호 재설정
+     void changePwdRandomlyAndSendMail(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException;
 }
