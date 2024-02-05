@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.user.service;
 
 
 import com.donguri.jejudorang.domain.user.dto.*;
+import org.apache.coyote.BadRequestException;
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
@@ -19,6 +20,12 @@ public interface UserService {
 
     ProfileResponse getProfileData(String accessToken);
 
+
+    // 프로필 사진, 닉네임, 이메일 수정
     ProfileResponse updateProfileData(String accessToken, ProfileRequest dataToUpdate);
-    ProfileResponse updateProfileData(String accessToken);
+    // 프로필 사진 삭제
+    void deleteProfileImg(String accessToken);
+
+    // 비밀번호 수정
+    void updatePassword(String accessToken, PasswordRequest pwdToUpdate) throws BadRequestException;
 }

@@ -102,7 +102,6 @@ public class UserController {
     public String registerForm() {
         return "/user/login/signUpForm";
     }
-    @ResponseBody
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
         // 유효성 검사 에러
@@ -210,6 +209,9 @@ public class UserController {
     * 마이페이지 - 프로필 수정
     * img: S3 url
     * email: 추가 인증 필요
+    * pwd
+    * pwdCheck
+    *
     * */
     @PutMapping("/settings/profile")
     public String updateProfile(@CookieValue("access_token") Cookie token,
@@ -239,7 +241,6 @@ public class UserController {
     /*
     * 마이페이지 - 프로필 사진 삭제
     * */
-    @ResponseBody
     @DeleteMapping("/settings/profile/deleteimg")
     public ResponseEntity<HttpStatus> deleteProfileImg(@CookieValue("access_token") Cookie token) {
         log.info("deleteProfileImg 컨트롤러 실행");
@@ -247,7 +248,7 @@ public class UserController {
         try {
             String accessToken = token.getValue();
 
-            userService.updateProfileData(accessToken);
+            userService.deleteProfileImg(accessToken);
 
             return new ResponseEntity<>(HttpStatus.OK);
 
@@ -256,6 +257,32 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+
+    /*
+    * 비밀번호 수정
+    * */
+    @ResponseBody
+    @PutMapping("/settings/profile/pwd")
+    public String updatePassword(@CookieValue("access_token") Cookie token,
+                                 @Valid PasswordRequest passwordRequest, BindingResult bindingResult) {
+
+        try {
+            if (bindingResult.hasErrors()) {
+                log.error("비밀번호 수정 실패: {}", bindingResult.getFieldError().getDefaultMessage());
+                return "Bad Request";
+            }
+
+            userService.updatePassword(token.getValue(), passwordRequest);
+            return "OK";
+
+        } catch (Exception e) {
+            log.error("비밀번호 수정 실패: {}", e.getMessage());
+            return "Failed: " + e.getMessage();
+        }
+    }
+
+
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());

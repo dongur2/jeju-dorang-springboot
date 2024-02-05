@@ -341,7 +341,7 @@ public class UserServiceI implements UserService {
     * */
     @Override
     @Transactional
-    public ProfileResponse updateProfileData(String token) {
+    public void deleteProfileImg(String token) {
         try {
             User nowUser = getNowUser(token);
 
@@ -356,12 +356,40 @@ public class UserServiceI implements UserService {
             }
             log.info("프로필 업데이트를 완료했습니다");
 
-            return ProfileResponse.builder().build()
-                    .from(nowUser);
-
         } catch (Exception e) {
             log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
-            return null;
+            throw e;
+        }
+    }
+
+
+    /*
+    * 비밀번호 변경
+    * > token
+    * > pwdToUpdate
+    *
+    * */
+    @Override
+    public void updatePassword(String token, PasswordRequest pwdToUpdate) throws BadRequestException {
+        try {
+            User nowUser = getNowUser(token);
+
+            if (!encoder.matches(pwdToUpdate.oldPwd(), nowUser.getPwd().getPassword())) {
+                log.error("현재 비밀번호가 일치하지 않습니다.");
+                throw new BadCredentialsException("현재 비밀번호가 일치하지 않습니다.");
+
+            } else if (!pwdToUpdate.newPwd().equals(pwdToUpdate.newPwdToCheck())) {
+                log.error("입력한 비밀번호가 일치하지 않습니다.");
+                throw new BadRequestException("입력한 비밀번호가 일치하지 않습니다.");
+
+            } else {
+                nowUser.getPwd().updatePassword(encoder, pwdToUpdate.newPwd());
+                log.info("비밀번호 변경을 완료했습니다.");
+            }
+
+        } catch (Exception e) {
+            log.error("패스워드 업데이트에 실패했습니다. {}", e.getMessage());
+            throw e;
         }
     }
 

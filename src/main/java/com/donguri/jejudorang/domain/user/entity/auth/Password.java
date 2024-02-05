@@ -39,8 +39,8 @@ public class Password extends BaseEntity {
     }
 
     // 패스워드 암호화
-    public void encodePassword(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(password);
-    }
+//    public void encodePassword(PasswordEncoder passwordEncoder) {
+//        this.password = passwordEncoder.encode(password);
+//    }
 
 }
