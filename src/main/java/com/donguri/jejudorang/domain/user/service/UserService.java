@@ -6,6 +6,7 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
+import jakarta.mail.MessagingException;
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
@@ -42,4 +43,8 @@ public interface UserService {
 
     // 이메일 변경
     void updateEmail(String accessToken, MailChangeRequest emailToUpdate);
+
+
+    // 아이디 찾기
+    void sendMailWithId(MailSendRequest mailSendRequest) throws MessagingException;
 }

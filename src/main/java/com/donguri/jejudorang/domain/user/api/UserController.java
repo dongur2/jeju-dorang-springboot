@@ -283,6 +283,24 @@ public class UserController {
 
 
     /*
+    * 아이디 찾기 이메일 전송
+    * */
+    @GetMapping("/email/find-id")
+    public ResponseEntity<?> findId(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.sendMailWithId(mailSendRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("아이디 찾기 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    /*
     * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
     * */
     private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {

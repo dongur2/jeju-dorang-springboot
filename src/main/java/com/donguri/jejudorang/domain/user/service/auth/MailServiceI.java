@@ -1,6 +1,8 @@
 package com.donguri.jejudorang.domain.user.service.auth;
 
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +10,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMailMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +32,39 @@ public class MailServiceI implements MailService {
         this.redisTemplate = redisTemplate;
     }
 
+
+    /*
+    * 아이디 메일 전송
+    * */
+    @Override
+    @Transactional
+    public void sendMail(String to, String subject, String text) throws MessagingException {
+
+        try {
+            MimeMessage message = createHtmlMessage(to, subject, text);
+            mailSender.send(message);
+
+        } catch (Exception e) {
+            log.error("이메일 전송에 실패했습니다 : {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    private MimeMessage createHtmlMessage(String to, String subject, String text) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
+
+        messageHelper.setTo(to);
+        messageHelper.setSubject(subject);
+        messageHelper.setText(text, true); // html body
+
+        return message;
+    }
+
+
+    /*
+    * 인증 번호 메일 전송
+    * */
     @Override
     @Transactional
     public void sendAuthMail(String to, String subject, String text) {
@@ -57,6 +94,10 @@ public class MailServiceI implements MailService {
         }
     }
 
+
+    /*
+    * 인증번호 확인
+    * */
     @Override
     @Transactional
     public boolean checkAuthMail(MailVerifyRequest mailVerifyRequest) {

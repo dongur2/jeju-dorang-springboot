@@ -16,6 +16,8 @@ import com.donguri.jejudorang.global.config.jwt.JwtUserDetails;
 import com.donguri.jejudorang.global.config.jwt.RefreshToken;
 import com.donguri.jejudorang.global.config.jwt.RefreshTokenRepository;
 import com.sun.jdi.request.DuplicateRequestException;
+import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -134,6 +136,7 @@ public class UserServiceI implements UserService {
             throw new RuntimeException(e.getMessage());
         }
     }
+
 
     /*
     * 회원 가입
@@ -430,6 +433,33 @@ public class UserServiceI implements UserService {
             throw e;
         }
     }
+
+
+    /*
+     * 아이디 찾기
+     * : 아이디 전송
+     * > MailSendRequest
+     *
+     * */
+    @Override
+    @Transactional
+    public void sendMailWithId(MailSendRequest mailSendRequest) throws MessagingException {
+        try {
+            String foundId = userRepository.findByEmail(mailSendRequest.email())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 이메일로 가입한 아이디가 없습니다."))
+                    .getProfile().getExternalId();
+
+            String subject = "[제주도랑] 아이디 찾기 결과입니다.";
+            String mailBody = "<h3> 아이디 찾기 결과를 보내드립니다.</h3>"
+                                + "<p>아이디: <b style='color:#FB7A51'>" + foundId + "</b></p><br><br>";
+            mailService.sendMail(mailSendRequest.email(), subject, mailBody);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
 
     private User getNowUser(String token) {
         String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
