@@ -489,6 +489,30 @@ public class UserServiceI implements UserService {
         }
     }
 
+    @Override
+    @Transactional
+    public void changePwdRandomlyAndSendMail(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
+        try {
+            User userToUpdatePwd = userRepository.findByEmailAndExternalId(mailSendForPwdRequest.email(), mailSendForPwdRequest.externalId())
+                    .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
+
+            // 임시 비밀번호 생성
+            String randomPwd = createNumber();
+
+            // 임시 비밀번호로 비밀번호 수정
+            userToUpdatePwd.getPwd().updatePassword(encoder, randomPwd);
+
+            String subject = "[제주도랑] 임시 비밀번호입니다.";
+            String mailBody = "<h3>임시 비밀번호를 보내드립니다. 로그인하신 후 비밀번호를 재설정해주세요.</h3>"
+                    + "<p>임시 비밀번호: <b style='color:#FB7A51'>" + randomPwd + "</b></p><br><br>";
+            mailService.sendMail(mailSendForPwdRequest.email(), subject, mailBody);
+
+        } catch (Exception e) {
+            log.error("임시 비밀번호 생성에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     private User getNowUser(String token) {
         String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);

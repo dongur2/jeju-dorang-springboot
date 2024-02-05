@@ -51,4 +51,7 @@ public interface UserService {
 
     // 비밀번호 찾기
     void checkUserAndSendVerifyCode(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException;
+
+    // 비밀번호 재설정
+     void changePwdRandomlyAndSendMail(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException;
 }

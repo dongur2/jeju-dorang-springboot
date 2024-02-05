@@ -13,6 +13,7 @@ import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.domain.user.repository.auth.PasswordRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -383,4 +384,39 @@ class UserServiceITest {
         org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> userService.checkUserAndSendVerifyCode(request));
     }
 
+    @Test
+    @Transactional
+    void 임시_비밀번호_변경() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("abcde!!1234").build();
+        password.updatePassword(passwordEncoder, password.getPassword());
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        userRepository.save(user);
+
+        //when
+        MailSendForPwdRequest request = MailSendForPwdRequest.builder().email(testMail).externalId("userId").build();
+
+        User userToUpdate = userRepository.findByEmailAndExternalId(request.email(), request.externalId())
+                .orElseThrow(() -> new EntityNotFoundException("정보와 일치하는 회원 없음"));
+
+        String randomPwd = "201239";
+
+        userToUpdate.getPwd().updatePassword(passwordEncoder, randomPwd);
+
+        //then
+        Assertions.assertThat(passwordEncoder.matches(randomPwd, userToUpdate.getPwd().getPassword())).isTrue();
+    }
 }

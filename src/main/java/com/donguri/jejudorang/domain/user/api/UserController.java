@@ -316,6 +316,24 @@ public class UserController {
 
 
     /*
+    * 랜덤 비밀번호 설정: 이메일 전송
+    * */
+    @PostMapping("/email/change-pwd")
+    public ResponseEntity<?> changePwd(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.changePwdRandomlyAndSendMail(mailSendForPwdRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("비밀번호 재설정 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    /*
     * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
     * */
     private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {
