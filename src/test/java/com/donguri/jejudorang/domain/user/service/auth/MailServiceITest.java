@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.service.auth;
 
-import com.donguri.jejudorang.domain.user.dto.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

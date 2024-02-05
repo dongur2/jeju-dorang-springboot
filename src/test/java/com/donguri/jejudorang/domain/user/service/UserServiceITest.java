@@ -1,6 +1,9 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.user.dto.*;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
+import com.donguri.jejudorang.domain.user.dto.request.PasswordRequest;
+import com.donguri.jejudorang.domain.user.dto.request.ProfileRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.AuthenticationRepository;

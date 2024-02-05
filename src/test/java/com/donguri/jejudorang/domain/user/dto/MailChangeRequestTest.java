@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.dto;
 
+import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -13,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class MailChangeRequestTest {

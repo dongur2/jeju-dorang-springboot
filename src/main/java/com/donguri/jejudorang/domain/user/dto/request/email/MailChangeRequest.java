@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.user.dto;
+package com.donguri.jejudorang.domain.user.dto.request.email;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;

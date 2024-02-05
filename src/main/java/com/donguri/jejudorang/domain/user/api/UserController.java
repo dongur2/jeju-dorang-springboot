@@ -1,6 +1,10 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.user.dto.*;
+import com.donguri.jejudorang.domain.user.dto.request.*;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -199,7 +203,7 @@ public class UserController {
     * */
     @PutMapping("/settings/profile")
     public ResponseEntity<?> updateProfile(@CookieValue("access_token") Cookie token,
-                                @Valid ProfileRequest profileRequest, BindingResult bindingResult) {
+                                           @Valid ProfileRequest profileRequest, BindingResult bindingResult) {
 
         try {
             checkValidationAndReturnException(bindingResult);

@@ -1,7 +1,11 @@
 package com.donguri.jejudorang.domain.user.service;
 
 
-import com.donguri.jejudorang.domain.user.dto.*;
+import com.donguri.jejudorang.domain.user.dto.request.*;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
