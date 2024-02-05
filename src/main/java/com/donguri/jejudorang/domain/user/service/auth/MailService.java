@@ -10,7 +10,7 @@ public interface MailService {
     void sendMail(String to, String subject, String text) throws MessagingException;
 
     // 인증번호 메일 전송 & 인증번호 저장
-    void sendAuthMail(String to, String subject, String text);
+    void sendAuthMail(String to, String subject, String text, String code) throws MessagingException;
 
     // 인증번호 확인
     boolean checkAuthMail(MailVerifyRequest mailVerifyRequest);

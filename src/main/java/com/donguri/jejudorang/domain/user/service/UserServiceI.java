@@ -77,12 +77,15 @@ public class UserServiceI implements UserService {
     * */
     @Override
     @Transactional
-    public void checkMailDuplicatedAndSendVerifyCode(MailSendRequest mailSendRequest) {
+    public void checkMailDuplicatedAndSendVerifyCode(MailSendRequest mailSendRequest) throws MessagingException {
         try {
             checkMailDuplicated(mailSendRequest.email());
 
-            String subject = "[제주도랑] 인증번호입니다.";
-            mailService.sendAuthMail(mailSendRequest.email(), subject, createNumber());
+            String subject = "[제주도랑] 회원 가입 인증번호입니다.";
+            String code = createNumber();
+            String mailBody = "<h3> 하단의 인증번호를 정확하게 입력해주세요.</h3>"
+                    + "<p>인증번호: <b style='color:#FB7A51'>" + code + "</b></p><br><br>";
+            mailService.sendAuthMail(mailSendRequest.email(), subject, mailBody, code);
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -475,9 +478,10 @@ public class UserServiceI implements UserService {
                     .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
 
             String subject = "[제주도랑] 비밀번호 찾기 인증번호입니다.";
+            String code = createNumber();
             String mailBody = "<h3> 하단의 인증번호를 정확하게 입력해주세요.</h3>"
-                    + "<p>인증번호: <b style='color:#FB7A51'>" + createNumber() + "</b></p><br><br>";
-            mailService.sendMail(mailSendForPwdRequest.email(), subject, mailBody);
+                    + "<p>인증번호: <b style='color:#FB7A51'>" + code + "</b></p><br><br>";
+            mailService.sendAuthMail(mailSendForPwdRequest.email(), subject, mailBody, code);
 
         } catch (Exception e) {
             log.error("인증번호 전송에 실패했습니다. {}", e.getMessage());
