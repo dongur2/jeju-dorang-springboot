@@ -103,7 +103,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-outline-dark">탈퇴</button>
+                        <button type="button" class="btn btn-outline-dark" onclick="quitUser()">탈퇴</button>
                     </div>
                 </div>
             </div>
@@ -252,6 +252,29 @@
             }
 
             xhr.send(JSON.stringify(mailChangeRequest));
+        }
+
+
+        /*
+        * 회원 탈퇴 요청
+        * */
+        function quitUser() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/user/settings/profile/quit", true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if(xhr.status === 200) {
+                        alert("회원 탈퇴되었습니다.")
+                        window.location.href = "/";
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+
+            xhr.send();
         }
 
 
