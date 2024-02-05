@@ -101,12 +101,13 @@
                             <input type="text" id="email-verify-dto" name="emailToSend" class="form-control" style="display: none">
                             <button type="button" class="btn btn-outline-secondary btn-verify" onclick="sendMail()">인증번호 전송</button>
 
-                            <div id="email-verify-container" style="display: none;">
+                            <div id="email-verify-container" style="display: none; margin-top:5%">
                                 <div>
                                     <label for="email-verify" class="form-label">이메일 인증번호 확인</label>
                                     <input type="text" id="email-verify" name="code" class="form-control btn-verify">
 
-                                    <button type="button" class="btn btn-outline-warning btn-verify" onclick="checkMail()" style="width:100%; margin-top:5px">인증번호 확인</button>
+                                    <button type="button" class="btn btn-outline-warning btn-verify" onclick="checkMail()"
+                                            style="width:100%; margin-top:5px">인증번호 확인</button>
                                     <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
                                 </div>
                             </div>

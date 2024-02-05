@@ -41,9 +41,7 @@ public class UserController {
     @PostMapping("/email/verify")
     public ResponseEntity<?> sendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
-            if (bindingResult.hasErrors()) {
-                throw new NullPointerException(bindingResult.toString());
-            }
+            checkValidationAndReturnException(bindingResult);
 
             userService.sendVerifyMail(mailSendRequest);
 
@@ -66,9 +64,7 @@ public class UserController {
     @PostMapping("/email/verify-check")
     public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
         try {
-            if (bindingResult.hasErrors()) {
-                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
-            }
+            checkValidationAndReturnException(bindingResult);
 
             boolean checkRes = userService.checkVerifyMail(mailVerifyRequest);
             if (checkRes) {
@@ -99,12 +95,10 @@ public class UserController {
     }
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
-        // 유효성 검사 에러
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
-        }
 
         try {
+            checkValidationAndReturnException(bindingResult);
+
             userService.signUp(signUpRequest);
             log.info("회원 가입 완료");
             return new ResponseEntity<>(HttpStatus.OK);
@@ -209,9 +203,7 @@ public class UserController {
                                 @Valid ProfileRequest profileRequest, BindingResult bindingResult) {
 
         try {
-            if (bindingResult.hasErrors()) {
-                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
-            }
+            checkValidationAndReturnException(bindingResult);
 
             String accessToken = token.getValue();
 
@@ -257,10 +249,7 @@ public class UserController {
                                  @Valid PasswordRequest passwordRequest, BindingResult bindingResult) {
 
         try {
-            if (bindingResult.hasErrors()) {
-                log.error("비밀번호 수정 실패: {}", bindingResult.getFieldError().getDefaultMessage());
-                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
-            }
+            checkValidationAndReturnException(bindingResult);
 
             userService.updatePassword(token.getValue(), passwordRequest);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -268,6 +257,35 @@ public class UserController {
         } catch (Exception e) {
             log.error("비밀번호 수정 실패: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /*
+    * 이메일 수정
+    * */
+    @PutMapping("/email/change")
+    public ResponseEntity<?> updateEmail(@CookieValue("access_token") Cookie token,
+                                         @Valid MailChangeRequest mailChangeRequest, BindingResult bindingResult) {
+        try {
+            checkValidationAndReturnException(bindingResult);
+
+            userService.updateEmail(token, mailChangeRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("이메일 변경 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    /*
+    * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
+    * */
+    private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {
+        if (bindingResult.hasErrors()) {
+            log.error("실패: {}", bindingResult.getFieldError().getDefaultMessage());
+            throw new Exception(bindingResult.getFieldError().getDefaultMessage());
         }
     }
 
