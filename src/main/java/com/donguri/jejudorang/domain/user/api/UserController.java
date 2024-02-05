@@ -42,11 +42,11 @@ public class UserController {
     * 이메일 인증 번호 전송 (+ 중복 확인)
     * */
     @PostMapping("/email/verify")
-    public ResponseEntity<?> sendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> checkDuplicatedAndSendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
 
-            userService.sendVerifyMail(mailSendRequest);
+            userService.checkMailDuplicatedAndSendVerifyCode(mailSendRequest);
 
             log.info("이메일 인증 번호 전송 완료");
             return new ResponseEntity<>(HttpStatus.OK);

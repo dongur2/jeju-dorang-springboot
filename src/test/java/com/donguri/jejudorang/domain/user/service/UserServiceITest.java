@@ -101,7 +101,7 @@ class UserServiceITest {
                 .build();
 
         //when, then
-        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> userService.sendVerifyMail(mailRequest));
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> userService.checkMailDuplicatedAndSendVerifyCode(mailRequest));
     }
 
     @Test
@@ -112,7 +112,7 @@ class UserServiceITest {
                 .build();
 
         //when, then
-        assertThrows(Exception.class, () -> userService.sendVerifyMail(mailRequest));
+        assertThrows(Exception.class, () -> userService.checkMailDuplicatedAndSendVerifyCode(mailRequest));
     }
 
     @Test
@@ -141,7 +141,7 @@ class UserServiceITest {
                 .build();
 
         //then
-        assertThrows(Exception.class, () -> userService.sendVerifyMail(mailRequest));
+        assertThrows(Exception.class, () -> userService.checkMailDuplicatedAndSendVerifyCode(mailRequest));
     }
 
     @Test

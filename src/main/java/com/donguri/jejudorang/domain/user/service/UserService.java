@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface UserService {
 
     // 이메일 인증번호 전송, 확인
-    void sendVerifyMail(MailSendRequest mailSendRequest);
+    void checkMailDuplicatedAndSendVerifyCode(MailSendRequest mailSendRequest);
     boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest);
 
     // 회원가입

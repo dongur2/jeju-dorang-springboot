@@ -74,7 +74,7 @@ public class UserServiceI implements UserService {
     * */
     @Override
     @Transactional
-    public void sendVerifyMail(MailSendRequest mailSendRequest) {
+    public void checkMailDuplicatedAndSendVerifyCode(MailSendRequest mailSendRequest) {
         try {
             checkMailDuplicated(mailSendRequest.email());
 
