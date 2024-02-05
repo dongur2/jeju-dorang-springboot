@@ -102,7 +102,8 @@
                                 </div>
                             </div>
 
-                            <button type="button" class="btn btn-warning" id="btn-for-reset-pwd" style="display:none; width:100%;">비밀번호 재설정</button>
+                            <button type="button" class="btn btn-warning" id="btn-for-reset-pwd" style="display:none; width:100%;"
+                            onclick="changeTempPwd()">비밀번호 재설정</button>
                         </div>
 
                     </div>
@@ -145,6 +146,34 @@
 
                 xhr.send(JSON.stringify(mailSendRequest));
             }
+        }
+
+        function changeTempPwd() {
+            var mailSendForPwdRequest = {
+                email: document.getElementById("email").value,
+                externalId: document.getElementById("externalIdForPwd").value
+            };
+
+            console.log('email: '+mailSendForPwdRequest.email);
+            console.log('id: '+mailSendForPwdRequest.externalId);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/user/email/change-pwd", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("입력한 이메일로 임시 비밀번호가 전송되었습니다. 전송된 메일을 확인해주세요.");
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+
+            xhr.send(JSON.stringify(mailSendForPwdRequest));
+
         }
 
     </script>
