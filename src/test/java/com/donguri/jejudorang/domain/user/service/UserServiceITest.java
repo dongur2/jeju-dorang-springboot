@@ -1,7 +1,6 @@
 package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.user.dto.MailSendRequest;
-import com.donguri.jejudorang.domain.user.dto.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.PasswordRequest;
 import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
@@ -75,7 +74,6 @@ class UserServiceITest {
         userRepository.save(user);
 
         ProfileRequest dataToUpdate = ProfileRequest.builder()
-                .email("guriguri@mail.com")
                 .nickname("뉴닉네임")
                 .build();
 
@@ -83,7 +81,6 @@ class UserServiceITest {
         User nowUser = userRepository.findByExternalId("userId")
                 .orElseThrow(() -> new RuntimeException("아이디에 해당하는 유저가 없습니다"));
 
-        nowUser.getAuth().updateEmail(dataToUpdate.email());
         nowUser.getProfile().updateNickname(dataToUpdate.nickname());
 
         //then
@@ -91,7 +88,6 @@ class UserServiceITest {
                 .orElseThrow(() -> new RuntimeException("아이디에 해당하는 유저가 없습니다"));
 
         Assertions.assertThat(dbUser.getProfile().getNickname()).isEqualTo(dataToUpdate.nickname());
-        Assertions.assertThat(dbUser.getAuth().getEmail()).isEqualTo(dataToUpdate.email());
     }
 
     @Test

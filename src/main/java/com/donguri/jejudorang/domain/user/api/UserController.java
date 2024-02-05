@@ -31,18 +31,14 @@ public class UserController {
     private int cookieTime;
 
     @Autowired private final UserService userService;
-    @Autowired private final ImageService imageService;
-
-    public UserController(UserService userService, ImageService imageService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.imageService = imageService;
     }
 
     /*
     * 이메일 인증 번호 전송 (+ 중복 확인)
     * */
-    @ResponseBody
-    @PostMapping("/signup/verify")
+    @PostMapping("/email/verify")
     public ResponseEntity<?> sendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -67,8 +63,7 @@ public class UserController {
     /*
     * 이메일 인증 번호 확인
     * */
-    @ResponseBody
-    @PostMapping("/signup/verify-check")
+    @PostMapping("/email/verify-check")
     public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -275,12 +270,6 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
-    /*
-    * 이메일 변경
-    * */
-
-
 
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {

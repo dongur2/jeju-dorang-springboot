@@ -68,7 +68,7 @@
                     <div style="display: flex; flex-direction: row; width:100%; gap:5%">
                         <input disabled type="email" id="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
                                style="height:40px; width:75%"/>
-                        <button type="button" class="btn btn-outline-success" style="height:40px; width:20%">이메일 변경</button>
+                        <button type="button" class="btn btn-outline-success" style="height:40px; width:20%" onclick="openMailModal()">이메일 변경</button>
                     </div>
                 </div>
 
@@ -81,6 +81,9 @@
 
     <script>
 
+        /*
+        * 선택한 이미지로 src 변경
+        * */
         function changeImg() {
             var imageFileInput = document.getElementById('profile-image-file');
             var imageFile = imageFileInput.files[0];
@@ -89,6 +92,9 @@
             img.src = URL.createObjectURL(imageFile);
         }
 
+        /*
+        * 프로필 이미지 S3, DB에서 삭제
+        * */
         function deleteImg() {
             console.log("delete img()")
             var xhr = new XMLHttpRequest();
@@ -105,8 +111,10 @@
             xhr.send();
         }
 
+        /*
+        * 프로필 수정
+        * */
         function submitForm() {
-            console.log("SUBMIT FORM()");
             let form = document.getElementById('profile-modify-form');
             let formData = new FormData(form);
 
@@ -144,6 +152,14 @@
             };
 
             xhr.send(formData);
+        }
+
+
+        /*
+        * 이메일 변경 모달 열기
+        * */
+        function openMailModal() {
+
         }
 
 
