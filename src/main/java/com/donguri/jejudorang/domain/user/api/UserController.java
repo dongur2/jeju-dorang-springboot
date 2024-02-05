@@ -1,10 +1,7 @@
 package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.dto.request.*;
-import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
-import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
-import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
-import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.*;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -304,7 +301,7 @@ public class UserController {
     * 비밀번호 찾기 이메일 전송
     * */
     @PostMapping("/email/find-pwd")
-    public ResponseEntity<?> findId(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> findPwd(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
 
