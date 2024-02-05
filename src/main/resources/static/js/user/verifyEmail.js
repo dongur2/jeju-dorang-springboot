@@ -118,6 +118,10 @@ function checkMail() {
                         elements[i].disabled = true;
                     }
 
+                    if(document.getElementById('btn-for-reset-pwd') != null) {
+                        document.getElementById('btn-for-reset-pwd').style.display = 'block';
+                    }
+
                 } else {
                     alert(xhr.responseText);
                 }

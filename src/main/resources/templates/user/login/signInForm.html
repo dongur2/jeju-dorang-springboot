@@ -96,11 +96,13 @@
                                     <label for="email-verify" class="form-label">이메일 인증번호 확인</label>
                                     <input type="text" id="email-verify" name="code" class="form-control btn-verify">
 
-                                    <button type="button" class="btn btn-warning btn-verify" onclick="checkMail()"
+                                    <button type="button" class="btn btn-secondary btn-verify" onclick="checkMail()"
                                             style="width:100%; margin-top:5px">인증번호 확인</button>
                                     <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
                                 </div>
                             </div>
+
+                            <button type="button" class="btn btn-warning" id="btn-for-reset-pwd" style="display:none; width:100%;">비밀번호 재설정</button>
                         </div>
 
                     </div>
