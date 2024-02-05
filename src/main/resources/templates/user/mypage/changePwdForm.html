@@ -28,7 +28,33 @@
 
 
         <!-- 컨텐츠 블록  -->
-        <div class="board-item board-main" style="background: palegoldenrod;">
+        <div class="board-item board-main"
+             style="width: 70%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%;
+                    border: 1px solid rgba(134,134,134,0.37); border-radius: 15px;">
+
+            <form id="profile-modify-form" th:action th:method="put" th:object="${passwordRequest}"
+                  style="width:100%; height:400px; margin-bottom:auto;
+                            display: flex; flex-direction: column; gap: 5%; justify-content: center; align-items: center;">
+
+                <div style="width:90%;">
+                    <label for="nowPassword">현재 비밀번호</label>
+                    <input type="password" id="nowPassword" name="oldPwd" style="width:100%; height:40px; "/>
+                </div>
+
+                <div style="width:90%; margin-top: 3%">
+                    <label for="newPassword">새로운 비밀번호</label>
+                    <input type="password" id="newPassword" name="newPwd" style="width:100%; height:40px; "/>
+                </div>
+
+                <div style="width:90%; margin-top: 1%">
+                    <label for="newPasswordForCheck">새로운 비밀번호 확인</label>
+                    <input type="password" id="newPasswordForCheck" name="newPwdToCheck" style="width:100%; height:40px; "/>
+                </div>
+
+                <button type="button" class="btn btn-success" onclick="submitForm()"
+                        style="width:90%; height:60px; margin-top:5%;">비밀번호 변경</button>
+
+            </form>
 
         </div>
 
