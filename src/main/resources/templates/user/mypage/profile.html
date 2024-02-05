@@ -4,6 +4,9 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{/fragments/layout}">
 <head>
+    <script th:src="@{/js/user/verifyEmail.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+
     <title>내 프로필 - 제주도랑 | 마이페이지</title>
 </head>
 <th layout:fragment="content">
@@ -66,9 +69,12 @@
                 <div style="width:90%;">
                     <label for="email">이메일</label>
                     <div style="display: flex; flex-direction: row; width:100%; gap:5%">
-                        <input disabled type="email" id="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
+                        <input disabled type="email" id="emailDisabled" name="emailDisabled" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
                                style="height:40px; width:75%"/>
-                        <button type="button" class="btn btn-outline-success" style="height:40px; width:20%" onclick="openMailModal()">이메일 변경</button>
+
+                        <button type="button" class="btn btn-outline-success" style="height:40px; width:20%" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            이메일 변경
+                        </button>
                     </div>
                 </div>
 
@@ -77,6 +83,45 @@
             </form>
 
         </div>
+
+        <!-- 이메일 모달 -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">이메일 변경</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div style="display: flex; flex-direction: column; gap:5px">
+                            <label for="email" class="form-label">이메일</label>
+                            <input type="email" id="email" name="email" class="form-control btn-verify">
+
+                            <input type="text" id="email-verify-dto" name="emailToSend" class="form-control" style="display: none">
+                            <button type="button" class="btn btn-outline-secondary btn-verify" onclick="sendMail()">인증번호 전송</button>
+
+                            <div id="email-verify-container" style="display: none;">
+                                <div>
+                                    <label for="email-verify" class="form-label">이메일 인증번호 확인</label>
+                                    <input type="text" id="email-verify" name="code" class="form-control btn-verify">
+
+                                    <button type="button" class="btn btn-outline-warning btn-verify" onclick="checkMail()" style="width:100%; margin-top:5px">인증번호 확인</button>
+                                    <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-success">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -159,6 +204,8 @@
         * 이메일 변경 모달 열기
         * */
         function openMailModal() {
+            const myModal = document.getElementById('email-modal');
+
 
         }
 
