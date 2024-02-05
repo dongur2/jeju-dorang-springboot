@@ -387,6 +387,22 @@ public class UserServiceI implements UserService {
         }
     }
 
+    @Override
+    @Transactional
+    public void updateEmail(String token, MailChangeRequest emailToUpdate) {
+
+        try {
+            User nowUser = getNowUser(token);
+
+            nowUser.getAuth().updateEmail(emailToUpdate.emailToSend());
+            log.info("이메일 변경이 완료되었습니다. 변경된 이메일: {}", nowUser.getAuth().getEmail());
+
+        } catch (Exception e) {
+            log.error("이메일 변경에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
     private User getNowUser(String token) {
         String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
 

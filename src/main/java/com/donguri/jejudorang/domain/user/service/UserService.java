@@ -35,4 +35,7 @@ public interface UserService {
 
     // 비밀번호 수정
     void updatePassword(String accessToken, PasswordRequest pwdToUpdate) throws Exception;
+
+    // 이메일 변경
+    void updateEmail(String accessToken, MailChangeRequest emailToUpdate);
 }

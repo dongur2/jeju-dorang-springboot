@@ -269,7 +269,7 @@ public class UserController {
         try {
             checkValidationAndReturnException(bindingResult);
 
-            userService.updateEmail(token, mailChangeRequest);
+            userService.updateEmail(token.getValue(), mailChangeRequest);
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {

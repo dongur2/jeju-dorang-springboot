@@ -1,8 +1,6 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.user.dto.MailSendRequest;
-import com.donguri.jejudorang.domain.user.dto.PasswordRequest;
-import com.donguri.jejudorang.domain.user.dto.ProfileRequest;
+import com.donguri.jejudorang.domain.user.dto.*;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.AuthenticationRepository;
@@ -41,7 +39,9 @@ class UserServiceITest {
     @Autowired PasswordEncoder passwordEncoder;
 
     @Value("${mail.test.email}")
-    String testmail;
+    String testMail;
+    @Value(("${mail.test.new-email}"))
+    String testMail2;
 
 
     @AfterEach
@@ -94,7 +94,7 @@ class UserServiceITest {
     void 이메일_인증_메일_전송() {
         //given
         MailSendRequest mailRequest = MailSendRequest.builder()
-                .email(testmail)
+                .email(testMail)
                 .build();
 
         //when, then
@@ -117,7 +117,7 @@ class UserServiceITest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).email(testmail).agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("1234").build();
 
         Set<Role> testRoles = new HashSet<>();
@@ -134,7 +134,7 @@ class UserServiceITest {
 
         //when
         MailSendRequest mailRequest = MailSendRequest.builder()
-                .email(testmail)
+                .email(testMail)
                 .build();
 
         //then
@@ -146,7 +146,7 @@ class UserServiceITest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).email(testmail).agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("abcde!!1234").build();
         password.updatePassword(passwordEncoder, password.getPassword());
 
@@ -184,7 +184,7 @@ class UserServiceITest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).email(testmail).agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("abcde!!1234").build();
         password.updatePassword(passwordEncoder, password.getPassword());
 
@@ -212,7 +212,7 @@ class UserServiceITest {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
         Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
-        Authentication authentication = Authentication.builder().user(user).email(testmail).agreement(AgreeRange.ALL).build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password("abcde!!1234").build();
         password.updatePassword(passwordEncoder, password.getPassword());
 
@@ -233,6 +233,38 @@ class UserServiceITest {
 
         //then
         Assertions.assertThat(pwdToUpdate.newPwd().equals(pwdToUpdate.newPwdToCheck())).isFalse();
+    }
+
+    @Test
+    void 이메일_변경_성공() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("abcde!!1234").build();
+        password.updatePassword(passwordEncoder, password.getPassword());
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User savedUser = userRepository.save(user);
+
+        //when
+        MailChangeRequest request = MailChangeRequest.builder()
+                .emailToSend(testMail2).isVerified(true).build();
+
+        savedUser.getAuth().updateEmail(request.emailToSend());
+
+        //then
+        Assertions.assertThat(userRepository.findById(savedUser.getId()).get().getAuth().getEmail())
+                .isEqualTo(request.emailToSend());
     }
 
 }
