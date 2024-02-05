@@ -117,7 +117,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-success">확인</button>
+                        <button type="button" class="btn btn-success" onclick="changeEmail()">확인</button>
                     </div>
                 </div>
             </div>
@@ -202,14 +202,32 @@
 
 
         /*
-        * 이메일 변경 모달 열기
+        * 이메일 변경 컨트롤러 요청
         * */
-        function openMailModal() {
-            const myModal = document.getElementById('email-modal');
+        function changeEmail() {
+            var mailChangeRequest = {
+                emailToSend: document.getElementById('email-verify-dto').value,
+                isVerified: document.getElementById('email-verify-status').value
+            };
 
+            let xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/user/email/change", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
 
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if(xhr.status === 200) {
+                        alert("이메일이 변경되었습니다.")
+                        window.location.reload();
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+
+            xhr.send(JSON.stringify(mailChangeRequest));
         }
-
 
 
     </script>

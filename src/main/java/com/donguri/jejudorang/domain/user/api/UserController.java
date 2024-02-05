@@ -2,7 +2,6 @@ package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.dto.*;
 import com.donguri.jejudorang.domain.user.service.UserService;
-import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -265,7 +264,7 @@ public class UserController {
     * */
     @PutMapping("/email/change")
     public ResponseEntity<?> updateEmail(@CookieValue("access_token") Cookie token,
-                                         @Valid MailChangeRequest mailChangeRequest, BindingResult bindingResult) {
+                                         @RequestBody @Valid MailChangeRequest mailChangeRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
 
