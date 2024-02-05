@@ -189,8 +189,6 @@ public class UserController {
     @GetMapping("/settings/profile")
     public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
         try {
-            log.info("컨트롤러 진입");
-
             String accessToken = token.getValue();
             log.info("@CookieValue Cookie's access_token: {}", accessToken);
 
@@ -214,27 +212,22 @@ public class UserController {
     *
     * */
     @PutMapping("/settings/profile")
-    public String updateProfile(@CookieValue("access_token") Cookie token,
-                                @Valid ProfileRequest profileRequest, BindingResult bindingResult,
-                                Model model) {
-        // 유효성 검사 에러
-        if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
-        }
-
-        log.info("UPDATE CONTROLLER !! ");
+    public ResponseEntity<?> updateProfile(@CookieValue("access_token") Cookie token,
+                                @Valid ProfileRequest profileRequest, BindingResult bindingResult) {
 
         try {
-            String accessToken = token.getValue();
-            log.info("@CookieValue Cookie's access_token: {}", accessToken);
+            if (bindingResult.hasErrors()) {
+                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
+            }
 
-            ProfileResponse profileResponse = userService.updateProfileData(accessToken, profileRequest);
-            model.addAttribute("profileResponse", profileResponse);
-            return "/user/mypage/profile";
+            String accessToken = token.getValue();
+
+            userService.updateProfileData(accessToken, profileRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
-            log.error(e.getMessage());
-            return "/user/mypage/profile";
+            log.error("프로필 수정 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

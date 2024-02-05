@@ -13,7 +13,6 @@ import com.donguri.jejudorang.global.config.RefreshToken;
 import com.donguri.jejudorang.global.config.RefreshTokenRepository;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,7 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -288,7 +286,7 @@ public class UserServiceI implements UserService {
     * */
     @Override
     @Transactional
-    public ProfileResponse updateProfileData(String token, ProfileRequest dataToUpdate) {
+    public void updateProfileData(String token, ProfileRequest dataToUpdate) throws IllegalAccessException {
         try {
             User nowUser = getNowUser(token);
 
@@ -310,7 +308,7 @@ public class UserServiceI implements UserService {
                 Map<String, String> uploadedImg = imageService.putS3Object(dataToUpdate.img());
 
                 if (uploadedImg == null) {
-                    throw new IllegalAccessException("사진 업로드 실패");
+                    throw new IllegalAccessException("사진 업로드에 실패했습니다.");
 
                 } else {
                     nowUser.getProfile().updateImgName(uploadedImg.get("imgName"));
@@ -322,16 +320,11 @@ public class UserServiceI implements UserService {
             Profile profile = nowUser.getProfile();
             profile.updateNickname(dataToUpdate.nickname());
 
-            nowUser.getAuth().updateEmail(dataToUpdate.email()); // 추가 인증 필요
-
             log.info("프로필 업데이트를 완료했습니다");
-
-            return ProfileResponse.builder().build()
-                    .from(nowUser);
 
         } catch (Exception e) {
             log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
-            return null;
+            throw e;
         }
     }
 

@@ -65,7 +65,7 @@
 
                 <div style="width:90%;">
                     <label for="email">이메일</label>
-                    <input type="email" id="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
+                    <input disabled type="email" id="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
                            style="width:100%; height:40px; "/>
                 </div>
 
@@ -134,8 +134,9 @@
                 if (xhr.status === 200) {
                     alert('프로필이 수정되었습니다.');
                     window.location.reload();
+
                 } else {
-                    alert('프로필 수정에 실패했습니다.');
+                    alert(xhr.responseText);
                 }
             };
 

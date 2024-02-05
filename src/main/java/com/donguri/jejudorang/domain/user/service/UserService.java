@@ -2,7 +2,6 @@ package com.donguri.jejudorang.domain.user.service;
 
 
 import com.donguri.jejudorang.domain.user.dto.*;
-import org.apache.coyote.BadRequestException;
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
@@ -10,19 +9,27 @@ import java.util.Optional;
 
 public interface UserService {
 
+    // 이메일 인증번호 전송, 확인
     void sendVerifyMail(MailSendRequest mailSendRequest);
     boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest);
+
+    // 회원가입
     void signUp(SignUpRequest signUpRequest);
 
+    // 로그인
     Map<String, String> signIn(LoginRequest loginRequest);
 
+    // 로그아웃
     Optional<Authentication> logOut();
 
+
+    // 프로필 정보 조회
     ProfileResponse getProfileData(String accessToken);
 
 
     // 프로필 사진, 닉네임, 이메일 수정
-    ProfileResponse updateProfileData(String accessToken, ProfileRequest dataToUpdate);
+    void updateProfileData(String accessToken, ProfileRequest dataToUpdate) throws IllegalAccessException;
+
     // 프로필 사진 삭제
     void deleteProfileImg(String accessToken);
 
