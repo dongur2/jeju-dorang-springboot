@@ -69,6 +69,8 @@ public class UserServiceI implements UserService {
 
     /*
     * 이메일 확인 - 중복 확인 후 인증 번호 전송
+    * > MailSendRequest
+    *
     * */
     @Override
     @Transactional
@@ -85,6 +87,11 @@ public class UserServiceI implements UserService {
         }
     }
 
+    /*
+    * 이메일 인증 번호 확인
+    * > MailVerifyRequest
+    *
+    * */
     @Override
     @Transactional
     public boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest) {
@@ -130,6 +137,8 @@ public class UserServiceI implements UserService {
 
     /*
     * 회원 가입
+    * > SignUpRequest
+    *
     * */
     @Override
     @Transactional
@@ -196,6 +205,8 @@ public class UserServiceI implements UserService {
 
     /*
     * 로그인
+    * > LoginRequest
+    *
     * */
     @Override
     @Transactional
@@ -270,6 +281,10 @@ public class UserServiceI implements UserService {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
     }
 
+    /*
+    * 프로필 조회
+    * > token
+    * */
     @Override
     @Transactional
     public ProfileResponse getProfileData(String token) {
@@ -286,7 +301,9 @@ public class UserServiceI implements UserService {
 
     /*
     * 프로필 전체 수정
-    * > token, requestDTO
+    * > token
+    * > ProfileRequest
+    *
     * */
     @Override
     @Transactional
@@ -334,7 +351,8 @@ public class UserServiceI implements UserService {
 
     /*
     * 프로필 사진만 삭제
-    * > params token
+    * > token
+    *
     * */
     @Override
     @Transactional
@@ -363,7 +381,7 @@ public class UserServiceI implements UserService {
     /*
     * 비밀번호 변경
     * > token
-    * > pwdToUpdate
+    * > PasswordRequest
     *
     * */
     @Override
@@ -391,6 +409,12 @@ public class UserServiceI implements UserService {
         }
     }
 
+    /*
+    * 이메일 변경
+    * > token
+    * > MailChangeRequest
+    *
+    * */
     @Override
     @Transactional
     public void updateEmail(String token, MailChangeRequest emailToUpdate) {
