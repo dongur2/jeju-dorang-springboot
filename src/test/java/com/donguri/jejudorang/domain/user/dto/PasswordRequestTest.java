@@ -30,7 +30,7 @@ class PasswordRequestTest {
     void 비밀번호_요청_DTO_성공() {
         //given
         PasswordRequest passwordRequest = PasswordRequest.builder()
-                .oldPwd("abcde~!zzz").newPwd("ABCDEFG!!$$").newPwdToCheck("ABCDEFG!!$$").build();
+                .oldPwd("abcde2~!zzz").newPwd("ABCDEFG2!!$$").newPwdToCheck("ABCDEFG2!!$$").build();
 
         //when
         Set<ConstraintViolation<PasswordRequest>> validate = validator.validate(passwordRequest);
