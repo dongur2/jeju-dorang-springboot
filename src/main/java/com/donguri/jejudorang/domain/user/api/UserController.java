@@ -205,10 +205,8 @@ public class UserController {
 
     /*
     * 마이페이지 - 프로필 수정
+    * nickname
     * img: S3 url
-    * email: 추가 인증 필요
-    * pwd
-    * pwdCheck
     *
     * */
     @PutMapping("/settings/profile")
@@ -277,6 +275,11 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    /*
+    * 이메일 변경
+    * */
+
 
 
 

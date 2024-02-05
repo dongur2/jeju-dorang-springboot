@@ -65,8 +65,11 @@
 
                 <div style="width:90%;">
                     <label for="email">이메일</label>
-                    <input disabled type="email" id="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
-                           style="width:100%; height:40px; "/>
+                    <div style="display: flex; flex-direction: row; width:100%; gap:5%">
+                        <input disabled type="email" id="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
+                               style="height:40px; width:75%"/>
+                        <button type="button" class="btn btn-outline-success" style="height:40px; width:20%">이메일 변경</button>
+                    </div>
                 </div>
 
                 <button type="button" class="btn btn-success" onclick="submitForm()"
