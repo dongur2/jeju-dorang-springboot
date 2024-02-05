@@ -1,5 +1,9 @@
 package com.donguri.jejudorang.domain.user.service;
 
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.entity.Community;
+import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
@@ -39,7 +43,10 @@ class UserServiceITest {
     @Autowired PasswordRepository passwordRepository;
     @Autowired AuthenticationRepository authenticationRepository;
 
+    @Autowired CommunityRepository communityRepository;
+
     @Autowired UserService userService;
+    @Autowired CommunityService communityService;
 
     @Autowired PasswordEncoder passwordEncoder;
 
@@ -55,6 +62,7 @@ class UserServiceITest {
         userRepository.flush();
         profileRepository.flush();
         passwordRepository.flush();
+        communityRepository.flush();
         authenticationRepository.flush();
     }
 
@@ -447,5 +455,44 @@ class UserServiceITest {
 
         //then
         Assertions.assertThat(userRepository.findByExternalId("userId")).isEmpty();
+    }
+
+    @Test
+    @Transactional
+    void 회원_탈퇴_작성글_개수_그대로_확인() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email(testMail).agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("abcde!!1234").build();
+        password.updatePassword(passwordEncoder, password.getPassword());
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User saved = userRepository.save(user);
+
+        //when
+        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+                .title("커뮤니티 글작성 테스트 제목")
+                .type("chat")
+                .content("커뮤니티 글작성 테스트 - CHAT")
+                .build();
+
+        Community savedCommunity = communityRepository.save(postToWrite.toEntity(saved));
+
+        //when
+        communityService.findAllPostsByUserAndSetWriterNull(saved.getId());
+        userRepository.deleteById(saved.getId());
+
+        //then
+        Assertions.assertThat(communityRepository.findAll().size()).isEqualTo(1);
     }
 }

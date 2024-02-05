@@ -155,7 +155,8 @@
 
                         <div class="card-bottom">
                             <div class="card-text card-bottom-sub">
-                                <small th:text="${post.nickname}">nickname</small>
+                                <small th:if="${post.nickname != null}" th:text="${post.nickname}">nickname</small>
+                                <small th:if="${post.nickname == null}">탈퇴한 회원</small>
                                 <small> • </small>
                                 <small th:text="${post.createdAt}">date</small>
                             </div>

@@ -178,11 +178,18 @@ public class CommunityServiceI implements CommunityService {
         }
     }
 
-
+    /*
+    * 회원 탈퇴시 작성자 - 작성글 연관 관계 삭제
+    * */
     @Override
     @Transactional
-    public void updateBookmarkState(CommunityBookmark bookmark) {
-        bookmark.getCommunity().updateBookmarks(bookmark); // 없으면 추가, 있으면 삭제
+    public void findAllPostsByUserAndSetWriterNull(Long userId) {
+        try {
+            communityRepository.findAllByWriterId(userId).forEach(Community::deleteWriter);
+
+        } catch (Exception e) {
+            log.error("작성글 작성자 삭제 실패: {}", e.getMessage());
+        }
     }
 
     private static String setTypeForRedirect(Community resultCommunity) {
