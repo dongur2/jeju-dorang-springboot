@@ -1,7 +1,6 @@
 package com.donguri.jejudorang.domain.user.repository;
 
 import com.donguri.jejudorang.domain.user.entity.User;
-import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

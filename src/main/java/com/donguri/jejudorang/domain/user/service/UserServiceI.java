@@ -489,6 +489,11 @@ public class UserServiceI implements UserService {
         }
     }
 
+    /*
+    * 랜덤 비밀번호 생성 & 비밀번호 변경 후 이메일 전송
+    * > MailSendForPwdRequest
+    *
+    * */
     @Override
     @Transactional
     public void changePwdRandomlyAndSendMail(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
