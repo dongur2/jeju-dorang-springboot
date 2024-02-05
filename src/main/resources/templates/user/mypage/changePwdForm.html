@@ -32,7 +32,7 @@
              style="width: 70%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%;
                     border: 1px solid rgba(134,134,134,0.37); border-radius: 15px;">
 
-            <form id="profile-modify-form" th:action th:method="put" th:object="${passwordRequest}"
+            <form id="profile-modify-form-pwd" th:action th:method="put" th:object="${passwordRequest}"
                   style="width:100%; height:400px; margin-bottom:auto;
                             display: flex; flex-direction: column; gap: 5%; justify-content: center; align-items: center;">
 
@@ -55,12 +55,36 @@
                         style="width:90%; height:60px; margin-top:5%;">비밀번호 변경</button>
 
             </form>
-
         </div>
 
-
-
     </div>
+
+
+    <script>
+
+        function submitForm() {
+            var form = document.getElementById('profile-modify-form-pwd');
+            var formData = new FormData(form);
+
+            alert("submitForm()");
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', form.action, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('비밀번호 변경이 완료되었습니다.');
+                    window.location.reload();
+
+                } else {
+                    alert(xhr.responseText);
+                }
+            };
+            xhr.send(formData);
+        }
+
+    </script>
+
 
 </th>
 </html>

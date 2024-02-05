@@ -266,23 +266,22 @@ public class UserController {
     public String getUpdatePasswordForm() {
         return "/user/mypage/changePwdForm";
     }
-    @ResponseBody
     @PutMapping("/settings/profile/pwd")
-    public String updatePassword(@CookieValue("access_token") Cookie token,
+    public ResponseEntity<?> updatePassword(@CookieValue("access_token") Cookie token,
                                  @Valid PasswordRequest passwordRequest, BindingResult bindingResult) {
 
         try {
             if (bindingResult.hasErrors()) {
                 log.error("비밀번호 수정 실패: {}", bindingResult.getFieldError().getDefaultMessage());
-                return "Bad Request";
+                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
             }
 
             userService.updatePassword(token.getValue(), passwordRequest);
-            return "OK";
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
             log.error("비밀번호 수정 실패: {}", e.getMessage());
-            return "Failed: " + e.getMessage();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -370,6 +370,7 @@ public class UserServiceI implements UserService {
     *
     * */
     @Override
+    @Transactional
     public void updatePassword(String token, PasswordRequest pwdToUpdate) throws BadRequestException {
         try {
             User nowUser = getNowUser(token);
