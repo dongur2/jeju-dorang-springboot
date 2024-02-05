@@ -5,6 +5,7 @@
         layout:decorate="~{/fragments/layout}">
 <head>
     <title>로그인 - 제주도랑</title>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
     <script th:inline="javascript">
         var error = [[${errorMsg}]];
         if (error != null) {
@@ -36,9 +37,73 @@
 
             <button type="button" class="btn btn-outline-success" th:onclick="|location.href='@{/user/signup}'|"
                     style="width:140px">회원가입</button>
-            <button type="button" class="btn btn-outline-warning" style="width:140px">아이디 찾기</button>
+
+            <button type="button" class="btn btn-outline-warning" style="width:140px"
+                    data-bs-toggle="modal" data-bs-target="#idModal">아이디 찾기</button>
+
             <button type="button" class="btn btn-outline-warning" style="width:140px">비밀번호 찾기</button>
         </div>
+
+
+        <!-- 아이디 찾기 모달 -->
+        <div class="modal fade" id="idModal" tabindex="-1" aria-labelledby="idModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="idModalLabel">아이디 찾기</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div style="display: flex; flex-direction: column; gap:5px">
+                            <label for="email" class="form-label">가입한 이메일</label>
+                            <input type="email" id="email" name="email" class="form-control btn-verify">
+                            <button type="button" class="btn btn-warning btn-send" onclick="sendMail()">이메일로 아이디 전송</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <script>
+
+        /*
+        * 아이디 찾기 이메일 전송
+        * */
+        function sendMail() {
+            var mailSendRequest = {
+                email: document.getElementById("email").value
+            };
+
+            if (mailSendRequest.email == null
+                || mailSendRequest.email.trim() === "") {
+                alert("이메일을 입력해주세요.");
+
+            } else {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/user/email/find-id", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            alert("입력한 이메일로 아이디가 전송되었습니다. 전송된 메일을 확인해주세요.");
+
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }
+                }
+
+                xhr.send(JSON.stringify(mailSendRequest));
+            }
+        }
+
+    </script>
+
 </th>
 </html>

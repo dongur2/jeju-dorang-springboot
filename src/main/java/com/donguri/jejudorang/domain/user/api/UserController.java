@@ -285,7 +285,7 @@ public class UserController {
     /*
     * 아이디 찾기 이메일 전송
     * */
-    @GetMapping("/email/find-id")
+    @PostMapping("/email/find-id")
     public ResponseEntity<?> findId(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
