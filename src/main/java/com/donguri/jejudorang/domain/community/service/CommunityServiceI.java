@@ -110,7 +110,7 @@ public class CommunityServiceI implements CommunityService {
                     StringBuilder idFromJwt = new StringBuilder();
                     try {
                         idFromJwt.append(jwtProvider.getUserNameFromJwtToken(accessToken.getValue()));
-                    } catch (SignatureException e) {
+                    } catch (Exception e) {
                         log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
                         resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
                         return resMap;
