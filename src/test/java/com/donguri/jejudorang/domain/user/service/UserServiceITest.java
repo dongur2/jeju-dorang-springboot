@@ -59,10 +59,10 @@ class UserServiceITest {
     @AfterEach
     void after() {
         em.clear();
+        communityRepository.flush();
         userRepository.flush();
         profileRepository.flush();
         passwordRepository.flush();
-        communityRepository.flush();
         authenticationRepository.flush();
     }
 
@@ -302,7 +302,7 @@ class UserServiceITest {
         userRepository.save(user);
 
         //when
-        MailSendRequest request = MailSendRequest.builder().email(testMail2).build();
+        MailSendRequest request = MailSendRequest.builder().email(testMail).build();
 
         //then
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> userService.sendMailWithId(request));
@@ -494,5 +494,6 @@ class UserServiceITest {
 
         //then
         Assertions.assertThat(communityRepository.findAll().size()).isEqualTo(1);
+        Assertions.assertThat(userRepository.findAll().size()).isEqualTo(0);
     }
 }

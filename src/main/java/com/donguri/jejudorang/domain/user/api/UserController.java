@@ -337,7 +337,7 @@ public class UserController {
     * 회원 탈퇴
     *
     * */
-    @DeleteMapping("/settings/profile/quit")
+    @PostMapping("/settings/profile/quit")
     public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token) {
         try {
             userService.withdrawUser(token.getValue());

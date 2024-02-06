@@ -103,7 +103,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-outline-dark" onclick="quitUser()">탈퇴</button>
+                        <button type="button" class="btn btn-outline-dark" onclick="quitUser()" data-bs-dismiss="modal">탈퇴</button>
                     </div>
                 </div>
             </div>
@@ -260,7 +260,7 @@
         * */
         function quitUser() {
             let xhr = new XMLHttpRequest();
-            xhr.open("DELETE", "/user/settings/profile/quit", true);
+            xhr.open("POST", "/user/settings/profile/quit", true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
