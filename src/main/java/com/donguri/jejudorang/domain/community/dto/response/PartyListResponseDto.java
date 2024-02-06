@@ -4,9 +4,11 @@ import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
 import com.donguri.jejudorang.global.common.DateFormat;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record PartyListResponseDto (
     Long id,
     BoardType type,
@@ -19,16 +21,22 @@ public record PartyListResponseDto (
     int bookmarkCount
 ) {
     public static PartyListResponseDto from(Community community, List<String> tagList) {
-        return new PartyListResponseDto(
-                community.getId(),
-                community.getType(),
-                community.getState(),
-                community.getTitle(),
-                community.getWriter().getProfile().getNickname(),
-                DateFormat.calculateTime(community.getCreatedAt()),
-                community.getViewCount(),
-                tagList,
-                community.getBookmarksCount()
-        );
+        String nickname = null;
+        if (community.getWriter() != null) {
+            nickname = community.getWriter().getProfile().getNickname();
+        }
+
+        return PartyListResponseDto.builder()
+                .id(community.getId())
+                .type(community.getType())
+                .state(community.getState())
+                .title(community.getTitle())
+                .nickname(nickname)
+                .createdAt(DateFormat.calculateTime(community.getCreatedAt()))
+                .viewCount(community.getViewCount())
+                .tags(tagList)
+                .bookmarkCount(community.getBookmarksCount())
+                .build();
+
     }
 }

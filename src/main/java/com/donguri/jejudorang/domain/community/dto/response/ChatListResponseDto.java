@@ -3,9 +3,11 @@ package com.donguri.jejudorang.domain.community.dto.response;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.global.common.DateFormat;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record ChatListResponseDto (
         Long id,
         BoardType type,
@@ -17,15 +19,21 @@ public record ChatListResponseDto (
         int bookmarkCount
 ) {
     public static ChatListResponseDto from(Community community, List<String> tagList) {
-        return new ChatListResponseDto(
-                community.getId(),
-                community.getType(),
-                community.getTitle(),
-                community.getWriter().getProfile().getNickname(),
-                DateFormat.calculateTime(community.getCreatedAt()),
-                community.getViewCount(),
-                tagList,
-                community.getBookmarksCount()
-        );
+        String nickname = null;
+        if (community.getWriter() != null) {
+            nickname = community.getWriter().getProfile().getNickname();
+        }
+
+        return ChatListResponseDto.builder()
+                .id(community.getId())
+                .type(community.getType())
+                .title(community.getTitle())
+                .nickname(nickname)
+                .createdAt(DateFormat.calculateTime(community.getCreatedAt()))
+                .viewCount(community.getViewCount())
+                .tags(tagList)
+                .bookmarkCount(community.getBookmarksCount())
+                .build();
+
     }
 }

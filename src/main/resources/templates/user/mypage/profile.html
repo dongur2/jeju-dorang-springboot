@@ -25,17 +25,17 @@
                     <a class="nav-link" href="#" style="color: #696969;"
                        th:href="@{/user/settings/profile/pwd}">비밀번호 변경</a>
                 </li>
+
             </ul>
         </div>
 
 
         <!-- 컨텐츠 블록  -->
         <div class="board-item board-main"
-             style="width: 70%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%;
-                    border: 1px solid rgba(134,134,134,0.37); border-radius: 15px;">
+             style="width: 70%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%;">
 
             <form id="profile-modify-form" th:action th:method="put" th:object="${profileRequest}"
-                    style="width:100%; height:750px; margin-bottom:auto;
+                    style="width:100%; height:750px; margin-bottom:auto; border: 1px solid rgba(134,134,134,0.37); border-radius: 15px;
                             display: flex; flex-direction: column; gap: 3%; justify-content: center; align-items: center;">
 
                 <div class="profile-pic-box" style="width:90%; display: flex; flex-direction: column;">
@@ -79,9 +79,34 @@
                 </div>
 
                 <button type="button" class="btn btn-success" onclick="submitForm()"
-                style="width:90%; height:60px; margin-top:3%;">수정</button>
+                        style="width:90%; height:60px; margin-top:3%;">수정</button>
             </form>
 
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#quitModal"
+                    style="width:100px; margin-left:auto; margin-top:-1%;">
+                회원 탈퇴
+            </button>
+
+        </div>
+
+
+        <!-- 회원 탈퇴 모달 -->
+        <div class="modal fade" id="quitModal" tabindex="-1" aria-labelledby="quitModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="quitModalLabel">회원 탈퇴</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        제주도랑을 탈퇴하시겠습니까?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-outline-dark" onclick="quitUser()" data-bs-dismiss="modal">탈퇴</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 이메일 모달 -->
@@ -107,7 +132,7 @@
                                     <input type="text" id="email-verify" name="code" class="form-control btn-verify">
 
                                     <button type="button" class="btn btn-outline-warning btn-verify" onclick="checkMail()"
-                                            style="width:100%; margin-top:5px">인증번호 확인</button>
+                                            style="width:100%; margin-top:5px" >인증번호 확인</button>
                                     <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
                                 </div>
                             </div>
@@ -117,7 +142,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-success" onclick="changeEmail()">확인</button>
+                        <button type="button" class="btn btn-success" onclick="changeEmail()"  data-bs-dismiss="modal">확인</button>
                     </div>
                 </div>
             </div>
@@ -227,6 +252,29 @@
             }
 
             xhr.send(JSON.stringify(mailChangeRequest));
+        }
+
+
+        /*
+        * 회원 탈퇴 요청
+        * */
+        function quitUser() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/user/settings/profile/quit", true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if(xhr.status === 200) {
+                        alert("회원 탈퇴되었습니다.")
+                        window.location.href = "/";
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+
+            xhr.send();
         }
 
 

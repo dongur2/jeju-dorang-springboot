@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,5 +20,7 @@ public interface CommunityService {
     //updateView
     void updateView(Long communityId);
 
-    void updateBookmarkState(CommunityBookmark bookmark);
+
+    //회원 탈퇴시 작성글과 작성자 연관 관계 삭제 - null 처리
+    void findAllPostsByUserAndSetWriterNull(Long userId);
 }

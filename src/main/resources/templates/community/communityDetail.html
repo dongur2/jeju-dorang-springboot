@@ -26,7 +26,8 @@
             <div class="board-sub-header">
                 <div class="board-sub-title">
                     <h6 class="sub-title-box user-name">
-                        <a href="#" th:text="${post.nickname}">닉네임</a>
+                        <a href="#" th:if="${post.nickname != null}" th:text="${post.nickname}">닉네임</a>
+                        <a href="#" th:if="${post.nickname == null}">탈퇴한 회원</a>
                     </h6>
                     <div class="sub-title-box content-date">
                         <span class="sub-title sub-title-created-at">

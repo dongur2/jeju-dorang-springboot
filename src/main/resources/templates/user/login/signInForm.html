@@ -60,7 +60,7 @@
                         <div style="display: flex; flex-direction: column; gap:5px">
                             <label for="email" class="form-label">가입한 이메일</label>
                             <input type="email" id="emailForId" name="email" class="form-control btn-verify">
-                            <button type="button" class="btn btn-warning btn-send" onclick="sendMail()">이메일로 아이디 전송</button>
+                            <button type="button" class="btn btn-warning btn-send" onclick="sendMail()" data-bs-dismiss="modal">이메일로 아이디 전송</button>
                         </div>
 
                     </div>
@@ -103,7 +103,7 @@
                             </div>
 
                             <button type="button" class="btn btn-warning" id="btn-for-reset-pwd" style="display:none; width:100%;"
-                            onclick="changeTempPwd()">비밀번호 재설정</button>
+                            onclick="changeTempPwd()"  data-bs-dismiss="modal">비밀번호 재설정</button>
                         </div>
 
                     </div>
