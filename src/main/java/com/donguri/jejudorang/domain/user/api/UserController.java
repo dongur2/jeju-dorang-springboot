@@ -360,7 +360,7 @@ public class UserController {
     public String getMyWritingsPage(@CookieValue("access_token") Cookie token, Model model,
                                     @RequestParam(name = "nowPage", required = false, defaultValue = "0") Integer nowPage) {
         try {
-            Pageable pageable = PageRequest.of(nowPage, 10);
+            Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
             Map<String, Object> resultMap = userService.getMyCommunityWritings(token.getValue(), pageable);
 
             model.addAttribute("endPage", resultMap.get("page"));
