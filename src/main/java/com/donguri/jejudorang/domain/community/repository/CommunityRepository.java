@@ -46,4 +46,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
 
     List<Community> findAllByWriterId(Long writerId);
+
+    // 작성글 모두 조회 - 페이징 처리
+    Page<Community> findAllByWriterId(Long writerId, Pageable pageable);
 }

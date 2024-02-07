@@ -1,9 +1,9 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
@@ -12,12 +12,13 @@ import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagServi
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.config.jwt.JwtProvider;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,6 +135,25 @@ public class CommunityServiceI implements CommunityService {
             log.error("게시글 불러오기를 실패했습니다. {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> getAllPostsWrittenByUser(User writer, Pageable pageable) {
+
+        Page<CommunityListResponseDto> resultDataPage = communityRepository.findAllByWriterId(writer.getId(), pageable)
+                .map(community -> CommunityListResponseDto.from(community,
+                        community.getTags().stream()
+                                .map(tag -> tag.getTag().getKeyword())
+                                .toList()));
+
+        int resultDataPageWholeSize = communityRepository.findAllByWriterId(writer.getId(), pageable).getTotalPages();
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("pageCount", resultDataPageWholeSize);
+        resultMap.put("data", resultDataPage);
+
+        return resultMap;
     }
 
 

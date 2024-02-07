@@ -23,7 +23,13 @@
             <div th:replace="~{fragments/mypage/mypageWritingsTab :: mypageWritingsTabFragment}"></div>
 
             <div>
-                작성글 목록
+                <h1>작성글 목록</h1>
+
+                <div th:each="post : ${post}">
+                    <p th:text="${post.title}"></p>
+                </div>
+
+                <p>전체 페이지 수: <span th:text="${endPage}"></span></p>
             </div>
 
 

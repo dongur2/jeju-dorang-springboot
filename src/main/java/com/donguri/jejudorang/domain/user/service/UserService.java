@@ -8,6 +8,7 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
@@ -58,4 +59,7 @@ public interface UserService {
 
     // 회원 탈퇴
     void withdrawUser(String accessToken);
+
+    // 마이페이지: 내 작성글 목록 조회
+    Map<String, Object> getMyCommunityWritings(String accessToken, Pageable pageable);
 }

@@ -10,6 +10,9 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -348,6 +351,29 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    /*
+     * 마이페이지 - 작성글 목록: 커뮤니티
+     *
+     * */
+    @GetMapping("/settings/profile/writings")
+    public String getMyWritingsPage(@CookieValue("access_token") Cookie token, Model model,
+                                    @RequestParam(name = "nowPage", required = false, defaultValue = "0") Integer nowPage) {
+        try {
+            Pageable pageable = PageRequest.of(nowPage, 10);
+            Map<String, Object> resultMap = userService.getMyCommunityWritings(token.getValue(), pageable);
+
+            model.addAttribute("endPage", resultMap.get("pageCount"));
+            model.addAttribute("post", resultMap.get("data"));
+            return "/user/mypage/myWritings";
+
+        } catch (Exception e) {
+            log.error("커뮤니티 작성글 불러오기 실패: {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
+    }
+
 
     /*
     * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw

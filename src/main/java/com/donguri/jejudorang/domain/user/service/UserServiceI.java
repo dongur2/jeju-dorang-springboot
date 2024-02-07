@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
@@ -23,6 +22,7 @@ import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -544,6 +544,27 @@ public class UserServiceI implements UserService {
 
         } catch (Exception e) {
             log.error("회원을 삭제하지 못했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 마이 페이지
+    * 내 작성글 목록: 커뮤니티
+    * > token
+    * > pageable(nowPage)
+    *
+    * */
+    @Override
+    public Map<String, Object> getMyCommunityWritings(String accessToken, Pageable pageable) {
+
+        try {
+            User nowUser = getNowUser(accessToken);
+
+            return communityService.getAllPostsWrittenByUser(nowUser, pageable);
+
+        } catch (Exception e) {
+            log.error("작성한 게시글 조회에 실패했습니다. {}", e.getMessage());
             throw e;
         }
     }
