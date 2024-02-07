@@ -147,10 +147,8 @@ public class CommunityServiceI implements CommunityService {
                                 .map(tag -> tag.getTag().getKeyword())
                                 .toList()));
 
-        int resultDataPageWholeSize = communityRepository.findAllByWriterId(writer.getId(), pageable).getTotalPages();
-
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("pageCount", resultDataPageWholeSize);
+        resultMap.put("page", resultDataPage.getTotalPages());
         resultMap.put("data", resultDataPage);
 
         return resultMap;

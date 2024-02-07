@@ -363,7 +363,7 @@ public class UserController {
             Pageable pageable = PageRequest.of(nowPage, 10);
             Map<String, Object> resultMap = userService.getMyCommunityWritings(token.getValue(), pageable);
 
-            model.addAttribute("endPage", resultMap.get("pageCount"));
+            model.addAttribute("endPage", resultMap.get("page"));
             model.addAttribute("post", resultMap.get("data"));
             return "/user/mypage/myWritings";
 
