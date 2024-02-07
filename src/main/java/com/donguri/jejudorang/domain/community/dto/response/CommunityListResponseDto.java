@@ -3,7 +3,6 @@ package com.donguri.jejudorang.domain.community.dto.response;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
-import com.donguri.jejudorang.global.common.DateFormat;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

@@ -5,19 +5,29 @@
 
     <nav aria-label="Page navigation example">
         <ul class="pagination">
+
             <li class="page-item">
-                <a class="page-link" href="#" aria-label="Previous">
+                <a class="page-link" href="#" th:href="@{/user/settings/profile/writings}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
+
+            <li th:if="${nowPage > 0}" class="page-item">
+                <a class="page-link" href="#" th:text="${nowPage - 1}" th:href="@{/user/settings/profile/writings(page=${nowPage - 1})}">1</a>
+            </li>
             <li class="page-item">
-                <a class="page-link" href="#" aria-label="Next">
+                <a class="page-link" href="#" th:text="${nowPage}" th:href="@{/user/settings/profile/writings(page=${nowPage})}">2</a>
+            </li>
+            <li th:if="${nowPage < endPage - 1}" class="page-item">
+                <a class="page-link" href="#" th:text="${nowPage + 1}" th:href="@{/user/settings/profile/writings(page=${nowPage + 1})}">3</a>
+            </li>
+
+            <li class="page-item">
+                <a class="page-link" href="#" th:href="@{/user/settings/profile/writings(page=${endPage - 1})}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
+
         </ul>
     </nav>
 

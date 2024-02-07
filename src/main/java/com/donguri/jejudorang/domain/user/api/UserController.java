@@ -358,11 +358,12 @@ public class UserController {
      * */
     @GetMapping("/settings/profile/writings")
     public String getMyWritingsPage(@CookieValue("access_token") Cookie token, Model model,
-                                    @RequestParam(name = "nowPage", required = false, defaultValue = "0") Integer nowPage) {
+                                    @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
             Map<String, Object> resultMap = userService.getMyCommunityWritings(token.getValue(), pageable);
 
+            model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", resultMap.get("page"));
             model.addAttribute("post", resultMap.get("data"));
             return "/user/mypage/myWritings";
