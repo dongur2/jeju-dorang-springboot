@@ -375,6 +375,31 @@ public class UserController {
         }
     }
 
+    /*
+    * 마이페이지 - 북마크 목록: 여행/커뮤니티
+    *
+    * */
+    @GetMapping("/settings/profile/bookmarks")
+    public String getMyBookmarkPage(@CookieValue("access_token") Cookie token, Model model,
+                                    @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
+                                    @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
+        try {
+            Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
+            Map<String, Object> resultMap = userService.getMyBookmarks(token.getValue(), type, pageable);
+
+            model.addAttribute("type", type);
+            model.addAttribute("nowPage", nowPage);
+            model.addAttribute("endPage", resultMap.get("endPage"));
+            model.addAttribute("post", resultMap.get("data"));
+            return "/user/mypage/myBookmarks";
+
+        } catch (Exception e) {
+            log.error("북마크 불러오기 실패: {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
+    }
+
 
     /*
     * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
