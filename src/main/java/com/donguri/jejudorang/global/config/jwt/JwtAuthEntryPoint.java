@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.global.config;
+package com.donguri.jejudorang.global.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

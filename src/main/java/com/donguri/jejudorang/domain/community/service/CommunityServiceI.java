@@ -1,9 +1,9 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
@@ -11,13 +11,14 @@ import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
-import com.donguri.jejudorang.global.config.JwtProvider;
-import io.jsonwebtoken.security.SignatureException;
+import com.donguri.jejudorang.global.config.jwt.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,7 +111,7 @@ public class CommunityServiceI implements CommunityService {
                     StringBuilder idFromJwt = new StringBuilder();
                     try {
                         idFromJwt.append(jwtProvider.getUserNameFromJwtToken(accessToken.getValue()));
-                    } catch (SignatureException e) {
+                    } catch (Exception e) {
                         log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
                         resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
                         return resMap;
@@ -134,6 +135,20 @@ public class CommunityServiceI implements CommunityService {
             log.error("게시글 불러오기를 실패했습니다. {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> getAllPostsWrittenByUser(User writer, Pageable pageable) {
+
+        Page<CommunityListResponseDto> resultDataPage = communityRepository.findAllByWriterId(writer.getId(), pageable)
+                .map(CommunityListResponseDto::from);
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("page", resultDataPage.getTotalPages());
+        resultMap.put("data", resultDataPage);
+
+        return resultMap;
     }
 
 
@@ -178,11 +193,45 @@ public class CommunityServiceI implements CommunityService {
         }
     }
 
-
+    /*
+    * 회원 탈퇴시 작성자 - 작성글 연관 관계 삭제
+    * */
     @Override
     @Transactional
-    public void updateBookmarkState(CommunityBookmark bookmark) {
-        bookmark.getCommunity().updateBookmarks(bookmark); // 없으면 추가, 있으면 삭제
+    public void findAllPostsByUserAndSetWriterNull(Long userId) {
+        try {
+            communityRepository.findAllByWriterId(userId).forEach(Community::deleteWriter);
+
+        } catch (Exception e) {
+            log.error("작성글 작성자 삭제 실패: {}", e.getMessage());
+        }
+    }
+
+    /*
+    * 커뮤니티 삭제
+    * */
+    @Override
+    @Transactional
+    public void deleteCommunityPost(String accessToken, Long communityId) {
+        try {
+            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
+            Community nowPost = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+
+            if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)) {
+                throw new IllegalAccessException("게시글은 작성자만 삭제할 수 있습니다.");
+            }
+
+            communityRepository.delete(nowPost);
+
+        } catch (IllegalAccessException e) {
+            log.error("작성자가 아니면 삭제할 수 없습니다.");
+            throw new RuntimeException(e);
+
+        } catch (Exception e) {
+            log.error("게시글 삭제 실패: {}", e.getMessage());
+            throw e;
+        }
     }
 
     private static String setTypeForRedirect(Community resultCommunity) {

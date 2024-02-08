@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.global.config;
+package com.donguri.jejudorang.global.config.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;

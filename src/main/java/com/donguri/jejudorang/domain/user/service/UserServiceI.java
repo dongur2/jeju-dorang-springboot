@@ -1,20 +1,29 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.user.dto.*;
+import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
+import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.domain.user.dto.request.*;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.domain.user.service.auth.MailService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
-import com.donguri.jejudorang.global.config.JwtProvider;
-import com.donguri.jejudorang.global.config.JwtUserDetails;
-import com.donguri.jejudorang.global.config.RefreshToken;
-import com.donguri.jejudorang.global.config.RefreshTokenRepository;
+import com.donguri.jejudorang.global.config.jwt.JwtProvider;
+import com.donguri.jejudorang.global.config.jwt.JwtUserDetails;
+import com.donguri.jejudorang.global.config.jwt.RefreshToken;
+import com.donguri.jejudorang.global.config.jwt.RefreshTokenRepository;
 import com.sun.jdi.request.DuplicateRequestException;
+import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +32,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -39,6 +47,11 @@ public class UserServiceI implements UserService {
     private final MailService mailService;
 
     @Autowired
+    private final CommunityService communityService;
+    @Autowired
+    private final BookmarkService bookmarkService;
+
+    @Autowired
     private final AuthenticationManager authenticationManager;
     @Autowired
     private final RefreshTokenRepository refreshTokenRepository;
@@ -48,18 +61,21 @@ public class UserServiceI implements UserService {
     @Autowired
     private final RoleRepository roleRepository;
 
+
     @Autowired
     private final PasswordEncoder encoder;
     @Autowired
     private final JwtProvider jwtProvider;
 
-    public UserServiceI(ImageService imageService, MailService mailService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
+    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
         this.mailService = mailService;
+        this.bookmarkService = bookmarkService;
         this.authenticationManager = authenticationManager;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.communityService = communityService;
         this.encoder = encoder;
         this.jwtProvider = jwtProvider;
     }
@@ -67,15 +83,20 @@ public class UserServiceI implements UserService {
 
     /*
     * 이메일 확인 - 중복 확인 후 인증 번호 전송
+    * > MailSendRequest
+    *
     * */
     @Override
     @Transactional
-    public void sendVerifyMail(MailSendRequest mailSendRequest) {
+    public void checkMailDuplicatedAndSendVerifyCode(MailSendRequest mailSendRequest) throws MessagingException {
         try {
             checkMailDuplicated(mailSendRequest.email());
 
-            String subject = "[제주도랑] 인증 번호입니다.";
-            mailService.sendAuthMail(mailSendRequest.email(), subject, createNumber());
+            String subject = "[제주도랑] 회원 가입 인증번호입니다.";
+            String code = createNumber();
+            String mailBody = "<h3> 하단의 인증번호를 정확하게 입력해주세요.</h3>"
+                    + "<p>인증번호: <b style='color:#FB7A51'>" + code + "</b></p><br><br>";
+            mailService.sendAuthMail(mailSendRequest.email(), subject, mailBody, code);
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -83,6 +104,11 @@ public class UserServiceI implements UserService {
         }
     }
 
+    /*
+    * 이메일 인증 번호 확인
+    * > MailVerifyRequest
+    *
+    * */
     @Override
     @Transactional
     public boolean checkVerifyMail(MailVerifyRequest mailVerifyRequest) {
@@ -90,11 +116,11 @@ public class UserServiceI implements UserService {
             return mailService.checkAuthMail(mailVerifyRequest);
 
         }  catch (NullPointerException e) {
-            log.error("인증 번호가 만료되었습니다.");
+            log.error("인증번호가 만료되었습니다.");
             throw e;
 
         } catch (Exception e) {
-            log.error("인증 번호 확인 실패 : {}",e.getMessage());
+            log.error("인증번호 확인 실패 : {}",e.getMessage());
             throw e;
         }
     }
@@ -121,13 +147,16 @@ public class UserServiceI implements UserService {
             return builder.toString();
 
         } catch (NoSuchAlgorithmException e) {
-            log.debug("이메일 인증 번호 생성을 실패했습니다 : {}", e.getMessage());
+            log.debug("이메일 인증번호 생성을 실패했습니다 : {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
 
+
     /*
     * 회원 가입
+    * > SignUpRequest
+    *
     * */
     @Override
     @Transactional
@@ -194,6 +223,8 @@ public class UserServiceI implements UserService {
 
     /*
     * 로그인
+    * > LoginRequest
+    *
     * */
     @Override
     @Transactional
@@ -268,6 +299,10 @@ public class UserServiceI implements UserService {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
     }
 
+    /*
+    * 프로필 조회
+    * > token
+    * */
     @Override
     @Transactional
     public ProfileResponse getProfileData(String token) {
@@ -284,11 +319,13 @@ public class UserServiceI implements UserService {
 
     /*
     * 프로필 전체 수정
-    * > token, requestDTO
+    * > token
+    * > ProfileRequest
+    *
     * */
     @Override
     @Transactional
-    public ProfileResponse updateProfileData(String token, ProfileRequest dataToUpdate) {
+    public void updateProfileData(String token, ProfileRequest dataToUpdate) throws IllegalAccessException {
         try {
             User nowUser = getNowUser(token);
 
@@ -310,7 +347,7 @@ public class UserServiceI implements UserService {
                 Map<String, String> uploadedImg = imageService.putS3Object(dataToUpdate.img());
 
                 if (uploadedImg == null) {
-                    throw new IllegalAccessException("사진 업로드 실패");
+                    throw new IllegalAccessException("사진 업로드에 실패했습니다.");
 
                 } else {
                     nowUser.getProfile().updateImgName(uploadedImg.get("imgName"));
@@ -322,26 +359,22 @@ public class UserServiceI implements UserService {
             Profile profile = nowUser.getProfile();
             profile.updateNickname(dataToUpdate.nickname());
 
-            nowUser.getAuth().updateEmail(dataToUpdate.email()); // 추가 인증 필요
-
             log.info("프로필 업데이트를 완료했습니다");
-
-            return ProfileResponse.builder().build()
-                    .from(nowUser);
 
         } catch (Exception e) {
             log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
-            return null;
+            throw e;
         }
     }
 
     /*
     * 프로필 사진만 삭제
-    * > params token
+    * > token
+    *
     * */
     @Override
     @Transactional
-    public ProfileResponse updateProfileData(String token) {
+    public void deleteProfileImg(String token) {
         try {
             User nowUser = getNowUser(token);
 
@@ -356,14 +389,211 @@ public class UserServiceI implements UserService {
             }
             log.info("프로필 업데이트를 완료했습니다");
 
-            return ProfileResponse.builder().build()
-                    .from(nowUser);
-
         } catch (Exception e) {
             log.error("프로필 업데이트에 실패했습니다 : {}", e.getMessage());
-            return null;
+            throw e;
         }
     }
+
+
+    /*
+    * 비밀번호 변경
+    * > token
+    * > PasswordRequest
+    *
+    * */
+    @Override
+    @Transactional
+    public void updatePassword(String token, PasswordRequest pwdToUpdate) throws Exception {
+        try {
+            User nowUser = getNowUser(token);
+
+            if (!encoder.matches(pwdToUpdate.oldPwd(), nowUser.getPwd().getPassword())) {
+                log.error("현재 비밀번호가 일치하지 않습니다.");
+                throw new BadCredentialsException("현재 비밀번호가 일치하지 않습니다.");
+
+            } else if (!pwdToUpdate.newPwd().equals(pwdToUpdate.newPwdToCheck())) {
+                log.error("입력한 비밀번호가 일치하지 않습니다.");
+                throw new Exception("입력한 비밀번호가 일치하지 않습니다.");
+
+            } else {
+                nowUser.getPwd().updatePassword(encoder, pwdToUpdate.newPwd());
+                log.info("비밀번호 변경을 완료했습니다.");
+            }
+
+        } catch (Exception e) {
+            log.error("패스워드 업데이트에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 이메일 변경
+    * > token
+    * > MailChangeRequest
+    *
+    * */
+    @Override
+    @Transactional
+    public void updateEmail(String token, MailChangeRequest emailToUpdate) {
+
+        try {
+            User nowUser = getNowUser(token);
+
+            nowUser.getAuth().updateEmail(emailToUpdate.emailToSend());
+            log.info("이메일 변경이 완료되었습니다. 변경된 이메일: {}", nowUser.getAuth().getEmail());
+
+        } catch (Exception e) {
+            log.error("이메일 변경에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+
+    /*
+     * 아이디 찾기
+     * : 아이디 전송
+     * > MailSendRequest
+     *
+     * */
+    @Override
+    @Transactional
+    public void sendMailWithId(MailSendRequest mailSendRequest) throws MessagingException {
+        try {
+            String foundId = userRepository.findByEmail(mailSendRequest.email())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 이메일로 가입한 아이디가 없습니다."))
+                    .getProfile().getExternalId();
+
+            String subject = "[제주도랑] 아이디 찾기 결과입니다.";
+            String mailBody = "<h3> 아이디 찾기 결과를 보내드립니다.</h3>"
+                                + "<p>아이디: <b style='color:#FB7A51'>" + foundId + "</b></p><br><br>";
+            mailService.sendMail(mailSendRequest.email(), subject, mailBody);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 비밀번호 찾기
+    * : 인증번호 전송
+    * > MailSendForPwdRequest
+    *
+    * */
+    @Override
+    @Transactional
+    public void checkUserAndSendVerifyCode(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
+        try {
+            userRepository.findByEmailAndExternalId(mailSendForPwdRequest.email(), mailSendForPwdRequest.externalId())
+                    .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
+
+            String subject = "[제주도랑] 비밀번호 찾기 인증번호입니다.";
+            String code = createNumber();
+            String mailBody = "<h3> 하단의 인증번호를 정확하게 입력해주세요.</h3>"
+                    + "<p>인증번호: <b style='color:#FB7A51'>" + code + "</b></p><br><br>";
+            mailService.sendAuthMail(mailSendForPwdRequest.email(), subject, mailBody, code);
+
+        } catch (Exception e) {
+            log.error("인증번호 전송에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 랜덤 비밀번호 생성 & 비밀번호 변경 후 이메일 전송
+    * > MailSendForPwdRequest
+    *
+    * */
+    @Override
+    @Transactional
+    public void changePwdRandomlyAndSendMail(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
+        try {
+            User userToUpdatePwd = userRepository.findByEmailAndExternalId(mailSendForPwdRequest.email(), mailSendForPwdRequest.externalId())
+                    .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
+
+            // 임시 비밀번호 생성
+            String randomPwd = createNumber();
+
+            // 임시 비밀번호로 비밀번호 수정
+            userToUpdatePwd.getPwd().updatePassword(encoder, randomPwd);
+
+            String subject = "[제주도랑] 임시 비밀번호입니다.";
+            String mailBody = "<h3>임시 비밀번호를 보내드립니다. 로그인하신 후 비밀번호를 재설정해주세요.</h3>"
+                    + "<p>임시 비밀번호: <b style='color:#FB7A51'>" + randomPwd + "</b></p><br><br>";
+            mailService.sendMail(mailSendForPwdRequest.email(), subject, mailBody);
+
+        } catch (Exception e) {
+            log.error("임시 비밀번호 생성에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 회원 탈퇴
+    * > token
+    *
+    * */
+    @Override
+    @Transactional
+    public void withdrawUser(String token) {
+        try {
+            Long idFromJwtToken = jwtProvider.getIdFromJwtToken(token);
+
+            // 추출한 아이디로 작성글 - 작성자 연관관계 삭제
+            communityService.findAllPostsByUserAndSetWriterNull(idFromJwtToken);
+
+            // 유저 삭제
+            userRepository.deleteById(idFromJwtToken);
+
+        } catch (Exception e) {
+            log.error("회원을 삭제하지 못했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 마이 페이지
+    * 내 작성글 목록: 커뮤니티
+    * > token
+    * > pageable(nowPage)
+    *
+    * */
+    @Override
+    public Map<String, Object> getMyCommunityWritings(String token, Pageable pageable) {
+
+        try {
+            User nowUser = getNowUser(token);
+
+            return communityService.getAllPostsWrittenByUser(nowUser, pageable);
+
+        } catch (Exception e) {
+            log.error("작성한 게시글 조회에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 마이 페이지
+    * 내 북마크 목록: 여행/커뮤니티
+    * > token
+    * > type
+    * > pageable(nowPage)
+    *
+    * */
+    @Override
+    public Map<String, Object> getMyBookmarks(String token, String type, Pageable pageable) {
+        try {
+            User nowUser = getNowUser(token);
+
+            return bookmarkService.getMyBookmarks(nowUser, type, pageable);
+
+        } catch (Exception e) {
+            log.error("북마크 불러오기에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     private User getNowUser(String token) {
         String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);

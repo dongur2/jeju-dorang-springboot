@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.user.dto.MailVerifyRequest;
-import com.donguri.jejudorang.domain.user.dto.SignUpRequest;
+import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.request.SignUpRequest;
 import com.donguri.jejudorang.domain.user.entity.AgreeRange;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;

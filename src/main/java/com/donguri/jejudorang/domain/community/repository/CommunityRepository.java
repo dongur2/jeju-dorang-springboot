@@ -44,4 +44,9 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     @Query("select c from Community c left outer join CommunityWithTag cwt on c.id=cwt.community.id left outer join Tag t on cwt.tag.id=t.id where c.type=:type and c.state=:state and t.keyword in :tags group by c.id having count(c)>=:tagCount")
     Page<Community> findAllByTypeAndStateContainingTag(@Param("type") BoardType boardType, @Param("state") JoinState state, @Param("tags") List<String> tags, @Param("tagCount") int tagCount, Pageable pageable);
 
+
+    List<Community> findAllByWriterId(Long writerId);
+
+    // 작성글 모두 조회 - 페이징 처리
+    Page<Community> findAllByWriterId(Long writerId, Pageable pageable);
 }

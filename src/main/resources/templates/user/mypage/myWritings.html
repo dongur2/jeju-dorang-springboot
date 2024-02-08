@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/fragments/layout}">
+<head>
+    <script th:src="@{/js/community/deleteCommunity.js}"></script>
+    <title>작성글 목록 - 제주도랑 | 마이페이지</title>
+</head>
+<th layout:fragment="content">
+
+    <div class="board-whole-box">
+
+
+        <!-- 마이페이지 좌측 탭  -->
+        <div th:replace="~{fragments/mypage/mypageTab :: mypageTabFragment}"></div>
+
+        <!-- 컨텐츠 블록  -->
+        <div class="board-item board-main"
+             style="width: 100%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%;">
+
+            <!-- 작성글/작성댓글 탭 -->
+            <div th:replace="~{fragments/mypage/mypageWritingsTab :: mypageWritingsTabFragment}"></div>
+
+            <div style="margin: 4% 0">
+                <div th:each="post : ${post}">
+                    <div class="card border mb-3" style="margin: 2% 0">
+                        <h5 class="card-header bg-transparent border" th:if="${post.type.name() == 'PARTY'}">
+                            모임 &#183;
+                            <span th:if="${post.state.name() == 'RECRUITING'}" style="color: #FB7A51">모집중</span>
+                            <span th:if="${post.state.name() == 'DONE'}" style="color: #696969">모집완료</span>
+                        </h5>
+                        <h5 class="card-header bg-transparent border" th:if="${post.type.name() == 'CHAT'}">잡담</h5>
+
+                        <div class="card-body text">
+                            <a th:if="${post.type.name() == 'PARTY'}" th:href="@{/community/boards/parties/{communityId}(communityId=${post.id})}"
+                                style="color: #696969; text-decoration-line: none; font-weight: bold">
+                                <h5 class="card-title"  th:text="${post.title}">Special title treatment</h5>
+                            </a>
+
+                            <a th:if="${post.type.name() == 'CHAT'}" th:href="@{/community/boards/chats/{communityId}(communityId=${post.id})}"
+                               style="color: #696969; text-decoration-line: none; font-weight: bold">
+                                <h5 class="card-title" th:text="${post.title}">Special title treatment</h5>
+                            </a>
+                        </div>
+
+                        <div class="card-footer bg-transparent border" style="display: flex; justify-content: space-between;">
+                            <div>
+                                북마크 <span th:text="${post.bookmarkCount}">0</span> &#183;
+                                조회 <span th:text="${post.viewCount}">0</span> &#183;
+                                댓글 0
+                            </div>
+                            <div style="width:200px; display: flex; justify-content: space-around">
+                                <span th:text="${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일')}"></span>
+                                <button href="#" class="btn btn-secondary"
+                                        th:onclick="deletePost([[${post.type.name()}]], [[${post.id}]], 'myWritings')">삭제</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div th:replace="~{fragments/pagination :: paginationFragment}"></div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function submitForm() {
+            var form = document.getElementById('profile-modify-form-pwd');
+            var formData = new FormData(form);
+
+            alert("submitForm()");
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', form.action, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('비밀번호 변경이 완료되었습니다.');
+                    window.location.reload();
+
+                } else {
+                    alert(xhr.responseText);
+                }
+            };
+            xhr.send(formData);
+        }
+
+    </script>
+
+
+</th>
+</html>

@@ -4,57 +4,144 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{/fragments/layout}">
 <head>
+    <script th:src="@{/js/user/verifyEmail.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+
     <title>내 프로필 - 제주도랑 | 마이페이지</title>
 </head>
 <th layout:fragment="content">
 
-    <div class="user-prof-form-box"
-         style="width:50%; height:750px; border-radius: 30px; border: 1px solid rgba(152,152,152,0.56); box-shadow: rgba(110,110,110,0.19)
-                ; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%">
+    <div class="board-whole-box">
 
-        <form id="profile-modify-form" th:action th:method="put" th:object="${profileRequest}"
-                style="width:100%; height:700px; margin-bottom:auto; border-radius: 30px;
-                        display: flex; flex-direction: column; gap: 10px">
 
-            <div class="profile-pic-box" style="margin-top:20px; margin-left:5%">
-                <h3>프로필 이미지</h3>
-                <div class="profile-pic-and-btn" style="margin-top:5%">
-                    <div class="profile-img-circle">
-                        <img class="profile-img" id="now-profile" th:src="${profileResponse.img()}">
-                    </div>
-                    <div class="profile-img-btn-box"
-                        style="margin:20px auto; display:flex; flex-direction: row; width:100%; height:50px
-                                  ;justify-content: space-between">
-                        <div>
-                            <input type="file" name="img" id="profile-image-file" onchange="changeImg()">
-                            <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
+        <!-- 마이페이지 좌측 탭  -->
+        <div th:replace="~{fragments/mypage/mypageTab :: mypageTabFragment}"></div>
+
+        <!-- 컨텐츠 블록  -->
+        <div class="board-item board-main"
+             style="width: 70%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%;">
+
+            <form id="profile-modify-form" th:action th:method="put" th:object="${profileRequest}"
+                    style="width:100%; height:750px; margin-bottom:auto; border: 1px solid rgba(134,134,134,0.37); border-radius: 15px;
+                            display: flex; flex-direction: column; gap: 3%; justify-content: center; align-items: center;">
+
+                <div class="profile-pic-box" style="width:90%; display: flex; flex-direction: column;">
+
+                    <div class="profile-pic-and-btn" style="width:100%; margin-top:3%;
+                        display: flex; flex-direction: column; justify-content:center; align-content: center;">
+
+                        <div class="profile-img-circle" style="margin: auto">
+                            <img class="profile-img" id="now-profile" th:src="${profileResponse.img()}">
                         </div>
-                        <button class="btn btn-primary" type="button" onclick="deleteImg()"
-                                style="width:100px; height:30px; margin-right:5%">삭제</button>
+                        <div class="profile-img-btn-box"
+                            style="margin-top:5%; display:flex; flex-direction: row; width:100%; height:70px;
+                            justify-content: space-between; align-content: center">
+
+                            <div>
+                                <input type="file" name="img" id="profile-image-file" onchange="changeImg()">
+                                <p>확장자: png, jpg, jpeg / 용량: 1MB 이하</p>
+                            </div>
+                            <button class="btn btn-secondary" type="button" onclick="deleteImg()"
+                                    style="height:40px;">삭제</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="width:90%;">
+                    <label for="nickname">닉네임</label>
+                    <input type="text" id="nickname" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"
+                            style="width:100%; height:40px; "/>
+                </div>
+
+                <div style="width:90%;">
+                    <label for="email">이메일</label>
+                    <div style="display: flex; flex-direction: row; width:100%; gap:5%">
+                        <input disabled type="email" id="emailDisabled" name="emailDisabled" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
+                               style="height:40px; width:75%"/>
+
+                        <button type="button" class="btn btn-outline-success" style="height:40px; width:20%" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            이메일 변경
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-success" onclick="submitForm()"
+                        style="width:90%; height:60px; margin-top:3%;">수정</button>
+            </form>
+
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#quitModal"
+                    style="width:100px; margin-left:auto; margin-top:-1%;">
+                회원 탈퇴
+            </button>
+
+        </div>
+
+
+        <!-- 회원 탈퇴 모달 -->
+        <div class="modal fade" id="quitModal" tabindex="-1" aria-labelledby="quitModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="quitModalLabel">회원 탈퇴</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        제주도랑을 탈퇴하시겠습니까?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-outline-dark" onclick="quitUser()" data-bs-dismiss="modal">탈퇴</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div style="margin-top:20px; margin-left:5%; margin-right:5%">
-                <p>닉네임</p>
-                <input type="text" name="nickname" th:placeholder="${profileResponse.nickname()}" th:value="${profileResponse.nickname()}"
-                        style="width:100%; height:40px; "/>
+        <!-- 이메일 모달 -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">이메일 변경</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div style="display: flex; flex-direction: column; gap:5px">
+                            <label for="email" class="form-label">이메일</label>
+                            <input type="email" id="email" name="email" class="form-control btn-verify">
+
+                            <input type="text" id="email-verify-dto" name="emailToSend" class="form-control" style="display: none">
+                            <button type="button" class="btn btn-outline-secondary btn-verify" onclick="sendMail()">인증번호 전송</button>
+
+                            <div id="email-verify-container" style="display: none; margin-top:5%">
+                                <div>
+                                    <label for="email-verify" class="form-label">이메일 인증번호 확인</label>
+                                    <input type="text" id="email-verify" name="code" class="form-control btn-verify">
+
+                                    <button type="button" class="btn btn-outline-warning btn-verify" onclick="checkMail()"
+                                            style="width:100%; margin-top:5px" >인증번호 확인</button>
+                                    <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-success" onclick="changeEmail()"  data-bs-dismiss="modal">확인</button>
+                    </div>
+                </div>
             </div>
-
-            <div style="margin-top:20px; margin-left:5%; margin-right:5%">
-                <p>이메일</p>
-                <input type="email" name="email" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
-                       style="width:100%; height:40px; "/>
-            </div>
-
-        </form>
-        <button type="button" class="btn btn-primary" onclick="submitForm()"
-        style="width:90%; height:50px; margin:0 5% 5% 5%;">수정</button>
+        </div>
 
     </div>
 
     <script>
 
+        /*
+        * 선택한 이미지로 src 변경
+        * */
         function changeImg() {
             var imageFileInput = document.getElementById('profile-image-file');
             var imageFile = imageFileInput.files[0];
@@ -63,6 +150,9 @@
             img.src = URL.createObjectURL(imageFile);
         }
 
+        /*
+        * 프로필 이미지 S3, DB에서 삭제
+        * */
         function deleteImg() {
             console.log("delete img()")
             var xhr = new XMLHttpRequest();
@@ -79,8 +169,10 @@
             xhr.send();
         }
 
+        /*
+        * 프로필 수정
+        * */
         function submitForm() {
-            console.log("SUBMIT FORM()");
             let form = document.getElementById('profile-modify-form');
             let formData = new FormData(form);
 
@@ -111,14 +203,66 @@
                 if (xhr.status === 200) {
                     alert('프로필이 수정되었습니다.');
                     window.location.reload();
+
                 } else {
-                    alert('프로필 수정에 실패했습니다.');
+                    alert(xhr.responseText);
                 }
             };
 
             xhr.send(formData);
         }
 
+
+        /*
+        * 이메일 변경 컨트롤러 요청
+        * */
+        function changeEmail() {
+            var mailChangeRequest = {
+                emailToSend: document.getElementById('email-verify-dto').value,
+                isVerified: document.getElementById('email-verify-status').value
+            };
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/user/email/change", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if(xhr.status === 200) {
+                        alert("이메일이 변경되었습니다.")
+                        window.location.reload();
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+
+            xhr.send(JSON.stringify(mailChangeRequest));
+        }
+
+
+        /*
+        * 회원 탈퇴 요청
+        * */
+        function quitUser() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/user/settings/profile/quit", true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if(xhr.status === 200) {
+                        alert("회원 탈퇴되었습니다.")
+                        window.location.href = "/";
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+
+            xhr.send();
+        }
 
 
     </script>

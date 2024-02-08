@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.global.config;
+package com.donguri.jejudorang.global.config.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -23,6 +23,7 @@ public class JwtProvider {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     private static final String AUTHORITIES_CLAIM = "authorities";
+    private static final String ID_CLAIM = "id";
     private final long jwtAccessExpirationInMs;
     private final long jwtRefreshExpirationInMs;
 
@@ -32,7 +33,7 @@ public class JwtProvider {
         this.jwtRefreshExpirationInMs = jwtRefreshExpirationInMs;
     }
 
-    // Authentication -> 토큰 생성
+    // Authentication -> Access Token 생성
     public String generateAccessToken(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
         String authorities = getUserAuthorities(userPrincipal);
@@ -43,39 +44,11 @@ public class JwtProvider {
                 .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs)) // Claims 인스턴스의 exp 값 설정
                 .signWith(key) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
                 .claim(AUTHORITIES_CLAIM, authorities) // JWT Claims에 커스텀 필드, 필드값 지정 - 권한 필드
+                .claim(ID_CLAIM, userPrincipal.getId())
                 .compact(); // JWT build
     }
 
-    public String getUserNameFromJwtToken(String token) { // externalId
-        return Jwts.parserBuilder()
-                .setSigningKey(key).build()
-                .parseClaimsJws(token).getBody().getSubject();
-    }
-
-    // Principal -> 토큰 생성
-    public String generateAccessToken(JwtUserDetails userDetails) {
-        String authorities = getUserAuthorities(userDetails);
-
-        return Jwts.builder() // * Claims == JWT body (토큰에 포함되는 속성/정보)
-                .setSubject(userDetails.getUsername()) // Claims 인스턴스의 sub 값 설정
-                .setIssuedAt(new Date()) // Claims 인스턴스의 iat 값 설정
-                .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs)) // Claims 인스턴스의 exp 값 설정
-                .signWith(key) // signWith(SignatureAlgorithm, String): 구성된 JWT를 지정한 알고리즘을 이용해 암호화
-                .claim(AUTHORITIES_CLAIM, authorities) // JWT Claims에 커스텀 필드, 필드값 지정 - 권한 필드
-                .compact(); // JWT build
-    }
-
-//    // userId를 이용한 토큰 생성
-//    public String generateTokenFromUserId(Long userId) {
-//        Instant expireDate = Instant.now().plusMillis(jwtAccessExpirationInMs);
-//        return Jwts.builder()
-//                .setSubject(Long.toString(userId))
-//                .setIssuedAt(Date.from(Instant.now()))
-//                .setExpiration(Date.from(expireDate))
-//                .signWith(key())
-//                .compact();
-//    }
-
+    // Refresh Token 생성
     public String generateRefreshTokenFromUserId(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
         String authorities = getUserAuthorities(userPrincipal);
@@ -84,23 +57,34 @@ public class JwtProvider {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationInMs))
                 .claim(AUTHORITIES_CLAIM, authorities)
+                .claim(ID_CLAIM, userPrincipal.getId())
                 .signWith(key)
                 .compact();
     }
 
+    /*
+    * JWT에서 externalId 추출
+    * */
+    public String getUserNameFromJwtToken(String token) { // externalId
+        return Jwts.parserBuilder()
+                .setSigningKey(key).build()
+                .parseClaimsJws(token).getBody().getSubject();
+    }
 
-//    /*
-//    * 토큰 userId 리턴
-//    *
-//    * */
-//    public Long getUserIdFromJWT(String token) {
-//        return Long.parseLong(
-//                Jwts.parserBuilder() // 복호화할 키 설정
-//                    .setSigningKey(key())
-//                    .build()
-//                    .parseClaimsJws(token).getBody().getSubject() // JWT의 Claims를 파싱해 body - subject(userId)을 추출해 리턴
-//        );
-//    }
+    /*
+    * JWT에서 Id 추출
+    * */
+    public Long getIdFromJwtToken(String token) {
+        String stringId = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody().get(ID_CLAIM).toString();
+
+        return Long.parseLong(stringId);
+    }
+
+
 
     /*
     * 토큰 만료날짜 리턴

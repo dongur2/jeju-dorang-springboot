@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.dto;
 
+import com.donguri.jejudorang.domain.user.dto.request.SignUpRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
