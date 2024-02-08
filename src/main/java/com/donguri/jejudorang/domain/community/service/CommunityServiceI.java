@@ -207,6 +207,33 @@ public class CommunityServiceI implements CommunityService {
         }
     }
 
+    /*
+    * 커뮤니티 삭제
+    * */
+    @Override
+    @Transactional
+    public void deleteCommunityPost(String accessToken, Long communityId) {
+        try {
+            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
+            Community nowPost = communityRepository.findById(communityId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+
+            if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)) {
+                throw new IllegalAccessException("게시글은 작성자만 삭제할 수 있습니다.");
+            }
+
+            communityRepository.delete(nowPost);
+
+        } catch (IllegalAccessException e) {
+            log.error("작성자가 아니면 삭제할 수 없습니다.");
+            throw new RuntimeException(e);
+
+        } catch (Exception e) {
+            log.error("게시글 삭제 실패: {}", e.getMessage());
+            throw e;
+        }
+    }
+
     private static String setTypeForRedirect(Community resultCommunity) {
         if (resultCommunity.getType() == BoardType.PARTY) {
             return "parties";

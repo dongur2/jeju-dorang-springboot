@@ -108,6 +108,11 @@
                 <div class="board-post-feature board-back-to-list">
                     <button class="feature-row board-share-btn" th:onclick="|window.history.back()|">목록</button>
                 </div>
+
+                <div class="board-post-feature board-back-to-list" style="margin-left:5%">
+                    <button class="feature-row board-share-btn"
+                            th:onclick="deletePost([[${post.type.name()}]], [[${post.id}]])">삭제</button>
+                </div>
             </div>
 
         </div>
@@ -266,6 +271,37 @@
             }).catch((error) => {
                 console.error('복사 실패:', error);
             });
+        }
+
+
+
+        /*
+        * 삭제 요청
+        * */
+        function deletePost(type, communityId) {
+            alert('delete');
+
+            let xhr = new XMLHttpRequest();
+            var url;
+            if(type === 'PARTY') {
+                url = '/community/boards/parties/' + communityId;
+            } else if (type === 'CHAT') {
+                url = '/community/boards/chats/' + communityId;
+            }
+            xhr.open('DELETE', url, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert('게시글 삭제가 완료되었습니다.');
+                        window.location.href = xhr.responseText;
+
+                    } else { // 그 외의 경우
+                        alert(xhr.responseText);
+                    }
+                }
+            };
+            xhr.send();
         }
 
     </script>

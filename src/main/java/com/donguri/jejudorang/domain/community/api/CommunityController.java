@@ -243,6 +243,27 @@ public class CommunityController {
         }
     }
 
+
+    /*
+     * 게시글 삭제
+     * */
+    @DeleteMapping("/boards/{type}/{communityId}")
+    public ResponseEntity<?> deleteCommunity(@PathVariable("communityId") Long communityId,
+                                              @PathVariable("type") String type,
+                                              @CookieValue("access_token") Cookie accessToken) {
+
+        try {
+            communityService.deleteCommunityPost(accessToken.getValue(), communityId);
+            return new ResponseEntity<>("/community/boards/" + type, HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("게시글 삭제 실패");
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+
     /*
      * 조회수 중복 필터링 (쿠키 확인)
      *
