@@ -109,7 +109,10 @@
                     <button class="feature-row board-share-btn" th:onclick="|window.history.back()|">목록</button>
                 </div>
 
-                <div class="board-post-feature board-back-to-list" style="margin-left:5%">
+                <!-- 삭제 버튼: 작성자일 경우에만 노출 -->
+                <div sec:authorize="isAuthenticated()"
+                     th:if="${#authentication.getName() == post.writerId()}"
+                     class="board-post-feature board-back-to-list" style="margin-left:5%">
                     <button class="feature-row board-share-btn"
                             th:onclick="deletePost([[${post.type.name()}]], [[${post.id}]])">삭제</button>
                 </div>
