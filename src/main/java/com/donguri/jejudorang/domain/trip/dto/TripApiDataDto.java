@@ -18,6 +18,7 @@ public record TripApiDataDto(
             String alltag,
             String contentsid,
             ContentCategory contentscd,
+            ContentRegion region1cd,
             String title,
             String roadaddress,
             String introduction,
@@ -27,6 +28,10 @@ public record TripApiDataDto(
        public record ContentCategory (
                String label
        ) {}
+
+        public record ContentRegion (
+                String label
+        ) {}
 
        public record RepPhoto (
                PhotoId photoid
@@ -47,13 +52,14 @@ public record TripApiDataDto(
 
     private static Trip mapToEntity(TripApiDataDto.Item item) {
         return Trip.builder()
-                .placeId(item.contentsid())
-                .category(item.contentscd().label())
-                .name(item.title())
-                .introduction(item.introduction())
-                .address(item.roadaddress())
-                .tel(item.phoneno())
-                .tags(item.alltag())
+                .placeId(item.contentsid)
+                .category(item.contentscd.label)
+                .region(item.region1cd.label)
+                .name(item.title)
+                .introduction(item.introduction)
+                .address(item.roadaddress)
+                .tel(item.phoneno)
+                .tags(item.alltag)
                 .thumbnail(item.repPhoto.photoid.thumbnailpath)
                 .image(item.repPhoto.photoid.imgpath)
                 .build();
