@@ -91,15 +91,15 @@ public class SecurityConfig {
                                         "/user/login", "/user/signup", "/user/signup/**", "/user/logout", "/user/email/**",
                                         "/trip/lists/*", "/trip/places/*",
                                         "/community/boards/**",
-                                        "/templates/**", "/error/**")
+                                        "/templates/**", "/error/**", "/trip/api/data")
                                 .permitAll()
                                 .requestMatchers(
                                         "/user/settings/profile/**",
                                         "/community/post/**", "/tui-editor/**",
                                         "/community/parties/{communityId}/state",
                                         "/bookmarks/communities/{communityId}",
-                                        "/bookmarks/trips/{tripId}",
-                                        "/trip/api/data"
+                                        "/bookmarks/trips/{tripId}"
+
                                 ).authenticated()
                         )
                 )

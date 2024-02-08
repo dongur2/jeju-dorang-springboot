@@ -8,6 +8,7 @@ import lombok.Getter;
 public class TripListResponseDto {
     private Long id;
     private String category;
+    private String region;
     private String name;
     private String tags;
     private String thumbnail;
@@ -16,6 +17,7 @@ public class TripListResponseDto {
     public TripListResponseDto(Trip trip) {
         this.id = trip.getId();
         this.category = trip.getCategory();
+        this.region = trip.getRegion();
         this.name = trip.getName();
         this.tags = trip.getTags();
         this.thumbnail = trip.getThumbnail();

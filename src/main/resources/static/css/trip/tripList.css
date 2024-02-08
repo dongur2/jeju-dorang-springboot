@@ -1,0 +1,35 @@
+
+.trip-list-whole-box {
+    width: 100%; display: flex; flex-direction:column; gap: 5%;
+}
+
+
+/* 검색 */
+.trip-list-search-box {
+    width:100%; display: flex; justify-content: flex-end; margin-bottom:1%
+}
+
+.trip-list-category-nav {
+    width: 350px; margin-right: 3%;  margin-bottom:1%; display: flex; flex-direction: row; justify-content: space-between; align-items: center; font-size:22px; font-family: GmarketSansMedium
+}
+
+.trip-list-category-nav > a {
+    color:#3F3D3A; text-decoration-line: none
+}
+
+
+.trip-list-search-form {
+    width: 400px
+}
+
+
+/* 여행 블록 */
+.trip-list-trips-data-block {
+    width:100%; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between
+}
+
+
+/* 페이지네이션 블록 */
+.trip-list-pagination-block {
+    width:100%; display: flex; justify-content: center; margin-top: 4%
+}

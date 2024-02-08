@@ -16,7 +16,7 @@ import java.util.Set;
 public class Trip extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "trip_id")
+    @Column(name = "trip_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -25,6 +25,9 @@ public class Trip extends BaseEntity {
 
     @Size(max = 10)
     private String category; // 쇼핑
+
+    @Size(max = 10)
+    private String region; // 시
 
     @Size(max = 50)
     private String name; // 장소 이름
@@ -55,9 +58,10 @@ public class Trip extends BaseEntity {
     private int bookmarksCount;
 
     @Builder
-    public Trip(String placeId, String category, String name, String introduction, String address, String tel, String tags, String thumbnail, String image) {
+    public Trip(String placeId, String category, String region, String name, String introduction, String address, String tel, String tags, String thumbnail, String image) {
         this.placeId = placeId;
         this.category = category;
+        this.region = region;
         this.name = name;
         this.introduction = introduction;
         this.address = address;
