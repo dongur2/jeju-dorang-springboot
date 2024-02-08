@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
@@ -23,6 +23,7 @@ import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,6 +48,8 @@ public class UserServiceI implements UserService {
 
     @Autowired
     private final CommunityService communityService;
+    @Autowired
+    private final BookmarkService bookmarkService;
 
     @Autowired
     private final AuthenticationManager authenticationManager;
@@ -64,9 +67,10 @@ public class UserServiceI implements UserService {
     @Autowired
     private final JwtProvider jwtProvider;
 
-    public UserServiceI(ImageService imageService, MailService mailService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
+    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
         this.mailService = mailService;
+        this.bookmarkService = bookmarkService;
         this.authenticationManager = authenticationManager;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
@@ -544,6 +548,48 @@ public class UserServiceI implements UserService {
 
         } catch (Exception e) {
             log.error("회원을 삭제하지 못했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 마이 페이지
+    * 내 작성글 목록: 커뮤니티
+    * > token
+    * > pageable(nowPage)
+    *
+    * */
+    @Override
+    public Map<String, Object> getMyCommunityWritings(String token, Pageable pageable) {
+
+        try {
+            User nowUser = getNowUser(token);
+
+            return communityService.getAllPostsWrittenByUser(nowUser, pageable);
+
+        } catch (Exception e) {
+            log.error("작성한 게시글 조회에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 마이 페이지
+    * 내 북마크 목록: 여행/커뮤니티
+    * > token
+    * > type
+    * > pageable(nowPage)
+    *
+    * */
+    @Override
+    public Map<String, Object> getMyBookmarks(String token, String type, Pageable pageable) {
+        try {
+            User nowUser = getNowUser(token);
+
+            return bookmarkService.getMyBookmarks(nowUser, type, pageable);
+
+        } catch (Exception e) {
+            log.error("북마크 불러오기에 실패했습니다. {}", e.getMessage());
             throw e;
         }
     }

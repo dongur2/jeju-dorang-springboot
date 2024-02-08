@@ -4,7 +4,9 @@ import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.bookmark.entity.TripBookmark;
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.bookmark.repository.TripBookmarkRepository;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.repository.TripRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
@@ -13,9 +15,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -124,6 +130,42 @@ public class BookmarkServiceI implements BookmarkService {
         } catch (Exception e) {
             log.error("북마크 삭제 실패: {}", e.getMessage());
             throw (RuntimeException) e;
+        }
+    }
+
+    /*
+    * 북마크 조회
+    * */
+    @Override
+    @Transactional
+    public Map<String, Object> getMyBookmarks(User user, String type, Pageable pageable) {
+
+        try {
+            Map<String, Object> result = new HashMap<>();
+
+            switch (type) {
+                case "trip": {
+                    Page<TripListResponseDto> data = tripBookmarkRepository.findAllByUser(user, pageable)
+                            .map(trip -> new TripListResponseDto(trip.getTrip()));
+
+                    result.put("data", data);
+                    result.put("endPage", data.getTotalPages());
+                    break;
+                }
+                case "community": {
+                    Page<CommunityListResponseDto> data = communityBookmarkRepository.findAllByUser(user, pageable)
+                            .map(community -> CommunityListResponseDto.from(community.getCommunity()));
+
+                    result.put("data", data);
+                    result.put("endPage", data.getTotalPages());
+                    break;
+                }
+            }
+            return result;
+
+        } catch (Exception e) {
+            log.error("북마크 불러오기에 실패했습니다. {}", e.getMessage());
+            throw e;
         }
     }
 
