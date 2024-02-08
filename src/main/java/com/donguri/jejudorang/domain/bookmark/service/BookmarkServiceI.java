@@ -137,6 +137,7 @@ public class BookmarkServiceI implements BookmarkService {
     * 북마크 조회
     * */
     @Override
+    @Transactional
     public Map<String, Object> getMyBookmarks(User user, String type, Pageable pageable) {
 
         try {
@@ -153,10 +154,7 @@ public class BookmarkServiceI implements BookmarkService {
                 }
                 case "community": {
                     Page<CommunityListResponseDto> data = communityBookmarkRepository.findAllByUser(user, pageable)
-                            .map(community -> CommunityListResponseDto
-                                    .from(community.getCommunity(),
-                                            community.getCommunity().getTags()
-                                                    .stream().map(tag -> tag.getTag().getKeyword()).toList()));
+                            .map(community -> CommunityListResponseDto.from(community.getCommunity()));
 
                     result.put("data", data);
                     result.put("endPage", data.getTotalPages());

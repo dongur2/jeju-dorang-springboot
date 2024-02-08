@@ -74,12 +74,18 @@
                         </div>
 
                         <div class="card-footer bg-transparent border" style="display: flex; justify-content: space-between;">
-                            <div>
-                                북마크 <span th:text="${post.bookmarkCount}">0</span> &#183;
-                                조회 <span th:text="${post.viewCount}">0</span> &#183;
-                                댓글 0
+                            <div style="width: 200px; display: flex; align-items: flex-end">
+                                작성자:
+                                <span th:if="${post.nickname != null}" th:text="${post.nickname}">닉네임</span>
+                                <span th:if="${post.nickname == null}">탈퇴한 회원</span>
                             </div>
-                            <div style="width:200px; display: flex; justify-content: space-around">
+
+                            <div style="width:450px; display: flex; justify-content: space-around; align-items: flex-end">
+                                <div>
+                                    북마크 <span th:text="${post.bookmarkCount}">0</span> &#183;
+                                    조회 <span th:text="${post.viewCount}">0</span> &#183;
+                                    댓글 0
+                                </div>
                                 <span th:text="${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일')}"></span>
                                 <a href="#" class="btn btn-secondary">삭제</a>
                             </div>

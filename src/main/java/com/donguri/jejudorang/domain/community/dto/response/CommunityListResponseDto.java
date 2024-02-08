@@ -14,14 +14,20 @@ public record CommunityListResponseDto(
     BoardType type,
     JoinState state,
     String title,
+    String nickname,
     LocalDateTime createdAt,
     int viewCount,
     int bookmarkCount
 ) {
-    public static CommunityListResponseDto from(Community community, List<String> tagList) {
+    public static CommunityListResponseDto from(Community community) {
         JoinState state = null;
         if (community.getState() != null) {
             state = community.getState();
+        }
+
+        String nickname = null;
+        if (community.getWriter() != null) {
+            nickname = community.getWriter().getProfile().getNickname();
         }
 
         return CommunityListResponseDto.builder()
@@ -29,6 +35,7 @@ public record CommunityListResponseDto(
                 .type(community.getType())
                 .state(state)
                 .title(community.getTitle())
+                .nickname(nickname)
                 .createdAt(community.getCreatedAt())
                 .viewCount(community.getViewCount())
                 .bookmarkCount(community.getBookmarksCount())

@@ -142,10 +142,7 @@ public class CommunityServiceI implements CommunityService {
     public Map<String, Object> getAllPostsWrittenByUser(User writer, Pageable pageable) {
 
         Page<CommunityListResponseDto> resultDataPage = communityRepository.findAllByWriterId(writer.getId(), pageable)
-                .map(community -> CommunityListResponseDto.from(community,
-                        community.getTags().stream()
-                                .map(tag -> tag.getTag().getKeyword())
-                                .toList()));
+                .map(CommunityListResponseDto::from);
 
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("page", resultDataPage.getTotalPages());
