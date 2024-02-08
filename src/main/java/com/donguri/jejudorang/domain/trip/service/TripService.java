@@ -17,8 +17,15 @@ public interface TripService {
     // 전체 여행 데이터 조회
     Map<String, Object> getAllTrips(Pageable pageable);
 
+    // 전체 여행 데이터 조회: 카테고리 구분
+    Map<String, Object> getAllTripsInCategory(String category, Pageable pageable);
+
     // 검색한 여행 데이터 조회: 태그에 검색어 포함
+
     Map<String, Object> getSearchedTripsContainingTagKeyword(String word, Pageable pageable);
+
+    // 검색한 여행 데이터 조회: 태그에 검색어 포함 & 카테고리 구분
+    Map<String, Object> getSearchedTripsContainingTagKeywordInCategory(String word, String category, Pageable pageable);
 
     // 여행 상세글 조회
     TripDetailResponseDto getTripDetail(String accessToken, Long tripId);

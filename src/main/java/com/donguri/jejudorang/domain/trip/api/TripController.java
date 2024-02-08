@@ -36,26 +36,39 @@ public class TripController {
      *
      * > String word: 검색어
      * > Integer nowPage: 현재 페이지 번호
+     * > String category: 카테고리
      *
     * */
     @GetMapping("/lists")
     public String getTripList(@RequestParam(name = "search", required = false) String word,
                               @RequestParam(name = "nowPage", required = false, defaultValue = "0") Integer nowPage,
+                              @RequestParam(name = "category", required = false, defaultValue = "전체") String category,
                               Model model) {
 
         try {
             Pageable pageable = PageRequest.of(nowPage, 10);
             Map<String, Object> result;
 
+            // 검색어가 없을 경우
+            if(word == null || word.trim().isEmpty()) {
+                if (category.equals("전체")) { // 전체 카테고리
+                    result = tripService.getAllTrips(pageable);
+                } else { // 그 외 카테고리
+                    result = tripService.getAllTripsInCategory(category, pageable);
+                }
+
             // 검색어가 존재할 경우 검색 메서드 호출, 없을 경우 전체 데이터 조회 메서드 호출
-            if(word != null) {
-                result = tripService.getSearchedTripsContainingTagKeyword(word, pageable);
             } else {
-                result = tripService.getAllTrips(pageable);
+                if (category.equals("전체")) { // 전체 카테고리
+                    result = tripService.getSearchedTripsContainingTagKeyword(word, pageable);
+                } else { // 그 외 카테고리
+                    result = tripService.getSearchedTripsContainingTagKeywordInCategory(word, category, pageable);
+                }
             }
 
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("searchWord", word);
+            model.addAttribute("nowCategory", category);
 
             model.addAttribute("trips", result.get("data"));
 

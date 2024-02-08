@@ -13,10 +13,14 @@
         <!-- 검색 -->
         <div style="width:100%; display: flex; justify-content: flex-end; margin-bottom:1%">
             <nav style="width: 350px; margin-right: 3%;  margin-bottom:1%; display: flex; flex-direction: row; justify-content: space-between; align-items: center; font-size:22px; font-family: GmarketSansMedium">
-                <a href="#" style="color:#3F3D3A; text-decoration-line: none">전체</a>
-                <a href="#" style="color:#3F3D3A; text-decoration-line: none">쇼핑</a>
-                <a href="#" style="color:#3F3D3A; text-decoration-line: none">관광</a>
-                <a href="#" style="color:#3F3D3A; text-decoration-line: none">음식점</a>
+                <a href="#" style="color:#3F3D3A; text-decoration-line: none"
+                   th:href="@{/trip/lists(category='전체', search=${searchWord})}">전체</a>
+                <a href="#" style="color:#3F3D3A; text-decoration-line: none"
+                   th:href="@{/trip/lists(category='쇼핑', search=${searchWord})}">쇼핑</a>
+                <a href="#" style="color:#3F3D3A; text-decoration-line: none"
+                   th:href="@{/trip/lists(category='관광지', search=${searchWord})}">관광</a>
+                <a href="#" style="color:#3F3D3A; text-decoration-line: none"
+                   th:href="@{/trip/lists(category='음식점', search=${searchWord})}">식당</a>
             </nav>
 
             <form th:method="get" action="/trip/lists" style="width: 400px">
@@ -53,23 +57,23 @@
                 <ul class="pagination">
 
                     <li class="page-item">
-                        <a class="page-link" href="#" th:href="@{/trip/lists(search=${searchWord})}" aria-label="Previous">
+                        <a class="page-link" href="#" th:href="@{/trip/lists(category=${nowCategory}, search=${searchWord})}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
 
                     <li th:if="${nowPage > 0}" class="page-item">
-                        <a class="page-link" href="#" th:text="${nowPage - 1}" th:href="@{/trip/lists(nowPage=${nowPage - 1}, search=${searchWord})}">1</a>
+                        <a class="page-link" href="#" th:text="${nowPage - 1}" th:href="@{/trip/lists(category=${nowCategory}, nowPage=${nowPage - 1}, search=${searchWord})}">1</a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="#" th:text="${nowPage}" th:href="@{/trip/lists(nowPage=${nowPage},search=${searchWord})}">2</a>
+                        <a class="page-link" href="#" th:text="${nowPage}" th:href="@{/trip/lists(category=${nowCategory}, nowPage=${nowPage},search=${searchWord})}">2</a>
                     </li>
                     <li th:if="${nowPage < endPage - 1}" class="page-item">
-                        <a class="page-link" href="#" th:text="${nowPage + 1}" th:href="@{/trip/lists(nowPage=${nowPage + 1},search=${searchWord})}">3</a>
+                        <a class="page-link" href="#" th:text="${nowPage + 1}" th:href="@{/trip/lists(category=${nowCategory}, nowPage=${nowPage + 1},search=${searchWord})}">3</a>
                     </li>
 
                     <li class="page-item">
-                        <a class="page-link" href="#" th:href="@{/trip/lists(nowPage=${endPage - 1},search=${searchWord})}" aria-label="Next">
+                        <a class="page-link" href="#" th:href="@{/trip/lists(category=${nowCategory}, nowPage=${endPage - 1},search=${searchWord})}" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
