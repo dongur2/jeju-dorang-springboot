@@ -47,7 +47,7 @@ public class TripController {
 
         try {
             Pageable pageable = PageRequest.of(nowPage, 10);
-            Map<String, Object> result;
+            Page<TripListResponseDto> result;
 
             // 검색어가 없을 경우
             if(word == null || word.trim().isEmpty()) {
@@ -70,13 +70,13 @@ public class TripController {
             model.addAttribute("searchWord", word);
             model.addAttribute("nowCategory", category);
 
-            model.addAttribute("trips", result.get("data"));
+            model.addAttribute("trips", result);
 
             // 데이터가 없을 경우 페이지 수 null -> 0 처리
-            if(result.get("page") == null) {
+            if(result == null) {
                 model.addAttribute("endPage", 0);
             } else {
-                model.addAttribute("endPage", result.get("page"));
+                model.addAttribute("endPage", result.getTotalPages());
             }
 
             return "/trip/tripList";

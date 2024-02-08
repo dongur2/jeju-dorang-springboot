@@ -40,19 +40,10 @@ public class TripServiceI implements TripService{
     * */
     @Override
     @Transactional
-    public Map<String, Object> getAllTrips(Pageable pageable) {
-        Map<String, Object> result = new HashMap<>();
-
+    public Page<TripListResponseDto> getAllTrips(Pageable pageable) {
         try {
-            Page<TripListResponseDto> data = tripRepository.findAll(pageable)
+            return tripRepository.findAll(pageable)
                     .map(trip -> TripListResponseDto.builder().trip(trip).build());
-
-            int page = data.getTotalPages();
-
-            result.put("data", data);
-            result.put("page", page);
-
-            return result;
 
         } catch (Exception e) {
             log.error("여행 데이터 리스트 조회에 실패했습니다.");
@@ -61,7 +52,7 @@ public class TripServiceI implements TripService{
     }
 
     /*
-     * 전체 여행 데이터 조회
+     * 카테고리별 여행 데이터 조회
      *
      * > String category: 카테고리
      * > Pageable pageable: 10개 목록
@@ -69,19 +60,10 @@ public class TripServiceI implements TripService{
      * */
     @Override
     @Transactional
-    public Map<String, Object> getAllTripsInCategory(String category, Pageable pageable) {
-        Map<String, Object> result = new HashMap<>();
-
+    public Page<TripListResponseDto>getAllTripsInCategory(String category, Pageable pageable) {
         try {
-            Page<TripListResponseDto> data = tripRepository.findAllByCategory(category, pageable)
+            return tripRepository.findAllByCategory(category, pageable)
                     .map(trip -> TripListResponseDto.builder().trip(trip).build());
-
-            int page = data.getTotalPages();
-
-            result.put("data", data);
-            result.put("page", page);
-
-            return result;
 
         } catch (Exception e) {
             log.error("여행 데이터 리스트 조회에 실패했습니다.");
@@ -98,17 +80,10 @@ public class TripServiceI implements TripService{
     * */
     @Override
     @Transactional
-    public Map<String, Object> getSearchedTripsContainingTagKeyword(String word, Pageable pageable) {
-        Map<String, Object> result = new HashMap<>();
-
+    public Page<TripListResponseDto> getSearchedTripsContainingTagKeyword(String word, Pageable pageable) {
         try {
-            Page<TripListResponseDto> data = tripRepository.findByTagsContaining(word, pageable)
+            return tripRepository.findByTagsContaining(word, pageable)
                     .map(trip -> TripListResponseDto.builder().trip(trip).build());
-
-            result.put("data", data);
-            result.put("page", data.getTotalPages());
-
-            return result;
 
         } catch (Exception e) {
             log.error("검색어를 포함하는 데이터가 없습니다.");
@@ -126,19 +101,10 @@ public class TripServiceI implements TripService{
      * */
     @Override
     @Transactional
-    public Map<String, Object> getSearchedTripsContainingTagKeywordInCategory(String word, String category, Pageable pageable) {
-        Map<String, Object> result = new HashMap<>();
-
-        log.info("검색어{} + 카테고리{} 조회", word, category);
-
+    public Page<TripListResponseDto> getSearchedTripsContainingTagKeywordInCategory(String word, String category, Pageable pageable) {
         try {
-            Page<TripListResponseDto> data = tripRepository.findByCategoryAndTagsContaining(category, word, pageable)
+            return tripRepository.findByCategoryAndTagsContaining(category, word, pageable)
                     .map(trip -> TripListResponseDto.builder().trip(trip).build());
-
-            result.put("data", data);
-            result.put("page", data.getTotalPages());
-
-            return result;
 
         } catch (Exception e) {
             log.error("검색어를 포함하고 해당 카테고리에 속하는 데이터가 없습니다.");
