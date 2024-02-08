@@ -9,29 +9,29 @@
 </head>
 <th layout:fragment="content">
 
-    <div class="card text-bg-dark">
+    <div class="card text-bg-dark" style="width:100%; height:100%">
         <img src="..." th:src="${trip.getImage()}" class="card-img" alt="...">
-        <div class="card-img-overlay"
-             style="width:35%; background:rgba(20,34,35,0.59); color:white; margin-left:auto;
-             display:flex; flex-direction:column; align-content:center; justify-content:center; gap: 2%">
+        <div class="card-img-overlay trip-detail-img-overlay">
 
-            <div style="width:100%; height:10%; padding:5%; display:flex; justify-content: flex-end; align-content: flex-end">
-                <i sec:authorize="!isAuthenticated()" onclick="cantBookmark()" class="fa-regular fa-heart" style="font-size: 45px; color:#FB7A51; cursor: pointer"></i>
-                <i sec:authorize="isAuthenticated()" th:if="${!trip.isBookmarked()}" th:onclick="'createBookmark('+${trip.id}+')'" class="fa-regular fa-heart"
-                   style="font-size: 45px; color:#FB7A51; cursor: pointer"></i>
-                <i sec:authorize="isAuthenticated()" th:if="${trip.isBookmarked()}" th:onclick="'deleteBookmark('+${trip.id}+')'" class="fa-solid fa-heart"
-                   style="font-size: 45px; color:#FB7A51; cursor: pointer"></i>
+            <!-- 북마크: 로그인/비로그인 구분 -->
+            <div class="trip-detail-bookmark-block">
+                <i sec:authorize="!isAuthenticated()" onclick="cantBookmark()" class="fa-regular fa-heart"></i>
+                <i sec:authorize="isAuthenticated()" th:if="${!trip.isBookmarked()}" th:onclick="'createBookmark('+${trip.id}+')'" class="fa-regular fa-heart">                   ></i>
+                <i sec:authorize="isAuthenticated()" th:if="${trip.isBookmarked()}" th:onclick="'deleteBookmark('+${trip.id}+')'" class="fa-solid fa-heart"></i>
             </div>
 
-            <div style="width:100%; height:80%; padding:4%;">
-                <h5 class="card-text" th:text="${trip.getCategory()}" style="color:#FB7A51">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</h5>
-                <h1 class="card-title" th:text="${trip.getName()}">Card title</h1>
-                <p class="card-text" th:text="${trip.getIntroduction()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                <br>
-                <p class="card-text" th:text="${trip.getAddress()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                <p class="card-text" th:text="${trip.getTel()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                <br><br>
-                <h5 class="card-text" th:text="${trip.getTags()}"></h5>
+            <div class="trip-detail-intro-block">
+                <div class="trip-detail-top">
+                    <h4 class="card-text trip-region">
+                        <i class="fa-solid fa-location-dot"></i><span th:text="${trip.getRegion()}">지역</span>
+                        : <span class="trip-detail-category" th:text="${trip.getCategory()}">카테고리</span>
+                    </h4>
+                </div>
+                    <h1 class="card-title" th:text="${trip.getName()}">관광지 이름</h1>
+                    <p class="card-text" th:text="${trip.getIntroduction()}">소개</p>
+                    <p class="card-text" th:text="${trip.getAddress()}">주소</p>
+                    <p class="card-text" th:text="${trip.getTel()}">연락처</p>
+                    <p class="card-text" th:text="${trip.getTags()}">태그</p>
             </div>
         </div>
     </div>

@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class TripDetailResponseDto {
     private Long id;
+    private String region;
     private String category;
     private String name;
     private String introduction;
@@ -20,6 +21,7 @@ public class TripDetailResponseDto {
     @Builder
     public TripDetailResponseDto(Trip trip, String nowViewer) {
         this.id = trip.getId();
+        this.region = trip.getRegion();
         this.category = trip.getCategory();
         this.name = trip.getName();
         this.introduction = trip.getIntroduction();
@@ -39,6 +41,7 @@ public class TripDetailResponseDto {
     @Builder
     public TripDetailResponseDto(Trip trip) {
         this.id = trip.getId();
+        this.region = trip.getRegion();
         this.category = trip.getCategory();
         this.name = trip.getName();
         this.introduction = trip.getIntroduction();
