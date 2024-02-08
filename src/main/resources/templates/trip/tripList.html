@@ -29,10 +29,11 @@
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
+                            <h5 style="color:#FB7A51; margin-bottom: 4%; font-family: GmarketSansMedium"><i class="fa-solid fa-location-dot" style="margin-right: 2%"></i><span th:text="${trip.getRegion()}">지역</span></h5>
                             <h5 class="card-title" th:text="${trip.getName()}">관광지 이름</h5>
                             <p class="card-text"><small class="text-body-secondary" th:text="${trip.getTags()}"
                             style="white-space: normal;
-                            display: -webkit-box; -webkit-line-clamp:4; -webkit-box-orient: vertical; overflow: hidden">태그</small></p>
+                            display: -webkit-box; -webkit-line-clamp:2; -webkit-box-orient: vertical; overflow: hidden">태그</small></p>
                         </div>
                     </div>
                 </div>
