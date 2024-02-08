@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -31,19 +32,63 @@ public class TripServiceI implements TripService{
     }
 
 
+    /*
+    * 전체 여행 데이터 조회
+    *
+    * > Pageable pageable: 10개 목록
+    *
+    * */
     @Override
-    public Map<String, Object> getAllTripsOnPage(Pageable pageable) {
-        Page<Trip> tripEntityList =  tripRepository.findAll(pageable);
-        int totalPages = tripRepository.findAll(pageable).getTotalPages();
+    @Transactional
+    public Map<String, Object> getAllTrips(Pageable pageable) {
+        Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("trips", tripEntityList.map(TripListResponseDto::new)) ;
-        resultMap.put("totalPages", totalPages);
+        try {
+            Page<TripListResponseDto> data = tripRepository.findAll(pageable)
+                    .map(trip -> TripListResponseDto.builder().trip(trip).build());
 
-        return resultMap;
+            int page = data.getTotalPages();
+
+            result.put("data", data);
+            result.put("page", page);
+
+            return result;
+
+        } catch (Exception e) {
+            log.error("여행 데이터 리스트 조회에 실패했습니다.");
+            throw e;
+        }
+    }
+
+    /*
+    * 검색어를 포함한 여행 데이터 조회
+    *
+    * > String word: 검색어
+    * > Pageable pageable: 10개 목록
+    *
+    * */
+    @Override
+    @Transactional
+    public Map<String, Object> getSearchedTripsContainingTagKeyword(String word, Pageable pageable) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            Page<TripListResponseDto> data = tripRepository.findByTagsContaining(word, pageable)
+                    .map(trip -> TripListResponseDto.builder().trip(trip).build());
+
+            result.put("data", data);
+            result.put("page", data.getTotalPages());
+
+            return result;
+
+        } catch (Exception e) {
+            log.error("검색어를 포함하는 데이터가 없습니다.");
+            throw e;
+        }
     }
 
     @Override
+    @Transactional
     public TripDetailResponseDto getTripDetail(String token, Long tripId) {
         try {
             Trip tripEntity = tripRepository.findById(tripId)
@@ -76,6 +121,7 @@ public class TripServiceI implements TripService{
     }
 
     @Override
+    @Transactional
     public void saveApiTrips(Mono<TripApiDataDto> response) {
         // Dto -> Entity
         List<Trip> data = response
