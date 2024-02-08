@@ -16,7 +16,7 @@ import java.util.Set;
 public class Trip extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "trip_id")
+    @Column(name = "trip_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
