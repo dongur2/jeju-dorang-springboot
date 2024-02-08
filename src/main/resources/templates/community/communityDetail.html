@@ -13,6 +13,7 @@
         // 카카오톡 공유 텍스트 설정 - 글 제목
         let nowPostTitleForShare = [[${post.title}]];
     </script>
+    <script th:src="@{/js/community/deleteCommunity.js}"></script>
     <title>상세 페이지 - 제주도랑 | 커뮤니티</title>
 </head>
 <th layout:fragment="content">
@@ -107,6 +108,14 @@
                 </div>
                 <div class="board-post-feature board-back-to-list">
                     <button class="feature-row board-share-btn" th:onclick="|window.history.back()|">목록</button>
+                </div>
+
+                <!-- 삭제 버튼: 작성자일 경우에만 노출 -->
+                <div sec:authorize="isAuthenticated()"
+                     th:if="${#authentication.getName() == post.writerId()}"
+                     class="board-post-feature board-back-to-list" style="margin-left:5%">
+                    <button class="feature-row board-share-btn"
+                            th:onclick="deletePost([[${post.type.name()}]], [[${post.id}]], 'detail')">삭제</button>
                 </div>
             </div>
 
@@ -267,6 +276,7 @@
                 console.error('복사 실패:', error);
             });
         }
+
 
     </script>
 </th>

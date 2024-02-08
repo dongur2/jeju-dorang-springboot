@@ -32,4 +32,7 @@ public interface CommunityService {
     //회원 탈퇴시 작성글과 작성자 연관 관계 삭제 - null 처리
     void findAllPostsByUserAndSetWriterNull(Long userId);
 
+    //커뮤니티 삭제
+    void deleteCommunityPost(String accessToken, Long communityId);
+
 }
