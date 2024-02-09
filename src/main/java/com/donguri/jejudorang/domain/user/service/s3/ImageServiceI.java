@@ -29,7 +29,7 @@ public class ImageServiceI implements ImageService {
     @Autowired private final UserRepository userRepository;
     @Autowired private final ProfileRepository profileRepository;
 
-    public ImageServiceI(@Value("${aws.s3.bucket}") String bucketName, S3Client s3Client, UserRepository userRepository, ProfileRepository profileRepository) {
+    public ImageServiceI(@Value("${aws.s3.bucket.name}") String bucketName, S3Client s3Client, UserRepository userRepository, ProfileRepository profileRepository) {
         this.bucketName = bucketName;
         this.s3Client = s3Client;
         this.userRepository = userRepository;

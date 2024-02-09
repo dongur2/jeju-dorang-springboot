@@ -17,9 +17,9 @@ import java.util.List;
 @Slf4j
 @RestController
 public class TripApiController {
-    @Value("${jeju-api-key}")
+    @Value("${jeju.key}")
     private String apiKey;
-    @Value("${jeju-api-uri}")
+    @Value("${jeju.url}")
     private String baseUrl;
 
     private final int page = 37;
