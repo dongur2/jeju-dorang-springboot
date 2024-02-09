@@ -3,7 +3,7 @@
 
     # Database
     datasource:
-      url: ${DATABASE_URL}
+      url: jdbc:mariadb://${DATABASE_URL}:${DB_PORT}/${DB_dataBaseName}?characterEncoding=UTF-8&serverTimezone=UTC
       driver-class-name: ${DATABASE_CLASS_NAME}
       username: ${DATABASE_USERNAME}
       password: ${DATABASE_PASSWORD}
