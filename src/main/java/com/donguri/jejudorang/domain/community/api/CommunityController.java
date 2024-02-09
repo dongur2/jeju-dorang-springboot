@@ -39,7 +39,7 @@ public class CommunityController {
     @Autowired private final ChatService chatService;
     @Autowired private final PartyService partyService;
 
-    public CommunityController(@Value("${kakao-api-key}") String kakaoApiKey,
+    public CommunityController(@Value("${kakao.key}") String kakaoApiKey,
                                @Value("${view.cookie-expire}") int viewCookieTime,
                                CommunityService communityService, ChatService chatService, PartyService partyService) {
         this.kakaoApiKey = kakaoApiKey;
