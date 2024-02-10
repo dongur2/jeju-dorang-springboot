@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
@@ -23,6 +24,7 @@ import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -560,7 +562,7 @@ public class UserServiceI implements UserService {
     *
     * */
     @Override
-    public Map<String, Object> getMyCommunityWritings(String token, Pageable pageable) {
+    public Page<CommunityListResponseDto> getMyCommunityWritings(String token, Pageable pageable) {
 
         try {
             User nowUser = getNowUser(token);
@@ -582,7 +584,7 @@ public class UserServiceI implements UserService {
     *
     * */
     @Override
-    public Map<String, Object> getMyBookmarks(String token, String type, Pageable pageable) {
+    public Page<?> getMyBookmarks(String token, String type, Pageable pageable) {
         try {
             User nowUser = getNowUser(token);
 

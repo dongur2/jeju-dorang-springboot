@@ -139,16 +139,9 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public Map<String, Object> getAllPostsWrittenByUser(User writer, Pageable pageable) {
-
-        Page<CommunityListResponseDto> resultDataPage = communityRepository.findAllByWriterId(writer.getId(), pageable)
+    public Page<CommunityListResponseDto> getAllPostsWrittenByUser(User writer, Pageable pageable) {
+        return communityRepository.findAllByWriterId(writer.getId(), pageable)
                 .map(CommunityListResponseDto::from);
-
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("page", resultDataPage.getTotalPages());
-        resultMap.put("data", resultDataPage);
-
-        return resultMap;
     }
 
 

@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -163,14 +164,15 @@ public class CommunityController {
         try {
             // 넘어온 정렬 기준값 -> 컬럼명으로 변환
             order = convertToProperty(order);
+
             // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
             Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
 
-            Map<String, Object> listInMap;
+            Page<?> data = null;
             if (type.equals("parties")) {
-                listInMap = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
+                data = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
             } else {
-                listInMap = chatService.getChatPostList(pageable, searchWord, searchTag);
+                data = chatService.getChatPostList(pageable, searchWord, searchTag);
             }
 
             model.addAttribute("nowType", type);
@@ -183,12 +185,10 @@ public class CommunityController {
 
             if (type.equals("parties")) {
                 model.addAttribute("nowState", state);
-                model.addAttribute("allPartyPageCount", listInMap.get("allPartyPageCount")); // 총 페이지 수
-                model.addAttribute("partyListDtoPage", listInMap.get("partyListDtoPage")); // 데이터
-            } else {
-                model.addAttribute("allChatPageCount", listInMap.get("allChatPageCount")); // 총 페이지 수
-                model.addAttribute("chatListDtoPage", listInMap.get("chatListDtoPage")); // 데이터
             }
+
+            model.addAttribute("endPage", data.getTotalPages()); // 총 페이지 수
+            model.addAttribute("posts", data); // 데이터
 
             return "/community/communityList";
 

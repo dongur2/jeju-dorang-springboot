@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.service;
 
 
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
@@ -8,6 +9,7 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
@@ -61,8 +63,8 @@ public interface UserService {
     void withdrawUser(String accessToken);
 
     // 마이페이지: 내 작성글 목록 조회
-    Map<String, Object> getMyCommunityWritings(String accessToken, Pageable pageable);
+    Page<CommunityListResponseDto> getMyCommunityWritings(String accessToken, Pageable pageable);
 
     // 마이페이지: 내 북마크 목록 조회
-    Map<String, Object> getMyBookmarks(String accessToken, String type, Pageable pageable);
+    Page<?> getMyBookmarks(String accessToken, String type, Pageable pageable);
 }

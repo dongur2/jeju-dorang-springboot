@@ -1,15 +1,16 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Map;
 
 public interface PartyService {
 
-    //getPartyList
-    Map<String, Object> getPartyPostList(Pageable pageable, String partyState, String searchWord, String searchTag);
+    // 모임 글목록 조회: 모집상태 정렬/검색어/태그 검색 포함
+    Page<PartyListResponseDto> getPartyPostList(Pageable pageable, String partyState, String searchWord, String searchTag);
 
-    //modifyBoardJoinState
+    // 모집상태 변경: 모집중/모집완료
     void changePartyJoinState(Long communityId);
 
 }

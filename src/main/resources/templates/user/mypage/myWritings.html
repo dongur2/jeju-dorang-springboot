@@ -23,7 +23,7 @@
             <div th:replace="~{fragments/mypage/mypageWritingsTab :: mypageWritingsTabFragment}"></div>
 
             <div style="margin: 4% 0">
-                <div th:each="post : ${post}">
+                <div th:each="post : ${posts}">
                     <div class="card border mb-3" style="margin: 2% 0">
                         <h5 class="card-header bg-transparent border" th:if="${post.type.name() == 'PARTY'}">
                             모임 &#183;

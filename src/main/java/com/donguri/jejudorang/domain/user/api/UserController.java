@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.api;
 
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.*;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -361,11 +363,12 @@ public class UserController {
                                     @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
-            Map<String, Object> resultMap = userService.getMyCommunityWritings(token.getValue(), pageable);
+
+            Page<CommunityListResponseDto> data = userService.getMyCommunityWritings(token.getValue(), pageable);
 
             model.addAttribute("nowPage", nowPage);
-            model.addAttribute("endPage", resultMap.get("page"));
-            model.addAttribute("post", resultMap.get("data"));
+            model.addAttribute("endPage", data.getTotalPages());
+            model.addAttribute("posts", data);
             return "/user/mypage/myWritings";
 
         } catch (Exception e) {
@@ -385,12 +388,12 @@ public class UserController {
                                     @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
-            Map<String, Object> resultMap = userService.getMyBookmarks(token.getValue(), type, pageable);
+            Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);
 
             model.addAttribute("type", type);
             model.addAttribute("nowPage", nowPage);
-            model.addAttribute("endPage", resultMap.get("endPage"));
-            model.addAttribute("post", resultMap.get("data"));
+            model.addAttribute("endPage", data.getTotalPages());
+            model.addAttribute("posts", data);
             return "/user/mypage/myBookmarks";
 
         } catch (Exception e) {
