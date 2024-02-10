@@ -6,6 +6,7 @@ import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.user.entity.*;
+import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;

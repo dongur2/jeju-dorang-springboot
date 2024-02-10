@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.repository;
 
-import com.donguri.jejudorang.domain.user.entity.Authentication;
+import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

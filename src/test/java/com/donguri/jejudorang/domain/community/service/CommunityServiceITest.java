@@ -11,6 +11,7 @@ import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRe
 import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
 import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
 import com.donguri.jejudorang.domain.user.entity.*;
+import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;

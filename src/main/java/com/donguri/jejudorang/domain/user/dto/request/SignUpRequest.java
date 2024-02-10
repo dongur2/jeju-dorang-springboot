@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.dto.request;
 
 import com.donguri.jejudorang.domain.user.entity.*;
+import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import org.apache.coyote.BadRequestException;

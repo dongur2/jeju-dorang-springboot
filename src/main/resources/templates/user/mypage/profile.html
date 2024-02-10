@@ -247,7 +247,7 @@
         * */
         function quitUser() {
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/user/settings/profile/quit", true);
+            xhr.open("POST", "/user/quit", true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {

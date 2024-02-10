@@ -94,6 +94,7 @@ public class SecurityConfig {
                                         "/templates/**", "/error/**", "/trip/api/data")
                                 .permitAll()
                                 .requestMatchers(
+                                        "/user/quit",
                                         "/user/settings/profile/**",
                                         "/community/post/**", "/tui-editor/**",
                                         "/community/parties/{communityId}/state",

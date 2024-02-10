@@ -1,5 +1,7 @@
-package com.donguri.jejudorang.domain.user.entity;
+package com.donguri.jejudorang.domain.user.entity.auth;
 
+import com.donguri.jejudorang.domain.user.entity.AgreeRange;
+import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
