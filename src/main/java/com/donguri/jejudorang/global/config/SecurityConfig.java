@@ -88,18 +88,19 @@ public class SecurityConfig {
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
-                                        "/user/login", "/user/signup", "/user/signup/**", "/user/logout", "/user/email/**",
+                                        "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
+                                        "/email/**",
                                         "/trip/lists**", "/trip/places/*",
                                         "/community/boards/**",
                                         "/templates/**", "/error/**", "/trip/api/data")
                                 .permitAll()
                                 .requestMatchers(
-                                        "/user/settings/profile/**",
+                                        "/user/quit",
+                                        "/profile/**", "/mypage/**",
                                         "/community/post/**", "/tui-editor/**",
                                         "/community/parties/{communityId}/state",
                                         "/bookmarks/communities/{communityId}",
                                         "/bookmarks/trips/{tripId}"
-
                                 ).authenticated()
                         )
                 )

@@ -10,6 +10,7 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.PasswordRequest;
 import com.donguri.jejudorang.domain.user.dto.request.ProfileRequest;
 import com.donguri.jejudorang.domain.user.entity.*;
+import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.AuthenticationRepository;
 import com.donguri.jejudorang.domain.user.repository.ProfileRepository;

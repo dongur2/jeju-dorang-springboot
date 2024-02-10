@@ -26,7 +26,8 @@ class UserControllerTest {
     @Autowired EntityManager em;
     @Autowired Validator validator;
 
-    @Autowired UserController userController;
+    @Autowired
+    MailController userController;
 
     @Autowired UserService userService;
     @Autowired RedisTemplate<String, String> redisTemplate;

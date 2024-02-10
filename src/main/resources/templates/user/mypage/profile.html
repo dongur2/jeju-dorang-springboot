@@ -154,9 +154,8 @@
         * 프로필 이미지 S3, DB에서 삭제
         * */
         function deleteImg() {
-            console.log("delete img()")
             var xhr = new XMLHttpRequest();
-            xhr.open('DELETE', "/user/settings/profile/deleteimg", true);
+            xhr.open('DELETE', "/profile/img", true);
 
             xhr.onload = function () {
                 if (xhr.status === 200) {
@@ -223,7 +222,7 @@
             };
 
             let xhr = new XMLHttpRequest();
-            xhr.open("PUT", "/user/email/change", true);
+            xhr.open("PUT", "/profile/email", true);
             xhr.setRequestHeader("Content-Type", "application/json");
 
             xhr.onreadystatechange = function () {
@@ -247,7 +246,7 @@
         * */
         function quitUser() {
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/user/settings/profile/quit", true);
+            xhr.open("POST", "/user/quit", true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {

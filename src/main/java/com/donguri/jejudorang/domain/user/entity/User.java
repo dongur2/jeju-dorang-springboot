@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.entity;
 
+import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.entity.auth.SocialLogin;
 import jakarta.persistence.*;
