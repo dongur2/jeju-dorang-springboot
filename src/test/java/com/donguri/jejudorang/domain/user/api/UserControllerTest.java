@@ -27,7 +27,7 @@ class UserControllerTest {
     @Autowired Validator validator;
 
     @Autowired
-    User2Controller userController;
+    MailController userController;
 
     @Autowired UserService userService;
     @Autowired RedisTemplate<String, String> redisTemplate;

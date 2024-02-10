@@ -30,6 +30,7 @@ public class MyPageController {
 
     /*
      * 마이페이지 - 작성글 목록: 커뮤니티
+     * GET
      *
      * */
     @GetMapping("/writings")
@@ -55,6 +56,7 @@ public class MyPageController {
 
     /*
      * 마이페이지 - 북마크 목록: 여행/커뮤니티
+     * GET
      *
      * */
     @GetMapping("/bookmarks")

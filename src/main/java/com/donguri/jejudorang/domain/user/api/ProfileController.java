@@ -102,7 +102,7 @@ public class ProfileController {
 
 
     /*
-     * 이메일 수정
+     * 이메일 변경
      * PUT
      *
      * */
@@ -123,7 +123,7 @@ public class ProfileController {
 
 
     /*
-     * 비밀번호 수정
+     * 비밀번호 변경
      * GET, PUT
      *
      * */

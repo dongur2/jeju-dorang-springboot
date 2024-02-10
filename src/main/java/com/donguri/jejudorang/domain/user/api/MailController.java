@@ -1,46 +1,35 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
-import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.*;
-import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
-import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
 @Controller
-@RequestMapping("/user")
-public class User2Controller {
-
-
+@RequestMapping("/email")
+public class MailController {
 
     @Autowired private final UserService userService;
-    public User2Controller(UserService userService) {
+
+    public MailController(UserService userService) {
         this.userService = userService;
     }
 
 
-
-
-
     /*
-    * 이메일 인증 번호 전송 (+ 중복 확인)
+    * 이메일 중복 확인 후 인증 번호 전송
+    * POST
+    *
     * */
-    @PostMapping("/email/verify")
+    @PostMapping("/available")
     public ResponseEntity<?> checkDuplicatedAndSendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
@@ -60,10 +49,13 @@ public class User2Controller {
         }
     }
 
+
     /*
     * 이메일 인증 번호 확인
+    * POST
+    *
     * */
-    @PostMapping("/email/verify-check")
+    @PostMapping("/verify")
     public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
@@ -91,27 +83,12 @@ public class User2Controller {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /*
     * 아이디 찾기 이메일 전송
+    * POST
+    *
     * */
-    @PostMapping("/email/find-id")
+    @PostMapping("/help/id")
     public ResponseEntity<?> findId(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
@@ -125,10 +102,13 @@ public class User2Controller {
         }
     }
 
+
     /*
     * 비밀번호 찾기 이메일 전송
+    * POST
+    *
     * */
-    @PostMapping("/email/find-pwd")
+    @PostMapping("/help/forPwd")
     public ResponseEntity<?> findPwd(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);
@@ -145,8 +125,10 @@ public class User2Controller {
 
     /*
     * 랜덤 비밀번호 설정: 이메일 전송
+    * POST
+    *
     * */
-    @PostMapping("/email/change-pwd")
+    @PostMapping("/help/pwd")
     public ResponseEntity<?> changePwd(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
         try {
             checkValidationAndReturnException(bindingResult);

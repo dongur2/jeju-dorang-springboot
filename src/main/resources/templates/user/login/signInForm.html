@@ -130,7 +130,7 @@
 
             } else {
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", "/user/email/find-id", true);
+                xhr.open("POST", "/email/help/id", true);
                 xhr.setRequestHeader("Content-Type", "application/json");
 
                 xhr.onreadystatechange = function() {
@@ -157,11 +157,8 @@
                 externalId: document.getElementById("externalIdForPwd").value
             };
 
-            console.log('email: '+mailSendForPwdRequest.email);
-            console.log('id: '+mailSendForPwdRequest.externalId);
-
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/user/email/change-pwd", true);
+            xhr.open("POST", "/email/help/pwd", true);
             xhr.setRequestHeader("Content-Type", "application/json");
 
             xhr.onreadystatechange = function() {
@@ -178,6 +175,47 @@
             xhr.send(JSON.stringify(mailSendForPwdRequest));
 
         }
+
+        /*
+        * 비밀번호 인증 이메일 전송
+        * */
+        function sendMailForPwd() {
+            var mailSendForPwdRequest = {
+                email: document.getElementById("email").value,
+                externalId: document.getElementById("externalIdForPwd").value
+            };
+
+            if (mailSendForPwdRequest.email == null
+                || mailSendForPwdRequest.email.trim() === "") {
+                alert("이메일을 입력해주세요.");
+
+            } else if (mailSendForPwdRequest.externalId == null
+                || mailSendForPwdRequest.externalId.trim() === ""){
+                alert("아이디를 입력해주세요.");
+
+            } else {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/email/help/forPwd", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            alert("이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.");
+
+                            // 인증 번호 입력란, 인증 번호 확인 버튼 노출
+                            document.getElementById("email-verify-container").style.display = "block";
+
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }
+                }
+
+                xhr.send(JSON.stringify(mailSendForPwdRequest));
+            }
+        }
+
 
     </script>
 
