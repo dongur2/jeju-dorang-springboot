@@ -1,11 +1,12 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.community.dto.response.ChatListResponseDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Map;
 
 public interface ChatService {
 
-    Map<String, Object> getChatPostList(Pageable pageable, String searchWord, String searchTag);
+    Page<ChatListResponseDto> getChatPostList(Pageable pageable, String searchWord, String searchTag);
 
 }

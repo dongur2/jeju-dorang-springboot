@@ -27,8 +27,7 @@ public class ChatServiceI implements ChatService {
 
     @Override
     @Transactional
-    public Map<String, Object> getChatPostList(Pageable pageable, String searchWord, String searchTag) {
-        Map<String, Object> resultMap = new HashMap<>();
+    public Page<ChatListResponseDto> getChatPostList(Pageable pageable, String searchWord, String searchTag) {
 
         // 검색어가 null인데 null처리 안되는 경우 처리
         if (searchWord != null && searchWord.trim().isEmpty()) {
@@ -41,40 +40,32 @@ public class ChatServiceI implements ChatService {
                         Arrays.asList(searchTag.split(","))
                         : null;
 
-        int allChatPageCount;
-        Page<Community> chatEntityList;
+        Page<Community> entities;
 
+        // 1. 검색어 없이 태그만 검색할 경우
         if (searchWord == null) {
-            // tag
             if (splitTagsToSearch != null) {
-                allChatPageCount = communityRepository.findAllByTypeContainingTag(BoardType.CHAT, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages();
-                chatEntityList = communityRepository.findAllByTypeContainingTag(BoardType.CHAT, splitTagsToSearch, splitTagsToSearch.size(), pageable);
+                entities = communityRepository.findAllByTypeContainingTag(BoardType.CHAT, splitTagsToSearch, splitTagsToSearch.size(), pageable);
             } else {
-                allChatPageCount = communityRepository.findAllByType(BoardType.CHAT, pageable).getTotalPages();
-                chatEntityList = communityRepository.findAllByType(BoardType.CHAT, pageable);
+                entities = communityRepository.findAllByType(BoardType.CHAT, pageable);
             }
 
+        // 2. 검색어와 태그 동시 검색할 경우
         } else {
             if (splitTagsToSearch != null) {
-                allChatPageCount = communityRepository.findAllByTypeContainingWordAndTag(BoardType.CHAT, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages();
-                chatEntityList = communityRepository.findAllByTypeContainingWordAndTag(BoardType.CHAT, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable);
+                entities = communityRepository.findAllByTypeContainingWordAndTag(BoardType.CHAT, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable);
             } else {
-                allChatPageCount = communityRepository.findAllByTypeContainingWord(BoardType.CHAT, searchWord, pageable).getTotalPages();
-                chatEntityList = communityRepository.findAllByTypeContainingWord(BoardType.CHAT, searchWord, pageable);
+                entities = communityRepository.findAllByTypeContainingWord(BoardType.CHAT, searchWord, pageable);
             }
         }
 
-
-        Page<ChatListResponseDto> chatListDtoPage = chatEntityList.map(
-                chat -> ChatListResponseDto.from(chat, chat.getTags().stream().map(
-                        tag -> tag.getTag().getKeyword())
+        // entity -> dto
+        return entities.map(
+                chat -> ChatListResponseDto.from(chat, chat.getTags().stream()
+                        .map(tag -> tag.getTag().getKeyword())
                         .toList())
         );
 
-        resultMap.put("allChatPageCount", allChatPageCount);
-        resultMap.put("chatListDtoPage", chatListDtoPage);
-
-        return resultMap;
     }
 
 }
