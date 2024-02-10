@@ -29,8 +29,7 @@ public class PartyServiceI implements PartyService{
 
     @Override
     @Transactional
-    public Map<String, Object> getPartyPostList(Pageable pageable, String paramState, String searchWord, String searchTag) {
-        Map<String, Object> resultMap = new HashMap<>();
+    public Page<PartyListResponseDto> getPartyPostList(Pageable pageable, String paramState, String searchWord, String searchTag) {
 
         // 넘어온 String state -> null / Enum 변환
         JoinState state = setStateToSort(paramState);
@@ -46,12 +45,11 @@ public class PartyServiceI implements PartyService{
                         Arrays.asList(searchTag.split(","))
                         : null;
 
-        int allPartyPageCount;
-        Page<Community> partyEntityList;
+        Page<Community> entities;
 
-        // 모든 모임글 (전체)
+        // 1. 모든 모집상태를 포함한 모임글
         if (state == null) {
-            partyEntityList =
+            entities =
                     (searchWord != null && splitTagsToSearch != null) ?
                             communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable)
                             : (searchWord == null && splitTagsToSearch == null) ?
@@ -60,18 +58,9 @@ public class PartyServiceI implements PartyService{
                             communityRepository.findAllByTypeContainingWord(BoardType.PARTY, searchWord, pageable)
                             : communityRepository.findAllByTypeContainingTag(BoardType.PARTY, splitTagsToSearch, splitTagsToSearch.size(), pageable);
 
-            allPartyPageCount =
-                    (searchWord != null && splitTagsToSearch != null) ?
-                            communityRepository.findAllByTypeContainingWordAndTag(BoardType.PARTY, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages()
-                            : (searchWord == null && splitTagsToSearch == null) ?
-                            communityRepository.findAllByType(BoardType.PARTY, pageable).getTotalPages()
-                            : (searchWord != null) ?
-                            communityRepository.findAllByTypeContainingWord(BoardType.PARTY, searchWord, pageable).getTotalPages()
-                            : communityRepository.findAllByTypeContainingTag(BoardType.PARTY, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages();
-
-        // 상태 존재 (모집중 or 모집완료)
+        // 2. 상태 존재 (모집중 or 모집완료)
         } else {
-            partyEntityList =
+            entities =
                     (searchWord != null && splitTagsToSearch != null) ?
                             communityRepository.findAllByTypeAndStateContainingWordAndTag(BoardType.PARTY, state, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable)
                             : (searchWord == null && splitTagsToSearch == null) ?
@@ -79,29 +68,15 @@ public class PartyServiceI implements PartyService{
                             : (searchWord != null) ?
                             communityRepository.findAllByTypeAndStateContainingWord(BoardType.PARTY, state, searchWord, pageable)
                             : communityRepository.findAllByTypeAndStateContainingTag(BoardType.PARTY, state, splitTagsToSearch, splitTagsToSearch.size(), pageable);
-
-            allPartyPageCount =
-                    (searchWord != null && splitTagsToSearch != null) ?
-                            communityRepository.findAllByTypeAndStateContainingWordAndTag(BoardType.PARTY, state, searchWord, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages()
-                            : (searchWord == null && splitTagsToSearch == null) ?
-                            communityRepository.findAllByTypeAndState(BoardType.PARTY, state, pageable).getTotalPages()
-                            : (searchWord != null) ?
-                            communityRepository.findAllByTypeAndStateContainingWord(BoardType.PARTY, state, searchWord, pageable).getTotalPages()
-                            : communityRepository.findAllByTypeAndStateContainingTag(BoardType.PARTY, state, splitTagsToSearch, splitTagsToSearch.size(), pageable).getTotalPages();
-
-
         }
 
-        Page<PartyListResponseDto> partyListDtoPage = partyEntityList.map(
-                party -> PartyListResponseDto.from(party, party.getTags().stream().map(
-                                tag -> tag.getTag().getKeyword())
+        // entity -> dto
+        return entities.map(
+                party -> PartyListResponseDto.from(party, party.getTags().stream()
+                        .map(tag -> tag.getTag().getKeyword())
                         .toList())
         );
 
-        resultMap.put("allPartyPageCount", allPartyPageCount);
-        resultMap.put("partyListDtoPage", partyListDtoPage);
-
-        return resultMap;
     }
 
     private static JoinState setStateToSort(String paramState) {

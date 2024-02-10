@@ -170,7 +170,7 @@ public class CommunityController {
 
             Page<?> data = null;
             if (type.equals("parties")) {
-//                listInMap = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
+                data = partyService.getPartyPostList(pageable, state, searchWord, searchTag);
             } else {
                 data = chatService.getChatPostList(pageable, searchWord, searchTag);
             }
@@ -185,8 +185,8 @@ public class CommunityController {
 
             if (type.equals("parties")) {
                 model.addAttribute("nowState", state);
-//                model.addAttribute("allPartyPageCount", listInMap.get("allPartyPageCount")); // 총 페이지 수
-//                model.addAttribute("partyListDtoPage", listInMap.get("partyListDtoPage")); // 데이터
+                model.addAttribute("allPartyPageCount", data.getTotalPages()); // 총 페이지 수
+                model.addAttribute("partyListDtoPage", data); // 데이터
             } else {
                 model.addAttribute("allChatPageCount", data.getTotalPages()); // 총 페이지 수
                 model.addAttribute("chatListDtoPage", data); // 데이터
