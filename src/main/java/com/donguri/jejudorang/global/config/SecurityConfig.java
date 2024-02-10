@@ -97,12 +97,10 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/user/quit",
                                         "/profile/**", "/mypage/**",
-                                        "/user/settings/profile/**",
                                         "/community/post/**", "/tui-editor/**",
                                         "/community/parties/{communityId}/state",
                                         "/bookmarks/communities/{communityId}",
                                         "/bookmarks/trips/{tripId}"
-
                                 ).authenticated()
                         )
                 )
