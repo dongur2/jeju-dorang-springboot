@@ -338,7 +338,7 @@ public class UserServiceI implements UserService {
 
                 String pastImg = nowUser.getProfile().getImgName();
                 if (pastImg != null) {
-                    imageService.deleteS3Object(pastImg);
+                    imageService.deleteImg(pastImg);
 
                     nowUser.getProfile().updateImgName(null);
                     nowUser.getProfile().updateImgUrl(null);
@@ -346,7 +346,7 @@ public class UserServiceI implements UserService {
                     log.info("이전 이미지 삭제 완료");
                 }
 
-                Map<String, String> uploadedImg = imageService.putS3Object(dataToUpdate.img());
+                Map<String, String> uploadedImg = imageService.uploadImg(dataToUpdate.img());
 
                 if (uploadedImg == null) {
                     throw new IllegalAccessException("사진 업로드에 실패했습니다.");
@@ -382,7 +382,7 @@ public class UserServiceI implements UserService {
 
             String pastImg = nowUser.getProfile().getImgName();
             if (pastImg != null) {
-                imageService.deleteS3Object(pastImg);
+                imageService.deleteImg(pastImg);
 
                 nowUser.getProfile().updateImgName(null);
                 nowUser.getProfile().updateImgUrl(null);

@@ -41,7 +41,7 @@ public class CommunityImageFileController {
                 throw new IllegalAccessException("파일 크기는 3MB를 초과할 수 없습니다");
             }
 
-            Map<String, String> resultMap = imageService.putS3Object(image);
+            Map<String, String> resultMap = imageService.uploadImg(image);
             return resultMap.get("imgUrl");
 
         } catch (Exception e) {
