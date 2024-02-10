@@ -97,111 +97,15 @@ public class User2Controller {
 
 
 
-    /*
-    * 마이페이지 - 프로필 조회
-    * */
-    @GetMapping("/settings/profile")
-    public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
-        try {
-            String accessToken = token.getValue();
-            log.info("@CookieValue Cookie's access_token: {}", accessToken);
-
-            ProfileResponse profileData = userService.getProfileData(accessToken);
-
-            model.addAttribute(profileData);
-            return "/user/mypage/profile";
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return "redirect:/user/login";
-        }
-    }
-
-    /*
-    * 마이페이지 - 프로필 수정
-    * nickname
-    * img: S3 url
-    *
-    * */
-    @PutMapping("/settings/profile")
-    public ResponseEntity<?> updateProfile(@CookieValue("access_token") Cookie token,
-                                           @Valid ProfileRequest profileRequest, BindingResult bindingResult) {
-
-        try {
-            checkValidationAndReturnException(bindingResult);
-
-            String accessToken = token.getValue();
-
-            userService.updateProfileData(accessToken, profileRequest);
-            return new ResponseEntity<>(HttpStatus.OK);
-
-        } catch (Exception e) {
-            log.error("프로필 수정 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    /*
-    * 마이페이지 - 프로필 사진 삭제
-    * */
-    @DeleteMapping("/settings/profile/deleteimg")
-    public ResponseEntity<HttpStatus> deleteProfileImg(@CookieValue("access_token") Cookie token) {
-        log.info("deleteProfileImg 컨트롤러 실행");
-
-        try {
-            String accessToken = token.getValue();
-
-            userService.deleteProfileImg(accessToken);
-
-            return new ResponseEntity<>(HttpStatus.OK);
-
-        } catch (Exception e) {
-            log.error("이미지 삭제 실패: {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
 
 
-    /*
-    * 비밀번호 수정
-    * */
-    @GetMapping("/settings/profile/pwd")
-    public String getUpdatePasswordForm() {
-        return "/user/mypage/changePwdForm";
-    }
-    @PutMapping("/settings/profile/pwd")
-    public ResponseEntity<?> updatePassword(@CookieValue("access_token") Cookie token,
-                                 @Valid PasswordRequest passwordRequest, BindingResult bindingResult) {
 
-        try {
-            checkValidationAndReturnException(bindingResult);
 
-            userService.updatePassword(token.getValue(), passwordRequest);
-            return new ResponseEntity<>(HttpStatus.OK);
 
-        } catch (Exception e) {
-            log.error("비밀번호 수정 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
 
-    /*
-    * 이메일 수정
-    * */
-    @PutMapping("/email/change")
-    public ResponseEntity<?> updateEmail(@CookieValue("access_token") Cookie token,
-                                         @RequestBody @Valid MailChangeRequest mailChangeRequest, BindingResult bindingResult) {
-        try {
-            checkValidationAndReturnException(bindingResult);
 
-            userService.updateEmail(token.getValue(), mailChangeRequest);
-            return new ResponseEntity<>(HttpStatus.OK);
 
-        } catch (Exception e) {
-            log.error("이메일 변경 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
+
 
 
     /*

@@ -95,6 +95,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(
                                         "/user/quit",
+                                        "/profile/**",
                                         "/user/settings/profile/**",
                                         "/community/post/**", "/tui-editor/**",
                                         "/community/parties/{communityId}/state",
