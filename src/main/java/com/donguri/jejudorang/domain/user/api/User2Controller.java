@@ -163,54 +163,7 @@ public class User2Controller {
 
 
 
-    /*
-     * 마이페이지 - 작성글 목록: 커뮤니티
-     *
-     * */
-    @GetMapping("/settings/profile/writings")
-    public String getMyWritingsPage(@CookieValue("access_token") Cookie token, Model model,
-                                    @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
-        try {
-            Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
 
-            Page<CommunityListResponseDto> data = userService.getMyCommunityWritings(token.getValue(), pageable);
-
-            model.addAttribute("nowPage", nowPage);
-            model.addAttribute("endPage", data.getTotalPages());
-            model.addAttribute("posts", data);
-            return "/user/mypage/myWritings";
-
-        } catch (Exception e) {
-            log.error("커뮤니티 작성글 불러오기 실패: {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
-        }
-    }
-
-    /*
-    * 마이페이지 - 북마크 목록: 여행/커뮤니티
-    *
-    * */
-    @GetMapping("/settings/profile/bookmarks")
-    public String getMyBookmarkPage(@CookieValue("access_token") Cookie token, Model model,
-                                    @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
-                                    @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
-        try {
-            Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
-            Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);
-
-            model.addAttribute("type", type);
-            model.addAttribute("nowPage", nowPage);
-            model.addAttribute("endPage", data.getTotalPages());
-            model.addAttribute("posts", data);
-            return "/user/mypage/myBookmarks";
-
-        } catch (Exception e) {
-            log.error("북마크 불러오기 실패: {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
-        }
-    }
 
 
     /*
