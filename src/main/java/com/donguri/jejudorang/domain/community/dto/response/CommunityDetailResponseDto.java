@@ -1,8 +1,10 @@
 package com.donguri.jejudorang.domain.community.dto.response;
 
+import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
+import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.global.common.DateFormat;
 import lombok.Builder;
 
@@ -24,7 +26,9 @@ public record CommunityDetailResponseDto(
     List<String> tags,
     int bookmarkCount,
 
-    boolean isBookmarked
+    boolean isBookmarked,
+
+    List<CommentResponse> comments
 
 ) {
     public static CommunityDetailResponseDto from(Community community, List<String> tagList, String nowViewer) {
@@ -33,6 +37,17 @@ public record CommunityDetailResponseDto(
         if (community.getWriter() != null) {
             nickname = community.getWriter().getProfile().getNickname();
             writerId = community.getWriter().getProfile().getExternalId();
+        }
+
+        List<CommentResponse> cmts = null;
+        if(community.getComments() != null) {
+            cmts = community.getComments().stream()
+                    .map(cmt -> CommentResponse.builder()
+                            .pic(cmt.getUser().getProfile().getImgUrl())
+                            .nickname(cmt.getUser().getProfile().getNickname())
+                            .content(cmt.getContent())
+                            .createdAt(cmt.getCreatedAt())
+                            .build()).toList();
         }
 
         return CommunityDetailResponseDto.builder()
@@ -48,6 +63,7 @@ public record CommunityDetailResponseDto(
                 .viewCount(community.getViewCount())
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
+                .comments(cmts)
 
                 // 현재 로그인한 유저의 북마크 여부 확인
                 .isBookmarked(community.getBookmarks().stream()
@@ -63,6 +79,16 @@ public record CommunityDetailResponseDto(
             nickname = community.getWriter().getProfile().getNickname();
             writerId = community.getWriter().getProfile().getExternalId();
         }
+        List<CommentResponse> cmts = null;
+        if(community.getComments() != null) {
+            cmts = community.getComments().stream()
+                    .map(cmt -> CommentResponse.builder()
+                            .pic(cmt.getUser().getProfile().getImgUrl())
+                            .nickname(cmt.getUser().getProfile().getNickname())
+                            .content(cmt.getContent())
+                            .createdAt(cmt.getCreatedAt())
+                            .build()).toList();
+        }
 
         return CommunityDetailResponseDto.builder()
                 .id(community.getId())
@@ -77,6 +103,7 @@ public record CommunityDetailResponseDto(
                 .viewCount(community.getViewCount())
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
+                .comments(cmts)
                 .build();
     }
     

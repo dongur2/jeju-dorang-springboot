@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,22 +28,42 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    /*
+    * 댓글 작성
+    * POST
+    *
+    * */
     @PostMapping("/new")
-    public ResponseEntity<?> createNewComment(@CookieValue("access_token") Cookie token,
-                                   @RequestParam("post") Long postId,
-                                   @Valid CommentRequest commentRequest, BindingResult bindingResult) {
+    public String createNewComment(@CookieValue("access_token") Cookie token,
+                                   @Valid CommentRequest commentRequest, BindingResult bindingResult,
+                                   @RequestParam("post") Long postId, @RequestParam("type") String type,
+                                   Model model) {
         try {
             if (bindingResult.hasErrors()) {
                 throw new Exception(bindingResult.getFieldError().getDefaultMessage());
             }
 
             commentService.writeNewComment(token.getValue(), postId, commentRequest);
-            return new ResponseEntity<>(HttpStatus.OK);
+
+            // PARTY -> parties, CHAT -> chats
+            type = matchMappingBoardType(type);
+
+            return "redirect:/community/boards/" + type + "/" + postId;
 
         } catch (Exception e) {
             log.error("댓글 생성에 실패했습니다: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
         }
+    }
+
+    private static String matchMappingBoardType(String type) {
+        if(type.equals("PARTY")) {
+            type = "parties";
+        } else {
+            type = "chats";
+        }
+        return type;
     }
 
 

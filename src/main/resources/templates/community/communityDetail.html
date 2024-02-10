@@ -134,33 +134,43 @@
         </div>
 
         <div class="comment-write-box" style="width:100%; padding:0 4%; background: #6f42c1; display: flex; flex-direction: row; justify-content: space-between">
+
+            <!-- 새로운 댓글 -->
             <div class="user-profile-pic-circle" style="width: 15%; background: yellowgreen; display: flex; flex-direction: row">
                 <img class="user-profile-pic"
                      style="width:50px; height:50px; border-radius: 50%; background: pink;">
                 <p>닉네임</p>
             </div>
-            <div class="user-comment-write-box" style="width: 80%; display: flex; flex-direction: row; justify-content: space-between">
-                <input name="comment" style="width: 85%">
-                <button type="button" class="btn btn-warning comment-write-new-request-btn"
-                style="width:10%">등록</button>
-            </div>
+
+            <!-- 댓글 작성 폼 -->
+            <form class="user-comment-write-box" id="new-comment-write-form"
+                  method="post" th:object="${commentRequest}" action="/community/comments/new"
+                  style="width: 80%; display: flex; flex-direction: row; justify-content: space-between">
+                <input name="content" style="width: 85%">
+                <input name="post" th:value="${post.id()}" type="hidden">
+                <input name="type" th:value="${post.type()}" type="hidden">
+                <button type="submit" class="btn btn-warning comment-write-new-request-btn" style="width:10%">등록</button>
+            </form>
+
         </div>
 
+        <!-- 기존 댓글 -->
         <div class="comments-list-box" style="width:100%; padding:0 4%; background: #146c43; display: flex; flex-direction: row; justify-content: space-between">
-            <div class="cmt-box">
+            <div class="cmt-box" th:each="cmt : ${post.comments()}">
                 <div class="cmt-header">
                     <div class="user-profile-pic-circle">
-                        <img class="user-profile-pic" style="width:50px; height:50px; border-radius: 50%; background: pink;">
+                        <img class="user-profile-pic" style="width:50px; height:50px; border-radius: 50%; background: pink;"
+                        th:src="${cmt.pic()}">
                     </div>
-                    <div class="cmt-writer-nickname">
+                    <div class="cmt-writer-nickname" th:text="${cmt.nickname()}">
                         닉네임
                     </div>
-                    <div class="cmt-write-date">
+                    <div class="cmt-write-date" th:text="${cmt.createdAt()}">
                         2000.00.00 오후 00.00
                     </div>
                 </div>
 
-                <div class="cmt-body">
+                <div class="cmt-body" th:text="${cmt.content()}">
                     댓글 내용
                 </div>
             </div>
@@ -302,6 +312,8 @@
             const facebookIntent = 'http://www.facebook.com/sharer/sharer.php?u=' + document.URL;
             window.open(facebookIntent, '_blank');
         }
+
+
         // 링크 복사
         function shareCopiedLink() {
             const url = window.location.href; // 현재 URL
@@ -316,7 +328,6 @@
                 console.error('복사 실패:', error);
             });
         }
-
 
     </script>
 </th>

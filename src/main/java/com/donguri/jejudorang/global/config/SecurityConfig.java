@@ -98,6 +98,7 @@ public class SecurityConfig {
                                         "/user/quit",
                                         "/profile/**", "/mypage/**",
                                         "/community/post/**", "/tui-editor/**",
+                                        "/community/comments/**",
                                         "/community/parties/{communityId}/state",
                                         "/bookmarks/communities/{communityId}",
                                         "/bookmarks/trips/{tripId}"
