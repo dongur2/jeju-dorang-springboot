@@ -4,6 +4,7 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
         layout:decorate="~{/fragments/layout}">
+
 <head>
     <!-- 카카오톡 공유  -->
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js"
@@ -15,6 +16,7 @@
     </script>
     <script th:src="@{/js/community/deleteCommunity.js}"></script>
     <title>상세 페이지 - 제주도랑 | 커뮤니티</title>
+    <link rel="stylesheet" href="../../static/css/community/communityDetail.css">
 </head>
 <th layout:fragment="content">
 
@@ -124,11 +126,49 @@
     </div>
 
     <!--  댓글  -->
-    <div class="comments-box">
-        COMMENT
+    <div class="comments-box"
+        style="width:100%; padding:5% 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: red">
+
+        <div class="cmt-title-box" style="margin-right: auto; padding:0 4%">
+            <h3>댓글 <span>999</span></h3>
+        </div>
+
+        <div class="comment-write-box" style="width:100%; padding:0 4%; background: #6f42c1; display: flex; flex-direction: row; justify-content: space-between">
+            <div class="user-profile-pic-circle" style="width: 15%; background: yellowgreen; display: flex; flex-direction: row">
+                <img class="user-profile-pic"
+                     style="width:50px; height:50px; border-radius: 50%; background: pink;">
+                <p>닉네임</p>
+            </div>
+            <div class="user-comment-write-box" style="width: 80%; display: flex; flex-direction: row; justify-content: space-between">
+                <input name="comment" style="width: 85%">
+                <button type="button" class="btn btn-warning comment-write-new-request-btn"
+                style="width:10%">등록</button>
+            </div>
+        </div>
+
+        <div class="comments-list-box" style="width:100%; padding:0 4%; background: #146c43; display: flex; flex-direction: row; justify-content: space-between">
+            <div class="cmt-box">
+                <div class="cmt-header">
+                    <div class="user-profile-pic-circle">
+                        <img class="user-profile-pic" style="width:50px; height:50px; border-radius: 50%; background: pink;">
+                    </div>
+                    <div class="cmt-writer-nickname">
+                        닉네임
+                    </div>
+                    <div class="cmt-write-date">
+                        2000.00.00 오후 00.00
+                    </div>
+                </div>
+
+                <div class="cmt-body">
+                    댓글 내용
+                </div>
+            </div>
+        </div>
     </div>
 
 
+    <!--  모달   -->
     <div class="modal-sns-share-box hidden-modal" id="modal-sns-share-box">
         <div class="modal-sns-header">
             <h4 class="modal-sns-title">글 공유하기</h4>
