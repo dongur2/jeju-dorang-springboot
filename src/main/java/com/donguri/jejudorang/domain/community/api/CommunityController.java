@@ -185,12 +185,10 @@ public class CommunityController {
 
             if (type.equals("parties")) {
                 model.addAttribute("nowState", state);
-                model.addAttribute("allPartyPageCount", data.getTotalPages()); // 총 페이지 수
-                model.addAttribute("partyListDtoPage", data); // 데이터
-            } else {
-                model.addAttribute("allChatPageCount", data.getTotalPages()); // 총 페이지 수
-                model.addAttribute("chatListDtoPage", data); // 데이터
             }
+
+            model.addAttribute("endPage", data.getTotalPages()); // 총 페이지 수
+            model.addAttribute("posts", data); // 데이터
 
             return "/community/communityList";
 
