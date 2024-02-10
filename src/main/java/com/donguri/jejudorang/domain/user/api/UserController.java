@@ -393,7 +393,7 @@ public class UserController {
             model.addAttribute("type", type);
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
-            model.addAttribute("post", data);
+            model.addAttribute("posts", data);
             return "/user/mypage/myBookmarks";
 
         } catch (Exception e) {
