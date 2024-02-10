@@ -1,9 +1,11 @@
 package com.donguri.jejudorang.domain.community.service;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
 import com.donguri.jejudorang.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Map;
@@ -18,7 +20,7 @@ public interface CommunityService {
     Map<String, Object> getCommunityPost(Long communityId, boolean forModify, HttpServletRequest request);
 
     //마이페이지: 작성한 게시글 조회
-    Map<String, Object> getAllPostsWrittenByUser(User writer, Pageable pageable);
+    Page<CommunityListResponseDto> getAllPostsWrittenByUser(User writer, Pageable pageable);
 
 
     //modifyCommunity
