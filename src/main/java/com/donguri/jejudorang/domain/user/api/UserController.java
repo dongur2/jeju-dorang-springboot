@@ -388,12 +388,12 @@ public class UserController {
                                     @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
-            Map<String, Object> resultMap = userService.getMyBookmarks(token.getValue(), type, pageable);
+            Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);
 
             model.addAttribute("type", type);
             model.addAttribute("nowPage", nowPage);
-            model.addAttribute("endPage", resultMap.get("endPage"));
-            model.addAttribute("post", resultMap.get("data"));
+            model.addAttribute("endPage", data.getTotalPages());
+            model.addAttribute("post", data);
             return "/user/mypage/myBookmarks";
 
         } catch (Exception e) {

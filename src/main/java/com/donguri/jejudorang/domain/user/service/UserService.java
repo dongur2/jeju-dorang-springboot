@@ -66,5 +66,5 @@ public interface UserService {
     Page<CommunityListResponseDto> getMyCommunityWritings(String accessToken, Pageable pageable);
 
     // 마이페이지: 내 북마크 목록 조회
-    Map<String, Object> getMyBookmarks(String accessToken, String type, Pageable pageable);
+    Page<?> getMyBookmarks(String accessToken, String type, Pageable pageable);
 }

@@ -584,7 +584,7 @@ public class UserServiceI implements UserService {
     *
     * */
     @Override
-    public Map<String, Object> getMyBookmarks(String token, String type, Pageable pageable) {
+    public Page<?> getMyBookmarks(String token, String type, Pageable pageable) {
         try {
             User nowUser = getNowUser(token);
 

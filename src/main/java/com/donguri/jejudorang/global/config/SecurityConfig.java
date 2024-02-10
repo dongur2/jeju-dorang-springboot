@@ -89,7 +89,7 @@ public class SecurityConfig {
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
                                         "/user/login", "/user/signup", "/user/signup/**", "/user/logout", "/user/email/**",
-                                        "/trip/lists/*", "/trip/places/*",
+                                        "/trip/lists**", "/trip/places/*",
                                         "/community/boards/**",
                                         "/templates/**", "/error/**", "/trip/api/data")
                                 .permitAll()

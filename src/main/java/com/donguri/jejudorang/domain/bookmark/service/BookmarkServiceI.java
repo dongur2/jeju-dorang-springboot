@@ -138,30 +138,15 @@ public class BookmarkServiceI implements BookmarkService {
     * */
     @Override
     @Transactional
-    public Map<String, Object> getMyBookmarks(User user, String type, Pageable pageable) {
-
+    public Page<?> getMyBookmarks(User user, String type, Pageable pageable) {
         try {
-            Map<String, Object> result = new HashMap<>();
-
-            switch (type) {
-                case "trip": {
-                    Page<TripListResponseDto> data = tripBookmarkRepository.findAllByUser(user, pageable)
+            if (type.equals("trip")) {
+                return tripBookmarkRepository.findAllByUser(user, pageable)
                             .map(trip -> new TripListResponseDto(trip.getTrip()));
-
-                    result.put("data", data);
-                    result.put("endPage", data.getTotalPages());
-                    break;
-                }
-                case "community": {
-                    Page<CommunityListResponseDto> data = communityBookmarkRepository.findAllByUser(user, pageable)
-                            .map(community -> CommunityListResponseDto.from(community.getCommunity()));
-
-                    result.put("data", data);
-                    result.put("endPage", data.getTotalPages());
-                    break;
-                }
+            } else {
+                return communityBookmarkRepository.findAllByUser(user, pageable)
+                        .map(community -> CommunityListResponseDto.from(community.getCommunity()));
             }
-            return result;
 
         } catch (Exception e) {
             log.error("북마크 불러오기에 실패했습니다. {}", e.getMessage());
