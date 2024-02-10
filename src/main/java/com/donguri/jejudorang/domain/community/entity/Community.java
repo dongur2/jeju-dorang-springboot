@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.entity;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
+import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,14 +66,22 @@ public class Community extends BaseEntity {
     @Formula("(SELECT COUNT(*) FROM community_bookmark b WHERE b.community_id = community_id)")
     private int bookmarksCount;
 
+    @OneToMany(mappedBy = "community"
+            , cascade = CascadeType.ALL
+            , orphanRemoval = true)
+    private List<Comment> comments;
+
+    @Formula("(SELECT COUNT(*) FROM comment c WHERE c.community_id = community_id)")
+    private int commentsCount;
 
     @Builder
-    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount) {
+    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments) {
         this.writer = writer;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.viewCount = viewCount;
+        this.comments = comments;
     }
 
     // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정
@@ -95,6 +105,17 @@ public class Community extends BaseEntity {
         } else {
             bookmarks.add(bookmark);
         }
+    }
+
+    // 댓글 업데이트
+    public void addComment(Comment newComment) {
+        if(comments == null) {
+            comments = new ArrayList<>();
+        }
+        comments.add(newComment);
+    }
+    public void deleteComment(Comment comment) {
+        comments.remove(comment);
     }
 
     public void setBoardType(String paramType) {
