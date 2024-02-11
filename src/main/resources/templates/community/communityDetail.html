@@ -125,56 +125,91 @@
 
     </div>
 
+
     <!--  댓글  -->
-    <div class="comments-box"
-        style="width:100%; padding:5% 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: red">
+    <div class="cmt-area"
+    style="width: 100%; height:100%; margin: 5% 0; padding: 2% 5%; background: #f8f9fa; display: flex; flex-direction: column; justify-content: center">
 
-        <div class="cmt-title-box" style="margin-right: auto; padding:0 4%">
-            <h3>댓글 <span>999</span></h3>
-        </div>
+        <div class="cmt-area-header"
+        style="width: 100%; height:160px; display: flex; flex-direction: column; justify-content: flex-end">
 
-        <div class="comment-write-box" style="width:100%; padding:0 4%; background: #6f42c1; display: flex; flex-direction: row; justify-content: space-between">
+            <h3 style="width:100%; margin-right:auto">
+                댓글 <span>999</span>
+            </h3>
 
-            <!-- 새로운 댓글 -->
-            <div class="user-profile-pic-circle" style="width: 15%; background: yellowgreen; display: flex; flex-direction: row">
-                <img class="user-profile-pic"
-                     style="width:50px; height:50px; border-radius: 50%; background: pink;">
-                <p>닉네임</p>
-            </div>
+            <!-- 댓글 작성 -->
+            <form class="cmt-new-box" id="cmt-new-form" method="post" th:object="${commentRequest}" action="/community/comments/new"
+            style="width: 100%; height:50px; margin-bottom:1%; display: flex; justify-content: space-between">
 
-            <!-- 댓글 작성 폼 -->
-            <form class="user-comment-write-box" id="new-comment-write-form"
-                  method="post" th:object="${commentRequest}" action="/community/comments/new"
-                  style="width: 80%; display: flex; flex-direction: row; justify-content: space-between">
-                <input name="content" style="width: 85%">
+                <input name="content" style="width: 80%">
                 <input name="post" th:value="${post.id()}" type="hidden">
                 <input name="type" th:value="${post.type()}" type="hidden">
-                <button type="submit" class="btn btn-warning comment-write-new-request-btn" style="width:10%">등록</button>
+                <button type="submit" class="btn btn-warning cmt-new-btn" style="width:15%">등록</button>
             </form>
-
         </div>
 
-        <!-- 기존 댓글 -->
-        <div class="comments-list-box" style="width:100%; padding:0 4%; background: #146c43; display: flex; flex-direction: row; justify-content: space-between">
-            <div class="cmt-box" th:each="cmt : ${post.comments()}">
-                <div class="cmt-header">
-                    <div class="user-profile-pic-circle">
-                        <img class="user-profile-pic" style="width:50px; height:50px; border-radius: 50%; background: pink;"
-                        th:src="${cmt.pic()}">
+        <div class="cmt-area-body"
+        style="width: 100%; display: flex; flex-direction: column;">
+
+            <div class="cmt-card" th:each="cmt : ${post.comments()}"
+            style="width: 100%; height:160px; display: flex; flex-direction: column; margin: 1% 0; border-bottom:1px solid #656565;
+                    gap:10px;">
+
+                <div class="cmt-card-header"
+                     style="width: 100%; height:60px; display: flex; flex-direction: row">
+
+                    <!-- 댓글 작성자 -->
+                    <div class="cmt-card-header-profile"
+                    style="min-width:30%; max-width: 50%; display: flex; flex-direction: row; justify-content: space-between">
+
+                        <!-- 프로필 사진 -->
+                        <div class="cmt-writer-img-circle"
+                             style="width:60px; height:60px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
+
+                            <img th:if="${cmt.pic() != null}" th:src="${cmt.pic()}"
+                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
+                        </div>
+
+                        <!-- 닉네임 -->
+                        <div class="cmt-writer-nickname"
+                        style="min-width: 100px; max-width: 40%; display:flex; align-items:flex-end;">
+
+                            <h5 th:text="${cmt.nickname()}">닉네임</h5>
+                        </div>
+
+                        <!-- 작성일 -->
+                        <div class="cmt-write-date"
+                        style="width: 160px; display:flex; align-items:flex-end; color:#696969">
+
+                            <h6 th:text="${#temporals.format(cmt.createdAt(), 'yy.MM.dd HH:mm')}">0000.00.00 MM:DD</h6>
+                        </div>
                     </div>
-                    <div class="cmt-writer-nickname" th:text="${cmt.nickname()}">
-                        닉네임
-                    </div>
-                    <div class="cmt-write-date" th:text="${cmt.createdAt()}">
-                        2000.00.00 오후 00.00
+
+
+                    <!-- 버튼 -->
+                    <div class="cmt-card-header-btns"
+                    style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
+
+                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" style="width:45%; height:60%;">수정</button>
+                        <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;">삭제</button>
                     </div>
                 </div>
 
-                <div class="cmt-body" th:text="${cmt.content()}">
-                    댓글 내용
+                <!-- 댓글 내용 -->
+                <div class="cmt-card-body"
+                style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white">
+
+                    <p style="font-size: 18px" th:text="${cmt.content()}">댓글</p>
                 </div>
+
+
             </div>
+
+
         </div>
+
+
+
     </div>
 
 
