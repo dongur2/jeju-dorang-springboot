@@ -192,7 +192,7 @@
 
                         <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
                                 style="width:45%; height:60%;">수정</button>
-                        <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;">삭제</button>
+                        <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId()} + ')'">삭제</button>
                     </div>
                 </div>
 
@@ -395,9 +395,6 @@
                 content: document.getElementById('cmt-modify-input-' + cmtId).value
             }
 
-            console.log('cmtid:' + commentRequestWithId.cmtId);
-            console.log('content:' + commentRequestWithId.content);
-
             var xhr = new XMLHttpRequest();
             xhr.open("PUT", "/community/comments", true);
             xhr.setRequestHeader("Content-Type", "application/json");
@@ -407,12 +404,35 @@
                     if (xhr.status === 200) {
                         alert("댓글 수정이 완료되었습니다.");
                         window.location.reload();
+
                     } else {
                         alert(xhr.responseText);
                     }
                 }
             }
             xhr.send(JSON.stringify(commentRequestWithId));
+        }
+
+        /*
+        * 댓글 삭제 요청
+        *
+        * */
+        function deleteCmtRequest(cmtId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/community/comments?cmtId=" + cmtId, true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("댓글 삭제가 완료되었습니다.");
+                        window.location.reload();
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+            xhr.send();
         }
 
 
