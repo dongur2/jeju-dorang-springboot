@@ -89,5 +89,25 @@ public class CommentController {
     }
 
 
+    /*
+    * 댓글 삭제
+    * DELETE
+    *
+    * */
+    @DeleteMapping
+    public ResponseEntity<?> deleteComment(@CookieValue("access_token") Cookie token, @RequestParam("cmtId") Long cmtId) {
+        try {
+            commentService.deleteComment(token.getValue(), cmtId);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("댓글 삭제 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+
 
 }

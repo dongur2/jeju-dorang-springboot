@@ -81,4 +81,27 @@ public class CommentServiceI implements CommentService{
         }
     }
 
+    @Override
+    @Transactional
+    public void deleteComment(String accessToken, Long cmtId) throws IllegalAccessException {
+        try {
+            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
+
+            Comment cmtToDelete = commentRepository.findById(cmtId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."));
+
+            // 로그인 유저가 댓글 작성자가 아닐 경우 예외 처리
+            if(!userNameFromJwtToken.equals(cmtToDelete.getUser().getProfile().getExternalId())) {
+                throw new IllegalAccessException("댓글 작성자 당사자만 댓글을 삭제할 수 있습니다.");
+            }
+
+            // 게시글에서 댓글 삭제 & 리포지토리 댓글 삭제
+            cmtToDelete.getCommunity().deleteComment(cmtToDelete);
+            commentRepository.delete(cmtToDelete);
+
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
 }

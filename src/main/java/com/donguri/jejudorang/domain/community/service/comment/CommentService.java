@@ -11,4 +11,6 @@ public interface CommentService {
     // 댓글 수정
     void modifyComment(String accessToken, CommentRequestWithId commentToUpdate) throws IllegalAccessException;
 
+    // 댓글 삭제
+    void deleteComment(String accessToken, Long cmtId) throws IllegalAccessException;
 }
