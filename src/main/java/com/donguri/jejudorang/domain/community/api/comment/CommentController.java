@@ -12,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -64,6 +61,32 @@ public class CommentController {
             type = "chats";
         }
         return type;
+    }
+
+
+    /*
+    * 댓글 수정
+    * PUT
+    *
+    * */
+    @PutMapping("/modify")
+    public ResponseEntity<?> updateComment(@CookieValue("access_token") Cookie token,
+                                           @RequestParam("cmt-id") Long cmtId,
+                                           @Valid CommentRequest commentRequest, BindingResult bindingResult) {
+
+        try {
+            if(bindingResult.hasErrors()) {
+                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
+            }
+
+            commentService.modifyComment(token.getValue(), cmtId, commentRequest);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("댓글 수정 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 

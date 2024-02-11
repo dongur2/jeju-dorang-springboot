@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -31,6 +32,7 @@ public class CommentServiceI implements CommentService{
 
 
     @Override
+    @Transactional
     public void writeNewComment(String accessToken, Long postId, CommentRequest newComment) {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
@@ -54,4 +56,28 @@ public class CommentServiceI implements CommentService{
             throw e;
         }
     }
+
+    @Override
+    @Transactional
+    public void modifyComment(String accessToken, Long cmtId, CommentRequest commentToUpdate) throws IllegalAccessException {
+        try {
+            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
+
+            Comment originalCmt = commentRepository.findById(cmtId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."));
+
+            // 로그인 유저가 댓글 작성자가 아닐 경우 예외 처리
+            if(!userNameFromJwtToken.equals(originalCmt.getUser().getProfile().getExternalId())) {
+                throw new IllegalAccessException("댓글 작성자 당사자만 댓글을 수정할 수 있습니다.");
+            }
+
+            // 댓글 내용 수정
+            originalCmt.updateContent(commentToUpdate);
+
+        } catch (Exception e) {
+            log.error("댓글 수정 실패: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 }

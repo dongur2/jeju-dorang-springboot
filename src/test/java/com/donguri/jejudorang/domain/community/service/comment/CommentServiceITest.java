@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.community.service.comment;
 
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
+import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
@@ -119,6 +120,61 @@ class CommentServiceITest {
 
         //then
         Assertions.assertThat(testCommunity.getComments().size()).isEqualTo(3);
+    }
+
+    @Test
+    @Transactional
+    void 댓글_수정() {
+        //given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User user1 = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile1 = Profile.builder().user(user1).externalId("userId1").nickname("userNickname").build();
+        Authentication authentication1 = Authentication.builder().user(user1).email("user1@mail.com").agreement(AgreeRange.ALL).build();
+        Password password1 = Password.builder().user(user1).password("12345678").build();
+
+        Set<Role> testRoles1 = new HashSet<>();
+        Role userRole1 = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles1.add(userRole1);
+
+        user1.updateRole(testRoles1);
+        user1.updateProfile(profile1);
+        user1.updateAuth(authentication1);
+        user1.updatePwd(password1);
+
+        User savedUser = userRepository.save(user);
+        User savedUser1 = userRepository.save(user1);
+
+        Community testCommunity = Community.builder().title("제목").writer(savedUser).content("본문").build();
+        testCommunity.setBoardType("party");
+        testCommunity.setDefaultJoinState();
+
+        Community savedCommunity = communityRepository.save(testCommunity);
+
+        //when
+        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1").build();
+        Comment savedComment1 = commentRepository.save(comment1);
+        savedCommunity.addComment(savedComment1);
+
+        savedComment1.updateContent(CommentRequest.builder().content("댓글 수정").build());
+
+        //then
+        Assertions.assertThat(savedCommunity.getComments().get(0).getContent()).isEqualTo("댓글 수정");
+
     }
 
 

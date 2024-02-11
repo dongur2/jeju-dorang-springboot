@@ -4,5 +4,10 @@ import com.donguri.jejudorang.domain.community.dto.request.comment.CommentReques
 
 public interface CommentService {
 
+    // 새 댓글 작성
     void writeNewComment(String accessToken, Long postId, CommentRequest newComment);
+
+    // 댓글 수정
+    void modifyComment(String accessToken, Long cmtId, CommentRequest commentToUpdate) throws IllegalAccessException;
+
 }
