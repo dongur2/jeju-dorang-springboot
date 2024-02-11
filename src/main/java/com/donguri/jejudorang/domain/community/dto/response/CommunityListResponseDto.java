@@ -15,6 +15,7 @@ public record CommunityListResponseDto(
     JoinState state,
     String title,
     String nickname,
+    String writerId,
     LocalDateTime createdAt,
     int viewCount,
     int bookmarkCount,
@@ -26,10 +27,13 @@ public record CommunityListResponseDto(
             state = community.getState();
         }
 
+        String writerId = null;
         String nickname = null;
         if (community.getWriter() != null) {
+            writerId = community.getWriter().getProfile().getExternalId();
             nickname = community.getWriter().getProfile().getNickname();
         }
+
 
         return CommunityListResponseDto.builder()
                 .id(community.getId())
@@ -37,6 +41,7 @@ public record CommunityListResponseDto(
                 .state(state)
                 .title(community.getTitle())
                 .nickname(nickname)
+                .writerId(writerId)
                 .createdAt(community.getCreatedAt())
                 .viewCount(community.getViewCount())
                 .bookmarkCount(community.getBookmarksCount())
