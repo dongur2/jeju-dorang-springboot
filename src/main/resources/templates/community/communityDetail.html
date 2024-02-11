@@ -555,6 +555,34 @@
             document.getElementById('re-cmt-modify-block-' + rCmtId).style.display = 'none';
         }
 
+        /*
+        * 대댓글 수정 요청
+        *
+        * */
+        function modifyReCmtRequest(rCmtId) {
+            var reCommentRequestWithId = {
+                rCmtId: rCmtId,
+                content: document.getElementById('re-cmt-modify-input-' + rCmtId).value
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/community/comments/re", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("대댓글 수정이 완료되었습니다.");
+                        window.location.reload();
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+            xhr.send(JSON.stringify(reCommentRequestWithId));
+        }
+
 
     </script>
 </th>
