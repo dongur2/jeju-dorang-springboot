@@ -47,6 +47,9 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     List<Community> findAllByWriterId(Long writerId);
 
+    @Query("select c from Community c left outer join Comment ct on c.id=ct.community.id where ct.user.id=:cmtWriterId")
+    Page<Community> findAllByCommentWriterId(@Param("cmtWriterId") Long writerId, Pageable pageable);
+
     // 작성글 모두 조회 - 페이징 처리
     Page<Community> findAllByWriterId(Long writerId, Pageable pageable);
 }

@@ -144,6 +144,13 @@ public class CommunityServiceI implements CommunityService {
                 .map(CommunityListResponseDto::from);
     }
 
+    @Override
+    @Transactional
+    public Page<CommunityListResponseDto> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
+        return communityRepository.findAllByCommentWriterId(writer.getId(), pageable)
+                .map(CommunityListResponseDto::from);
+    }
+
 
     @Override
     @Transactional

@@ -44,10 +44,38 @@ public class MyPageController {
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);
+
             return "/user/mypage/myWritings";
 
         } catch (Exception e) {
             log.error("커뮤니티 작성글 불러오기 실패: {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
+    }
+
+
+    /*
+    * 마이페이지 - 댓글 단 글 목록: 커뮤니티
+    * GET
+    *
+    * */
+    @GetMapping("/comments")
+    public String getMyCommentsPage(@CookieValue("access_token") Cookie token, Model model,
+                                    @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
+        try {
+            Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
+
+            Page<CommunityListResponseDto> data = userService.getMyCommunityComments(token.getValue(), pageable);
+
+            model.addAttribute("nowPage", nowPage);
+            model.addAttribute("endPage", data.getTotalPages());
+            model.addAttribute("posts", data);
+
+            return "/user/mypage/myWritings";
+
+        } catch (Exception e) {
+            log.error("커뮤니티 작성댓글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
             return "/error/errorTemp";
         }
@@ -60,9 +88,9 @@ public class MyPageController {
      *
      * */
     @GetMapping("/bookmarks")
-    public String getMyBookmarkPage(@CookieValue("access_token") Cookie token, Model model,
-                                    @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
-                                    @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
+    public String getMyBookmarkPage (@CookieValue("access_token") Cookie token, Model model,
+            @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage){
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
             Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);
@@ -79,5 +107,6 @@ public class MyPageController {
             return "/error/errorTemp";
         }
     }
+
 
 }

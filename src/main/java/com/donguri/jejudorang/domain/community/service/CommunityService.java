@@ -32,6 +32,9 @@ public interface CommunityService {
     // 마이페이지: 작성한 게시글 조회
     Page<CommunityListResponseDto> getAllPostsWrittenByUser(User writer, Pageable pageable);
 
+    // 마이페이지: 댓글단 글 조회
+    Page<CommunityListResponseDto> getAllPostsWithCommentsByUser(User writer, Pageable pageable);
+
     // 회원 탈퇴시 작성글과 작성자 연관 관계 삭제 - null 처리
     void findAllPostsByUserAndSetWriterNull(Long userId);
 

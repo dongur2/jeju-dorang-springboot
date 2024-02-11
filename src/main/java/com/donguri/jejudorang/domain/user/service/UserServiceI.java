@@ -583,6 +583,27 @@ public class UserServiceI implements UserService {
     }
 
     /*
+     * 마이 페이지
+     * 내가 댓글단 글 목록: 커뮤니티
+     * > token
+     * > pageable(nowPage)
+     *
+     * */
+    @Override
+    @Transactional
+    public Page<CommunityListResponseDto> getMyCommunityComments(String accessToken, Pageable pageable) {
+        try {
+            User nowUser = getNowUser(accessToken);
+
+            return communityService.getAllPostsWithCommentsByUser(nowUser, pageable);
+
+        } catch (Exception e) {
+            log.error("댓글단 글 조회에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
     * 마이 페이지
     * 내 북마크 목록: 여행/커뮤니티
     * > token
