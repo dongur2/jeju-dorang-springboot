@@ -17,7 +17,8 @@ public record CommunityListResponseDto(
     String nickname,
     LocalDateTime createdAt,
     int viewCount,
-    int bookmarkCount
+    int bookmarkCount,
+    int commentCount
 ) {
     public static CommunityListResponseDto from(Community community) {
         JoinState state = null;
@@ -39,6 +40,7 @@ public record CommunityListResponseDto(
                 .createdAt(community.getCreatedAt())
                 .viewCount(community.getViewCount())
                 .bookmarkCount(community.getBookmarksCount())
+                .commentCount(community.getCommentsCount())
                 .build();
 
     }

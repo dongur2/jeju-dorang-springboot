@@ -75,13 +75,14 @@ public class Community extends BaseEntity {
     private int commentsCount;
 
     @Builder
-    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments) {
+    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentsCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.viewCount = viewCount;
         this.comments = comments;
+        this.commentsCount = commentsCount;
     }
 
     // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정

@@ -26,7 +26,8 @@ public record CommunityDetailResponseDto(
 
     boolean isBookmarked,
 
-    List<CommentResponse> comments
+    List<CommentResponse> comments,
+    int commentCount
 
 ) {
     public static CommunityDetailResponseDto from(Community community, List<String> tagList, String nowViewer) {
@@ -64,6 +65,7 @@ public record CommunityDetailResponseDto(
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
                 .comments(cmts)
+                .commentCount(community.getCommentsCount())
 
                 // 현재 로그인한 유저의 북마크 여부 확인
                 .isBookmarked(community.getBookmarks().stream()
@@ -106,6 +108,7 @@ public record CommunityDetailResponseDto(
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
                 .comments(cmts)
+                .commentCount(community.getCommentsCount())
                 .build();
     }
     

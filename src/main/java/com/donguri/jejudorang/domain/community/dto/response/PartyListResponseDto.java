@@ -18,7 +18,8 @@ public record PartyListResponseDto (
     String createdAt,
     int viewCount,
     List<String> tags,
-    int bookmarkCount
+    int bookmarkCount,
+    int commentCount
 ) {
     public static PartyListResponseDto from(Community community, List<String> tagList) {
         String nickname = null;
@@ -36,6 +37,7 @@ public record PartyListResponseDto (
                 .viewCount(community.getViewCount())
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
+                .commentCount(community.getCommentsCount())
                 .build();
 
     }
