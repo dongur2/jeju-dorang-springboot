@@ -89,6 +89,28 @@ public class ReCommentServiceI implements ReCommentService{
         }
     }
 
+    @Override
+    @Transactional
+    public void deleteReComment(String accessToken, Long rCmtId) throws IllegalAccessException {
+        try {
+            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
+
+            ReComment reCmtToDelete = reCommentRepository.findById(rCmtId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 대댓글이 없습니다."));
+
+            // 로그인 유저가 대댓글 작성자가 아닐 경우 예외 처리
+            if(!userNameFromJwtToken.equals(reCmtToDelete.getUser().getProfile().getExternalId())) {
+                throw new IllegalAccessException("대댓글 작성자 당사자만 대댓글을 삭제할 수 있습니다.");
+            }
+
+            // 댓글에서 대댓글 삭제 & 리포지토리 대댓글 삭제
+            reCmtToDelete.getComment().deleteReComment(reCmtToDelete);
+            reCommentRepository.delete(reCmtToDelete);
+
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
 
 }

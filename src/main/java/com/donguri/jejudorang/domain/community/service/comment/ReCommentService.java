@@ -11,4 +11,6 @@ public interface ReCommentService {
     // 대댓글 수정
     void modifyReComment(String accessToken, ReCommentRequestWIthId reCommentToUpdate) throws IllegalAccessException;
 
+    // 대댓글 삭제
+    void deleteReComment(String accessToken, Long rCmtId) throws IllegalAccessException;
 }

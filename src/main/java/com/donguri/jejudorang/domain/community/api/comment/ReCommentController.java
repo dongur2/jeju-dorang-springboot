@@ -87,4 +87,23 @@ public class ReCommentController {
         }
     }
 
+
+    /*
+     * 대댓글 삭제
+     * DELETE
+     *
+     * */
+    @DeleteMapping
+    public ResponseEntity<?> deleteReComment(@CookieValue("access_token") Cookie token, @RequestParam("rCmtId") Long rCmtId) {
+        try {
+            reCommentService.deleteReComment(token.getValue(), rCmtId);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("대댓글 삭제 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

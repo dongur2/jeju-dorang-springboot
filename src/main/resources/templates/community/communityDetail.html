@@ -583,6 +583,28 @@
             xhr.send(JSON.stringify(reCommentRequestWithId));
         }
 
+        /*
+        * 대댓글 삭제 요청
+        *
+        * */
+        function deleteReCmtRequest(rCmtId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/community/comments/re?rCmtId=" + rCmtId, true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("댓글 삭제가 완료되었습니다.");
+                        window.location.reload();
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+            xhr.send();
+        }
+
 
     </script>
 </th>
