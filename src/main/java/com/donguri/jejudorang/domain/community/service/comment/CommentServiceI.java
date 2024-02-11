@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.community.service.comment;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
+import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
@@ -59,11 +60,11 @@ public class CommentServiceI implements CommentService{
 
     @Override
     @Transactional
-    public void modifyComment(String accessToken, Long cmtId, CommentRequest commentToUpdate) throws IllegalAccessException {
+    public void modifyComment(String accessToken, CommentRequestWithId commentToUpdate) throws IllegalAccessException {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
 
-            Comment originalCmt = commentRepository.findById(cmtId)
+            Comment originalCmt = commentRepository.findById(commentToUpdate.cmtId())
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."));
 
             // 로그인 유저가 댓글 작성자가 아닐 경우 예외 처리
@@ -72,7 +73,7 @@ public class CommentServiceI implements CommentService{
             }
 
             // 댓글 내용 수정
-            originalCmt.updateContent(commentToUpdate);
+            originalCmt.updateContent(commentToUpdate.content());
 
         } catch (Exception e) {
             log.error("댓글 수정 실패: {}", e.getMessage());

@@ -4,8 +4,6 @@ import com.donguri.jejudorang.domain.community.dto.response.comment.CommentRespo
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
-import com.donguri.jejudorang.domain.community.entity.comment.Comment;
-import com.donguri.jejudorang.global.common.DateFormat;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -43,6 +41,7 @@ public record CommunityDetailResponseDto(
         if(community.getComments() != null) {
             cmts = community.getComments().stream()
                     .map(cmt -> CommentResponse.builder()
+                            .cmtId(cmt.getId())
                             .pic(cmt.getUser().getProfile().getImgUrl())
                             .nickname(cmt.getUser().getProfile().getNickname())
                             .content(cmt.getContent())
@@ -83,6 +82,7 @@ public record CommunityDetailResponseDto(
         if(community.getComments() != null) {
             cmts = community.getComments().stream()
                     .map(cmt -> CommentResponse.builder()
+                            .cmtId(cmt.getId())
                             .pic(cmt.getUser().getProfile().getImgUrl())
                             .nickname(cmt.getUser().getProfile().getNickname())
                             .content(cmt.getContent())

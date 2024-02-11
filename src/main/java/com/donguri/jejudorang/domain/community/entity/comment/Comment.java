@@ -1,6 +1,5 @@
 package com.donguri.jejudorang.domain.community.entity.comment;
 
-import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
@@ -41,7 +40,7 @@ public class Comment extends BaseEntity {
     }
 
     // 댓글 내용 수정
-    public void updateContent(CommentRequest commentRequest) {
-        this.content = commentRequest.content();
+    public void updateContent(String content) {
+        this.content = content;
     }
 }

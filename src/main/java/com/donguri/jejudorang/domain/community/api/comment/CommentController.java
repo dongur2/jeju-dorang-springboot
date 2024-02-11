@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.community.api.comment;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
-import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
@@ -71,15 +71,14 @@ public class CommentController {
     * */
     @PutMapping("/modify")
     public ResponseEntity<?> updateComment(@CookieValue("access_token") Cookie token,
-                                           @RequestParam("cmt-id") Long cmtId,
-                                           @Valid CommentRequest commentRequest, BindingResult bindingResult) {
+                                           @Valid CommentRequestWithId commentRequest, BindingResult bindingResult) {
 
         try {
             if(bindingResult.hasErrors()) {
                 throw new Exception(bindingResult.getFieldError().getDefaultMessage());
             }
 
-            commentService.modifyComment(token.getValue(), cmtId, commentRequest);
+            commentService.modifyComment(token.getValue(), commentRequest);
 
             return new ResponseEntity<>(HttpStatus.OK);
 

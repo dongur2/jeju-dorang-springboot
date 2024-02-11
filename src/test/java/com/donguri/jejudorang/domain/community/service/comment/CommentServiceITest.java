@@ -170,7 +170,7 @@ class CommentServiceITest {
         Comment savedComment1 = commentRepository.save(comment1);
         savedCommunity.addComment(savedComment1);
 
-        savedComment1.updateContent(CommentRequest.builder().content("댓글 수정").build());
+        savedComment1.updateContent("댓글 수정");
 
         //then
         Assertions.assertThat(savedCommunity.getComments().get(0).getContent()).isEqualTo("댓글 수정");

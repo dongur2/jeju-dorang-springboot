@@ -190,7 +190,7 @@
                     <div class="cmt-card-header-btns"
                     style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
-                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" style="width:45%; height:60%;">수정</button>
+                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" style="width:45%; height:60%;" th:onclick="modifyCmt(${cmt.cmtId()})">수정</button>
                         <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;">삭제</button>
                     </div>
                 </div>
@@ -363,6 +363,17 @@
                 console.error('복사 실패:', error);
             });
         }
+
+
+        /*
+        * 댓글 수정
+        *
+        * */
+        // function modifyCmt(cmtId) {
+        //     var commentRequest = {
+        //         content: document.getElementById()
+        //     }
+        // }
 
     </script>
 </th>

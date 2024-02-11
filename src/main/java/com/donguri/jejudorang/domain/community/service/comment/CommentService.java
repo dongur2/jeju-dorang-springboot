@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.community.service.comment;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
+import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
 
 public interface CommentService {
 
@@ -8,6 +9,6 @@ public interface CommentService {
     void writeNewComment(String accessToken, Long postId, CommentRequest newComment);
 
     // 댓글 수정
-    void modifyComment(String accessToken, Long cmtId, CommentRequest commentToUpdate) throws IllegalAccessException;
+    void modifyComment(String accessToken, CommentRequestWithId commentToUpdate) throws IllegalAccessException;
 
 }
