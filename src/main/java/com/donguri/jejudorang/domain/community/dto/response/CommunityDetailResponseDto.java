@@ -44,6 +44,7 @@ public record CommunityDetailResponseDto(
                             .cmtId(cmt.getId())
                             .pic(cmt.getUser().getProfile().getImgUrl())
                             .nickname(cmt.getUser().getProfile().getNickname())
+                            .writerId(cmt.getUser().getProfile().getExternalId())
                             .content(cmt.getContent())
                             .createdAt(cmt.getCreatedAt())
                             .build()).toList();
@@ -85,6 +86,7 @@ public record CommunityDetailResponseDto(
                             .cmtId(cmt.getId())
                             .pic(cmt.getUser().getProfile().getImgUrl())
                             .nickname(cmt.getUser().getProfile().getNickname())
+                            .writerId(cmt.getUser().getProfile().getExternalId())
                             .content(cmt.getContent())
                             .createdAt(cmt.getCreatedAt())
                             .build()).toList();

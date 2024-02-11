@@ -186,9 +186,11 @@
                     </div>
 
 
-                    <!-- 버튼 -->
+                    <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                     <div class="cmt-card-header-btns"
-                    style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
+                         sec:authorize="isAuthenticated()"
+                         th:if="${#authentication.getName() == cmt.writerId()}"
+                        style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
                         <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
                                 style="width:45%; height:60%;">수정</button>

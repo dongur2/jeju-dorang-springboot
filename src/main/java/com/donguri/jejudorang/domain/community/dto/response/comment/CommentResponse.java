@@ -9,6 +9,7 @@ public record CommentResponse (
         Long cmtId,
         String pic,
         String nickname,
+        String writerId,
         String content,
         LocalDateTime createdAt
 ){ }
