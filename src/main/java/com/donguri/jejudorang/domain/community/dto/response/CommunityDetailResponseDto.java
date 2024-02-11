@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.community.dto.response;
 
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
+import com.donguri.jejudorang.domain.community.dto.response.comment.ReCommentResponse;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
@@ -30,7 +31,8 @@ public record CommunityDetailResponseDto(
     boolean isBookmarked,
 
     List<CommentResponse> comments,
-    int commentCount
+    int commentCount // 댓글 + 대댓글 개수 합
+
 
 ) {
     public static CommunityDetailResponseDto from(Community community, List<String> tagList, String nowViewer) {
@@ -60,6 +62,20 @@ public record CommunityDetailResponseDto(
                                 .map(Profile::getExternalId)
                                 .orElse(null);
 
+                        List<ReCommentResponse> recomments = Optional.ofNullable(cmt.getRecomments())
+                                .orElse(null)
+                                .stream()
+                                .map(rcmt -> ReCommentResponse.builder()
+                                        .cmtId(rcmt.getComment().getId())
+                                        .reCmtId(rcmt.getId())
+                                        .pic(rcmt.getUser().getProfile().getImgUrl())
+                                        .nickname(rcmt.getUser().getProfile().getNickname())
+                                        .writerId(rcmt.getUser().getProfile().getExternalId())
+                                        .content(rcmt.getContent())
+                                        .createdAt(rcmt.getCreatedAt())
+                                        .build())
+                                .toList();
+
 
                         return CommentResponse.builder()
                             .cmtId(cmt.getId())
@@ -68,6 +84,7 @@ public record CommunityDetailResponseDto(
                             .writerId(writerExId)
                             .content(cmt.getContent())
                             .createdAt(cmt.getCreatedAt())
+                            .recomments(recomments)
                             .build();
 
                     }).toList();
@@ -87,7 +104,7 @@ public record CommunityDetailResponseDto(
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
                 .comments(cmts)
-                .commentCount(community.getCommentsCount())
+                .commentCount(community.getCommentsCount() + community.getRecommentCount())
 
                 // 현재 로그인한 유저의 북마크 여부 확인
                 .isBookmarked(community.getBookmarks().stream()
@@ -122,6 +139,20 @@ public record CommunityDetailResponseDto(
                                 .map(Profile::getExternalId)
                                 .orElse(null);
 
+                        List<ReCommentResponse> recomments = Optional.ofNullable(cmt.getRecomments())
+                                .orElse(null)
+                                .stream()
+                                .map(rcmt -> ReCommentResponse.builder()
+                                        .cmtId(rcmt.getComment().getId())
+                                        .reCmtId(rcmt.getId())
+                                        .pic(rcmt.getUser().getProfile().getImgUrl())
+                                        .nickname(rcmt.getUser().getProfile().getNickname())
+                                        .writerId(rcmt.getUser().getProfile().getExternalId())
+                                        .content(rcmt.getContent())
+                                        .createdAt(rcmt.getCreatedAt())
+                                        .build())
+                                .toList();
+
                         return CommentResponse.builder()
                                 .cmtId(cmt.getId())
                                 .pic(writerPic)
@@ -129,6 +160,7 @@ public record CommunityDetailResponseDto(
                                 .writerId(writerExId)
                                 .content(cmt.getContent())
                                 .createdAt(cmt.getCreatedAt())
+                                .recomments(recomments)
                                 .build();
 
                     }).toList();
@@ -148,7 +180,7 @@ public record CommunityDetailResponseDto(
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
                 .comments(cmts)
-                .commentCount(community.getCommentsCount())
+                .commentCount(community.getCommentsCount() + community.getRecommentCount())
                 .build();
     }
     
