@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Formula;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -75,12 +76,11 @@ public class Community extends BaseEntity {
     private int commentsCount;
 
     @Formula("(SELECT COUNT(*) FROM re_comment r LEFT JOIN comment c ON r.comment_id = c.comment_id WHERE r.community_id = community_id)")
-    private int recommentCount;
-
+    private int recommentsCount;
 
 
     @Builder
-    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentsCount, int recommentCount) {
+    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentsCount, int recommentsCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;
@@ -88,7 +88,7 @@ public class Community extends BaseEntity {
         this.viewCount = viewCount;
         this.comments = comments;
         this.commentsCount = commentsCount;
-        this.recommentCount = recommentCount;
+        this.recommentsCount = recommentsCount;
     }
 
     // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정

@@ -45,7 +45,7 @@ public record CommunityListResponseDto(
                 .createdAt(community.getCreatedAt())
                 .viewCount(community.getViewCount())
                 .bookmarkCount(community.getBookmarksCount())
-                .commentCount(community.getCommentsCount())
+                .commentCount(community.getCommentsCount()+community.getRecommentsCount())
                 .build();
 
     }

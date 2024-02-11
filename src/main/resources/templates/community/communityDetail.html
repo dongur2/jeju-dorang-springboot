@@ -152,8 +152,7 @@
         style="width: 100%; height:100%; display: flex; flex-direction: column;">
 
             <div class="cmt-card" th:each="cmt : ${post.comments()}"
-            style="width: 100%; min-height:160px; height:100%; display: flex; flex-direction: column; margin: 1% 0; border-bottom:1px solid #656565;
-                    gap:10px; background: violet">
+            style="width: 100%; min-height:160px; height:100%; display: flex; flex-direction: column; margin: 1% 0; border-bottom:1px solid rgba(101,101,101,0.51); gap:10px">
 
                 <div class="cmt-card-header"
                      style="width: 100%; height:60px; display: flex; flex-direction: row">
@@ -186,8 +185,9 @@
                         </div>
                     </div>
 
-                    <!-- 대댓글 폼 열기 버튼 -->
-                    <div class="re-cmt-box" style="width:80px; display: flex; flex-direction: row; align-items: flex-end">
+                    <!-- 대댓글 작성폼 열기 버튼: 로그인한 경우만 노출 -->
+                    <div class="re-cmt-box" style="width:80px; display: flex; flex-direction: row; align-items: flex-end"
+                         sec:authorize="isAuthenticated()">
                         <button id="re-cmt-btn" style="width:95%; height:60%;" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId()} + ')'">답글 달기</button>
                     </div>
 
@@ -205,7 +205,7 @@
 
                 <!-- 댓글 내용 -->
                 <div class="cmt-card-body"
-                style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white">
+                style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white; margin-top:5px;">
 
                     <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
 
@@ -219,10 +219,10 @@
 
                 <!-- 대댓글 카드 -->
                 <div class="re-cmt-area"
-                     style="width: 100%; border: 5px solid red; display: flex; flex-direction: column; gap:10px;">
+                     style="width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top:10px;">
 
                     <div class="re-cmt-card" th:each="rcmt : ${cmt.recomments()}"
-                         style="width: 100%; min-height:130px; max-height:160px; padding-left:5%; display: flex; flex-direction: column; border-bottom:1px solid #656565; background: pink">
+                         style="width: 100%; min-height:130px; max-height:160px; padding-left:6%; display: flex; flex-direction: column">
 
                         <div class="re-cmt-card-header"
                              style="width: 100%; height:50px; display: flex; flex-direction: row">
@@ -269,7 +269,7 @@
 
                         <!-- 대댓글 내용 -->
                         <div class="re-cmt-card-body"
-                             style="width:100%; min-height:40px; max-height:100px; padding:  1% 6.5%; background: cadetblue">
+                             style="width:100%; min-height:40px; max-height:100px; padding:  1% 6.5%">
 
                             <p style="font-size: 18px" th:text="${rcmt.content()}" th:id="'re-cmt-content-origin-' + ${rcmt.reCmtId()}">댓글</p>
 
@@ -286,17 +286,17 @@
 
                 <!-- 대댓글 폼 -->
                 <div class="re-cmt-form-box" th:id="'re-cmt-form-box-' + ${cmt.cmtId()}"
-                style="width:100%; height:60px; background: palevioletred; display: none; flex-direction: row; align-items: center">
+                style="width:100%; height:60px; display: none; flex-direction: row; align-items: center">
 
                     <form method="post" th:object="${reCommentRequest}" th:action="@{/community/comments/re(type=${post.type()})}"
-                    style="padding-left: 5%; width:100%; background: papayawhip; display: flex; flex-direction: row; justify-content: space-between">
+                    style="padding-left: 5%; width:100%; display: flex; flex-direction: row; justify-content: space-between">
 
                         <input name="content" style="width: 80%; height:40px">
                         <input type="hidden" name="postId" th:value="${post.id()}">
                         <input type="hidden" name="cmtId" th:value="${cmt.cmtId()}">
 
-                        <button type="submit" style="width: 9%; height:40px">리댓등록</button>
-                        <button type="button" style="width: 9%; height:40px" th:onclick="'closeRecommentWriteForm(' + ${cmt.cmtId()} + ')'">취소</button>
+                        <button type="submit" class="btn btn-warning" style="width: 9%; height:40px">답글 등록</button>
+                        <button type="button" class="btn btn-outline-secondary" style="width: 9%; height:40px" th:onclick="'closeRecommentWriteForm(' + ${cmt.cmtId()} + ')'">취소</button>
                     </form>
                 </div>
 

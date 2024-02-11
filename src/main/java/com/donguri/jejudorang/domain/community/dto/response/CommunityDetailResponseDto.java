@@ -104,7 +104,7 @@ public record CommunityDetailResponseDto(
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
                 .comments(cmts)
-                .commentCount(community.getCommentsCount() + community.getRecommentCount())
+                .commentCount(community.getCommentsCount()+community.getRecommentsCount())
 
                 // 현재 로그인한 유저의 북마크 여부 확인
                 .isBookmarked(community.getBookmarks().stream()
@@ -180,7 +180,7 @@ public record CommunityDetailResponseDto(
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
                 .comments(cmts)
-                .commentCount(community.getCommentsCount() + community.getRecommentCount())
+                .commentCount(community.getCommentsCount()+community.getRecommentsCount())
                 .build();
     }
     
