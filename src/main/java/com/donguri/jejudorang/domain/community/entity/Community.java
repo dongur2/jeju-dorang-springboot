@@ -71,7 +71,7 @@ public class Community extends BaseEntity {
             , orphanRemoval = true)
     private List<Comment> comments;
 
-    @Formula("(SELECT COUNT(*) FROM comment c WHERE c.community_id = community_id)")
+    @Formula("(SELECT COUNT(*) FROM comment c LEFT JOIN recomment rc ON c.comment_id = rc.comment_id WHERE c.community_id = community_id)")
     private int commentsCount;
 
     @Builder
