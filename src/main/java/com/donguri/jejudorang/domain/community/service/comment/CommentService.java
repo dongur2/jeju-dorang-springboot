@@ -13,4 +13,7 @@ public interface CommentService {
 
     // 댓글 삭제
     void deleteComment(String accessToken, Long cmtId) throws IllegalAccessException;
+
+    // 회원 탈퇴시 탈퇴 회원이 작성한 댓글 연관관계 삭제
+    void findAllCmtsByUserAndSetWriterNull(Long writerId);
 }

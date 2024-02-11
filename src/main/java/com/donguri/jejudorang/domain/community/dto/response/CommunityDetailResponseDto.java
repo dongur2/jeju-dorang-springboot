@@ -4,10 +4,13 @@ import com.donguri.jejudorang.domain.community.dto.response.comment.CommentRespo
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
+import com.donguri.jejudorang.domain.user.entity.Profile;
+import com.donguri.jejudorang.domain.user.entity.User;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Builder
 public record CommunityDetailResponseDto(
@@ -41,14 +44,33 @@ public record CommunityDetailResponseDto(
         List<CommentResponse> cmts = null;
         if(community.getComments() != null) {
             cmts = community.getComments().stream()
-                    .map(cmt -> CommentResponse.builder()
+                    .map(cmt -> {
+                        String writerPic = Optional.ofNullable(cmt.getUser())
+                                .map(User::getProfile)
+                                .map(Profile::getImgUrl)
+                                .orElse(null);
+
+                        String writerNickname = Optional.ofNullable(cmt.getUser())
+                                .map(User::getProfile)
+                                .map(Profile::getNickname)
+                                .orElse(null);
+
+                        String writerExId = Optional.ofNullable(cmt.getUser())
+                                .map(User::getProfile)
+                                .map(Profile::getExternalId)
+                                .orElse(null);
+
+
+                        return CommentResponse.builder()
                             .cmtId(cmt.getId())
-                            .pic(cmt.getUser().getProfile().getImgUrl())
-                            .nickname(cmt.getUser().getProfile().getNickname())
-                            .writerId(cmt.getUser().getProfile().getExternalId())
+                            .pic(writerPic)
+                            .nickname(writerNickname)
+                            .writerId(writerExId)
                             .content(cmt.getContent())
                             .createdAt(cmt.getCreatedAt())
-                            .build()).toList();
+                            .build();
+
+                    }).toList();
         }
 
         return CommunityDetailResponseDto.builder()
@@ -84,14 +106,32 @@ public record CommunityDetailResponseDto(
         List<CommentResponse> cmts = null;
         if(community.getComments() != null) {
             cmts = community.getComments().stream()
-                    .map(cmt -> CommentResponse.builder()
-                            .cmtId(cmt.getId())
-                            .pic(cmt.getUser().getProfile().getImgUrl())
-                            .nickname(cmt.getUser().getProfile().getNickname())
-                            .writerId(cmt.getUser().getProfile().getExternalId())
-                            .content(cmt.getContent())
-                            .createdAt(cmt.getCreatedAt())
-                            .build()).toList();
+                    .map(cmt -> {
+                        String writerPic = Optional.ofNullable(cmt.getUser())
+                                .map(User::getProfile)
+                                .map(Profile::getImgUrl)
+                                .orElse(null);
+
+                        String writerNickname = Optional.ofNullable(cmt.getUser())
+                                .map(User::getProfile)
+                                .map(Profile::getNickname)
+                                .orElse(null);
+
+                        String writerExId = Optional.ofNullable(cmt.getUser())
+                                .map(User::getProfile)
+                                .map(Profile::getExternalId)
+                                .orElse(null);
+
+                        return CommentResponse.builder()
+                                .cmtId(cmt.getId())
+                                .pic(writerPic)
+                                .nickname(writerNickname)
+                                .writerId(writerExId)
+                                .content(cmt.getContent())
+                                .createdAt(cmt.getCreatedAt())
+                                .build();
+
+                    }).toList();
         }
 
         return CommunityDetailResponseDto.builder()

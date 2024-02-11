@@ -28,8 +28,8 @@ public class Comment extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "writer_id")
-    private User user; // 회원 탈퇴하면 함께 삭제
+    @JoinColumn(name = "writer_id")
+    private User user; // 회원 탈퇴해도 삭제되지 않음
 
 
     @Builder
@@ -42,5 +42,10 @@ public class Comment extends BaseEntity {
     // 댓글 내용 수정
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    // 댓글 작성자 NULL 처리 - 작성자 탈퇴
+    public void deleteWriter() {
+        this.user = null;
     }
 }

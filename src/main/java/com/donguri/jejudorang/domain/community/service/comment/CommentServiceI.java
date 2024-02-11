@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Slf4j
 @Service
 public class CommentServiceI implements CommentService{
@@ -58,6 +59,7 @@ public class CommentServiceI implements CommentService{
         }
     }
 
+
     @Override
     @Transactional
     public void modifyComment(String accessToken, CommentRequestWithId commentToUpdate) throws IllegalAccessException {
@@ -81,6 +83,7 @@ public class CommentServiceI implements CommentService{
         }
     }
 
+
     @Override
     @Transactional
     public void deleteComment(String accessToken, Long cmtId) throws IllegalAccessException {
@@ -103,5 +106,21 @@ public class CommentServiceI implements CommentService{
             throw e;
         }
     }
+
+
+    @Override
+    @Transactional
+    public void findAllCmtsByUserAndSetWriterNull(Long writerId) {
+        try {
+            // 회원이 작성한 댓글이 존재할 경우, 작성자를 NULL 처리
+            commentRepository.findAllByUserId(writerId)
+                    .ifPresent(comments -> comments.forEach(Comment::deleteWriter));
+
+        } catch (Exception e) {
+            log.error("작성자 null 처리 실패: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
 }

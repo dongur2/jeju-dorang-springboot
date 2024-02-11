@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.service;
 import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
@@ -52,6 +53,8 @@ public class UserServiceI implements UserService {
     private final CommunityService communityService;
     @Autowired
     private final BookmarkService bookmarkService;
+    @Autowired
+    private final CommentService commentService;
 
     @Autowired
     private final AuthenticationManager authenticationManager;
@@ -69,10 +72,11 @@ public class UserServiceI implements UserService {
     @Autowired
     private final JwtProvider jwtProvider;
 
-    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
+    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
         this.mailService = mailService;
         this.bookmarkService = bookmarkService;
+        this.commentService = commentService;
         this.authenticationManager = authenticationManager;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
@@ -544,6 +548,9 @@ public class UserServiceI implements UserService {
 
             // 추출한 아이디로 작성글 - 작성자 연관관계 삭제
             communityService.findAllPostsByUserAndSetWriterNull(idFromJwtToken);
+
+            // 추출한 아이디로 작성 댓글 - 작성자 연관관계 삭제
+            commentService.findAllCmtsByUserAndSetWriterNull(idFromJwtToken);
 
             // 유저 삭제
             userRepository.deleteById(idFromJwtToken);

@@ -174,7 +174,8 @@
                         <div class="cmt-writer-nickname"
                         style="min-width: 100px; max-width: 40%; display:flex; align-items:flex-end;">
 
-                            <h5 th:text="${cmt.nickname()}">닉네임</h5>
+                            <h5 th:if="${cmt.writerId() != null}" th:text="${cmt.nickname()}">닉네임</h5>
+                            <h5 th:if="${cmt.writerId() == null}">탈퇴한 회원</h5>
                         </div>
 
                         <!-- 작성일 -->
@@ -189,7 +190,7 @@
                     <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                     <div class="cmt-card-header-btns"
                          sec:authorize="isAuthenticated()"
-                         th:if="${#authentication.getName() == cmt.writerId()}"
+                         th:if="${cmt.writerId() != null && #authentication.getName() == cmt.writerId()}"
                         style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
                         <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
