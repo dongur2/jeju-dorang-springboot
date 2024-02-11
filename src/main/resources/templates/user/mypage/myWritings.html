@@ -48,7 +48,7 @@
                             <div>
                                 북마크 <span th:text="${post.bookmarkCount}">0</span> &#183;
                                 조회 <span th:text="${post.viewCount}">0</span> &#183;
-                                댓글 0
+                                댓글 <span th:text="${post.commentCount}">0</span>
                             </div>
                             <div style="width:200px; display: flex; justify-content: space-around">
                                 <span th:text="${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일')}"></span>
