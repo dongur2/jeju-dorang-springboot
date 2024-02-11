@@ -138,7 +138,7 @@
             </h3>
 
             <!-- 댓글 작성 -->
-            <form class="cmt-new-box" id="cmt-new-form" method="post" th:object="${commentRequest}" action="/community/comments/new"
+            <form class="cmt-new-box" id="cmt-new-form" method="post" th:object="${commentRequest}" action="/community/comments"
             style="width: 100%; height:50px; margin-bottom:1%; display: flex; justify-content: space-between">
 
                 <input name="content" style="width: 80%">
@@ -190,7 +190,7 @@
                     <div class="cmt-card-header-btns"
                     style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
-                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" onclick="openCmtModifyInput()"
+                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
                                 style="width:45%; height:60%;">수정</button>
                         <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;">삭제</button>
                     </div>
@@ -200,11 +200,11 @@
                 <div class="cmt-card-body"
                 style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white">
 
-                    <p style="font-size: 18px" th:text="${cmt.content()}" id="cmt-content-origin">댓글</p>
-                    <div id="cmt-modify-block" style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
-                        <input id="cmt-modify-input" th:value="${cmt.content()}" style="width: 88%; border: none">
+                    <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
+                    <div th:id="'cmt-modify-block-' + ${cmt.cmtId()}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
+                        <input th:id="'cmt-modify-input-' + ${cmt.cmtId()}" th:value="${cmt.content()}" style="width: 88%; border: none">
                         <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
-                        <button style="width:5%" onclick="closeCmtModifyInput()">취소</button>
+                        <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId()} + ')'">취소</button>
                     </div>
                 </div>
 
@@ -375,14 +375,14 @@
         * 댓글 수정 폼 열기
         *
         * */
-        function openCmtModifyInput() {
-            document.getElementById('cmt-content-origin').style.display = 'none';
-            document.getElementById('cmt-modify-block').style.display = 'flex';
+        function openCmtModifyInput(cmtId) {
+            document.getElementById('cmt-content-origin-' + cmtId).style.display = 'none';
+            document.getElementById('cmt-modify-block-' + cmtId).style.display = 'flex';
         }
         // 닫기
-        function closeCmtModifyInput() {
-            document.getElementById('cmt-content-origin').style.display = 'flex';
-            document.getElementById('cmt-modify-block').style.display = 'none';
+        function closeCmtModifyInput(cmtId) {
+            document.getElementById('cmt-content-origin-' + cmtId).style.display = 'flex';
+            document.getElementById('cmt-modify-block-' + cmtId).style.display = 'none';
         }
 
         /*
@@ -392,14 +392,14 @@
         function modifyCmtRequest(cmtId) {
             var commentRequestWithId = {
                 cmtId: cmtId,
-                content: document.getElementById('cmt-modify-input').value
+                content: document.getElementById('cmt-modify-input-' + cmtId).value
             }
 
             console.log('cmtid:' + commentRequestWithId.cmtId);
             console.log('content:' + commentRequestWithId.content);
 
             var xhr = new XMLHttpRequest();
-            xhr.open("PUT", "/community/comments/modify", true);
+            xhr.open("PUT", "/community/comments", true);
             xhr.setRequestHeader("Content-Type", "application/json");
 
             xhr.onreadystatechange = function() {

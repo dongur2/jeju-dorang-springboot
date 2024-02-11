@@ -30,7 +30,7 @@ public class CommentController {
     * POST
     *
     * */
-    @PostMapping("/new")
+    @PostMapping
     public String createNewComment(@CookieValue("access_token") Cookie token,
                                    @Valid CommentRequest commentRequest, BindingResult bindingResult,
                                    @RequestParam("post") Long postId, @RequestParam("type") String type,
@@ -69,7 +69,7 @@ public class CommentController {
     * PUT
     *
     * */
-    @PutMapping("/modify")
+    @PutMapping
     public ResponseEntity<?> updateComment(@CookieValue("access_token") Cookie token,
                                            @RequestBody @Valid CommentRequestWithId commentRequest, BindingResult bindingResult) {
 
@@ -87,6 +87,7 @@ public class CommentController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 
 
 }
