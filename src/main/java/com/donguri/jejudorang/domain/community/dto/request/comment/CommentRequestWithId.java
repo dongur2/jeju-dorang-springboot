@@ -7,7 +7,6 @@ import lombok.Builder;
 @Builder
 public record CommentRequestWithId (
 
-        @NotBlank(message = "댓글 아이디가 필요합니다.")
         Long cmtId,
 
         @Size(max = 50, message = "댓글은 50자를 초과할 수 없습니다.")

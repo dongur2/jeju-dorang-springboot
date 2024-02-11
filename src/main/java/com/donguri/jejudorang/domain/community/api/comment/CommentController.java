@@ -71,7 +71,7 @@ public class CommentController {
     * */
     @PutMapping("/modify")
     public ResponseEntity<?> updateComment(@CookieValue("access_token") Cookie token,
-                                           @Valid CommentRequestWithId commentRequest, BindingResult bindingResult) {
+                                           @RequestBody @Valid CommentRequestWithId commentRequest, BindingResult bindingResult) {
 
         try {
             if(bindingResult.hasErrors()) {

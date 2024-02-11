@@ -190,7 +190,8 @@
                     <div class="cmt-card-header-btns"
                     style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
-                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" style="width:45%; height:60%;" th:onclick="modifyCmt(${cmt.cmtId()})">수정</button>
+                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" onclick="openCmtModifyInput()"
+                                style="width:45%; height:60%;">수정</button>
                         <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;">삭제</button>
                     </div>
                 </div>
@@ -199,7 +200,12 @@
                 <div class="cmt-card-body"
                 style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white">
 
-                    <p style="font-size: 18px" th:text="${cmt.content()}">댓글</p>
+                    <p style="font-size: 18px" th:text="${cmt.content()}" id="cmt-content-origin">댓글</p>
+                    <div id="cmt-modify-block" style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
+                        <input id="cmt-modify-input" th:value="${cmt.content()}" style="width: 88%; border: none">
+                        <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
+                        <button style="width:5%" onclick="closeCmtModifyInput()">취소</button>
+                    </div>
                 </div>
 
 
@@ -366,14 +372,49 @@
 
 
         /*
-        * 댓글 수정
+        * 댓글 수정 폼 열기
         *
         * */
-        // function modifyCmt(cmtId) {
-        //     var commentRequest = {
-        //         content: document.getElementById()
-        //     }
-        // }
+        function openCmtModifyInput() {
+            document.getElementById('cmt-content-origin').style.display = 'none';
+            document.getElementById('cmt-modify-block').style.display = 'flex';
+        }
+        // 닫기
+        function closeCmtModifyInput() {
+            document.getElementById('cmt-content-origin').style.display = 'flex';
+            document.getElementById('cmt-modify-block').style.display = 'none';
+        }
+
+        /*
+        * 댓글 수정 요청
+        *
+        * */
+        function modifyCmtRequest(cmtId) {
+            var commentRequestWithId = {
+                cmtId: cmtId,
+                content: document.getElementById('cmt-modify-input').value
+            }
+
+            console.log('cmtid:' + commentRequestWithId.cmtId);
+            console.log('content:' + commentRequestWithId.content);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/community/comments/modify", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("댓글 수정이 완료되었습니다.");
+                        window.location.reload();
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+            xhr.send(JSON.stringify(commentRequestWithId));
+        }
+
 
     </script>
 </th>
