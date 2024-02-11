@@ -160,7 +160,7 @@
 
                     <!-- 댓글 작성자 -->
                     <div class="cmt-card-header-profile"
-                    style="min-width:30%; max-width: 50%; display: flex; flex-direction: row; justify-content: space-between">
+                    style="min-width: 30%; max-width:50%; display: flex; flex-direction: row; gap:15px;">
 
                         <!-- 프로필 사진 -->
                         <div class="cmt-writer-img-circle"
@@ -172,7 +172,7 @@
 
                         <!-- 닉네임 -->
                         <div class="cmt-writer-nickname"
-                        style="min-width: 100px; max-width: 40%; display:flex; align-items:flex-end;">
+                        style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
                             <h5 th:if="${cmt.writerId() != null}" th:text="${cmt.nickname()}">닉네임</h5>
                             <h5 th:if="${cmt.writerId() == null}">탈퇴한 회원</h5>
@@ -180,7 +180,7 @@
 
                         <!-- 작성일 -->
                         <div class="cmt-write-date"
-                        style="width: 160px; display:flex; align-items:flex-end; color:#696969">
+                        style="width: 120px; display:flex; align-items:flex-end; color:#696969">
 
                             <h6 th:text="${#temporals.format(cmt.createdAt(), 'yy.MM.dd HH:mm')}">0000.00.00 MM:DD</h6>
                         </div>
