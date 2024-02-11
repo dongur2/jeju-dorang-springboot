@@ -71,11 +71,16 @@ public class Community extends BaseEntity {
             , orphanRemoval = true)
     private List<Comment> comments;
 
-    @Formula("(SELECT COUNT(*) FROM comment c LEFT JOIN recomment rc ON c.comment_id = rc.comment_id WHERE c.community_id = community_id)")
+    @Formula("(SELECT COUNT(*) FROM comment c WHERE c.community_id = community_id)")
     private int commentsCount;
 
+    @Formula("(SELECT COUNT(*) FROM re_comment r LEFT JOIN comment c ON r.comment_id = c.comment_id WHERE r.community_id = community_id)")
+    private int recommentCount;
+
+
+
     @Builder
-    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentsCount) {
+    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentsCount, int recommentCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;
@@ -83,6 +88,7 @@ public class Community extends BaseEntity {
         this.viewCount = viewCount;
         this.comments = comments;
         this.commentsCount = commentsCount;
+        this.recommentCount = recommentCount;
     }
 
     // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정

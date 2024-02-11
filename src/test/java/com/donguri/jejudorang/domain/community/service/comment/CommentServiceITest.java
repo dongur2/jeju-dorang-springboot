@@ -1,7 +1,6 @@
 package com.donguri.jejudorang.domain.community.service.comment;
 
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
-import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;

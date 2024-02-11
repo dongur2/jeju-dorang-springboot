@@ -56,4 +56,13 @@ public class Comment extends BaseEntity {
     public void deleteWriter() {
         this.user = null;
     }
+
+    // 대댓글 업데이트
+    public void addReComment(ReComment reComment) {
+        this.recomments.add(reComment);
+    }
+
+    public void deleteReComment(ReComment reComment) {
+        this.recomments.remove(reComment);
+    }
 }
