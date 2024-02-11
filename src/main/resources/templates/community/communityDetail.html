@@ -186,6 +186,10 @@
                         </div>
                     </div>
 
+                    <!-- 대댓글 폼 열기 버튼 -->
+                    <div class="re-cmt-box" style="width:80px; display: flex; flex-direction: row; align-items: flex-end">
+                        <button id="re-cmt-btn" style="width:95%; height:60%;">답글 달기</button>
+                    </div>
 
                     <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                     <div class="cmt-card-header-btns"
@@ -204,12 +208,25 @@
                 style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white">
 
                     <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
+
                     <div th:id="'cmt-modify-block-' + ${cmt.cmtId()}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
                         <input th:id="'cmt-modify-input-' + ${cmt.cmtId()}" th:value="${cmt.content()}" style="width: 88%; border: none">
                         <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
                         <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId()} + ')'">취소</button>
                     </div>
+
+                    <!-- 대댓글 폼 -->
+                    <div class="re-cmt-form-box">
+                        <form method="post" th:object="${reCommentRequest}" th:action="@{/community/comments/re(type=${post.type()})}">
+                            <input name="content">
+                            <input type="hidden" name="postId" th:value="${post.id()}">
+                            <input type="hidden" name="cmtId" th:value="${cmt.cmtId()}">
+                            <button type="submit" id="re-cmt-request-btn">리댓등록</button>
+                        </form>
+                    </div>
+
                 </div>
+
 
 
             </div>
