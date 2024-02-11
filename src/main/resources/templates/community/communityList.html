@@ -28,6 +28,8 @@
         </div>
 
         <div class="board-item board-main">
+
+            <!-- 모임: 전체/모집중/모집완료 -->
             <ul th:if="${nowType == 'parties'}" class="nav nav-tabs">
                 <li class="nav-item">
                     <a th:if="${currentSearchWord} != null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
@@ -49,6 +51,7 @@
                 </li>
             </ul>
 
+            <!-- 검색 -->
             <form th:if="${nowType == 'parties'}" class="search-input-box" th:method="get" th:action="@{/community/boards/parties(search=${currentSearchWord})}">
                 <div class="search-input-box-sub">
                     <input class="search-words" name="search" th:value="${currentSearchWord}" th:placeholder="${currentSearchWord}">
@@ -74,6 +77,7 @@
             </form>
 
 
+            <!-- 기준별 정렬: 최신순/댓글순/북마크순 -->
             <div class="sort-and-write-box">
                 <ul th:if="${nowType == 'parties'}" class="nav">
                     <li  class="nav-item">
@@ -90,7 +94,7 @@
                            th:href="@{/community/boards/parties(state=${nowState}, search=${currentSearchWord}, order='comment', tags=${currentSearchTag})}">댓글많은순</a>
                         <a th:if="${currentSearchWord} == null"
                            class="nav-link" href="#" style="font-size: 18px; color: #696969"
-                           th:href="@{/community/boards/parties(state=${nowState},order='comment', tags=${currentSearchTag})}">댓글많은순</a>
+                           th:href="@{/community/boards/parties(state=${nowState}, order='comment', tags=${currentSearchTag})}">댓글많은순</a>
                     </li>
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
@@ -140,6 +144,7 @@
                    style="background: #696969"
                    th:href="@{/community/post/new(type=chat)}">글쓰기</a>
             </div>
+
 
             <!--     게시글 카드       -->
             <div class="board-cards-box">
