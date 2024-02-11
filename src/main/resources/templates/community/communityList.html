@@ -200,7 +200,7 @@
             </div>
 
             <!-- 페이지 네비게이션 블록 -->
-            <div class="board-paging">
+            <div class="board-paging" th:if="${endPage > 1}">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination" th:if="${nowType == 'parties'}">
                         <li class="page-item">
