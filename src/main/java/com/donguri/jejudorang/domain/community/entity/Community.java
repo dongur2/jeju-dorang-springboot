@@ -74,12 +74,9 @@ public class Community extends BaseEntity {
     @Formula("(SELECT COUNT(*) FROM comment c WHERE c.community_id = community_id AND c.is_deleted = 'EXISTING')")
     private int commentCount;
 
-    @Formula("(SELECT COUNT(*) FROM re_comment r LEFT JOIN comment c ON r.comment_id = c.comment_id WHERE r.community_id = community_id)")
-    private int recommentsCount;
-
 
     @Builder
-    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentCount, int recommentsCount) {
+    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;
@@ -87,7 +84,6 @@ public class Community extends BaseEntity {
         this.viewCount = viewCount;
         this.comments = comments;
         this.commentCount = commentCount;
-        this.recommentsCount = recommentsCount;
     }
 
     // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정

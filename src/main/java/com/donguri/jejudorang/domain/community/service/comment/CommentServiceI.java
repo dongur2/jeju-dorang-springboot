@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.service.comment;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
+import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequest;
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
@@ -14,9 +15,6 @@ import com.donguri.jejudorang.global.config.jwt.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +70,37 @@ public class CommentServiceI implements CommentService{
         }
     }
 
+
+    @Override
+    @Transactional
+    public void writeNewReComment(String accessToken, ReCommentRequest newReComment) {
+        try {
+            String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
+
+            Community community = communityRepository.findById(newReComment.postId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+
+            User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 회원이 없습니다."));
+
+
+            Comment savedReComment = commentRepository.save(Comment.builder()
+                    .community(community)
+                    .user(nowUser)
+                    .content(newReComment.content())
+                    .cmtGroup(newReComment.cmtId())
+                    .cmtDepth(1)
+                    .isDeleted(IsDeleted.EXISTING)
+                    .build());
+            savedReComment.updateCmtOrder(orderIdx++);
+
+            community.addComment(savedReComment);
+
+        } catch (Exception e) {
+            log.error("대댓글 작성 실패: {}", e.getMessage());
+            throw e;
+        }
+    }
 
 
 

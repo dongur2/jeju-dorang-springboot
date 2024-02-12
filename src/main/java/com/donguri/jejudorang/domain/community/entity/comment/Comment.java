@@ -8,10 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -35,13 +31,6 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "writer_id")
     private User user; // 회원 탈퇴해도 삭제되지 않음
 
-    // 대댓글
-    @OneToMany(mappedBy = "comment") // 댓글 삭제해도 대댓글은 삭제되지 않음
-    private List<ReComment> recomments = new ArrayList<>();
-
-
-
-
     // * 댓글 리팩토링 - 댓글 순서 구분 ( 댓글 목록 불러올 때 이 순서대로 정렬 )
     @Column
     private Long cmtOrder;
@@ -61,11 +50,10 @@ public class Comment extends BaseEntity {
 
 
     @Builder
-    public Comment(Community community, String content, User user, List<ReComment> recomments, Long cmtOrder, Long cmtGroup, int cmtDepth, IsDeleted isDeleted) {
+    public Comment(Community community, String content, User user, Long cmtOrder, Long cmtGroup, int cmtDepth, IsDeleted isDeleted) {
         this.community = community;
         this.content = content;
         this.user = user;
-        this.recomments = recomments;
         this.cmtOrder = cmtOrder;
         this.cmtGroup = cmtGroup;
         this.cmtDepth = cmtDepth;
@@ -95,11 +83,4 @@ public class Comment extends BaseEntity {
         this.user = null;
     }
 
-    // 대댓글 업데이트
-    public void addReComment(ReComment reComment) {
-        this.recomments.add(reComment);
-    }
-    public void deleteReComment(ReComment reComment) {
-        this.recomments.remove(reComment);
-    }
 }

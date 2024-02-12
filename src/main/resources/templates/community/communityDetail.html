@@ -266,9 +266,9 @@
                              th:if="${cmt.writerId() != null && #authentication.getName() == cmt.writerId()}"
                              style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: center">
 
-                            <button type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openReCmtModifyInput('+ ${cmt.cmtId()} + ')'"
+                            <button type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
                                     style="width:45%; height:40px;">수정</button>
-                            <button type="button" class="btn btn-secondary re-cmt-delete-btn" style="width:45%; height:40px;" th:onclick="'deleteReCmtRequest(' + ${cmt.cmtId()} + ')'">삭제</button>
+                            <button type="button" class="btn btn-secondary re-cmt-delete-btn" style="width:45%; height:40px;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId()} + ')'">삭제</button>
                         </div>
                     </div>
 
@@ -276,12 +276,12 @@
                     <div class="re-cmt-card-body"
                          style="width:100%; min-height:40px; max-height:100px; padding:  1% 6.5%">
 
-                        <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'re-cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
+                        <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
 
-                        <div th:id="'re-cmt-modify-block-' + ${cmt.cmtId()}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
-                            <input th:id="'re-cmt-modify-input-' + ${cmt.cmtId()}" th:value="${cmt.content()}" name="cmtId" style="width: 88%; border: none">
-                            <button style="width: 5%;" th:onclick="'modifyReCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
-                            <button style="width:5%" th:onclick="'closeReCmtModifyInput(' + ${cmt.cmtId()} + ')'">취소</button>
+                        <div th:id="'cmt-modify-block-' + ${cmt.cmtId()}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
+                            <input th:id="'cmt-modify-input-' + ${cmt.cmtId()}" th:value="${cmt.content()}" name="cmtId" style="width: 88%; border: none">
+                            <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
+                            <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId()} + ')'">취소</button>
                         </div>
 
                     </div>
@@ -552,69 +552,6 @@
             document.getElementById('re-cmt-form-box-' + cmtId).style.display = 'none';
         }
 
-        /*
-        * 대댓글 수정 폼 열기
-        *
-        * */
-        function openReCmtModifyInput(cmtId) {
-            document.getElementById('re-cmt-content-origin-' + cmtId).style.display = 'none';
-            document.getElementById('re-cmt-modify-block-' + cmtId).style.display = 'flex';
-        }
-        // 닫기
-        function closeReCmtModifyInput(cmtId) {
-            document.getElementById('re-cmt-content-origin-' + cmtId).style.display = 'flex';
-            document.getElementById('re-cmt-modify-block-' + cmtId).style.display = 'none';
-        }
-
-        /*
-        * 대댓글 수정 요청
-        *
-        * */
-        function modifyReCmtRequest(cmtId) {
-            var reCommentRequestWithId = {
-                cmtId: cmtId,
-                content: document.getElementById('re-cmt-modify-input-' + cmtId).value
-            }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("PUT", "/community/comments/re", true);
-            xhr.setRequestHeader("Content-Type", "application/json");
-
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        alert("대댓글 수정이 완료되었습니다.");
-                        window.location.reload();
-
-                    } else {
-                        alert(xhr.responseText);
-                    }
-                }
-            }
-            xhr.send(JSON.stringify(reCommentRequestWithId));
-        }
-
-        /*
-        * 대댓글 삭제 요청
-        *
-        * */
-        function deleteReCmtRequest(cmtId) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("DELETE", "/community/comments/re?cmtId=" + cmtId, true);
-
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        alert("대댓글 삭제가 완료되었습니다.");
-                        window.location.reload();
-
-                    } else {
-                        alert(xhr.responseText);
-                    }
-                }
-            }
-            xhr.send();
-        }
 
 
     </script>

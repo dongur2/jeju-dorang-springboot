@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.api.comment;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
+import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequest;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ public class CommentController {
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
+
 
     /*
     * 댓글 작성
@@ -53,6 +55,36 @@ public class CommentController {
             return "/error/errorTemp";
         }
     }
+
+
+    /*
+     * 대댓글 작성
+     * POST
+     *
+     * */
+    @PostMapping("/re")
+    public String createNewReComment(@CookieValue("access_token") Cookie token,
+                                     @Valid ReCommentRequest request, BindingResult bindingResult,
+                                     @RequestParam("type") String type, Model model) {
+        try {
+            if (bindingResult.hasErrors()) {
+                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
+            }
+
+            commentService.writeNewReComment(token.getValue(), request);
+
+            // PARTY -> parties, CHAT -> chats
+            type = matchMappingBoardType(type);
+
+            return "redirect:/community/boards/" + type + "/" + request.postId();
+
+        } catch (Exception e) {
+            log.error("대댓글 작성에 실패했습니다. {}", e.getMessage());
+            model.addAttribute("errorMsg", e.getMessage());
+            return "/error/errorTemp";
+        }
+    }
+
 
     private static String matchMappingBoardType(String type) {
         if(type.equals("PARTY")) {

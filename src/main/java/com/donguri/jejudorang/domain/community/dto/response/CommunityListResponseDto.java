@@ -6,7 +6,6 @@ import com.donguri.jejudorang.domain.community.entity.JoinState;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 public record CommunityListResponseDto(

@@ -1,17 +1,12 @@
 package com.donguri.jejudorang.domain.community.dto.response;
 
-import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
-import com.donguri.jejudorang.domain.community.dto.response.comment.ReCommentResponse;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
-import com.donguri.jejudorang.domain.user.entity.Profile;
-import com.donguri.jejudorang.domain.user.entity.User;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Builder
 public record CommunityDetailResponseDto(

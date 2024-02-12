@@ -34,7 +34,7 @@ public record ChatListResponseDto (
                 .viewCount(community.getViewCount())
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarkCount())
-                .commentCount(community.getCommentCount() + community.getRecommentsCount())
+                .commentCount(community.getCommentCount())
                 .build();
 
     }
