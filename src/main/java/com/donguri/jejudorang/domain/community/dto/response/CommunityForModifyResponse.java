@@ -6,7 +6,7 @@ import com.donguri.jejudorang.domain.community.entity.JoinState;
 
 import java.util.List;
 
-public record CommunityForModifyResponseDto (
+public record CommunityForModifyResponse(
     Long id,
     BoardType type,
     JoinState state,
@@ -14,8 +14,8 @@ public record CommunityForModifyResponseDto (
     String content,
     List<String> tags
 ) {
-    public static CommunityForModifyResponseDto from(Community community, List<String> tagList) {
-        return new CommunityForModifyResponseDto(
+    public static CommunityForModifyResponse from(Community community, List<String> tagList) {
+        return new CommunityForModifyResponse(
                 community.getId(),
                 community.getType(),
                 community.getState(),

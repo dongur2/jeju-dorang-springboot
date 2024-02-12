@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.user.dto.request.*;
@@ -569,7 +569,7 @@ public class UserServiceI implements UserService {
     *
     * */
     @Override
-    public Page<CommunityListResponseDto> getMyCommunityWritings(String token, Pageable pageable) {
+    public Page<CommunityListResponse> getMyCommunityWritings(String token, Pageable pageable) {
 
         try {
             User nowUser = getNowUser(token);
@@ -591,7 +591,7 @@ public class UserServiceI implements UserService {
      * */
     @Override
     @Transactional
-    public Page<CommunityListResponseDto> getMyCommunityComments(String accessToken, Pageable pageable) {
+    public Page<CommunityListResponse> getMyCommunityComments(String accessToken, Pageable pageable) {
         try {
             User nowUser = getNowUser(accessToken);
 
