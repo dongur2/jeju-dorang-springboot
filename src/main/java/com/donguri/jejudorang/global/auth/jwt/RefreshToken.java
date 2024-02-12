@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.global.config.jwt;
+package com.donguri.jejudorang.global.auth.jwt;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.global.config.jwt;
+package com.donguri.jejudorang.global.auth.jwt;
 
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
