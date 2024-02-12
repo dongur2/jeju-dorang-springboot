@@ -3,7 +3,6 @@ package com.donguri.jejudorang.domain.community.dto.response;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
-import com.donguri.jejudorang.global.common.DateFormat;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -24,7 +23,9 @@ public record CommunityDetailResponseDto(
     List<String> tags,
     int bookmarkCount,
 
-    boolean isBookmarked
+    boolean isBookmarked,
+
+    int commentCount
 
 ) {
     public static CommunityDetailResponseDto from(Community community, List<String> tagList, String nowViewer) {
@@ -42,15 +43,18 @@ public record CommunityDetailResponseDto(
                 .title(community.getTitle())
                 .nickname(nickname)
                 .writerId(writerId)
+                .content(community.getContent())
                 .createdAt(community.getCreatedAt())
                 .updatedAt(community.getUpdatedAt())
                 .viewCount(community.getViewCount())
                 .tags(tagList)
-                .bookmarkCount(community.getBookmarksCount())
+                .bookmarkCount(community.getBookmarkCount())
 
                 // 현재 로그인한 유저의 북마크 여부 확인
                 .isBookmarked(community.getBookmarks().stream()
                         .anyMatch(bookmark -> bookmark.getUser().getProfile().getExternalId().equals(nowViewer)))
+
+                .commentCount(community.getCommentCount())
                 .build();
 
     }
@@ -70,11 +74,14 @@ public record CommunityDetailResponseDto(
                 .title(community.getTitle())
                 .nickname(nickname)
                 .writerId(writerId)
+                .content(community.getContent())
                 .createdAt(community.getCreatedAt())
                 .updatedAt(community.getUpdatedAt())
                 .viewCount(community.getViewCount())
                 .tags(tagList)
-                .bookmarkCount(community.getBookmarksCount())
+                .bookmarkCount(community.getBookmarkCount())
+
+                .commentCount(community.getCommentCount())
                 .build();
     }
     

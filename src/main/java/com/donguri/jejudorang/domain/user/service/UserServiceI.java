@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.service;
 import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
@@ -52,6 +53,8 @@ public class UserServiceI implements UserService {
     private final CommunityService communityService;
     @Autowired
     private final BookmarkService bookmarkService;
+    @Autowired
+    private final CommentService commentService;
 
     @Autowired
     private final AuthenticationManager authenticationManager;
@@ -69,10 +72,11 @@ public class UserServiceI implements UserService {
     @Autowired
     private final JwtProvider jwtProvider;
 
-    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
+    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
         this.mailService = mailService;
         this.bookmarkService = bookmarkService;
+        this.commentService = commentService;
         this.authenticationManager = authenticationManager;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
@@ -338,7 +342,7 @@ public class UserServiceI implements UserService {
 
                 String pastImg = nowUser.getProfile().getImgName();
                 if (pastImg != null) {
-                    imageService.deleteS3Object(pastImg);
+                    imageService.deleteImg(pastImg);
 
                     nowUser.getProfile().updateImgName(null);
                     nowUser.getProfile().updateImgUrl(null);
@@ -346,7 +350,7 @@ public class UserServiceI implements UserService {
                     log.info("이전 이미지 삭제 완료");
                 }
 
-                Map<String, String> uploadedImg = imageService.putS3Object(dataToUpdate.img());
+                Map<String, String> uploadedImg = imageService.uploadImg(dataToUpdate.img());
 
                 if (uploadedImg == null) {
                     throw new IllegalAccessException("사진 업로드에 실패했습니다.");
@@ -382,7 +386,7 @@ public class UserServiceI implements UserService {
 
             String pastImg = nowUser.getProfile().getImgName();
             if (pastImg != null) {
-                imageService.deleteS3Object(pastImg);
+                imageService.deleteImg(pastImg);
 
                 nowUser.getProfile().updateImgName(null);
                 nowUser.getProfile().updateImgUrl(null);
@@ -545,6 +549,9 @@ public class UserServiceI implements UserService {
             // 추출한 아이디로 작성글 - 작성자 연관관계 삭제
             communityService.findAllPostsByUserAndSetWriterNull(idFromJwtToken);
 
+            // 추출한 아이디로 작성 댓글 - 작성자 연관관계 삭제
+            commentService.findAllCmtsByUserAndSetWriterNull(idFromJwtToken);
+
             // 유저 삭제
             userRepository.deleteById(idFromJwtToken);
 
@@ -571,6 +578,27 @@ public class UserServiceI implements UserService {
 
         } catch (Exception e) {
             log.error("작성한 게시글 조회에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+     * 마이 페이지
+     * 내가 댓글단 글 목록: 커뮤니티
+     * > token
+     * > pageable(nowPage)
+     *
+     * */
+    @Override
+    @Transactional
+    public Page<CommunityListResponseDto> getMyCommunityComments(String accessToken, Pageable pageable) {
+        try {
+            User nowUser = getNowUser(accessToken);
+
+            return communityService.getAllPostsWithCommentsByUser(nowUser, pageable);
+
+        } catch (Exception e) {
+            log.error("댓글단 글 조회에 실패했습니다. {}", e.getMessage());
             throw e;
         }
     }

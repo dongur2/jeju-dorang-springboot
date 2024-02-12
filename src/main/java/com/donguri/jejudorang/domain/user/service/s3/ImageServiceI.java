@@ -38,7 +38,7 @@ public class ImageServiceI implements ImageService {
 
     @Override
     @Transactional
-    public Map<String, String> putS3Object(MultipartFile imgFile) {
+    public Map<String, String> uploadImg(MultipartFile imgFile) {
         try {
             String originalName = imgFile.getOriginalFilename();
             log.info("이미지 파일의 사용자 저장 이름 : {}", originalName);
@@ -96,7 +96,7 @@ public class ImageServiceI implements ImageService {
 
     @Override
     @Transactional
-    public void deleteS3Object(String objectName) {
+    public void deleteImg(String objectName) {
         ArrayList<ObjectIdentifier> toDelete = new ArrayList<>();
         toDelete.add(ObjectIdentifier.builder()
                 .key(objectName)

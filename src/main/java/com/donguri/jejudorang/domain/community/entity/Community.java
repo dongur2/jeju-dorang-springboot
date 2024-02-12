@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.entity;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
 import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
+import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
@@ -10,8 +11,10 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Formula;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,22 +59,31 @@ public class Community extends BaseEntity {
 
     @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 북마크(Bookmark)
             , cascade = CascadeType.ALL // Community 엔티티에 대한 변경이 Bookmark 엔티티에 전파
-            , orphanRemoval = true //  Community 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
-            , fetch = FetchType.EAGER)
+            , orphanRemoval = true) //  Community 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
     private Set<CommunityBookmark> bookmarks = new HashSet<>();
 
     // 페이징 정렬 위한 가상 컬럼
     @Formula("(SELECT COUNT(*) FROM community_bookmark b WHERE b.community_id = community_id)")
-    private int bookmarksCount;
+    private int bookmarkCount;
+
+    @OneToMany(mappedBy = "community"
+            , cascade = CascadeType.ALL
+            , orphanRemoval = true)
+    private List<Comment> comments;
+
+    @Formula("(SELECT COUNT(*) FROM comment c WHERE c.community_id = community_id AND c.is_deleted = 'EXISTING')")
+    private int commentCount;
 
 
     @Builder
-    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount) {
+    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.viewCount = viewCount;
+        this.comments = comments;
+        this.commentCount = commentCount;
     }
 
     // 유저 아이디 후 조건 추가 필요 ** 조회수, 모집 상태 설정
@@ -95,6 +107,17 @@ public class Community extends BaseEntity {
         } else {
             bookmarks.add(bookmark);
         }
+    }
+
+    // 댓글 업데이트
+    public void addComment(Comment newComment) {
+        if(comments == null) {
+            comments = new ArrayList<>();
+        }
+        comments.add(newComment);
+    }
+    public void deleteComment(Comment comment) {
+        comments.remove(comment);
     }
 
     public void setBoardType(String paramType) {

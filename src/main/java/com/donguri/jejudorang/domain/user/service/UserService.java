@@ -65,6 +65,10 @@ public interface UserService {
     // 마이페이지: 내 작성글 목록 조회
     Page<CommunityListResponseDto> getMyCommunityWritings(String accessToken, Pageable pageable);
 
+    // 마이페이지: 내가 댓글단 글 목록 조회
+    Page<CommunityListResponseDto> getMyCommunityComments(String accessToken, Pageable pageable);
+
+
     // 마이페이지: 내 북마크 목록 조회
     Page<?> getMyBookmarks(String accessToken, String type, Pageable pageable);
 }

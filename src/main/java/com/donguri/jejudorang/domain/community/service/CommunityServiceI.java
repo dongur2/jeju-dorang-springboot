@@ -5,9 +5,12 @@ import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailRespo
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
+import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
@@ -32,12 +35,16 @@ import java.util.Map;
 public class CommunityServiceI implements CommunityService {
 
     @Autowired private final JwtProvider jwtProvider;
+
+    @Autowired private final CommentService commentService;
+
     @Autowired private final UserRepository userRepository;
     @Autowired private final CommunityRepository communityRepository;
     @Autowired private final CommunityWithTagService communityWithTagService;
 
-    public CommunityServiceI(JwtProvider jwtProvider, UserRepository userRepository, CommunityRepository communityRepository, CommunityWithTagService communityWithTagService) {
+    public CommunityServiceI(JwtProvider jwtProvider, CommentService commentService, UserRepository userRepository, CommunityRepository communityRepository, CommunityWithTagService communityWithTagService) {
         this.jwtProvider = jwtProvider;
+        this.commentService = commentService;
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
         this.communityWithTagService = communityWithTagService;
@@ -88,6 +95,9 @@ public class CommunityServiceI implements CommunityService {
                     .map(communityWithTag -> communityWithTag.getTag().getKeyword())
                     .toList();
 
+            // 댓글 따로 조회 후 리턴
+            List<CommentResponse> cmtList = commentService.findAllCmtsOnCommunity(communityId);
+
             /* 수정폼으로 데이터 불러오기
             * */
             if (forModify) {
@@ -114,18 +124,21 @@ public class CommunityServiceI implements CommunityService {
                     } catch (Exception e) {
                         log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
                         resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
+                        resMap.put("cmts", cmtList);
                         return resMap;
                     }
 
                     // 1-2. Access Token이 유효 -> from(.., idFromJwt) 북마크 여부 확인
-                    resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList, idFromJwt.toString()));
+                    resMap.put("post", CommunityDetailResponseDto.from(found, tagsToStringList, idFromJwt.toString()));
+                    resMap.put("cmts", cmtList);
                     log.info("{}가 북마크한 글입니다. isBookmarked == {}", idFromJwt,
                             CommunityDetailResponseDto.from(found, tagsToStringList, idFromJwt.toString()).isBookmarked());
 
                 // 2. Access Token 쿠키가 없는 경우
                 } else {
                     log.info("비회원은 북마크 여부를 확인할 수 없습니다.");
-                    resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
+                    resMap.put("post", CommunityDetailResponseDto.from(found, tagsToStringList));
+                    resMap.put("cmts", cmtList);
                 }
 
                 return resMap;
@@ -141,6 +154,13 @@ public class CommunityServiceI implements CommunityService {
     @Transactional
     public Page<CommunityListResponseDto> getAllPostsWrittenByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByWriterId(writer.getId(), pageable)
+                .map(CommunityListResponseDto::from);
+    }
+
+    @Override
+    @Transactional
+    public Page<CommunityListResponseDto> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
+        return communityRepository.findAllByCommentWriterIdAndIsDeletedFalse(writer.getId(), IsDeleted.EXISTING, pageable)
                 .map(CommunityListResponseDto::from);
     }
 

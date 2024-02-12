@@ -4,6 +4,7 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
         layout:decorate="~{/fragments/layout}">
+
 <head>
     <!-- 카카오톡 공유  -->
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js"
@@ -15,6 +16,7 @@
     </script>
     <script th:src="@{/js/community/deleteCommunity.js}"></script>
     <title>상세 페이지 - 제주도랑 | 커뮤니티</title>
+    <link rel="stylesheet" href="../../static/css/community/communityDetail.css">
 </head>
 <th layout:fragment="content">
 
@@ -123,12 +125,205 @@
 
     </div>
 
+
     <!--  댓글  -->
-    <div class="comments-box">
-        COMMENT
+    <div class="cmt-area"
+    style="width: 100%; height: 100%; margin: 5% 0; padding: 2% 5%; background: #f8f9fa; display: flex; flex-direction: column; justify-content: center">
+
+        <div class="cmt-area-header"
+        style="width: 100%; height:160px; display: flex; flex-direction: column; justify-content: flex-end">
+
+            <h3 style="width:100%; margin-right:auto">
+                댓글 <span style="color: #FB7A51" th:text="${post.commentCount()}">999</span>
+            </h3>
+
+            <!-- 댓글 작성 -->
+            <form class="cmt-new-box" id="cmt-new-form" method="post" th:object="${commentRequest}" action="/community/comments"
+            style="width: 100%; height:50px; margin-bottom:1%; display: flex; justify-content: space-between">
+
+                <input name="content" style="width: 82%">
+                <input name="post" th:value="${post.id()}" type="hidden">
+                <input name="type" th:value="${post.type()}" type="hidden">
+                <button type="submit" class="btn btn-warning cmt-new-btn" style="width:15%">등록</button>
+            </form>
+        </div>
+
+        <div class="cmt-area-body"
+        style="width: 100%; height:100%; display: flex; flex-direction: column;"
+             th:each="cmt : ${cmts}" >
+
+            <div class="cmt-card" th:if="${cmt.depth == 0}"
+            style="width: 100%; min-height:160px; height:100%; display: flex; flex-direction: column; margin: 1% 0; gap:10px">
+
+                <div class="cmt-card-header"
+                     style="width: 100%; height:60px; display: flex; flex-direction: row">
+
+                    <!-- 댓글 작성자 -->
+                    <div class="cmt-card-header-profile"
+                    style="min-width: 30%; max-width:50%; display: flex; flex-direction: row; gap:15px;">
+
+                        <!-- 프로필 사진 -->
+                        <div class="cmt-writer-img-circle"
+                             style="width:60px; height:60px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
+
+                            <img th:if="${cmt.pic() != null}" th:src="${cmt.pic()}"
+                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
+                        </div>
+
+                        <!-- 닉네임 -->
+                        <div class="cmt-writer-nickname"
+                        style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
+
+                            <h5 th:if="${cmt.nickname() != null}" th:text="${cmt.nickname()}">닉네임</h5>
+                            <h5 th:if="${cmt.nickname() == null}">탈퇴한 회원</h5>
+                        </div>
+
+                        <!-- 작성일 -->
+                        <div class="cmt-write-date"
+                        style="width: 120px; display:flex; align-items:flex-end; color:#696969">
+
+                            <h6 th:text="${#temporals.format(cmt.createdAt(), 'yy.MM.dd HH:mm')}">0000.00.00 MM:DD</h6>
+                        </div>
+                    </div>
+
+                    <!-- 대댓글 작성폼 열기 버튼: 로그인한 경우만 노출 -->
+                    <div class="re-cmt-box" style="width:80px; display: flex; flex-direction: row; align-items: flex-end"
+                         sec:authorize="isAuthenticated()"
+                         th:if="${cmt.nickname() != null && cmt.nickname() != '삭제된 댓글입니다.'}">
+                        <button id="re-cmt-btn" style="width:95%; height:60%;" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId()} + ')'">답글 달기</button>
+                    </div>
+
+                    <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
+                    <div class="cmt-card-header-btns"
+                         sec:authorize="isAuthenticated()"
+                         th:if="${cmt.writerId() != null && #authentication.getName() == cmt.writerId()}"
+                        style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
+
+                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
+                                style="width:45%; height:60%;">수정</button>
+                        <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId()} + ')'">삭제</button>
+                    </div>
+
+                </div>
+
+                <!-- 댓글 내용 -->
+                <div class="cmt-card-body"
+                style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white; margin-top:5px;">
+
+                    <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
+
+                    <div th:id="'cmt-modify-block-' + ${cmt.cmtId()}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
+                        <input th:id="'cmt-modify-input-' + ${cmt.cmtId()}" th:value="${cmt.content()}" style="width: 88%; border: none">
+                        <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
+                        <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId()} + ')'">취소</button>
+                    </div>
+
+                </div>
+
+            </div><!-- 댓글일 경우 카드 끝-->
+
+            <!-- 대댓글 카드 -->
+            <div class="re-cmt-area" th:if="${cmt.depth == 1}"
+                 style="width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top:10px;">
+
+                <div class="re-cmt-card"
+                     style="width: 100%; min-height:130px; max-height:160px; padding-left:6%; display: flex; flex-direction: column">
+
+                    <div class="re-cmt-card-header"
+                         style="width: 100%; height:50px; display: flex; flex-direction: row">
+
+                        <!-- 댓글 작성자 -->
+                        <div class="re-cmt-card-header-profile"
+                             style="min-width: 30%; max-width:50%; display: flex; flex-direction: row; gap:15px;">
+
+                            <!-- 프로필 사진 -->
+                            <div class="re-cmt-writer-img-circle"
+                                 style="width:50px; height:50px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
+
+                                <img th:if="${cmt.pic() != null}" th:src="${cmt.pic()}"
+                                     style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
+                            </div>
+
+                            <!-- 닉네임 -->
+                            <div class="re-cmt-writer-nickname"
+                                 style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
+
+                                <h5 th:if="${cmt.nickname() != null}" th:text="${cmt.nickname()}">닉네임</h5>
+                                <h5 th:if="${cmt.nickname() == null}">탈퇴한 회원</h5>
+                            </div>
+
+                            <!-- 작성일 -->
+                            <div class="re-cmt-write-date"
+                                 style="width: 120px; display:flex; align-items:flex-end; color:#696969">
+
+                                <h6 th:text="${#temporals.format(cmt.createdAt(), 'yy.MM.dd HH:mm')}">0000.00.00 MM:DD</h6>
+                            </div>
+                        </div>
+
+                        <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
+                        <div class="re-cmt-card-header-btns"
+                             sec:authorize="isAuthenticated()"
+                             th:if="${cmt.writerId() != null && #authentication.getName() == cmt.writerId()}"
+                             style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+
+                            <button type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
+                                    style="width:45%; height:40px;">수정</button>
+                            <button type="button" class="btn btn-secondary re-cmt-delete-btn" style="width:45%; height:40px;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId()} + ')'">삭제</button>
+                        </div>
+                    </div>
+
+                    <!-- 대댓글 내용 -->
+                    <div class="re-cmt-card-body"
+                         style="width:100%; min-height:40px; max-height:100px; padding:  1% 6.5%">
+
+                        <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
+
+                        <div th:id="'cmt-modify-block-' + ${cmt.cmtId()}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
+                            <input th:id="'cmt-modify-input-' + ${cmt.cmtId()}" th:value="${cmt.content()}" name="cmtId" style="width: 88%; border: none">
+                            <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
+                            <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId()} + ')'">취소</button>
+                        </div>
+
+                    </div>
+
+                </div><!-- 대댓글 카드 -->
+            </div><!-- 대댓글 영역-->
+
+            <!-- 대댓글 폼 -->
+            <div class="re-cmt-form-box" th:id="'re-cmt-form-box-' + ${cmt.cmtId()}"
+                 style="width:100%; height:60px; display: none; flex-direction: row; align-items: center">
+
+                <form method="post" th:object="${reCommentRequest}" th:action="@{/community/comments/re(type=${post.type()})}"
+                      style="padding-left: 5%; width:100%; display: flex; flex-direction: row; justify-content: space-between">
+
+                    <input name="content" style="width: 80%; height:40px">
+                    <input type="hidden" name="postId" th:value="${post.id()}">
+                    <input type="hidden" name="cmtId" th:value="${cmt.cmtId()}">
+
+                    <button type="submit" class="btn btn-warning" style="width: 9%; height:40px">답글 등록</button>
+                    <button type="button" class="btn btn-outline-secondary" style="width: 9%; height:40px" th:onclick="'closeRecommentWriteForm(' + ${cmt.cmtId()} + ')'">취소</button>
+                </form>
+            </div>
+
+
+
+        </div>
     </div>
 
 
+
+
+
+
+
+        </div><!-- 카드 영역-->
+
+
+
+    </div><!-- 전체 -->
+
+
+    <!--  모달   -->
     <div class="modal-sns-share-box hidden-modal" id="modal-sns-share-box">
         <div class="modal-sns-header">
             <h4 class="modal-sns-title">글 공유하기</h4>
@@ -262,6 +457,8 @@
             const facebookIntent = 'http://www.facebook.com/sharer/sharer.php?u=' + document.URL;
             window.open(facebookIntent, '_blank');
         }
+
+
         // 링크 복사
         function shareCopiedLink() {
             const url = window.location.href; // 현재 URL
@@ -276,6 +473,85 @@
                 console.error('복사 실패:', error);
             });
         }
+
+
+        /*
+        * 댓글 수정 폼 열기
+        *
+        * */
+        function openCmtModifyInput(cmtId) {
+            document.getElementById('cmt-content-origin-' + cmtId).style.display = 'none';
+            document.getElementById('cmt-modify-block-' + cmtId).style.display = 'flex';
+        }
+        // 닫기
+        function closeCmtModifyInput(cmtId) {
+            document.getElementById('cmt-content-origin-' + cmtId).style.display = 'flex';
+            document.getElementById('cmt-modify-block-' + cmtId).style.display = 'none';
+        }
+
+        /*
+        * 댓글 수정 요청
+        *
+        * */
+        function modifyCmtRequest(cmtId) {
+            var commentRequestWithId = {
+                cmtId: cmtId,
+                content: document.getElementById('cmt-modify-input-' + cmtId).value
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/community/comments", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("댓글 수정이 완료되었습니다.");
+                        window.location.reload();
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+            xhr.send(JSON.stringify(commentRequestWithId));
+        }
+
+        /*
+        * 댓글 삭제 요청
+        *
+        * */
+        function deleteCmtRequest(cmtId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/community/comments?cmtId=" + cmtId, true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("댓글 삭제가 완료되었습니다.");
+                        window.location.reload();
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+            xhr.send();
+        }
+
+
+        /*
+        * 대댓글 작성 폼 열기
+        *
+        * */
+        function openRecommentWriteForm(cmtId) {
+            document.getElementById('re-cmt-form-box-' + cmtId).style.display = 'flex';
+        }
+        // 닫기
+        function closeRecommentWriteForm(cmtId) {
+            document.getElementById('re-cmt-form-box-' + cmtId).style.display = 'none';
+        }
+
 
 
     </script>

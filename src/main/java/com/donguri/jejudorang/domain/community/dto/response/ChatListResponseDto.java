@@ -16,7 +16,8 @@ public record ChatListResponseDto (
         String createdAt,
         int viewCount,
         List<String> tags,
-        int bookmarkCount
+        int bookmarkCount,
+        int commentCount
 ) {
     public static ChatListResponseDto from(Community community, List<String> tagList) {
         String nickname = null;
@@ -32,7 +33,8 @@ public record ChatListResponseDto (
                 .createdAt(DateFormat.calculateTime(community.getCreatedAt()))
                 .viewCount(community.getViewCount())
                 .tags(tagList)
-                .bookmarkCount(community.getBookmarksCount())
+                .bookmarkCount(community.getBookmarkCount())
+                .commentCount(community.getCommentCount())
                 .build();
 
     }

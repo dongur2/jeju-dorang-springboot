@@ -76,11 +76,29 @@
 
 
 
+/*  댓글   */
 .comments-box {
     width:100%;
-    height:300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10% 0;
     background: #f8f9fa;
 }
+
+.user-profile-pic-circle {
+    width:100px;
+    height:50px;
+    border-radius: 50%;
+    background: greenyellow;
+}
+
+
+
+
+
+
 
 /* 모달 */
 .modal-sns-share-box{
