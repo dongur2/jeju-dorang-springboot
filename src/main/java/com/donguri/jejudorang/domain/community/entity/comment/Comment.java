@@ -40,11 +40,38 @@ public class Comment extends BaseEntity {
 
 
 
+
+    // * 댓글 리팩토링 - 댓글 순서 구분 ( 댓글 목록 불러올 때 이 순서대로 정렬 )
+    @Column
+    private Long cmtOrder;
+
+    // * 댓글 리팩토링 - 댓글 그룹 구분 ( 댓글 + 대댓글 그룹 인덱스: 댓글 아이디 )
+    @Column
+    private Long cmtGroup;
+
+    // * 댓글 리팩토링 - 깊이 표시( 대댓글 구분 ): 기본 0
+    @Column(nullable = false)
+    private int cmtDepth;
+
+
     @Builder
-    public Comment(Community community, String content, User user) {
+    public Comment(Community community, String content, User user, List<ReComment> recomments, Long cmtOrder, Long cmtGroup, int cmtDepth) {
         this.community = community;
         this.content = content;
         this.user = user;
+        this.recomments = recomments;
+        this.cmtOrder = cmtOrder;
+        this.cmtGroup = cmtGroup;
+        this.cmtDepth = cmtDepth;
+    }
+
+    // * 댓글 순서 구분 설정
+    public void updateCmtOrder(Long idx) {
+        this.cmtOrder = idx;
+    }
+    // * 댓글 그룹 설정
+    public void updateCmtGroup() {
+        this.cmtGroup = this.id;
     }
 
     // 댓글 내용 수정
@@ -61,7 +88,6 @@ public class Comment extends BaseEntity {
     public void addReComment(ReComment reComment) {
         this.recomments.add(reComment);
     }
-
     public void deleteReComment(ReComment reComment) {
         this.recomments.remove(reComment);
     }

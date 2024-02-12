@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ReCommentServiceI implements ReCommentService{
 
+    private Long idx = 0L;
+
     @Autowired private final JwtProvider jwtProvider;
     @Autowired private final ReCommentRepository reCommentRepository;
 
@@ -48,18 +50,19 @@ public class ReCommentServiceI implements ReCommentService{
             Comment comment = commentRepository.findById(newReComment.cmtId())
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."));
 
-            User user = userRepository.findByExternalId(userNameFromJwtToken)
+            User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 회원이 없습니다."));
 
-            ReComment reCommentToSave = ReComment.builder()
-                    .community(community)
-                    .comment(comment)
-                    .user(user)
-                    .content(newReComment.content())
-                    .build();
 
-            comment.addReComment(reCommentToSave);
-            reCommentRepository.save(reCommentToSave);
+            Comment savedReComment = commentRepository.save(Comment.builder()
+                    .community(community)
+                    .user(nowUser)
+                    .content(newReComment.content())
+                    .cmtGroup(comment.getId())
+                    .cmtDepth(1)
+                    .build());
+            savedReComment.updateCmtOrder(idx++);
+            community.addComment(savedReComment);
 
         } catch (Exception e) {
             log.error("대댓글 작성 실패: {}", e.getMessage());

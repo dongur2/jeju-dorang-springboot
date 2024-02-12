@@ -109,18 +109,35 @@ class CommentServiceITest {
         Community savedCommunity = communityRepository.save(testCommunity);
 
         //when
-        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1").build();
-        Comment comment2 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment2").build();
-        Comment comment3 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment3").build();
+        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1").cmtDepth(0).build();
+        Comment comment2 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment2").cmtDepth(0).build();
+        Comment comment3 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment3").cmtDepth(0).build();
         Comment savedComment1 = commentRepository.save(comment1);
         Comment savedComment2 = commentRepository.save(comment2);
         Comment savedComment3 = commentRepository.save(comment3);
+
+        Long idx = 0L;
+        savedComment1.updateCmtOrder(idx++);
+        savedComment2.updateCmtOrder(idx++);
+        savedComment3.updateCmtOrder(idx++);
+
+        savedComment1.updateCmtGroup();
+        savedComment2.updateCmtGroup();
+        savedComment3.updateCmtGroup();
+
         savedCommunity.addComment(savedComment1);
         savedCommunity.addComment(savedComment2);
         savedCommunity.addComment(savedComment3);
 
         //then
         Assertions.assertThat(testCommunity.getComments().size()).isEqualTo(3);
+
+        Assertions.assertThat(savedComment1.getCmtOrder()).isEqualTo(0L);
+        Assertions.assertThat(savedComment1.getCmtGroup()).isEqualTo(savedComment1.getId());
+        Assertions.assertThat(savedComment2.getCmtOrder()).isEqualTo(1L);
+        Assertions.assertThat(savedComment2.getCmtGroup()).isEqualTo(savedComment2.getId());
+        Assertions.assertThat(savedComment3.getCmtOrder()).isEqualTo(2L);
+        Assertions.assertThat(savedComment3.getCmtGroup()).isEqualTo(savedComment3.getId());
     }
 
     @Test

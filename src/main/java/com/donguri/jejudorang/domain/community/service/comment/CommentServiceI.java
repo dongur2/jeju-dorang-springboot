@@ -20,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CommentServiceI implements CommentService{
 
+    // 댓글, 대댓글 통합한 순서 정렬 위한 인덱스
+    private Long orderIdx = 0L;
+
     @Autowired private final JwtProvider jwtProvider;
     @Autowired private final UserRepository userRepository;
     @Autowired private final CommentRepository commentRepository;
@@ -48,8 +51,10 @@ public class CommentServiceI implements CommentService{
                     .community(nowPost)
                     .user(nowUser)
                     .content(newComment.content())
-                    .build()
-            );
+                    .cmtDepth(0)
+                    .build());
+            savedComment.updateCmtGroup();
+            savedComment.updateCmtOrder(orderIdx++);
 
             nowPost.addComment(savedComment);
 
@@ -58,6 +63,8 @@ public class CommentServiceI implements CommentService{
             throw e;
         }
     }
+
+
 
 
     @Override

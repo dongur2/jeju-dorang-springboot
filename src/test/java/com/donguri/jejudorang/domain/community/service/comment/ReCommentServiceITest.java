@@ -114,19 +114,29 @@ class ReCommentServiceITest {
         Community savedCommunity = communityRepository.save(testCommunity);
 
         //when
-        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1").build();
+        Long idx = 0L;
+
+        Comment comment1 = Comment.builder()
+                .community(testCommunity).user(savedUser1).content("테스트 댓글1").cmtDepth(0).build();
+        comment1.updateCmtOrder(idx++);
         Comment savedComment1 = commentRepository.save(comment1);
-        Long cmtId = savedComment1.getId();
 
-        savedCommunity.addComment(savedComment1);
+        comment1.updateCmtGroup();
 
-        ReComment recomment = ReComment.builder().community(savedCommunity).comment(savedComment1).user(savedUser).content("대댓글 테스트1").build();
-        reCommentRepository.save(recomment);
-        savedComment1.addReComment(recomment);
+        savedCommunity.addComment(savedComment1); // 댓글 저장
+
+        Comment reComment1 = Comment.builder()
+                .community(testCommunity).user(savedUser).content("테스트 대댓글1-1").cmtDepth(1).cmtGroup(comment1.getId()).build();
+        reComment1.updateCmtOrder(idx++);
+        commentRepository.save(reComment1);
+
+        savedCommunity.addComment(reComment1); // 대댓글 저장
 
         //then
-        Assertions.assertThat(savedComment1.getRecomments().size()).isEqualTo(1);
-        Assertions.assertThat(reCommentRepository.findAll().size()).isEqualTo(1);
+        Assertions.assertThat(savedCommunity.getComments().size()).isEqualTo(2);
+        Assertions.assertThat(savedCommunity.getComments().stream().filter(cmt -> cmt.getCmtGroup().equals(comment1.getId())).count()).isEqualTo(2);
+        Assertions.assertThat(savedCommunity.getComments().stream().filter(cmt -> cmt.getCmtDepth() == 0).count()).isEqualTo(1);
+        Assertions.assertThat(savedCommunity.getComments().stream().filter(cmt -> cmt.getCmtDepth() == 1).count()).isEqualTo(1);
     }
 
 }
