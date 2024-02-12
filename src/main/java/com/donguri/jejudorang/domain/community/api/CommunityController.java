@@ -91,10 +91,7 @@ public class CommunityController {
     @GetMapping("/post/{communityId}/modify")
     public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
         try {
-            CommunityForModifyResponseDto foundPost =
-                    (CommunityForModifyResponseDto) communityService.getCommunityPost(communityId, true, null).get("result");
-
-            model.addAttribute("post", foundPost);
+            model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("post"));
             return "/community/communityModifyForm";
 
         } catch (Exception e) {
@@ -229,11 +226,14 @@ public class CommunityController {
             // 쿠키 체크 & 조회수 업데이트 여부 결정 & 조건 충족할 경우 조회수, 쿠키 업데이트
             checkIsAlreadyReadForUpdateView(communityId, request, response);
 
-            CommunityDetailResponseDto foundPost =
-                    (CommunityDetailResponseDto) communityService.getCommunityPost(communityId, false, request).get("result");
+            Map<String, Object> result = communityService.getCommunityPost(communityId, false, request);
+            CommunityDetailResponseDto post = (CommunityDetailResponseDto) result.get("post");
 
-            model.addAttribute("post", foundPost);
+
+            model.addAttribute("post", post);
+            model.addAttribute("cmts", result.get("cmts"));
             model.addAttribute("kakaoApiKey", kakaoApiKey);
+
             return "/community/communityDetail";
 
         } catch (Exception e) {

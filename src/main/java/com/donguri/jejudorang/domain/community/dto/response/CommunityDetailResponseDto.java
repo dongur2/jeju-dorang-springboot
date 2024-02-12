@@ -28,11 +28,7 @@ public record CommunityDetailResponseDto(
     List<String> tags,
     int bookmarkCount,
 
-    boolean isBookmarked,
-
-    List<CommentResponse> comments,
-    int commentCount // 댓글 + 대댓글 개수 합
-
+    boolean isBookmarked
 
 ) {
     public static CommunityDetailResponseDto from(Community community, List<String> tagList, String nowViewer) {
@@ -41,53 +37,6 @@ public record CommunityDetailResponseDto(
         if (community.getWriter() != null) {
             nickname = community.getWriter().getProfile().getNickname();
             writerId = community.getWriter().getProfile().getExternalId();
-        }
-
-        List<CommentResponse> cmts = null;
-        if(community.getComments() != null) {
-            cmts = community.getComments().stream()
-                    .map(cmt -> {
-                        String writerPic = Optional.ofNullable(cmt.getUser())
-                                .map(User::getProfile)
-                                .map(Profile::getImgUrl)
-                                .orElse(null);
-
-                        String writerNickname = Optional.ofNullable(cmt.getUser())
-                                .map(User::getProfile)
-                                .map(Profile::getNickname)
-                                .orElse(null);
-
-                        String writerExId = Optional.ofNullable(cmt.getUser())
-                                .map(User::getProfile)
-                                .map(Profile::getExternalId)
-                                .orElse(null);
-
-                        List<ReCommentResponse> recomments = Optional.ofNullable(cmt.getRecomments())
-                                .orElse(null)
-                                .stream()
-                                .map(rcmt -> ReCommentResponse.builder()
-                                        .cmtId(rcmt.getComment().getId())
-                                        .reCmtId(rcmt.getId())
-                                        .pic(rcmt.getUser().getProfile().getImgUrl())
-                                        .nickname(rcmt.getUser().getProfile().getNickname())
-                                        .writerId(rcmt.getUser().getProfile().getExternalId())
-                                        .content(rcmt.getContent())
-                                        .createdAt(rcmt.getCreatedAt())
-                                        .build())
-                                .toList();
-
-
-                        return CommentResponse.builder()
-                            .cmtId(cmt.getId())
-                            .pic(writerPic)
-                            .nickname(writerNickname)
-                            .writerId(writerExId)
-                            .content(cmt.getContent())
-                            .createdAt(cmt.getCreatedAt())
-                            .recomments(recomments)
-                            .build();
-
-                    }).toList();
         }
 
         return CommunityDetailResponseDto.builder()
@@ -103,8 +52,6 @@ public record CommunityDetailResponseDto(
                 .viewCount(community.getViewCount())
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
-                .comments(cmts)
-                .commentCount(community.getCommentsCount()+community.getRecommentsCount())
 
                 // 현재 로그인한 유저의 북마크 여부 확인
                 .isBookmarked(community.getBookmarks().stream()
@@ -120,51 +67,6 @@ public record CommunityDetailResponseDto(
             nickname = community.getWriter().getProfile().getNickname();
             writerId = community.getWriter().getProfile().getExternalId();
         }
-        List<CommentResponse> cmts = null;
-        if(community.getComments() != null) {
-            cmts = community.getComments().stream()
-                    .map(cmt -> {
-                        String writerPic = Optional.ofNullable(cmt.getUser())
-                                .map(User::getProfile)
-                                .map(Profile::getImgUrl)
-                                .orElse(null);
-
-                        String writerNickname = Optional.ofNullable(cmt.getUser())
-                                .map(User::getProfile)
-                                .map(Profile::getNickname)
-                                .orElse(null);
-
-                        String writerExId = Optional.ofNullable(cmt.getUser())
-                                .map(User::getProfile)
-                                .map(Profile::getExternalId)
-                                .orElse(null);
-
-                        List<ReCommentResponse> recomments = Optional.ofNullable(cmt.getRecomments())
-                                .orElse(null)
-                                .stream()
-                                .map(rcmt -> ReCommentResponse.builder()
-                                        .cmtId(rcmt.getComment().getId())
-                                        .reCmtId(rcmt.getId())
-                                        .pic(rcmt.getUser().getProfile().getImgUrl())
-                                        .nickname(rcmt.getUser().getProfile().getNickname())
-                                        .writerId(rcmt.getUser().getProfile().getExternalId())
-                                        .content(rcmt.getContent())
-                                        .createdAt(rcmt.getCreatedAt())
-                                        .build())
-                                .toList();
-
-                        return CommentResponse.builder()
-                                .cmtId(cmt.getId())
-                                .pic(writerPic)
-                                .nickname(writerNickname)
-                                .writerId(writerExId)
-                                .content(cmt.getContent())
-                                .createdAt(cmt.getCreatedAt())
-                                .recomments(recomments)
-                                .build();
-
-                    }).toList();
-        }
 
         return CommunityDetailResponseDto.builder()
                 .id(community.getId())
@@ -179,8 +81,6 @@ public record CommunityDetailResponseDto(
                 .viewCount(community.getViewCount())
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarksCount())
-                .comments(cmts)
-                .commentCount(community.getCommentsCount()+community.getRecommentsCount())
                 .build();
     }
     

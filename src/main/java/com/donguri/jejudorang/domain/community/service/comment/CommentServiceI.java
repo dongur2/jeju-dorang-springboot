@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.service.comment;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
+import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
@@ -12,8 +13,13 @@ import com.donguri.jejudorang.global.config.jwt.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Slf4j
@@ -125,6 +131,19 @@ public class CommentServiceI implements CommentService{
 
         } catch (Exception e) {
             log.error("작성자 null 처리 실패: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public List<CommentResponse> findAllCmtsOnCommunity(Long communityId) {
+        try {
+            return commentRepository.findAllByCommunityIdOrderByCmtGroupAscCmtOrderAsc(communityId).stream()
+                    .map(CommentResponse::from).toList();
+
+        } catch (Exception e) {
+            log.error("해당하는 게시글에 대한 댓글을 불러오지 못했습니다. {}", e.getMessage());
             throw e;
         }
     }

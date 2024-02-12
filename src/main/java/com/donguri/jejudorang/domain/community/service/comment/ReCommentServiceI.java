@@ -47,9 +47,6 @@ public class ReCommentServiceI implements ReCommentService{
             Community community = communityRepository.findById(newReComment.postId())
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
 
-            Comment comment = commentRepository.findById(newReComment.cmtId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."));
-
             User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 회원이 없습니다."));
 
@@ -58,10 +55,11 @@ public class ReCommentServiceI implements ReCommentService{
                     .community(community)
                     .user(nowUser)
                     .content(newReComment.content())
-                    .cmtGroup(comment.getId())
+                    .cmtGroup(newReComment.cmtId())
                     .cmtDepth(1)
                     .build());
             savedReComment.updateCmtOrder(idx++);
+
             community.addComment(savedReComment);
 
         } catch (Exception e) {
