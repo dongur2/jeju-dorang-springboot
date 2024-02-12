@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.community.repository;
 
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
-import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRepository;
 import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
@@ -75,13 +75,13 @@ class CommunityRepositoryTest {
                 .orElseThrow(() -> new RuntimeException("저장된 회원이 없습니다."));
 
         //when
-        CommunityWriteRequestDto postToWrite1 = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite1 = CommunityWriteRequest.builder()
                 .title("커뮤니티 글작성 테스트 제목1")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
                 .build();
 
-        CommunityWriteRequestDto postToWrite2 = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite2 = CommunityWriteRequest.builder()
                 .title("커뮤니티 글작성 테스트 제목2")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")

@@ -3,46 +3,39 @@ package com.donguri.jejudorang.domain.community.dto.response;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
+import com.donguri.jejudorang.global.common.DateFormat;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
-public record CommunityListResponseDto(
+public record PartyListResponse(
     Long id,
     BoardType type,
     JoinState state,
     String title,
     String nickname,
-    String writerId,
-    LocalDateTime createdAt,
+    String createdAt,
     int viewCount,
+    List<String> tags,
     int bookmarkCount,
     int commentCount
 ) {
-    public static CommunityListResponseDto from(Community community) {
-        JoinState state = null;
-        if (community.getState() != null) {
-            state = community.getState();
-        }
-
-        String writerId = null;
+    public static PartyListResponse from(Community community, List<String> tagList) {
         String nickname = null;
         if (community.getWriter() != null) {
-            writerId = community.getWriter().getProfile().getExternalId();
             nickname = community.getWriter().getProfile().getNickname();
         }
 
-
-        return CommunityListResponseDto.builder()
+        return PartyListResponse.builder()
                 .id(community.getId())
                 .type(community.getType())
-                .state(state)
+                .state(community.getState())
                 .title(community.getTitle())
                 .nickname(nickname)
-                .writerId(writerId)
-                .createdAt(community.getCreatedAt())
+                .createdAt(DateFormat.calculateTime(community.getCreatedAt()))
                 .viewCount(community.getViewCount())
+                .tags(tagList)
                 .bookmarkCount(community.getBookmarkCount())
                 .commentCount(community.getCommentCount())
                 .build();

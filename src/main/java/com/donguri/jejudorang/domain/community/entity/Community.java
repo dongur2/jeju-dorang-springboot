@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.entity;
 
-import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
@@ -11,7 +11,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Formula;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -92,7 +91,7 @@ public class Community extends BaseEntity {
     }
 
     // 글 수정
-    public void update(CommunityWriteRequestDto resource) {
+    public void update(CommunityWriteRequest resource) {
         title = resource.title();
         content = resource.content();
 
@@ -115,9 +114,6 @@ public class Community extends BaseEntity {
             comments = new ArrayList<>();
         }
         comments.add(newComment);
-    }
-    public void deleteComment(Comment comment) {
-        comments.remove(comment);
     }
 
     public void setBoardType(String paramType) {

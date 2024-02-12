@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.service;
 
-import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
@@ -481,7 +481,7 @@ class UserServiceITest {
         User saved = userRepository.save(user);
 
         //when
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("커뮤니티 글작성 테스트 제목")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")

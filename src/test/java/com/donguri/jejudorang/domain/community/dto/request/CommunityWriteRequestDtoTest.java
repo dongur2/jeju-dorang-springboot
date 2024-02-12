@@ -26,17 +26,17 @@ class CommunityWriteRequestDtoTest {
     @Test
     void DTO_실패_제목_누락() {
         // given
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
                 .build();
 
         //when
-        Set<ConstraintViolation<CommunityWriteRequestDto>> validate = validator.validate(postToWrite);
+        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
 
         //then
-        Iterator<ConstraintViolation<CommunityWriteRequestDto>> iterator = validate.iterator();
+        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
         List<String> msgList = new ArrayList<>();
 
         while(iterator.hasNext()) {
@@ -49,17 +49,17 @@ class CommunityWriteRequestDtoTest {
     @Test
     void DTO_실패_제목_글자수_부족() {
         // given
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("가")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
                 .build();
 
         //when
-        Set<ConstraintViolation<CommunityWriteRequestDto>> validate = validator.validate(postToWrite);
+        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
 
         //then
-        Iterator<ConstraintViolation<CommunityWriteRequestDto>> iterator = validate.iterator();
+        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
         List<String> msgList = new ArrayList<>();
 
         while(iterator.hasNext()) {
@@ -72,17 +72,17 @@ class CommunityWriteRequestDtoTest {
     @Test
     void DTO_실패_제목_글자수_초과() {
         // given
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("일이삼사오륙칠팔구십일이삼사오륙칠팔구십일이삼사오륙칠팔구십일이삼사오륙칠팔구십일이삼사오륙칠팔구십일이삼사오륙칠팔구십일이삼사오륙칠팔구십")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
                 .build();
 
         //when
-        Set<ConstraintViolation<CommunityWriteRequestDto>> validate = validator.validate(postToWrite);
+        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
 
         //then
-        Iterator<ConstraintViolation<CommunityWriteRequestDto>> iterator = validate.iterator();
+        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
         List<String> msgList = new ArrayList<>();
 
         while(iterator.hasNext()) {
@@ -95,17 +95,17 @@ class CommunityWriteRequestDtoTest {
     @Test
     void DTO_실패_글_제목_공백() {
         // given
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("               ")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
                 .build();
 
         //when
-        Set<ConstraintViolation<CommunityWriteRequestDto>> validate = validator.validate(postToWrite);
+        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
 
         //then
-        Iterator<ConstraintViolation<CommunityWriteRequestDto>> iterator = validate.iterator();
+        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
         List<String> msgList = new ArrayList<>();
 
         while(iterator.hasNext()) {
@@ -118,17 +118,17 @@ class CommunityWriteRequestDtoTest {
     @Test
     void DTO_실패_타입_누락() {
         // given
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("글 작성 테스트 제목")
                 .type(null)
                 .content("커뮤니티 글작성 테스트 - CHAT")
                 .build();
 
         //when
-        Set<ConstraintViolation<CommunityWriteRequestDto>> validate = validator.validate(postToWrite);
+        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
 
         //then
-        Iterator<ConstraintViolation<CommunityWriteRequestDto>> iterator = validate.iterator();
+        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
         List<String> msgList = new ArrayList<>();
 
         while(iterator.hasNext()) {
@@ -141,17 +141,17 @@ class CommunityWriteRequestDtoTest {
     @Test
     void DTO_실패_글_내용_글자수_부족() {
         // given
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("글 작성 테스트 제목")
                 .type("chat")
                 .content("n")
                 .build();
 
         //when
-        Set<ConstraintViolation<CommunityWriteRequestDto>> validate = validator.validate(postToWrite);
+        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
 
         //then
-        Iterator<ConstraintViolation<CommunityWriteRequestDto>> iterator = validate.iterator();
+        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
         List<String> msgList = new ArrayList<>();
 
         while(iterator.hasNext()) {
@@ -164,17 +164,17 @@ class CommunityWriteRequestDtoTest {
     @Test
     void DTO_실패_글_내용_누락() {
         // given
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("글 작성 테스트 제목")
                 .type("chat")
                 .content(null)
                 .build();
 
         //when
-        Set<ConstraintViolation<CommunityWriteRequestDto>> validate = validator.validate(postToWrite);
+        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
 
         //then
-        Iterator<ConstraintViolation<CommunityWriteRequestDto>> iterator = validate.iterator();
+        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
         List<String> msgList = new ArrayList<>();
 
         while(iterator.hasNext()) {
@@ -187,17 +187,17 @@ class CommunityWriteRequestDtoTest {
     @Test
     void DTO_실패_글_내용_공백() {
         // given
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("글 작성 테스트 제목")
                 .type("chat")
                 .content("                   ")
                 .build();
 
         //when
-        Set<ConstraintViolation<CommunityWriteRequestDto>> validate = validator.validate(postToWrite);
+        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
 
         //then
-        Iterator<ConstraintViolation<CommunityWriteRequestDto>> iterator = validate.iterator();
+        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
         List<String> msgList = new ArrayList<>();
 
         while(iterator.hasNext()) {

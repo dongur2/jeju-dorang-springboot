@@ -35,19 +35,19 @@ public class CommentController {
     @PostMapping
     public String createNewComment(@CookieValue("access_token") Cookie token,
                                    @Valid CommentRequest commentRequest, BindingResult bindingResult,
-                                   @RequestParam("post") Long postId, @RequestParam("type") String type,
+                                   @RequestParam("type") String type,
                                    Model model) {
         try {
             if (bindingResult.hasErrors()) {
                 throw new Exception(bindingResult.getFieldError().getDefaultMessage());
             }
 
-            commentService.writeNewComment(token.getValue(), postId, commentRequest);
+            commentService.writeNewComment(token.getValue(), commentRequest);
 
             // PARTY -> parties, CHAT -> chats
             type = matchMappingBoardType(type);
 
-            return "redirect:/community/boards/" + type + "/" + postId;
+            return "redirect:/community/boards/" + type + "/" + commentRequest.postId();
 
         } catch (Exception e) {
             log.error("댓글 생성에 실패했습니다: {}", e.getMessage());

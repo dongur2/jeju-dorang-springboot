@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.response.ChatListResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.ChatListResponse;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
@@ -12,9 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -27,7 +25,7 @@ public class ChatServiceI implements ChatService {
 
     @Override
     @Transactional
-    public Page<ChatListResponseDto> getChatPostList(Pageable pageable, String searchWord, String searchTag) {
+    public Page<ChatListResponse> getChatPostList(Pageable pageable, String searchWord, String searchTag) {
 
         // 검색어가 null인데 null처리 안되는 경우 처리
         if (searchWord != null && searchWord.trim().isEmpty()) {
@@ -61,7 +59,7 @@ public class ChatServiceI implements ChatService {
 
         // entity -> dto
         return entities.map(
-                chat -> ChatListResponseDto.from(chat, chat.getTags().stream()
+                chat -> ChatListResponse.from(chat, chat.getTags().stream()
                         .map(tag -> tag.getTag().getKeyword())
                         .toList())
         );

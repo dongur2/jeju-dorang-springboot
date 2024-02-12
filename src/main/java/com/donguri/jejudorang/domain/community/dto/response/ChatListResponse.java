@@ -8,7 +8,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record ChatListResponseDto (
+public record ChatListResponse(
         Long id,
         BoardType type,
         String title,
@@ -19,13 +19,13 @@ public record ChatListResponseDto (
         int bookmarkCount,
         int commentCount
 ) {
-    public static ChatListResponseDto from(Community community, List<String> tagList) {
+    public static ChatListResponse from(Community community, List<String> tagList) {
         String nickname = null;
         if (community.getWriter() != null) {
             nickname = community.getWriter().getProfile().getNickname();
         }
 
-        return ChatListResponseDto.builder()
+        return ChatListResponse.builder()
                 .id(community.getId())
                 .type(community.getType())
                 .title(community.getTitle())

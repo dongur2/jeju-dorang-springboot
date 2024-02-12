@@ -11,7 +11,7 @@ import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
-import com.donguri.jejudorang.global.config.jwt.JwtProvider;
+import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +43,13 @@ public class CommentServiceI implements CommentService{
 
     @Override
     @Transactional
-    public void writeNewComment(String accessToken, Long postId, CommentRequest newComment) {
+    public void writeNewComment(String accessToken, CommentRequest newComment) {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
             User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
                     .orElseThrow(() -> new EntityNotFoundException("가입된 사용자가 아닙니다."));
 
-            Community nowPost = communityRepository.findById(postId)
+            Community nowPost = communityRepository.findById(newComment.postId())
                     .orElseThrow(() -> new EntityNotFoundException("존재하는 게시물이 아닙니다."));
 
             Comment savedComment = commentRepository.save(Comment.builder()
@@ -57,10 +57,10 @@ public class CommentServiceI implements CommentService{
                     .user(nowUser)
                     .content(newComment.content())
                     .cmtDepth(0)
+                    .cmtOrder(orderIdx++)
                     .isDeleted(IsDeleted.EXISTING)
                     .build());
             savedComment.updateCmtGroup();
-            savedComment.updateCmtOrder(orderIdx++);
 
             nowPost.addComment(savedComment);
 
@@ -90,9 +90,9 @@ public class CommentServiceI implements CommentService{
                     .content(newReComment.content())
                     .cmtGroup(newReComment.cmtId())
                     .cmtDepth(1)
+                    .cmtOrder(orderIdx++)
                     .isDeleted(IsDeleted.EXISTING)
                     .build());
-            savedReComment.updateCmtOrder(orderIdx++);
 
             community.addComment(savedReComment);
 

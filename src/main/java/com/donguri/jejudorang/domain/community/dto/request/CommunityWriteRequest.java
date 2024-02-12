@@ -9,7 +9,7 @@ import lombok.Builder;
 
 
 @Builder
-public record CommunityWriteRequestDto (
+public record CommunityWriteRequest(
 
         @NotBlank(message = "제목을 작성해주세요.")
         @Size(min= 2, max = 60, message = "제목은 2자 이상 60자 이하만 가능합니다.")

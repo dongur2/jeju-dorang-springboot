@@ -4,13 +4,13 @@ import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.bookmark.entity.TripBookmark;
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.bookmark.repository.TripBookmarkRepository;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.repository.TripRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
-import com.donguri.jejudorang.global.config.jwt.JwtProvider;
+import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -20,8 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -145,7 +143,7 @@ public class BookmarkServiceI implements BookmarkService {
                             .map(trip -> new TripListResponseDto(trip.getTrip()));
             } else {
                 return communityBookmarkRepository.findAllByUser(user, pageable)
-                        .map(community -> CommunityListResponseDto.from(community.getCommunity()));
+                        .map(community -> CommunityListResponse.from(community.getCommunity()));
             }
 
         } catch (Exception e) {

@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.community.dto.response;
 
 
-public record CommunityTypeResponseDto (
+public record CommunityTypeResponse(
         String typeForRedirect
 ) {
 

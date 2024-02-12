@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record CommunityDetailResponseDto(
+public record CommunityDetailResponse(
     Long id,
     BoardType type,
     JoinState state,
@@ -28,7 +28,7 @@ public record CommunityDetailResponseDto(
     int commentCount
 
 ) {
-    public static CommunityDetailResponseDto from(Community community, List<String> tagList, String nowViewer) {
+    public static CommunityDetailResponse from(Community community, List<String> tagList, String nowViewer) {
         String nickname = null;
         String writerId = null;
         if (community.getWriter() != null) {
@@ -36,7 +36,7 @@ public record CommunityDetailResponseDto(
             writerId = community.getWriter().getProfile().getExternalId();
         }
 
-        return CommunityDetailResponseDto.builder()
+        return CommunityDetailResponse.builder()
                 .id(community.getId())
                 .type(community.getType())
                 .state(community.getState())
@@ -59,7 +59,7 @@ public record CommunityDetailResponseDto(
 
     }
 
-    public static CommunityDetailResponseDto from(Community community, List<String> tagList) {
+    public static CommunityDetailResponse from(Community community, List<String> tagList) {
         String nickname = null;
         String writerId = null;
         if (community.getWriter() != null) {
@@ -67,7 +67,7 @@ public record CommunityDetailResponseDto(
             writerId = community.getWriter().getProfile().getExternalId();
         }
 
-        return CommunityDetailResponseDto.builder()
+        return CommunityDetailResponse.builder()
                 .id(community.getId())
                 .type(community.getType())
                 .state(community.getState())

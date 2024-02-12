@@ -1,10 +1,10 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponseDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponseDto;
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponse;
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
@@ -14,7 +14,7 @@ import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
-import com.donguri.jejudorang.global.config.jwt.JwtProvider;
+import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,7 +52,7 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public CommunityTypeResponseDto saveNewPost(CommunityWriteRequestDto postToWrite, String token) {
+    public CommunityTypeResponse saveNewPost(CommunityWriteRequest postToWrite, String token) {
         try {
             // 토큰에서 현재 작성자 추출
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
@@ -72,7 +72,7 @@ public class CommunityServiceI implements CommunityService {
                                                         savedCommunity.getWriter().getProfile().getExternalId());
 
             // 리다이렉트할 때 넣어줄 글타입
-            return new CommunityTypeResponseDto(setTypeForRedirect(savedCommunity));
+            return new CommunityTypeResponse(setTypeForRedirect(savedCommunity));
 
         } catch (Exception e) {
             log.error("게시글 작성에 실패했습니다 : {}", e.getMessage());
@@ -101,7 +101,7 @@ public class CommunityServiceI implements CommunityService {
             /* 수정폼으로 데이터 불러오기
             * */
             if (forModify) {
-                resMap.put("result", CommunityForModifyResponseDto.from(found, tagsToStringList));
+                resMap.put("result", CommunityForModifyResponse.from(found, tagsToStringList));
                 return resMap;
 
             /* 상세글 조회
@@ -123,21 +123,21 @@ public class CommunityServiceI implements CommunityService {
                         idFromJwt.append(jwtProvider.getUserNameFromJwtToken(accessToken.getValue()));
                     } catch (Exception e) {
                         log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
-                        resMap.put("result", CommunityDetailResponseDto.from(found, tagsToStringList));
+                        resMap.put("result", CommunityDetailResponse.from(found, tagsToStringList));
                         resMap.put("cmts", cmtList);
                         return resMap;
                     }
 
                     // 1-2. Access Token이 유효 -> from(.., idFromJwt) 북마크 여부 확인
-                    resMap.put("post", CommunityDetailResponseDto.from(found, tagsToStringList, idFromJwt.toString()));
+                    resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList, idFromJwt.toString()));
                     resMap.put("cmts", cmtList);
                     log.info("{}가 북마크한 글입니다. isBookmarked == {}", idFromJwt,
-                            CommunityDetailResponseDto.from(found, tagsToStringList, idFromJwt.toString()).isBookmarked());
+                            CommunityDetailResponse.from(found, tagsToStringList, idFromJwt.toString()).isBookmarked());
 
                 // 2. Access Token 쿠키가 없는 경우
                 } else {
                     log.info("비회원은 북마크 여부를 확인할 수 없습니다.");
-                    resMap.put("post", CommunityDetailResponseDto.from(found, tagsToStringList));
+                    resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList));
                     resMap.put("cmts", cmtList);
                 }
 
@@ -152,22 +152,22 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public Page<CommunityListResponseDto> getAllPostsWrittenByUser(User writer, Pageable pageable) {
+    public Page<CommunityListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByWriterId(writer.getId(), pageable)
-                .map(CommunityListResponseDto::from);
+                .map(CommunityListResponse::from);
     }
 
     @Override
     @Transactional
-    public Page<CommunityListResponseDto> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
+    public Page<CommunityListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByCommentWriterIdAndIsDeletedFalse(writer.getId(), IsDeleted.EXISTING, pageable)
-                .map(CommunityListResponseDto::from);
+                .map(CommunityListResponse::from);
     }
 
 
     @Override
     @Transactional
-    public CommunityTypeResponseDto updatePost(Long communityId, CommunityWriteRequestDto postToUpdate) {
+    public CommunityTypeResponse updatePost(Long communityId, CommunityWriteRequest postToUpdate) {
         try {
             Community existingCommunity = communityRepository.findById(communityId)
                     .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
@@ -182,7 +182,7 @@ public class CommunityServiceI implements CommunityService {
 
             // 리다이렉트할 때 넣어줄 글타입
             String typeForDto = setTypeForRedirect(existingCommunity);
-            return new CommunityTypeResponseDto(typeForDto);
+            return new CommunityTypeResponse(typeForDto);
 
         } catch (Exception e) {
             log.error("게시글 업데이트 실패: {}", e.getMessage());

@@ -31,19 +31,19 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "writer_id")
     private User user; // 회원 탈퇴해도 삭제되지 않음
 
-    // * 댓글 리팩토링 - 댓글 순서 구분 ( 댓글 목록 불러올 때 이 순서대로 정렬 )
+    // * 댓글 순서 구분 ( 댓글 목록 불러올 때 이 순서대로 정렬 )
     @Column
     private Long cmtOrder;
 
-    // * 댓글 리팩토링 - 댓글 그룹 구분 ( 댓글 + 대댓글 그룹 인덱스: 댓글 아이디 )
+    // * 댓글 그룹 구분 ( 댓글 + 대댓글 그룹 인덱스: 댓글 아이디 )
     @Column
     private Long cmtGroup;
 
-    // * 댓글 리팩토링 - 깊이 표시( 대댓글 구분 ): 기본 0
+    // * 댓글 깊이 표시( 대댓글 구분 ): 기본 0
     @Column(nullable = false)
     private int cmtDepth;
 
-    // * 딸린 대댓글이 존재할 경우 사용
+    // * 댓글 삭제 처리
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private IsDeleted isDeleted;
@@ -60,18 +60,17 @@ public class Comment extends BaseEntity {
         this.isDeleted = isDeleted;
     }
 
-    // * 댓글 순서 구분 설정
-    public void updateCmtOrder(Long idx) {
-        this.cmtOrder = idx;
-    }
+
     // * 댓글 그룹 설정
     public void updateCmtGroup() {
         this.cmtGroup = this.id;
     }
+
     // * 댓글 삭제 상태 업데이트
     public void updateIsDeleted() {
         this.isDeleted = IsDeleted.DELETED;
     }
+
 
     // 댓글 내용 수정
     public void updateContent(String content) {

@@ -2,8 +2,8 @@ package com.donguri.jejudorang.domain.community.service;
 
 import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
-import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponseDto;
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
@@ -79,7 +79,7 @@ class CommunityServiceITest {
                 .orElseThrow(() -> new RuntimeException("저장된 회원이 없습니다."));
 
         //when
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("커뮤니티 글작성 테스트 제목")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
@@ -116,7 +116,7 @@ class CommunityServiceITest {
                 .orElseThrow(() -> new RuntimeException("저장된 회원이 없습니다."));
 
         //when
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("커뮤니티 글작성 테스트 제목")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
@@ -170,7 +170,7 @@ class CommunityServiceITest {
                 .orElseThrow(() -> new RuntimeException("저장된 회원이 없습니다."));
 
         //when
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("커뮤니티 글작성 테스트 제목")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
@@ -213,7 +213,7 @@ class CommunityServiceITest {
                 .orElseThrow(() -> new RuntimeException("저장된 회원이 없습니다."));
 
         //when
-        CommunityWriteRequestDto postToWrite = CommunityWriteRequestDto.builder()
+        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
                 .title("커뮤니티 글작성 테스트 제목")
                 .type("chat")
                 .content("커뮤니티 글작성 테스트 - CHAT")
@@ -287,7 +287,7 @@ class CommunityServiceITest {
         CommunityBookmark savedBookmark = bookmarkRepository.save(newBookmark);
         savedCommunity.updateBookmarks(savedBookmark);
 
-        CommunityDetailResponseDto dtoToReturn = CommunityDetailResponseDto.from(savedCommunity, tags, savedUser1.getProfile().getExternalId());
+        CommunityDetailResponse dtoToReturn = CommunityDetailResponse.from(savedCommunity, tags, savedUser1.getProfile().getExternalId());
 
         //then
         Assertions.assertThat(dtoToReturn.isBookmarked()).isTrue();
@@ -347,7 +347,7 @@ class CommunityServiceITest {
                     .toList();
         }
 
-        CommunityDetailResponseDto dtoToReturn = CommunityDetailResponseDto.from(savedCommunity, tags, savedUser1.getProfile().getExternalId());
+        CommunityDetailResponse dtoToReturn = CommunityDetailResponse.from(savedCommunity, tags, savedUser1.getProfile().getExternalId());
 
         //then
         Assertions.assertThat(dtoToReturn.isBookmarked()).isFalse();
@@ -391,7 +391,7 @@ class CommunityServiceITest {
                     .toList();
         }
 
-        CommunityDetailResponseDto dtoToReturn = CommunityDetailResponseDto.from(savedCommunity, tags);
+        CommunityDetailResponse dtoToReturn = CommunityDetailResponse.from(savedCommunity, tags);
 
         //then
         Assertions.assertThat(dtoToReturn.isBookmarked()).isFalse();

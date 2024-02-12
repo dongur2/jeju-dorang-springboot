@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.response.PartyListResponseDto;
+import com.donguri.jejudorang.domain.community.dto.response.PartyListResponse;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -29,7 +27,7 @@ public class PartyServiceI implements PartyService{
 
     @Override
     @Transactional
-    public Page<PartyListResponseDto> getPartyPostList(Pageable pageable, String paramState, String searchWord, String searchTag) {
+    public Page<PartyListResponse> getPartyPostList(Pageable pageable, String paramState, String searchWord, String searchTag) {
 
         // 넘어온 String state -> null / Enum 변환
         JoinState state = setStateToSort(paramState);
@@ -72,7 +70,7 @@ public class PartyServiceI implements PartyService{
 
         // entity -> dto
         return entities.map(
-                party -> PartyListResponseDto.from(party, party.getTags().stream()
+                party -> PartyListResponse.from(party, party.getTags().stream()
                         .map(tag -> tag.getTag().getKeyword())
                         .toList())
         );

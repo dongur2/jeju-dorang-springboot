@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.api;
 
-import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequestDto;
+import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.community.dto.response.*;
 import com.donguri.jejudorang.domain.community.service.ChatService;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
@@ -64,7 +64,7 @@ public class CommunityController {
     }
 
     @PostMapping("/post/new")
-    public ResponseEntity<?> postNewCommunity(@Valid CommunityWriteRequestDto postToWrite, BindingResult bindingResult,
+    public ResponseEntity<?> postNewCommunity(@Valid CommunityWriteRequest postToWrite, BindingResult bindingResult,
                                               @CookieValue("access_token") Cookie token) {
 
         if (bindingResult.hasErrors()) {
@@ -72,7 +72,7 @@ public class CommunityController {
         }
 
         try {
-            CommunityTypeResponseDto communityTypeResponseDto = communityService.saveNewPost(postToWrite, token.getValue());
+            CommunityTypeResponse communityTypeResponseDto = communityService.saveNewPost(postToWrite, token.getValue());
             return new ResponseEntity<>(communityTypeResponseDto.typeForRedirect(), HttpStatus.OK);
 
         } catch (Exception e) {
@@ -91,7 +91,8 @@ public class CommunityController {
     @GetMapping("/post/{communityId}/modify")
     public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
         try {
-            model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("post"));
+
+            model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("result"));
             return "/community/communityModifyForm";
 
         } catch (Exception e) {
@@ -103,7 +104,7 @@ public class CommunityController {
 
     @PutMapping("/post/{communityId}/modify")
     public String modifyCommunity(@PathVariable("communityId") Long communityId,
-                                  @Valid CommunityWriteRequestDto postToUpdate,
+                                  @Valid CommunityWriteRequest postToUpdate,
                                   BindingResult bindingResult,
                                   Model model) {
 
@@ -112,7 +113,7 @@ public class CommunityController {
                 throw new IllegalArgumentException(bindingResult.getFieldError().getDefaultMessage());
             }
 
-            CommunityTypeResponseDto redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
+            CommunityTypeResponse redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
             return "redirect:/community/boards/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
 
         } catch (Exception e) {
@@ -227,7 +228,7 @@ public class CommunityController {
             checkIsAlreadyReadForUpdateView(communityId, request, response);
 
             Map<String, Object> result = communityService.getCommunityPost(communityId, false, request);
-            CommunityDetailResponseDto post = (CommunityDetailResponseDto) result.get("post");
+            CommunityDetailResponse post = (CommunityDetailResponse) result.get("post");
 
 
             model.addAttribute("post", post);

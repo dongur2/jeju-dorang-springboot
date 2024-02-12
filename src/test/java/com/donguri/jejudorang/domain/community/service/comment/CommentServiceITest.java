@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.community.service.comment;
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
+import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
 import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRepository;
@@ -109,17 +110,17 @@ class CommentServiceITest {
         Community savedCommunity = communityRepository.save(testCommunity);
 
         //when
-        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1").cmtDepth(0).build();
-        Comment comment2 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment2").cmtDepth(0).build();
-        Comment comment3 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment3").cmtDepth(0).build();
+        Long idx = 0L;
+        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(idx++).build();
+        Comment comment2 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment2")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(idx++).build();
+        Comment comment3 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment3")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(idx++).build();
+
         Comment savedComment1 = commentRepository.save(comment1);
         Comment savedComment2 = commentRepository.save(comment2);
         Comment savedComment3 = commentRepository.save(comment3);
-
-        Long idx = 0L;
-        savedComment1.updateCmtOrder(idx++);
-        savedComment2.updateCmtOrder(idx++);
-        savedComment3.updateCmtOrder(idx++);
 
         savedComment1.updateCmtGroup();
         savedComment2.updateCmtGroup();
@@ -184,8 +185,13 @@ class CommentServiceITest {
         Community savedCommunity = communityRepository.save(testCommunity);
 
         //when
-        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1").build();
+        Long idx = 0L;
+        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(idx++).build();
         Comment savedComment1 = commentRepository.save(comment1);
+
+        savedComment1.updateCmtGroup();
+
         savedCommunity.addComment(savedComment1);
 
         savedComment1.updateContent("댓글 수정");
@@ -239,18 +245,20 @@ class CommentServiceITest {
         Community savedCommunity = communityRepository.save(testCommunity);
 
         //when
-        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1").build();
+        Long idx = 0L;
+        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(idx++).build();
         Comment savedComment1 = commentRepository.save(comment1);
-        Long cmtId = savedComment1.getId();
+
+        savedComment1.updateCmtGroup();
 
         savedCommunity.addComment(savedComment1);
 
-        savedComment1.getCommunity().deleteComment(savedComment1);
-        commentRepository.delete(savedComment1);
+        savedComment1.updateIsDeleted(); // 삭제 처리
 
         //then
-        Assertions.assertThat(savedCommunity.getComments().size()).isEqualTo(0);
-        Assertions.assertThat(commentRepository.findById(cmtId)).isEmpty();
+        Assertions.assertThat(savedCommunity.getComments().size()).isEqualTo(1); // comments, db에선 삭제하지 않음
+        Assertions.assertThat(savedCommunity.getComments().get(0).getIsDeleted()).isEqualTo(IsDeleted.DELETED);
     }
 
     @Test
@@ -297,22 +305,23 @@ class CommentServiceITest {
         Community savedCommunity = communityRepository.save(testCommunity);
 
         //when
-        Comment comment1 = Comment.builder().community(testCommunity).user(savedUser1).content("test_comment1").build();
+        Long idx = 0L;
+        Comment comment1 = Comment.builder().community(savedCommunity).user(savedUser1).content("test_comment1").cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(idx++).build();
         Comment savedComment1 = commentRepository.save(comment1);
-        Long cmtId = savedComment1.getId();
+
+        savedComment1.updateCmtGroup();
 
         savedCommunity.addComment(savedComment1);
 
-        List<Comment> comments = commentRepository.findAllByUserId(savedUser1.getId()).orElseThrow(() -> new EntityNotFoundException("댓글 없음"));
-        comments.forEach(cmt -> {
-                    System.out.println("댓글 : "+ cmt.getContent() + ", writer: " + cmt.getUser().getProfile().getNickname());
-                    cmt.deleteWriter();
-                    System.out.println("댓글 작성자: " + cmt.getUser());
-                });
+        List<Comment> comments = commentRepository.findAllByUserId(savedUser1.getId())
+                .orElse(null);
 
+        if(comments != null) {
+            comments.forEach(Comment::deleteWriter); // 작성자 null
+        }
 
         //then
-        Assertions.assertThat(comment1.getUser()).isNull();
+        Assertions.assertThat(savedCommunity.getComments().get(0).getUser()).isNull();
     }
 
 }
