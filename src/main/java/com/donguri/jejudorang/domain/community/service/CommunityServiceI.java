@@ -8,6 +8,7 @@ import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeRespons
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
+import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
@@ -159,7 +160,7 @@ public class CommunityServiceI implements CommunityService {
     @Override
     @Transactional
     public Page<CommunityListResponseDto> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
-        return communityRepository.findAllByCommentWriterId(writer.getId(), pageable)
+        return communityRepository.findAllByCommentWriterIdAndIsDeletedFalse(writer.getId(), IsDeleted.EXISTING, pageable)
                 .map(CommunityListResponseDto::from);
     }
 

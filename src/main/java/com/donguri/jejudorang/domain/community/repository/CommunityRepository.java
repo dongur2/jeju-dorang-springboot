@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.community.repository;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
+import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,8 +48,9 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     List<Community> findAllByWriterId(Long writerId);
 
-    @Query("select c from Community c left outer join Comment ct on c.id=ct.community.id where ct.user.id=:cmtWriterId")
-    Page<Community> findAllByCommentWriterId(@Param("cmtWriterId") Long writerId, Pageable pageable);
+    // 마이페이지 - 내가 댓글 단 글 목록 조회
+    @Query("select c from Community c left outer join Comment ct on c.id=ct.community.id where ct.user.id=:cmtWriterId and ct.isDeleted=:isDeleted")
+    Page<Community> findAllByCommentWriterIdAndIsDeletedFalse(@Param("cmtWriterId") Long writerId, @Param("isDeleted") IsDeleted isDeleted, Pageable pageable);
 
     // 작성글 모두 조회 - 페이징 처리
     Page<Community> findAllByWriterId(Long writerId, Pageable pageable);
