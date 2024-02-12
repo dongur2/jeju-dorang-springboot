@@ -91,7 +91,8 @@ public class CommunityController {
     @GetMapping("/post/{communityId}/modify")
     public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
         try {
-            model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("post"));
+
+            model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("result"));
             return "/community/communityModifyForm";
 
         } catch (Exception e) {

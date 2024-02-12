@@ -39,7 +39,7 @@
                                href="#" style="font-size:22px">동행모집</a>
                         </li>
                         <!--   글분류값 전달(default: chat)   -->
-                        <input type="hidden" id="postType" name="type" value="chat" th:value="${post.type.name().toLowerCase()}">
+                        <input type="hidden" id="postType" name="type" value="chat" th:value="${post.type}">
                     </ul>
                 </div>
                 <div class="board-form-input-box">
@@ -55,9 +55,9 @@
             <input type="hidden" id="board-form-content" name="content" value="" th:value="${post.content}">
 
             <div class="board-write-form-bottom">
-                <button th:if="${post.type.name().toLowerCase() == 'party'}" type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
+                <button th:if="${post.type == 'party'}" type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
                         th:onclick="|location.href='@{/community/boards/parties}'|">취소</button>
-                <button th:if="${post.type.name().toLowerCase() == 'chat'}" type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
+                <button th:if="${post.type == 'chat'}" type="button" class="btn btn-outline-secondary" style="width:150px; height:50px; border-radius: 10px"
                         th:onclick="|location.href='@{/community/boards/chats}'|">취소</button>
 
                 <button type="button" class="btn btn-primary"
