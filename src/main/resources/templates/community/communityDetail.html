@@ -188,7 +188,8 @@
 
                     <!-- 대댓글 작성폼 열기 버튼: 로그인한 경우만 노출 -->
                     <div class="re-cmt-box" style="width:80px; display: flex; flex-direction: row; align-items: flex-end"
-                         sec:authorize="isAuthenticated()">
+                         sec:authorize="isAuthenticated()"
+                         th:if="${cmt.nickname() != null && cmt.nickname() != '삭제된 댓글입니다.'}">
                         <button id="re-cmt-btn" style="width:95%; height:60%;" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId()} + ')'">답글 달기</button>
                     </div>
 

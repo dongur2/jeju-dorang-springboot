@@ -24,7 +24,7 @@ public record CommentResponse (
             return CommentResponse.builder()
                     .cmtId(cmt.getId())
                     .pic(null)
-                    .nickname(" - ")
+                    .nickname("삭제된 댓글입니다.")
                     .writerId(null)
                     .content("삭제된 댓글입니다.")
                     .createdAt(cmt.getCreatedAt())
