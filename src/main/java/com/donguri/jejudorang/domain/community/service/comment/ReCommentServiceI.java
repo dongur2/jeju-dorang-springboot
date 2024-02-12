@@ -4,6 +4,7 @@ import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequ
 import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequestWIthId;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
+import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.entity.comment.ReComment;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
@@ -57,6 +58,7 @@ public class ReCommentServiceI implements ReCommentService{
                     .content(newReComment.content())
                     .cmtGroup(newReComment.cmtId())
                     .cmtDepth(1)
+                    .isDeleted(IsDeleted.EXISTING)
                     .build());
             savedReComment.updateCmtOrder(idx++);
 
