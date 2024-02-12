@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.community.dto.request.comment.CommentReques
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
+import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
@@ -58,6 +59,7 @@ public class CommentServiceI implements CommentService{
                     .user(nowUser)
                     .content(newComment.content())
                     .cmtDepth(0)
+                    .isDeleted(IsDeleted.EXISTING)
                     .build());
             savedComment.updateCmtGroup();
             savedComment.updateCmtOrder(orderIdx++);
@@ -111,9 +113,22 @@ public class CommentServiceI implements CommentService{
                 throw new IllegalAccessException("댓글 작성자 당사자만 댓글을 삭제할 수 있습니다.");
             }
 
-            // 게시글에서 댓글 삭제 & 리포지토리 댓글 삭제
-            cmtToDelete.getCommunity().deleteComment(cmtToDelete);
-            commentRepository.delete(cmtToDelete);
+            // 삭제되지 않은 대댓글
+            List<Comment> allRecmtsUndeleted = commentRepository.findAllByCmtGroupAndCmtDepthAndIsDeleted(1, cmtToDelete.getId(), IsDeleted.EXISTING);
+
+            // 1. 포함하는 대댓글 / 삭제되지 않은 대댓글이 없을 경우
+            if(allRecmtsUndeleted == null) {
+
+                // 댓글에 해당하는 그룹아이디 가지는 대댓글, 댓글 모두 삭제
+                cmtToDelete.getCommunity().deleteComment(cmtToDelete);
+                commentRepository.deleteAllByCmtGroup(cmtToDelete.getId());
+
+            // 2. 포함하는 대댓글이 있고, 대댓글 중 삭제되지 않은 대댓글이 있을 경우
+            } else {
+                // 삭제 상태만 업데이트
+                cmtToDelete.updateIsDeleted();
+            }
+
 
         } catch (Exception e) {
             throw e;
@@ -139,7 +154,7 @@ public class CommentServiceI implements CommentService{
     @Transactional
     public List<CommentResponse> findAllCmtsOnCommunity(Long communityId) {
         try {
-            return commentRepository.findAllByCommunityIdOrderByCmtGroupAscCmtOrderAsc(communityId).stream()
+            return commentRepository.findAllByCommunityIdAndIsDeletedOrderByCmtGroupAscCmtOrderAsc(communityId, IsDeleted.EXISTING).stream()
                     .map(CommentResponse::from).toList();
 
         } catch (Exception e) {

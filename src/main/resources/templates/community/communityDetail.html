@@ -516,54 +516,54 @@
             xhr.send(JSON.stringify(commentRequestWithId));
         }
 
-        // /*
-        // * 댓글 삭제 요청
-        // *
-        // * */
-        // function deleteCmtRequest(cmtId) {
-        //     var xhr = new XMLHttpRequest();
-        //     xhr.open("DELETE", "/community/comments?cmtId=" + cmtId, true);
-        //
-        //     xhr.onreadystatechange = function() {
-        //         if (xhr.readyState === 4) {
-        //             if (xhr.status === 200) {
-        //                 alert("댓글 삭제가 완료되었습니다.");
-        //                 window.location.reload();
-        //
-        //             } else {
-        //                 alert(xhr.responseText);
-        //             }
-        //         }
-        //     }
-        //     xhr.send();
-        // }
-        //
-        //
-        // /*
-        // * 대댓글 작정 폼 열기
-        // *
-        // * */
-        // function openRecommentWriteForm(rCmtId) {
-        //     document.getElementById('re-cmt-form-box-' + rCmtId).style.display = 'flex';
-        // }
-        // // 닫기
-        // function closeRecommentWriteForm(rCmtId) {
-        //     document.getElementById('re-cmt-form-box-' + rCmtId).style.display = 'none';
-        // }
-        //
-        // /*
-        // * 대댓글 수정 폼 열기
-        // *
-        // * */
-        // function openReCmtModifyInput(rCmtId) {
-        //     document.getElementById('re-cmt-content-origin-' + rCmtId).style.display = 'none';
-        //     document.getElementById('re-cmt-modify-block-' + rCmtId).style.display = 'flex';
-        // }
-        // // 닫기
-        // function closeReCmtModifyInput(rCmtId) {
-        //     document.getElementById('re-cmt-content-origin-' + rCmtId).style.display = 'flex';
-        //     document.getElementById('re-cmt-modify-block-' + rCmtId).style.display = 'none';
-        // }
+        /*
+        * 댓글 삭제 요청
+        *
+        * */
+        function deleteCmtRequest(cmtId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/community/comments?cmtId=" + cmtId, true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert("댓글 삭제가 완료되었습니다.");
+                        window.location.reload();
+
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+            xhr.send();
+        }
+
+
+        /*
+        * 대댓글 작성 폼 열기
+        *
+        * */
+        function openRecommentWriteForm(cmtId) {
+            document.getElementById('re-cmt-form-box-' + cmtId).style.display = 'flex';
+        }
+        // 닫기
+        function closeRecommentWriteForm(cmtId) {
+            document.getElementById('re-cmt-form-box-' + cmtId).style.display = 'none';
+        }
+
+        /*
+        * 대댓글 수정 폼 열기
+        *
+        * */
+        function openReCmtModifyInput(cmtId) {
+            document.getElementById('re-cmt-content-origin-' + cmtId).style.display = 'none';
+            document.getElementById('re-cmt-modify-block-' + cmtId).style.display = 'flex';
+        }
+        // 닫기
+        function closeReCmtModifyInput(cmtId) {
+            document.getElementById('re-cmt-content-origin-' + cmtId).style.display = 'flex';
+            document.getElementById('re-cmt-modify-block-' + cmtId).style.display = 'none';
+        }
         //
         // /*
         // * 대댓글 수정 요청

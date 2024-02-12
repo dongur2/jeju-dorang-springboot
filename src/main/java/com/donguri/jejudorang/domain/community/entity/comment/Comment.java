@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +54,14 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private int cmtDepth;
 
+    // * 딸린 대댓글이 존재할 경우 사용
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private IsDeleted isDeleted;
+
 
     @Builder
-    public Comment(Community community, String content, User user, List<ReComment> recomments, Long cmtOrder, Long cmtGroup, int cmtDepth) {
+    public Comment(Community community, String content, User user, List<ReComment> recomments, Long cmtOrder, Long cmtGroup, int cmtDepth, IsDeleted isDeleted) {
         this.community = community;
         this.content = content;
         this.user = user;
@@ -63,6 +69,7 @@ public class Comment extends BaseEntity {
         this.cmtOrder = cmtOrder;
         this.cmtGroup = cmtGroup;
         this.cmtDepth = cmtDepth;
+        this.isDeleted = isDeleted;
     }
 
     // * 댓글 순서 구분 설정
@@ -72,6 +79,10 @@ public class Comment extends BaseEntity {
     // * 댓글 그룹 설정
     public void updateCmtGroup() {
         this.cmtGroup = this.id;
+    }
+    // * 댓글 삭제 상태 업데이트
+    public void updateIsDeleted() {
+        this.isDeleted = IsDeleted.DELETED;
     }
 
     // 댓글 내용 수정
