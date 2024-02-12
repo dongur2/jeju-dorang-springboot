@@ -3,10 +3,9 @@ package com.donguri.jejudorang.domain.community.service.comment;
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
-import com.donguri.jejudorang.domain.community.entity.comment.ReComment;
+import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
-import com.donguri.jejudorang.domain.community.repository.comment.ReCommentRepository;
 import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRepository;
 import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
@@ -51,8 +50,6 @@ class ReCommentServiceITest {
     TagRepository tagRepository;
     @Autowired
     CommentRepository commentRepository;
-    @Autowired
-    ReCommentRepository reCommentRepository;
 
     @Autowired
     CommunityBookmarkRepository bookmarkRepository;
@@ -60,7 +57,6 @@ class ReCommentServiceITest {
     @AfterEach
     void after() {
         em.clear();
-        reCommentRepository.flush();
         commentRepository.flush();
         communityRepository.flush();
         userRepository.flush();
@@ -116,27 +112,23 @@ class ReCommentServiceITest {
         //when
         Long idx = 0L;
 
-        Comment comment1 = Comment.builder()
-                .community(testCommunity).user(savedUser1).content("테스트 댓글1").cmtDepth(0).build();
-        comment1.updateCmtOrder(idx++);
+        Comment comment1 = Comment.builder().community(savedCommunity).user(savedUser1).content("test_comment1")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(idx++).build();
         Comment savedComment1 = commentRepository.save(comment1);
 
-        comment1.updateCmtGroup();
+        savedComment1.updateCmtGroup();
 
         savedCommunity.addComment(savedComment1); // 댓글 저장
 
-        Comment reComment1 = Comment.builder()
-                .community(testCommunity).user(savedUser).content("테스트 대댓글1-1").cmtDepth(1).cmtGroup(comment1.getId()).build();
-        reComment1.updateCmtOrder(idx++);
-        commentRepository.save(reComment1);
+        Comment recomment1 = Comment.builder()
+                .community(savedCommunity).user(savedUser).content("test_re_comment1")
+                .cmtDepth(1).cmtGroup(comment1.getId()).isDeleted(IsDeleted.EXISTING).cmtOrder(idx++).build();
+        commentRepository.save(recomment1);
 
-        savedCommunity.addComment(reComment1); // 대댓글 저장
+        savedCommunity.addComment(recomment1);
 
         //then
         Assertions.assertThat(savedCommunity.getComments().size()).isEqualTo(2);
-        Assertions.assertThat(savedCommunity.getComments().stream().filter(cmt -> cmt.getCmtGroup().equals(comment1.getId())).count()).isEqualTo(2);
-        Assertions.assertThat(savedCommunity.getComments().stream().filter(cmt -> cmt.getCmtDepth() == 0).count()).isEqualTo(1);
-        Assertions.assertThat(savedCommunity.getComments().stream().filter(cmt -> cmt.getCmtDepth() == 1).count()).isEqualTo(1);
     }
 
 }

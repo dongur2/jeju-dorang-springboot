@@ -116,9 +116,6 @@ public class Community extends BaseEntity {
         }
         comments.add(newComment);
     }
-    public void deleteComment(Comment comment) {
-        comments.remove(comment);
-    }
 
     public void setBoardType(String paramType) {
         if (paramType.equals("chat")) {

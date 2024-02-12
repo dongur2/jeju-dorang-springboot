@@ -57,10 +57,10 @@ public class CommentServiceI implements CommentService{
                     .user(nowUser)
                     .content(newComment.content())
                     .cmtDepth(0)
+                    .cmtOrder(orderIdx++)
                     .isDeleted(IsDeleted.EXISTING)
                     .build());
             savedComment.updateCmtGroup();
-            savedComment.updateCmtOrder(orderIdx++);
 
             nowPost.addComment(savedComment);
 
@@ -90,9 +90,9 @@ public class CommentServiceI implements CommentService{
                     .content(newReComment.content())
                     .cmtGroup(newReComment.cmtId())
                     .cmtDepth(1)
+                    .cmtOrder(orderIdx++)
                     .isDeleted(IsDeleted.EXISTING)
                     .build());
-            savedReComment.updateCmtOrder(orderIdx++);
 
             community.addComment(savedReComment);
 
