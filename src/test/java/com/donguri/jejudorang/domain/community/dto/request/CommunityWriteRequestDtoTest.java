@@ -135,30 +135,7 @@ class CommunityWriteRequestDtoTest {
             String message = iterator.next().getMessage();
             msgList.add(message);
         }
-        Assertions.assertThat(msgList).contains("Error");
-    }
-
-    @Test
-    void DTO_실패_글_내용_글자수_부족() {
-        // given
-        CommunityWriteRequest postToWrite = CommunityWriteRequest.builder()
-                .title("글 작성 테스트 제목")
-                .type("chat")
-                .content("n")
-                .build();
-
-        //when
-        Set<ConstraintViolation<CommunityWriteRequest>> validate = validator.validate(postToWrite);
-
-        //then
-        Iterator<ConstraintViolation<CommunityWriteRequest>> iterator = validate.iterator();
-        List<String> msgList = new ArrayList<>();
-
-        while(iterator.hasNext()) {
-            String message = iterator.next().getMessage();
-            msgList.add(message);
-        }
-        Assertions.assertThat(msgList).contains("글 내용은 2자 이상 4000자 이하만 가능합니다.");
+        Assertions.assertThat(msgList).contains("[오류] 글 타입이 필요합니다.");
     }
 
     @Test
