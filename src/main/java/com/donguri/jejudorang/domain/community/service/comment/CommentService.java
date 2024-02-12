@@ -10,7 +10,7 @@ import java.util.List;
 public interface CommentService {
 
     // 새 댓글 작성
-    void writeNewComment(String accessToken, Long postId, CommentRequest newComment);
+    void writeNewComment(String accessToken, CommentRequest newComment);
 
     // 새 대댓글 작성
     void writeNewReComment(String accessToken, ReCommentRequest newReComment);

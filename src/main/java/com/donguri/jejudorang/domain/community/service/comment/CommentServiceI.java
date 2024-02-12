@@ -43,13 +43,13 @@ public class CommentServiceI implements CommentService{
 
     @Override
     @Transactional
-    public void writeNewComment(String accessToken, Long postId, CommentRequest newComment) {
+    public void writeNewComment(String accessToken, CommentRequest newComment) {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
             User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
                     .orElseThrow(() -> new EntityNotFoundException("가입된 사용자가 아닙니다."));
 
-            Community nowPost = communityRepository.findById(postId)
+            Community nowPost = communityRepository.findById(newComment.postId())
                     .orElseThrow(() -> new EntityNotFoundException("존재하는 게시물이 아닙니다."));
 
             Comment savedComment = commentRepository.save(Comment.builder()
