@@ -7,7 +7,6 @@ import jakarta.validation.Validator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.Set;
 @SpringBootTest
 class SignUpRequestTest {
 
-    @Value("${mail.test.email}") String testmail;
+    String testMail = "user1212@mail.com";
 
     @Autowired EntityManager em;
     @Autowired Validator validator;
@@ -52,7 +51,7 @@ class SignUpRequestTest {
             msgList.add(message);
         }
 
-        org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일을 작성해주세요.", "이메일 인증이 필요합니다.");
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("이메일을 입력해주세요.", "이메일 인증이 필요합니다.");
     }
 
     @Test
@@ -142,7 +141,7 @@ class SignUpRequestTest {
             msgList.add(message);
         }
 
-        org.assertj.core.api.Assertions.assertThat(msgList).contains("아이디를 작성해주세요.");
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("아이디를 입력해주세요.");
     }
 
     @Test
@@ -442,7 +441,7 @@ class SignUpRequestTest {
             msgList.add(message);
         }
 
-        org.assertj.core.api.Assertions.assertThat(msgList).contains("닉네임을 작성해주세요.");
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("닉네임을 입력해주세요.");
     }
 
 
@@ -505,7 +504,7 @@ class SignUpRequestTest {
             msgList.add(message);
         }
 
-        org.assertj.core.api.Assertions.assertThat(msgList).contains("비밀번호를 작성해주세요.", "비밀번호를 한 번 더 입력해주세요.");
+        org.assertj.core.api.Assertions.assertThat(msgList).contains("비밀번호를 한 번 더 입력해주세요.", "비밀번호를 입력해주세요.");
     }
 
     @Test
