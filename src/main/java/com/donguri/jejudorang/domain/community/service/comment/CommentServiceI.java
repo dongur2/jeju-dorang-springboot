@@ -113,22 +113,8 @@ public class CommentServiceI implements CommentService{
                 throw new IllegalAccessException("댓글 작성자 당사자만 댓글을 삭제할 수 있습니다.");
             }
 
-            // 삭제되지 않은 대댓글
-            List<Comment> allRecmtsUndeleted = commentRepository.findAllByCmtGroupAndCmtDepthAndIsDeleted(1, cmtToDelete.getId(), IsDeleted.EXISTING);
-
-            // 1. 포함하는 대댓글 / 삭제되지 않은 대댓글이 없을 경우
-            if(allRecmtsUndeleted == null) {
-
-                // 댓글에 해당하는 그룹아이디 가지는 대댓글, 댓글 모두 삭제
-                cmtToDelete.getCommunity().deleteComment(cmtToDelete);
-                commentRepository.deleteAllByCmtGroup(cmtToDelete.getId());
-
-            // 2. 포함하는 대댓글이 있고, 대댓글 중 삭제되지 않은 대댓글이 있을 경우
-            } else {
-                // 삭제 상태만 업데이트
-                cmtToDelete.updateIsDeleted();
-            }
-
+            // 삭제 처리
+            cmtToDelete.updateIsDeleted();
 
         } catch (Exception e) {
             throw e;
@@ -154,7 +140,7 @@ public class CommentServiceI implements CommentService{
     @Transactional
     public List<CommentResponse> findAllCmtsOnCommunity(Long communityId) {
         try {
-            return commentRepository.findAllByCommunityIdAndIsDeletedOrderByCmtGroupAscCmtOrderAsc(communityId, IsDeleted.EXISTING).stream()
+            return commentRepository.findAllByCommunityIdOrderByCmtGroupAscCmtOrderAsc(communityId).stream()
                     .map(CommentResponse::from).toList();
 
         } catch (Exception e) {

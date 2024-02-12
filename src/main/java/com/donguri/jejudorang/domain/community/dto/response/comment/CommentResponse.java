@@ -1,10 +1,10 @@
 package com.donguri.jejudorang.domain.community.dto.response.comment;
 
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
+import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 public record CommentResponse (
@@ -14,12 +14,24 @@ public record CommentResponse (
         String writerId,
         String content,
         LocalDateTime createdAt,
-
         int depth
-//        List<ReCommentResponse> recomments
 ){
 
     public static CommentResponse from(Comment cmt) {
+
+        // 삭제처리된 댓글일 경우
+        if(cmt.getIsDeleted() == IsDeleted.DELETED) {
+            return CommentResponse.builder()
+                    .cmtId(cmt.getId())
+                    .pic(null)
+                    .nickname(" - ")
+                    .writerId(null)
+                    .content("삭제된 댓글입니다.")
+                    .createdAt(cmt.getCreatedAt())
+                    .depth(cmt.getCmtDepth())
+                    .build();
+        }
+
         return CommentResponse.builder()
                 .cmtId(cmt.getId())
                 .pic(cmt.getUser().getProfile().getImgUrl())

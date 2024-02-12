@@ -11,8 +11,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Optional<List<Comment>> findAllByUserId(Long writerId);
 
-    // 커뮤니티 상세글 댓글 조회
-    List<Comment> findAllByCommunityIdAndIsDeletedOrderByCmtGroupAscCmtOrderAsc(Long communityId, IsDeleted isDeleted);
+    // 커뮤니티 상세글 댓글 조회: 모두
+    List<Comment> findAllByCommunityIdOrderByCmtGroupAscCmtOrderAsc(Long communityId);
 
     // 댓글에 포함된 삭제되지 않은 대댓글
     List<Comment> findAllByCmtGroupAndCmtDepthAndIsDeleted(int cmtDepth, Long commentId, IsDeleted isDeleted);

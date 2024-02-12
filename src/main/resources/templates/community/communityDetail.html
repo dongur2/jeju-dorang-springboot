@@ -174,8 +174,8 @@
                         <div class="cmt-writer-nickname"
                         style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
-                            <h5 th:if="${cmt.writerId() != null}" th:text="${cmt.nickname()}">닉네임</h5>
-                            <h5 th:if="${cmt.writerId() == null}">탈퇴한 회원</h5>
+                            <h5 th:if="${cmt.nickname() != null}" th:text="${cmt.nickname()}">닉네임</h5>
+                            <h5 th:if="${cmt.nickname() == null}">탈퇴한 회원</h5>
                         </div>
 
                         <!-- 작성일 -->
@@ -247,8 +247,8 @@
                             <div class="re-cmt-writer-nickname"
                                  style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
-                                <h5 th:if="${cmt.writerId() != null}" th:text="${cmt.nickname()}">닉네임</h5>
-                                <h5 th:if="${cmt.writerId() == null}">탈퇴한 회원</h5>
+                                <h5 th:if="${cmt.nickname() != null}" th:text="${cmt.nickname()}">닉네임</h5>
+                                <h5 th:if="${cmt.nickname() == null}">탈퇴한 회원</h5>
                             </div>
 
                             <!-- 작성일 -->
