@@ -94,9 +94,9 @@ public class ReCommentController {
      *
      * */
     @DeleteMapping
-    public ResponseEntity<?> deleteReComment(@CookieValue("access_token") Cookie token, @RequestParam("rCmtId") Long rCmtId) {
+    public ResponseEntity<?> deleteReComment(@CookieValue("access_token") Cookie token, @RequestParam("cmtId") Long cmtId) {
         try {
-            reCommentService.deleteReComment(token.getValue(), rCmtId);
+            reCommentService.deleteReComment(token.getValue(), cmtId);
 
             return new ResponseEntity<>(HttpStatus.OK);
 

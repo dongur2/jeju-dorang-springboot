@@ -76,7 +76,7 @@ public class ReCommentServiceI implements ReCommentService{
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
 
-            ReComment originalReCmt = reCommentRepository.findById(reCommentToUpdate.rCmtId())
+            Comment originalReCmt = commentRepository.findById(reCommentToUpdate.cmtId())
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 대댓글이 없습니다."));
 
             // 로그인 유저가 대댓글 작성자가 아닐 경우 예외 처리

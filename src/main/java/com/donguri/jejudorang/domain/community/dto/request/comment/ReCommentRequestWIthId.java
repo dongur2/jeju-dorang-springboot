@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 public record ReCommentRequestWIthId(
 
-        Long rCmtId,
+        Long cmtId,
 
         @Size(max = 50, message = "댓글은 50자를 초과할 수 없습니다.")
         @NotBlank(message = "댓글 내용을 입력해주세요.")
