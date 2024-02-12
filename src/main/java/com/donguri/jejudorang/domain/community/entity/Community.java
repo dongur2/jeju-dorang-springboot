@@ -64,29 +64,29 @@ public class Community extends BaseEntity {
 
     // 페이징 정렬 위한 가상 컬럼
     @Formula("(SELECT COUNT(*) FROM community_bookmark b WHERE b.community_id = community_id)")
-    private int bookmarksCount;
+    private int bookmarkCount;
 
     @OneToMany(mappedBy = "community"
             , cascade = CascadeType.ALL
             , orphanRemoval = true)
     private List<Comment> comments;
 
-    @Formula("(SELECT COUNT(*) FROM comment c WHERE c.community_id = community_id)")
-    private int commentsCount;
+    @Formula("(SELECT COUNT(*) FROM comment c WHERE c.community_id = community_id AND c.is_deleted = 'EXISTING')")
+    private int commentCount;
 
     @Formula("(SELECT COUNT(*) FROM re_comment r LEFT JOIN comment c ON r.comment_id = c.comment_id WHERE r.community_id = community_id)")
     private int recommentsCount;
 
 
     @Builder
-    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentsCount, int recommentsCount) {
+    public Community(User writer, String title, String content, List<CommunityWithTag> tags, int viewCount, List<Comment> comments, int commentCount, int recommentsCount) {
         this.writer = writer;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.viewCount = viewCount;
         this.comments = comments;
-        this.commentsCount = commentsCount;
+        this.commentCount = commentCount;
         this.recommentsCount = recommentsCount;
     }
 

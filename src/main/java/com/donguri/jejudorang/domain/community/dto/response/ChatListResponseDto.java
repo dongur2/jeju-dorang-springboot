@@ -33,8 +33,8 @@ public record ChatListResponseDto (
                 .createdAt(DateFormat.calculateTime(community.getCreatedAt()))
                 .viewCount(community.getViewCount())
                 .tags(tagList)
-                .bookmarkCount(community.getBookmarksCount())
-                .commentCount(community.getCommentsCount() + community.getRecommentsCount())
+                .bookmarkCount(community.getBookmarkCount())
+                .commentCount(community.getCommentCount() + community.getRecommentsCount())
                 .build();
 
     }
