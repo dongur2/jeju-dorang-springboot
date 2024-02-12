@@ -202,8 +202,8 @@ public class CommunityController {
     private String convertToProperty(String order) {
         switch (order) {
             case "recent" -> order = "createdAt";
-            case "comment" -> order = "commentsCount";
-            case "bookmark" -> order = "bookmarksCount";
+            case "comment" -> order = "commentCount";
+            case "bookmark" -> order = "bookmarkCount";
         }
         return order;
     }
