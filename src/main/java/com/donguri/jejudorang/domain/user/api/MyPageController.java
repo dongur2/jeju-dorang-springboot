@@ -50,7 +50,7 @@ public class MyPageController {
         } catch (Exception e) {
             log.error("커뮤니티 작성글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
     }
 
@@ -77,7 +77,7 @@ public class MyPageController {
         } catch (Exception e) {
             log.error("커뮤니티 작성댓글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
     }
 
@@ -104,7 +104,7 @@ public class MyPageController {
         } catch (Exception e) {
             log.error("북마크 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
     }
 

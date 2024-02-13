@@ -9,13 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 @Slf4j
@@ -84,7 +80,7 @@ public class TripController {
         } catch (Exception e) {
             log.error("여행 리스트 데이터 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
 
     }
@@ -107,7 +103,7 @@ public class TripController {
         } catch (Exception e) {
             log.error("여행 상세글 조회에 실패했습니다. {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
     }
 

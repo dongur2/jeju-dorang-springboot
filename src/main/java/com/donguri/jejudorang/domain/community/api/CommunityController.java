@@ -98,7 +98,7 @@ public class CommunityController {
         } catch (Exception e) {
             log.error("수정 데이터 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
     }
 
@@ -118,7 +118,7 @@ public class CommunityController {
 
         } catch (Exception e) {
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
     }
 
@@ -193,7 +193,7 @@ public class CommunityController {
         } catch (Exception e) {
             log.error("게시글 목록 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
     }
 
@@ -240,7 +240,7 @@ public class CommunityController {
         } catch (Exception e) {
             log.error("상세글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorTemp";
+            return "errorPage";
         }
     }
 
