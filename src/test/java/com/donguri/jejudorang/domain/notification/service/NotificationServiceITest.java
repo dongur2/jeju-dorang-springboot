@@ -1,0 +1,74 @@
+package com.donguri.jejudorang.domain.notification.service;
+
+import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
+import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRepository;
+import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
+import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
+import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
+import com.donguri.jejudorang.domain.user.entity.*;
+import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
+import com.donguri.jejudorang.domain.user.entity.auth.Password;
+import com.donguri.jejudorang.domain.user.repository.RoleRepository;
+import com.donguri.jejudorang.domain.user.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.HashSet;
+import java.util.Set;
+
+
+@SpringBootTest
+class NotificationServiceITest {
+
+    @Autowired EntityManager em;
+
+    @Autowired RoleRepository roleRepository;
+    @Autowired UserRepository userRepository;
+
+    @Autowired NotificationRepository notificationRepository;
+
+    @AfterEach
+    void after() {
+        em.clear();
+        userRepository.flush();
+        notificationRepository.flush();
+    }
+
+
+    @Test
+    void SseEmitter_Connection() {
+        // given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        Long userId = userRepository.save(user).getId();
+
+        // when
+        notificationRepository.save(userId, new SseEmitter(60 * 1000 * 60L));
+
+        // then
+        org.assertj.core.api.Assertions.assertThat(notificationRepository).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(notificationRepository.get(userId)).isPresent();
+    }
+
+
+
+}
