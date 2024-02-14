@@ -7,4 +7,7 @@ import java.io.IOException;
 public interface NotificationService {
 
     SseEmitter connectNotification(String accessToken) throws IOException;
+
+    void sendNotification(Long userId, Long notificationId);
+
 }
