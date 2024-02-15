@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.notification.entity;
 
+import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -20,6 +21,10 @@ public class Notification extends BaseEntity {
     @JoinColumn(nullable = false, name = "user_id")
     User owner; // 회원 탈퇴시 함께 삭제
 
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(nullable = false, name = "community_id")
+    Community post;
+
     @Column(nullable = false)
     String content;
 
@@ -28,8 +33,9 @@ public class Notification extends BaseEntity {
     IsChecked isChecked; // 읽음 상태: 알림을 통해 게시글로 이동할 때만 변경
 
     @Builder
-    public Notification(User owner, String content, IsChecked isChecked) {
+    public Notification(User owner, Community post, String content, IsChecked isChecked) {
         this.owner = owner;
+        this.post = post;
         this.content = content;
         this.isChecked = isChecked;
     }

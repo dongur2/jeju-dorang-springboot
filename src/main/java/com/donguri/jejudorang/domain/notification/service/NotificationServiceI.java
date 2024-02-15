@@ -1,5 +1,7 @@
 package com.donguri.jejudorang.domain.notification.service;
 
+import com.donguri.jejudorang.domain.community.entity.Community;
+import com.donguri.jejudorang.domain.notification.dto.NotificationResponse;
 import com.donguri.jejudorang.domain.notification.entity.IsChecked;
 import com.donguri.jejudorang.domain.notification.entity.Notification;
 import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
@@ -10,10 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -62,10 +66,10 @@ public class NotificationServiceI implements NotificationService{
     }
 
     @Override
-    public void sendNotification(User postWriter, String postTitle, Long notificationId) {
+    public void sendNotification(User postWriter, Community post, Long notificationId) {
         sseEmitterRepository.get(postWriter.getId()).ifPresentOrElse(sseEmitter -> {
             try {
-                String notifyData = "[" + postTitle + "]" + " 글에 새 댓글이 달렸습니다.";
+                String notifyData = "[" + post.getTitle() + "]" + " 글에 새 댓글이 달렸습니다.";
 
                 sseEmitter.send(SseEmitter.event()
                         .id(notificationId.toString())
@@ -78,6 +82,7 @@ public class NotificationServiceI implements NotificationService{
                 notificationRepository.save(Notification.builder()
                         .owner(postWriter)
                         .content(notifyData)
+                        .post(post)
                         .isChecked(IsChecked.NOT_YET)
                         .build()
                 );
@@ -90,6 +95,16 @@ public class NotificationServiceI implements NotificationService{
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "새로운 알림 전송에 실패했습니다.");
             }
         }, () -> log.info("sseEmitter를 찾을 수 없습니다. (현재 로그인한 회원이 아닙니다)"));
+    }
+
+    @Override
+    @Transactional
+    public List<NotificationResponse> getNotifications(String accessToken) {
+        Long idFromJwtToken = jwtProvider.getIdFromJwtToken(accessToken);
+
+        return notificationRepository.findAllByOwnerId(idFromJwtToken)
+                .map(notifications -> notifications.stream().map(NotificationResponse::from).toList())
+                .orElseThrow(() -> new NullPointerException("새 알림이 없습니다"));
     }
 
 }

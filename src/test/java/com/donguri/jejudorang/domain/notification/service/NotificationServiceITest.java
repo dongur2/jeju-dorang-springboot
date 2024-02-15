@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
+import com.donguri.jejudorang.domain.notification.entity.Notification;
 import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
 import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
 import com.donguri.jejudorang.domain.user.entity.*;
@@ -13,6 +14,7 @@ import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -115,8 +119,67 @@ class NotificationServiceITest {
 
         //then
         // * send notification
-        Assertions.assertDoesNotThrow(() -> notificationService.sendNotification(user, savedPost.getTitle(), 0L));
+        Assertions.assertDoesNotThrow(() -> notificationService.sendNotification(user, savedPost, 0L));
+    }
 
+    @Test
+    void SseEmitter_get_notification() {
+        // given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User user1 = userRepository.save(user);
+
+        // * sseEmitter instance created
+        SseEmitter sseEmitter = sseEmitterRepository.save(user.getId(), new SseEmitter(60 * 1000 * 60L));
+
+        Community newPost = Community.builder().writer(user1).title("test title1").content("test content1").build();
+        newPost.setBoardType("party");
+        newPost.setDefaultJoinState();
+
+        Community savedPost = communityRepository.save(newPost);
+
+
+        //when
+        Comment comment1 = Comment.builder().community(savedPost).user(user1).content("test_comment1")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(0L).build();
+        commentRepository.save(comment1); // new comment
+        notificationService.sendNotification(user, savedPost, 0L);
+
+        Comment comment2 = Comment.builder().community(savedPost).user(user1).content("test_comment2")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(1L).build();
+        commentRepository.save(comment2); // new comment
+        notificationService.sendNotification(user, savedPost, 1L);
+
+        Comment comment3 = Comment.builder().community(savedPost).user(user1).content("test_comment3")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(2L).build();
+        notificationService.sendNotification(user, savedPost, 2L);
+        commentRepository.save(comment3); // new comment
+
+        Comment comment4 = Comment.builder().community(savedPost).user(user1).content("test_comment4")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(3L).build();
+        notificationService.sendNotification(user, savedPost, 3L);
+        commentRepository.save(comment4); // new comment
+
+
+        //then
+        Assertions.assertDoesNotThrow(() ->
+        {
+            List<Notification> notifications = notificationRepository.findAllByOwnerId(user1.getId()).orElseThrow(() -> new EntityNotFoundException("없음"));
+            org.assertj.core.api.Assertions.assertThat(notifications.size()).isEqualTo(4);
+        });
 
 
     }
