@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <div th:fragment="headerFragment" class="header-box" style="height:120px">
+<div th:fragment="headerFragment" class="header-box" style="height:120px">
 
         <ul class="user-header"
             style="width:40%; height:70px; display: flex; gap: 20px">
@@ -50,7 +50,9 @@
             <li><a th:href="@{/community/boards/parties(state='all')}" style="text-decoration-line: none; color:#696969;">커뮤니티</a></li>
         </ul>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="application/javascript">
+
 
         /*
         * 로그인 여부 확인 후 알림 연결 요청
@@ -66,15 +68,27 @@
                     let msg = event.data;
                     console.log(msg);
 
-                    // 팝오버
-                    var notificationPopover = document.getElementById('notification-pop-over');
-                    console.log('popover: ', notificationPopover);
+                    // 새 댓글이 달렸을 경우 실시간 알림 alert 표시
+                    if(msg !== 'Connected') {
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'info',
+                            title: '',
+                            text: msg,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
 
-                    // 팝오버의 data-bs-content 변경
-                    notificationPopover.setAttribute('data-bs-content', msg);
+                        // 팝오버
+                        var notificationPopover = document.getElementById('notification-pop-over');
+                        console.log('popover: ', notificationPopover);
 
-                    // 팝오버 재초기화 (뷰의 팝오버 내용 변경 위함)
-                    var popover = new bootstrap.Popover(notificationPopover);
+                        // 팝오버의 data-bs-content 변경
+                        notificationPopover.setAttribute('data-bs-content', msg);
+
+                        // 팝오버 재초기화 (뷰의 팝오버 내용 변경 위함)
+                        var popover = new bootstrap.Popover(notificationPopover);
+                    }
 
                 })
 
