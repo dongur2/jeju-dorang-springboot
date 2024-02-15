@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -71,7 +72,11 @@ public class CommentServiceI implements CommentService{
             nowPost.addComment(savedComment);
 
             // 새 댓글 알림 전송
-            notificationService.sendNotification(nowPost.getWriter().getId(), notificationId++);
+            Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
+            writer.ifPresentOrElse(
+                    postWriter -> notificationService.sendNotification(postWriter.getId(), nowPost.getTitle(), notificationId++),
+                    () -> log.info("탈퇴한 회원의 글입니다.")
+            );
 
         } catch (Exception e) {
             log.error("댓글 작성 실패: {}", e.getMessage());
@@ -106,7 +111,11 @@ public class CommentServiceI implements CommentService{
             nowPost.addComment(savedReComment);
 
             // 새 댓글 알림 전송
-            notificationService.sendNotification(nowPost.getWriter().getId(), notificationId++);
+            Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
+            writer.ifPresentOrElse(
+                    postWriter -> notificationService.sendNotification(postWriter.getId(), nowPost.getTitle(), notificationId++),
+                    () -> log.info("탈퇴한 회원의 글입니다.")
+            );
 
         } catch (Exception e) {
             log.error("대댓글 작성 실패: {}", e.getMessage());

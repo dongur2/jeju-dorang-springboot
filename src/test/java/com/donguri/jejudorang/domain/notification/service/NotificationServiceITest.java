@@ -118,7 +118,7 @@ class NotificationServiceITest {
 
         //then
         // * send notification
-        Assertions.assertDoesNotThrow(() -> notificationService.sendNotification(userId, 0L));
+        Assertions.assertDoesNotThrow(() -> notificationService.sendNotification(userId, savedPost.getTitle(), 0L));
 
 
 

@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.notification.service;
 
+import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -56,13 +57,15 @@ public class NotificationServiceI implements NotificationService{
     }
 
     @Override
-    public void sendNotification(Long userId, Long notificationId) {
-        notificationRepository.get(userId).ifPresentOrElse(sseEmitter -> {
+    public void sendNotification(Long postWriterId, String postTitle, Long notificationId) {
+        notificationRepository.get(postWriterId).ifPresentOrElse(sseEmitter -> {
             try {
+                String notifyData = "[" + postTitle + "]" + " 글에 새 댓글이 달렸습니다.";
+
                 sseEmitter.send(SseEmitter.event()
                         .id(notificationId.toString())
                         .name(NOTIFICATION_NAME)
-                        .data("새 댓글 발생"));
+                        .data(notifyData));
 
                 log.info("새로운 알림 전송 완료");
 
@@ -70,7 +73,7 @@ public class NotificationServiceI implements NotificationService{
                 log.error("새로운 알림 전송에 실패했습니다: {}", e.getMessage());
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "새로운 알림 전송에 실패했습니다.");
             }
-        }, () -> log.info("sseEmitter를 찾을 수 없습니다."));
+        }, () -> log.info("sseEmitter를 찾을 수 없습니다. (현재 로그인한 회원이 아닙니다)"));
     }
 
 }
