@@ -3,23 +3,27 @@
 
 <div th:fragment="headerFragment" class="header-box" style="height:120px">
 
-        <ul class="user-header"
-            style="width:40%; height:70px; display: flex; gap: 20px">
 
-            <li style="width:80px" sec:authorize="isAuthenticated()">
+        <ul class="user-header"
+            style="width:100%; height:70px; display: flex; gap: 20px; justify-items: flex-end; background: cadetblue">
+
+            <li class="notify-box" id="notify-box"
+                style="width:500px; height:450px; padding:3% 1%; opacity: 0; z-index: 50; background: pink; margin-left: auto; transition: opacity 0.3s;
+                        display: flex; flex-direction: column; gap:10px; align-items: flex-start">
+                <h2>알림</h2>
+            </li>
+
+
+            <li style="width:80px; background: yellowgreen">
+                <button onclick="openNotify()">알림</button>
+            </li>
+
+
+            <li style="width:80px; display: none" sec:authorize="isAuthenticated()" >
                 <a  href="#"
                    id="authenticated-id"
                    style="width:100px; font-size: 16px; text-decoration-line: none; color: #696969; margin-left:auto"
                    th:text="${#authentication.name}">로그인한 아이디</a>
-            </li>
-
-            <!-- 팝오버 -->
-            <li style="width:80px" sec:authorize="isAuthenticated()">
-                <button type="button" class="btn btn-lg btn-danger" id="notification-pop-over" data-bs-toggle="popover"
-                        data-bs-placement="bottom"
-                        data-bs-title="알림"
-                        data-bs-content="And here's some amazing content. It's very engaging. Right?">
-                    알림</button>
             </li>
 
             <li sec:authorize="isAuthenticated()" style="width:100px">
@@ -34,21 +38,23 @@
                 </form>
             </li>
 
-            <li sec:authorize="!isAuthenticated()" style="width:80px; margin-left:auto">
+            <li sec:authorize="!isAuthenticated()" style="width:80px; background: hotpink">
                 <a href="#" style="font-size: 16px; text-decoration-line: none; color: #696969; margin-left:auto"
                    th:href="@{/user/login}">로그인</a>
             </li>
         </ul>
-
-
-
-
 
         <ul class="category-header">
             <li><img th:src="@{/img/logo.png}" alt="logo" id="header-logo" th:onclick="|location.href='@{/}'|"/></li>
             <li><a th:href="@{/trip/lists}" style="text-decoration-line: none; color:#696969;">여행</a></li>
             <li><a th:href="@{/community/boards/parties(state='all')}" style="text-decoration-line: none; color:#696969;">커뮤니티</a></li>
         </ul>
+
+
+
+
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="application/javascript">
@@ -78,33 +84,117 @@
                             showConfirmButton: false,
                             timer: 1500
                         });
-
-                        // 팝오버
-                        var notificationPopover = document.getElementById('notification-pop-over');
-                        console.log('popover: ', notificationPopover);
-
-                        // 팝오버의 data-bs-content 변경
-                        notificationPopover.setAttribute('data-bs-content', msg);
-
-                        // 팝오버 재초기화 (뷰의 팝오버 내용 변경 위함)
-                        var popover = new bootstrap.Popover(notificationPopover);
                     }
+                });
 
-                })
+
+                console.log('알림 불러오기');
+
+                getNotify();
+
 
             } else {
                 console.log('로그인하지 않은 유저');
             }
-
         });
 
-        /*
-        * 팝오버 초기화
-        * */
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-            return new bootstrap.Popover(popoverTriggerEl);
-        });
+
+        function getNotify() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/notifications', true);
+            xhr.setRequestHeader('Content-Type', 'application/json'); // JSON 요청으로 설정
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log('조회 완료');
+
+                        // JSON 데이터 파싱
+                        var notifications = JSON.parse(xhr.response);
+
+                        console.log(notifications);
+
+                        for (var notify of notifications) {
+                            let popBody = document.getElementById('notify-box');
+                            var div = document.createElement('div');
+                            div.className = 'notification-card';
+                            div.style.width = '100%';
+                            div.style.height = '40px';
+                            div.style.display = 'flex';
+                            div.style.flexDirection = 'row';
+                            div.style.justifyContent = 'space-around';
+                            div.style.alignItems = 'center';
+                            div.style.background = 'white';
+                            div.style.borderRadius = '10px';
+                            div.style.border = '1px solid #b2b2b2';
+
+                            var aTag = document.createElement('a');
+                            aTag.style.textDecorationLine = 'none';
+                            aTag.style.color = '#696969';
+                            aTag.style.fontSize = '18px';
+
+                            // 제목 추출
+                            var content = notify.content;
+                            var title = content.substring(content.indexOf('[') + 1, content.indexOf(']'));
+
+                            var maxLength = 20; // 표시할 최대 글자 수
+                            var trimmedTitle = title.length > maxLength ? title.substring(0, maxLength - 3) + '...' : title;
+                            var trimmedContent = content.replace(`[${title}]`, `[${trimmedTitle}]`);
+
+                            aTag.textContent = trimmedContent;
+                            aTag.href = '/community/boards/' + notify.type + '/' + notify.postId;
+                            div.append(aTag);
+
+                            var button = document.createElement('button');
+                            button.textContent = '삭제';
+                            div.append(button);
+
+                            popBody.append(div);
+                        }
+
+
+                    } else if (xhr.status === 204) {
+                        console.log('새 알림 없음');
+
+                    } else {
+                        console.log('알림 조회 실패' + xhr.responseText);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+
+        function moveToPost(postId, type) {
+            var url = '/community/boards/' + type + '/' + postId;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        window.location = xhr.responseText;
+
+                    } else { // 그 외의 경우
+                        alert(xhr.responseText);
+                    }
+                }
+            }
+
+        }
+
+        function openNotify() {
+            var notifyBox = document.getElementById('notify-box');
+            var computedStyle = window.getComputedStyle(notifyBox);
+            var opacity = parseFloat(computedStyle.getPropertyValue('opacity'));
+
+            if (opacity === 1) {
+                notifyBox.style.opacity = 0;
+            } else {
+                notifyBox.style.opacity = 1;
+            }
+        }
 
 
     </script>
