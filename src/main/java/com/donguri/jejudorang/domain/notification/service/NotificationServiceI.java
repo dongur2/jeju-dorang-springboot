@@ -1,14 +1,11 @@
 package com.donguri.jejudorang.domain.notification.service;
 
-import ch.qos.logback.core.spi.ErrorCodes;
 import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContextException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -31,7 +28,6 @@ public class NotificationServiceI implements NotificationService{
 
 
     @Override
-    @Transactional
     public SseEmitter connectNotification(String accessToken) throws IOException {
         try {
             Long userId = jwtProvider.getIdFromJwtToken(accessToken);
@@ -60,7 +56,6 @@ public class NotificationServiceI implements NotificationService{
     }
 
     @Override
-    @Transactional
     public void sendNotification(Long userId, Long notificationId) {
         notificationRepository.get(userId).ifPresentOrElse(sseEmitter -> {
             try {
@@ -68,6 +63,8 @@ public class NotificationServiceI implements NotificationService{
                         .id(notificationId.toString())
                         .name(NOTIFICATION_NAME)
                         .data("새 댓글 발생"));
+
+                log.info("새로운 알림 전송 완료");
 
             } catch (IOException e) {
                 log.error("새로운 알림 전송에 실패했습니다: {}", e.getMessage());
