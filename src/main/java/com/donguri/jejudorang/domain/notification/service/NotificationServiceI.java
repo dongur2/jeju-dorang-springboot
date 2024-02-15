@@ -1,6 +1,10 @@
 package com.donguri.jejudorang.domain.notification.service;
 
+import com.donguri.jejudorang.domain.notification.entity.IsChecked;
+import com.donguri.jejudorang.domain.notification.entity.Notification;
+import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
 import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
+import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +23,12 @@ public class NotificationServiceI implements NotificationService{
     private final String NOTIFICATION_NAME = "notification";
 
     @Autowired private final JwtProvider jwtProvider;
-    @Autowired private final SseEmitterRepository notificationRepository;
+    @Autowired private final SseEmitterRepository sseEmitterRepository;
+    @Autowired private final NotificationRepository notificationRepository;
 
-    public NotificationServiceI(JwtProvider jwtProvider, SseEmitterRepository notificationRepository) {
+    public NotificationServiceI(JwtProvider jwtProvider, SseEmitterRepository sseEmitterRepository, NotificationRepository notificationRepository) {
         this.jwtProvider = jwtProvider;
+        this.sseEmitterRepository = sseEmitterRepository;
         this.notificationRepository = notificationRepository;
     }
 
@@ -33,13 +39,13 @@ public class NotificationServiceI implements NotificationService{
             Long userId = jwtProvider.getIdFromJwtToken(accessToken);
 
             // 현재 로그인 유저 ID & SseEmitter 인스턴스 생성해 저장
-            SseEmitter sseEmitter = notificationRepository.save(userId, new SseEmitter(DEFAULT_TIMEOUT));
+            SseEmitter sseEmitter = sseEmitterRepository.save(userId, new SseEmitter(DEFAULT_TIMEOUT));
             log.info("CONNECT :: SseEmitter: {}", sseEmitter);
 
             // SseEmitter 인스턴스 제거할 상황
-            sseEmitter.onCompletion(() -> notificationRepository.delete(userId)); // 요청 완료시 호출될 코드 (콜백)
-            sseEmitter.onTimeout(() -> notificationRepository.delete(userId)); // 요청 시간 초과시 호출될 코드
-            sseEmitter.onError((e) -> notificationRepository.delete(userId)); // 요청중 에러 발생시 호출될 코드
+            sseEmitter.onCompletion(() -> sseEmitterRepository.delete(userId)); // 요청 완료시 호출될 코드 (콜백)
+            sseEmitter.onTimeout(() -> sseEmitterRepository.delete(userId)); // 요청 시간 초과시 호출될 코드
+            sseEmitter.onError((e) -> sseEmitterRepository.delete(userId)); // 요청중 에러 발생시 호출될 코드
 
             // 처음 연결시 전달할 더미 데이터 생성: SseEmitter생성 후 아무런 데이터도 보내지 않으면 503 에러 발생
             sseEmitter.send(SseEmitter.event()
@@ -56,8 +62,8 @@ public class NotificationServiceI implements NotificationService{
     }
 
     @Override
-    public void sendNotification(Long postWriterId, String postTitle, Long notificationId) {
-        notificationRepository.get(postWriterId).ifPresentOrElse(sseEmitter -> {
+    public void sendNotification(User postWriter, String postTitle, Long notificationId) {
+        sseEmitterRepository.get(postWriter.getId()).ifPresentOrElse(sseEmitter -> {
             try {
                 String notifyData = "[" + postTitle + "]" + " 글에 새 댓글이 달렸습니다.";
 
@@ -66,7 +72,18 @@ public class NotificationServiceI implements NotificationService{
                         .name(NOTIFICATION_NAME)
                         .data(notifyData));
 
-                log.info("새로운 알림 전송 완료");
+                log.info("실시간 알림 전송 완료");
+
+                // 알림 저장
+                notificationRepository.save(Notification.builder()
+                        .owner(postWriter)
+                        .content(notifyData)
+                        .isChecked(IsChecked.NOT_YET)
+                        .build()
+                );
+
+                log.info("알림 DB에 저장 완료");
+
 
             } catch (IOException e) {
                 log.error("새로운 알림 전송에 실패했습니다: {}", e.getMessage());

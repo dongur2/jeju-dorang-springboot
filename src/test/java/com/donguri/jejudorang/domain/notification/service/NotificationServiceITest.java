@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
+import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
 import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
@@ -33,6 +34,7 @@ class NotificationServiceITest {
 
     @Autowired NotificationService notificationService;
     @Autowired SseEmitterRepository sseEmitterRepository;
+    @Autowired NotificationRepository notificationRepository;
 
     @Autowired CommunityRepository communityRepository;
     @Autowired CommentRepository commentRepository;
@@ -42,6 +44,7 @@ class NotificationServiceITest {
         em.clear();
         userRepository.flush();
         sseEmitterRepository.flush();
+        notificationRepository.flush();
         communityRepository.flush();
         commentRepository.flush();
     }
@@ -94,10 +97,9 @@ class NotificationServiceITest {
         user.updatePwd(password);
 
         User user1 = userRepository.save(user);
-        Long userId = user1.getId();
 
         // * sseEmitter instance created
-        SseEmitter sseEmitter = sseEmitterRepository.save(userId, new SseEmitter(60 * 1000 * 60L));
+        SseEmitter sseEmitter = sseEmitterRepository.save(user.getId(), new SseEmitter(60 * 1000 * 60L));
 
         Community newPost = Community.builder().writer(user1).title("test title1").content("test content1").build();
         newPost.setBoardType("party");
@@ -113,7 +115,7 @@ class NotificationServiceITest {
 
         //then
         // * send notification
-        Assertions.assertDoesNotThrow(() -> notificationService.sendNotification(userId, savedPost.getTitle(), 0L));
+        Assertions.assertDoesNotThrow(() -> notificationService.sendNotification(user, savedPost.getTitle(), 0L));
 
 
 

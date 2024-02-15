@@ -25,13 +25,19 @@ public class Notification extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    IsChecked isChecked; // 읽음 상태
+    IsChecked isChecked; // 읽음 상태: 알림을 통해 게시글로 이동할 때만 변경
 
     @Builder
     public Notification(User owner, String content, IsChecked isChecked) {
         this.owner = owner;
         this.content = content;
         this.isChecked = isChecked;
+    }
+
+
+    // 읽음 상태 업데이트
+    public void updateIsChecked() {
+        this.isChecked = IsChecked.CHECKED;
     }
 
 }
