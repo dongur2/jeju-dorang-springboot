@@ -1,7 +1,6 @@
 package com.donguri.jejudorang.domain.notification.service;
 
-import com.donguri.jejudorang.domain.community.entity.Community;
-import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
+import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +19,9 @@ public class NotificationServiceI implements NotificationService{
     private final String NOTIFICATION_NAME = "notification";
 
     @Autowired private final JwtProvider jwtProvider;
-    @Autowired private final NotificationRepository notificationRepository;
+    @Autowired private final SseEmitterRepository notificationRepository;
 
-    public NotificationServiceI(JwtProvider jwtProvider, NotificationRepository notificationRepository) {
+    public NotificationServiceI(JwtProvider jwtProvider, SseEmitterRepository notificationRepository) {
         this.jwtProvider = jwtProvider;
         this.notificationRepository = notificationRepository;
     }

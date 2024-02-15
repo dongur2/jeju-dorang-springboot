@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Repository
-public class NotificationRepositoryI implements NotificationRepository{
+public class SseEmitterRepositoryI implements SseEmitterRepository {
 
     private Map<Long, SseEmitter> emitterMap = new ConcurrentHashMap<>();
 

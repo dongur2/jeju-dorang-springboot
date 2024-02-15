@@ -1,19 +1,7 @@
 package com.donguri.jejudorang.domain.notification.repository;
 
+import com.donguri.jejudorang.domain.notification.entity.Notification;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.util.Optional;
-
-public interface NotificationRepository {
-
-    SseEmitter save(Long userId, SseEmitter sseEmitter);
-
-    void delete(Long userId);
-
-    Optional<SseEmitter> get(Long userId);
-
-    void flush();
-
-
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
 }

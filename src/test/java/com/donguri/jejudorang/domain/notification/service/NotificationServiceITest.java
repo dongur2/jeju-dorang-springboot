@@ -1,16 +1,11 @@
 package com.donguri.jejudorang.domain.notification.service;
 
-import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
-import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRepository;
-import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
-import com.donguri.jejudorang.domain.community.service.CommunityService;
-import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
-import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
+import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
@@ -37,7 +32,7 @@ class NotificationServiceITest {
     @Autowired UserRepository userRepository;
 
     @Autowired NotificationService notificationService;
-    @Autowired NotificationRepository notificationRepository;
+    @Autowired SseEmitterRepository sseEmitterRepository;
 
     @Autowired CommunityRepository communityRepository;
     @Autowired CommentRepository commentRepository;
@@ -46,7 +41,7 @@ class NotificationServiceITest {
     void after() {
         em.clear();
         userRepository.flush();
-        notificationRepository.flush();
+        sseEmitterRepository.flush();
         communityRepository.flush();
         commentRepository.flush();
     }
@@ -73,11 +68,11 @@ class NotificationServiceITest {
         Long userId = userRepository.save(user).getId();
 
         // when
-        notificationRepository.save(userId, new SseEmitter(60 * 1000 * 60L));
+        sseEmitterRepository.save(userId, new SseEmitter(60 * 1000 * 60L));
 
         // then
-        org.assertj.core.api.Assertions.assertThat(notificationRepository).isNotNull();
-        org.assertj.core.api.Assertions.assertThat(notificationRepository.get(userId)).isPresent();
+        org.assertj.core.api.Assertions.assertThat(sseEmitterRepository).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(sseEmitterRepository.get(userId)).isPresent();
     }
 
     @Test
@@ -102,7 +97,7 @@ class NotificationServiceITest {
         Long userId = user1.getId();
 
         // * sseEmitter instance created
-        SseEmitter sseEmitter = notificationRepository.save(userId, new SseEmitter(60 * 1000 * 60L));
+        SseEmitter sseEmitter = sseEmitterRepository.save(userId, new SseEmitter(60 * 1000 * 60L));
 
         Community newPost = Community.builder().writer(user1).title("test title1").content("test content1").build();
         newPost.setBoardType("party");
