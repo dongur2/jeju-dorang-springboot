@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
+import com.donguri.jejudorang.domain.notification.dto.NotificationResponse;
 import com.donguri.jejudorang.domain.notification.entity.Notification;
 import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
 import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
@@ -26,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest
@@ -177,12 +180,52 @@ class NotificationServiceITest {
         //then
         Assertions.assertDoesNotThrow(() ->
         {
-            List<Notification> notifications = notificationRepository.findAllByOwnerId(user1.getId()).orElseThrow(() -> new EntityNotFoundException("없음"));
+            List<Notification> notifications = notificationRepository.findAllByOwnerId(user1.getId()).get();
             org.assertj.core.api.Assertions.assertThat(notifications.size()).isEqualTo(4);
         });
-
-
     }
 
+    @Test
+    void SseEmitter_get_notification_NO_CONTENT() {
+        // given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User user1 = userRepository.save(user);
+
+        // * sseEmitter instance created
+        SseEmitter sseEmitter = sseEmitterRepository.save(user.getId(), new SseEmitter(60 * 1000 * 60L));
+
+        Community newPost = Community.builder().writer(user1).title("test title1").content("test content1").build();
+        newPost.setBoardType("party");
+        newPost.setDefaultJoinState();
+
+        Community savedPost = communityRepository.save(newPost);
+
+        System.out.println("아이디: "+user1.getId());
+
+        //when, then
+        Assertions.assertThrows(NullPointerException.class,
+            () -> {
+                List<Notification> notiList = notificationRepository.findAllByOwnerId(user1.getId()).get();
+                if(notiList.isEmpty()) {
+                    throw new NullPointerException("새 알림이 없습니다.");
+                }
+            }
+        );
+
+    }
 
 }
