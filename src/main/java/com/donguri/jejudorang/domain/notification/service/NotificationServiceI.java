@@ -19,8 +19,10 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -106,7 +108,11 @@ public class NotificationServiceI implements NotificationService{
         Long idFromJwtToken = jwtProvider.getIdFromJwtToken(accessToken);
 
         return notificationRepository.findAllByOwnerId(idFromJwtToken)
-                .map(notifications -> notifications.stream().map(NotificationResponse::from).toList())
+                .map(notifications -> notifications.stream()
+                        .map(NotificationResponse::from)
+                        .sorted(Comparator.comparing(NotificationResponse::createdAt))
+                        .toList()
+                )
                 .orElseThrow(() -> new NullPointerException("새 알림이 없습니다"));
     }
 
