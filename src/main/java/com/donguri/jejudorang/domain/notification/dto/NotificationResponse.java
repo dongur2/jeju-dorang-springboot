@@ -7,6 +7,7 @@ import lombok.Builder;
 
 @Builder
 public record NotificationResponse(
+        Long notifyId,
         Long userId,
         String content,
         String type,
@@ -21,6 +22,7 @@ public record NotificationResponse(
         }
 
         return NotificationResponse.builder()
+                .notifyId(notification.getId())
                 .userId(notification.getOwner().getId())
                 .content(notification.getContent())
                 .type(type)

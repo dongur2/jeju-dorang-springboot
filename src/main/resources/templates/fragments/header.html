@@ -8,9 +8,10 @@
             style="width:100%; height:70px; display: flex; gap: 20px; justify-items: flex-end; background: cadetblue">
 
             <li class="notify-box" id="notify-box"
-                style="width:500px; height:450px; padding:3% 1%; opacity: 0; z-index: 50; background: pink; margin-left: auto; transition: opacity 0.3s;
-                        display: flex; flex-direction: column; gap:10px; align-items: flex-start">
-                <h2>알림</h2>
+                style="width:470px; height:300px; padding:3% 1%; opacity: 0; z-index: 50; background: #fff9f9; margin-left: auto; transition: opacity 0.3s;
+                        display: flex; flex-direction: column; gap:10px; justify-content: flex-start; align-items: flex-start;
+                        border: 1px solid rgba(110,110,110,0.65); border-radius: 13px; box-shadow: rgba(138,138,138,0.65); margin-top: 2%; overflow-y: auto;">
+                <h3>알림</h3>
             </li>
 
 
@@ -116,40 +117,96 @@
 
                         for (var notify of notifications) {
                             let popBody = document.getElementById('notify-box');
+
+                            /* 전체 플렉스 박스 */
                             var div = document.createElement('div');
                             div.className = 'notification-card';
                             div.style.width = '100%';
-                            div.style.height = '40px';
+                            div.style.height = '140px';
                             div.style.display = 'flex';
-                            div.style.flexDirection = 'row';
+                            div.style.flexDirection = 'column';
                             div.style.justifyContent = 'space-around';
                             div.style.alignItems = 'center';
-                            div.style.background = 'white';
+
+                            if(notify.isChecked === 'NOT_YET') {
+                                div.style.background = 'white';
+                            } else {
+                                div.style.background = '#e7eced';
+                            }
+
                             div.style.borderRadius = '10px';
                             div.style.border = '1px solid #b2b2b2';
 
-                            var aTag = document.createElement('a');
-                            aTag.style.textDecorationLine = 'none';
-                            aTag.style.color = '#696969';
-                            aTag.style.fontSize = '18px';
+                                /* header */
+                                var header = document.createElement('div');
+                                header.className = 'notify-header';
+                                header.style.width = '100%';
+                                header.style.height = '25px';
+                                header.style.display = 'flex';
+                                header.style.flexDirection = 'row';
+                                header.style.justifyContent = 'space-around';
+                                header.style.alignItems = 'center';
+                                header.style.background = '#f8f9fa';
+                                header.style.padding = '10px 2%';
+                                header.style.borderRadius = '10px 10px 0 0';
 
-                            // 제목 추출
-                            var content = notify.content;
-                            var title = content.substring(content.indexOf('[') + 1, content.indexOf(']'));
+                                    /* 댓글/대댓글 구분 */
+                                    var type = document.createElement('span');
+                                    type.style.fontWeight = 'bold';
+                                    type.style.color = '#FB7A51';
+                                    type.textContent = '댓글';
+                                    header.append(type);
 
-                            var maxLength = 20; // 표시할 최대 글자 수
-                            var trimmedTitle = title.length > maxLength ? title.substring(0, maxLength - 3) + '...' : title;
-                            var trimmedContent = content.replace(`[${title}]`, `[${trimmedTitle}]`);
+                                    /* 알림 발생 시간 */
+                                    var date = document.createElement('small');
+                                    date.style.marginLeft = '10px';
+                                    date.style.color = '#696969';
+                                    date.textContent = notify.createdAt;
+                                    header.append(date);
 
-                            aTag.textContent = trimmedContent;
-                            aTag.href = '/community/boards/' + notify.type + '/' + notify.postId;
-                            div.append(aTag);
+                                    /* 삭제 버튼 */
+                                    var button = document.createElement('button');
+                                    button.style.marginLeft = 'auto';
+                                    button.type = 'button';
+                                    button.className = 'btn-close';
+                                    button.ariaLabel = 'Close';
+                                    header.append(button);
 
-                            var button = document.createElement('button');
-                            button.textContent = '삭제';
-                            div.append(button);
+                                div.append(header);
+
+                                /* body */
+                                var body = document.createElement('div');
+                                body.className = 'notify-body';
+                                body.style.width = '100%';
+                                body.style.height = '50px';
+                                body.style.background = 'white';
+                                body.style.display = 'flex';
+                                body.style.flexDirection = 'row';
+                                body.style.justifyContent = 'center';
+                                body.style.alignItems = 'center';
+                                body.style.padding = '10px 2%';
+                                body.style.borderRadius = '0 0 10px 10px';
+
+                                    /* 알림 내용 */
+                                    var alertContent = document.createElement('div');
+                                    alertContent.className = 'alert-content';
+                                    alertContent.style.fontSize = '18px';
+
+                                    // 제목 추출
+                                    var content = notify.content;
+                                    var title = content.substring(content.indexOf('[') + 1, content.indexOf(']'));
+
+                                    var maxLength = 20; // 표시할 최대 글자 수
+                                    var trimmedTitle = title.length > maxLength ? title.substring(0, maxLength - 3) + '...' : title;
+                                    var trimmedContent = content.replace(`[${title}]`, `[${trimmedTitle}]`);
+
+                                    alertContent.textContent = trimmedContent;
+                                    body.append(alertContent);
+
+                                div.append(body);
 
                             popBody.append(div);
+
                         }
 
 
@@ -165,25 +222,6 @@
         }
 
 
-        function moveToPost(postId, type) {
-            var url = '/community/boards/' + type + '/' + postId;
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        window.location = xhr.responseText;
-
-                    } else { // 그 외의 경우
-                        alert(xhr.responseText);
-                    }
-                }
-            }
-
-        }
-
         function openNotify() {
             var notifyBox = document.getElementById('notify-box');
             var computedStyle = window.getComputedStyle(notifyBox);
@@ -194,6 +232,25 @@
             } else {
                 notifyBox.style.opacity = 1;
             }
+        }
+
+        function updateChecked(alertId) {
+            console.log('alertId: ' + alertId);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', '/notifications/check?alertId=' + alertId, true);
+            xhr.setRequestHeader('Content-Type', 'application/json'); // JSON 요청으로 설정
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert('요청 완료');
+
+                    } else { // 그 외의 경우
+                        alert('요청 실패');
+                    }
+                }
+            };
+            xhr.send();
         }
 
 
