@@ -22,8 +22,32 @@
     <div class="board-whole-content-box">
         <!-- 헤더: 제목, 작성자(닉네임), 작성/수정날짜, 조회수   -->
         <div class="board-post-info">
-            <div class="board-header">
-                <h1 th:text="${post.title}" id="board-post-title"></h1>
+            <div class="board-header"
+                 style="width:100%; height:50px; display:flex; flex-direction:row">
+
+                <!-- 모집상태 -->
+                <div th:if="${post.type.name} == 'PARTY'" class="board-post-feature board-state"
+                style="width:150px; height:100%">
+                    <div th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}"
+                    style="width:150px; height:100%;">
+                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn btn btn-success"
+                                th:onclick="'changeJoinState(' + ${post.id} + ')'"
+                                style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집중</button>
+                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn btn btn-secondary"
+                                th:onclick="'changeJoinState(' + ${post.id} + ')'"
+                                style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집완료</button>
+                    </div>
+
+                    <div th:if="${post.writerId != 'INVALID' && (post.writerId != #authentication.name || !#authentication.isAuthenticated())}"
+                         style="width:200px; height:100%;">
+                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn btn btn-success" disabled
+                                style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집중</button>
+                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn btn btn-secondary" disabled
+                                style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집완료</button>
+                    </div>
+                </div>
+
+                <h1 th:text="${post.title}" id="board-post-title" style="width:90%; height:100%"></h1>
             </div>
             <div class="board-sub-header">
                 <div class="board-sub-title">
@@ -31,7 +55,7 @@
                         <a href="#" th:if="${post.nickname != 'INVALID'}" th:text="${post.nickname}">닉네임</a>
                         <a href="#" th:if="${post.nickname == 'INVALID'}">탈퇴한 회원</a>
                     </h6>
-                    <div class="sub-title-box content-date">
+                    <div class="sub-title-box content-date" style="width:100%; height:40px; display: flex; flex-direction: row; align-items: center">
                         <span class="sub-title sub-title-created-at">
                             <span class="sub-title-title">작성일</span>
                             <span class="sub-title-value" th:text="${#temporals.format(post.createdAt, 'yy.MM.dd HH:mm')}">24.01.08 16:30</span>
@@ -48,6 +72,22 @@
                             <span class="sub-title-title">북마크수</span>
                             <span class="sub-title-value" th:text="${post.bookmarkCount}">00</span>
                         </span>
+
+                        <!-- 수정 버튼: 작성자일 경우에만 노출 -->
+                        <div class="board-post-feature board-modify" style="margin-left:auto; width:90px; height:100%">
+                            <button class="feature-row board-modify-btn btn btn-outline-secondary"
+                                    style="width:100%; height:96%"
+                                    th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}"
+                                    th:onclick="|location.href='@{/community/post/{communityId}/modify(communityId=${post.id})}'|">수정</button>
+                        </div>
+                        <!-- 삭제 버튼: 작성자일 경우에만 노출 -->
+                        <div sec:authorize="isAuthenticated()"
+                             th:if="${post.writerId != 'INVALID' && #authentication.name == post.writerId}"
+                             class="board-post-feature board-back-to-list" style="margin-left:1%; width:90px; height:100% ">
+                            <button class="feature-row board-share-btn btn btn-secondary" style="width:100%; height:96%"
+                                    th:onclick="deletePost([[${post.type.name}]], [[${post.id}]], 'detail')">삭제</button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -64,60 +104,46 @@
             </div>
 
             <!--    버튼    -->
-            <div class="board-post-features">
-                <!-- 모집상태 -->
-                <div th:if="${post.type.name} == 'PARTY'" class="board-post-feature board-state">
-                    <div th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}">
-                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn"
-                                th:onclick="'changeJoinState(' + ${post.id} + ')'">모집중</button>
-                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn"
-                                th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
-                    </div>
+            <div class="board-post-features"
+                 style="width:100%; height: 80px; display: flex;">
 
-                    <div th:if="${post.writerId != 'INVALID' && (post.writerId != #authentication.name || !#authentication.isAuthenticated())}">
-                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn" disabled>모집중</button>
-                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn" disabled>모집완료</button>
-                    </div>
-                </div>
-
-                <div class="board-post-feature board-liked">
+                <div class="board-post-feature board-liked" style="width: 90px; height:100%;  display:flex; justify-content:center; align-items:center" >
 
                     <!--        북마크: 로그인/비로그인 분리           -->
-                    <button class="feature-row board-liked-btn"
+                    <div class="feature-row board-liked-btn"
                             sec:authorize="!isAuthenticated()"
-                            th:onclick="cantBookmark()">북마크</button>
+                            th:onclick="cantBookmark()"
+                            style="cursor:pointer; width:80px; height:80px; display:flex; justify-content:center; align-items:center;"
+                    ><i class="fa-regular fa-heart" style="font-size:40px; color:#3F3D3A"></i></div>
 
                     <!--        로그인: 북마크 여부로 분리            -->
-                    <button class="feature-row board-liked-btn"
+                    <div class="feature-row board-liked-btn"
                             sec:authorize="isAuthenticated()"
                             th:if="${post.isBookmarked}"
-                            th:onclick="'deleteBookmark('+${post.id}+')'">북마크</button>
-                    <button class="feature-row board-liked-btn"
+                            th:onclick="'deleteBookmark('+${post.id}+')'"
+                            style="cursor:pointer; width:80px; height:80px; display:flex; justify-content:center; align-items:center;"
+                    ><i class="fa-solid fa-heart" style="font-size:40px; color:#FB7A51"></i></div>
+                    <div class="feature-row board-liked-btn"
                             sec:authorize="isAuthenticated()"
                             th:if="${!post.isBookmarked}"
-                            th:onclick="'createBookmark('+${post.id}+')'">북마크</button>
+                            th:onclick="'createBookmark('+${post.id}+')'"
+                            style="cursor:pointer; width:80px; height:80px; display:flex; justify-content:center; align-items:center;"
+                    ><i class="fa-regular fa-heart" style="font-size:40px; color:#3F3D3A"></i></div>
 
                 </div>
-                <div class="board-post-feature board-share">
-                    <button class="feature-row board-share-btn"
+                <div class="board-post-feature board-share" style="width:100px; height:80px; display: flex; justify-content: center; align-items: center;">
+                    <button class="feature-row board-share-btn btn btn-light"
+                            style="width:90%; height: 50%"
                     th:onclick="openSnsModal()">공유</button>
                 </div>
-                <div class="board-post-feature board-modify">
-                    <button class="feature-row board-modify-btn"
-                    th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}"
-                    th:onclick="|location.href='@{/community/post/{communityId}/modify(communityId=${post.id})}'|">수정</button>
-                </div>
-                <div class="board-post-feature board-back-to-list">
-                    <button class="feature-row board-share-btn" th:onclick="|window.history.back()|">목록</button>
+
+                <div class="board-post-feature board-back-to-list" style="width:100px; height:80px; display: flex; justify-content: center; align-items: center;">
+                    <button class="feature-row board-share-btn btn btn-light" th:onclick="|window.history.back()|"
+                            style="width:90%; height: 50%"
+                    >목록</button>
                 </div>
 
-                <!-- 삭제 버튼: 작성자일 경우에만 노출 -->
-                <div sec:authorize="isAuthenticated()"
-                     th:if="${post.writerId != 'INVALID' && #authentication.name == post.writerId}"
-                     class="board-post-feature board-back-to-list" style="margin-left:5%">
-                    <button class="feature-row board-share-btn"
-                            th:onclick="deletePost([[${post.type.name}]], [[${post.id}]], 'detail')">삭제</button>
-                </div>
+
             </div>
 
         </div>
