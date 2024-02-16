@@ -225,6 +225,52 @@ class NotificationServiceITest {
                 }
             }
         );
+    }
+
+    @Test
+    void SseEmitter_DELETE_notification() {
+        // given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User user1 = userRepository.save(user);
+
+        // * sseEmitter instance created
+        SseEmitter sseEmitter = sseEmitterRepository.save(user.getId(), new SseEmitter(60 * 1000 * 60L));
+
+        Community newPost = Community.builder().writer(user1).title("test title1").content("test content1").build();
+        newPost.setBoardType("party");
+        newPost.setDefaultJoinState();
+
+        Community savedPost = communityRepository.save(newPost);
+
+
+        //when
+        Comment comment1 = Comment.builder().community(savedPost).user(user1).content("test_comment1")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(0L).build();
+        commentRepository.save(comment1); // new comment
+
+        notificationService.sendNotification(user, savedPost, 0L); //send notification
+        Notification notification = notificationRepository.findAllByOwnerId(user1.getId())
+                .orElseThrow(() -> new EntityNotFoundException("알림 없음"))
+                .get(0);
+
+        notificationRepository.delete(notification);
+
+        //then
+        org.assertj.core.api.Assertions.assertThat(notificationRepository.findAllByOwnerId(user1.getId()).get().size()).isEqualTo(0);
 
     }
 

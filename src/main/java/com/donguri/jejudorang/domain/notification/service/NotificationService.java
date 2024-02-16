@@ -18,4 +18,7 @@ public interface NotificationService {
 
     // 알림 읽음 처리 후 상세글 요청 url 리턴
     String updateNotificationToChecked(String accessToken, Long notificationId);
+
+    // 알림 삭제
+    void deleteNotification(String accessToken, Long notificationId) throws Exception;
 }

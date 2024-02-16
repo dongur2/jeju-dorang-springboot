@@ -135,8 +135,29 @@ public class NotificationServiceI implements NotificationService{
             return "/community/boards/" + type + "/" + post.getId();
             
         } catch (Exception e) {
-            log.error("잘못된 접근: 당사자가 아님 {}", e.getMessage());
+            log.error("잘못된 접근: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteNotification(String accessToken, Long notificationId) throws Exception {
+        Long idFromJwtToken = jwtProvider.getIdFromJwtToken(accessToken);
+
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("알림이 존재하지 않습니다."));
+
+        try {
+            if (!Objects.equals(idFromJwtToken, notification.getOwner().getId())) {
+                throw new Exception("알림은 당사자만 삭제 가능합니다.");
+            }
+
+            notificationRepository.delete(notification);
+
+        } catch (Exception e) {
+          log.error("알림 삭제 실패: {}", e.getMessage());
+          throw e;
         }
     }
 
