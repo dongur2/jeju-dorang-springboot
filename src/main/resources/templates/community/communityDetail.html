@@ -187,10 +187,10 @@
                     </div>
 
                     <!-- 대댓글 작성폼 열기 버튼: 로그인한 경우만 노출 -->
-                    <div class="re-cmt-box" style="width:80px; display: flex; flex-direction: row; align-items: flex-end"
+                    <div class="re-cmt-box" style="width:120px; display: flex; flex-direction: row; align-items: flex-end"
                          sec:authorize="isAuthenticated()"
                          th:if="${cmt.nickname != 'INVALID'}">
-                        <button id="re-cmt-btn" style="width:95%; height:60%;" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId} + ')'">답글 달기</button>
+                        <button class="btn btn-outline-success" id="re-cmt-btn" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId} + ')'" style="width:95%; height:60%">답글 달기</button>
                     </div>
 
                     <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
