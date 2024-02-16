@@ -74,7 +74,7 @@ public class CommentServiceI implements CommentService{
             // 새 댓글 알림 전송
             Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
             writer.ifPresentOrElse(
-                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++),
+                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, savedComment.getCmtDepth()),
                     () -> log.info("탈퇴한 회원의 글입니다.")
             );
 
@@ -113,7 +113,7 @@ public class CommentServiceI implements CommentService{
             // 새 댓글 알림 전송
             Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
             writer.ifPresentOrElse(
-                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++),
+                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, savedReComment.getCmtDepth()),
                     () -> log.info("탈퇴한 회원의 글입니다.")
             );
 

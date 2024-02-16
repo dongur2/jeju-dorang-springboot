@@ -13,12 +13,18 @@ public record NotificationResponse(
         String type,
         Long postId,
         String isChecked,
-        String createdAt
+        String createdAt,
+        String cmtType
 ) {
     public static NotificationResponse from(Notification notification) {
         String type = "parties";
         if(notification.getPost().getType().equals(BoardType.CHAT)) {
             type = "chats";
+        }
+
+        String cmtType = "댓글";
+        if(notification.getCommentDepth() == 1) {
+            cmtType = "대댓글";
         }
 
         return NotificationResponse.builder()
@@ -29,6 +35,7 @@ public record NotificationResponse(
                 .postId(notification.getPost().getId())
                 .isChecked(notification.getIsChecked().name())
                 .createdAt(DateFormat.calculateTime(notification.getCreatedAt()))
+                .cmtType(cmtType)
                 .build();
     }
 }

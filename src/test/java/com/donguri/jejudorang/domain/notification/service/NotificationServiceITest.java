@@ -129,7 +129,7 @@ class NotificationServiceITest {
 
         //then
         // * send notification
-        Assertions.assertDoesNotThrow(() -> notificationService.sendNotification(user, savedPost, 0L));
+        Assertions.assertDoesNotThrow(() -> notificationService.sendNotification(user, savedPost, 0L, comment1.getCmtDepth()));
     }
 
     @Test
@@ -166,21 +166,21 @@ class NotificationServiceITest {
         Comment comment1 = Comment.builder().community(savedPost).user(user1).content("test_comment1")
                 .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(0L).build();
         commentRepository.save(comment1); // new comment
-        notificationService.sendNotification(user, savedPost, 0L);
+        notificationService.sendNotification(user, savedPost, 0L, comment1.getCmtDepth());
 
         Comment comment2 = Comment.builder().community(savedPost).user(user1).content("test_comment2")
                 .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(1L).build();
         commentRepository.save(comment2); // new comment
-        notificationService.sendNotification(user, savedPost, 1L);
+        notificationService.sendNotification(user, savedPost, 1L, comment2.getCmtDepth());
 
         Comment comment3 = Comment.builder().community(savedPost).user(user1).content("test_comment3")
                 .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(2L).build();
-        notificationService.sendNotification(user, savedPost, 2L);
+        notificationService.sendNotification(user, savedPost, 2L, comment3.getCmtDepth());
         commentRepository.save(comment3); // new comment
 
         Comment comment4 = Comment.builder().community(savedPost).user(user1).content("test_comment4")
                 .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(3L).build();
-        notificationService.sendNotification(user, savedPost, 3L);
+        notificationService.sendNotification(user, savedPost, 3L, comment4.getCmtDepth());
         commentRepository.save(comment4); // new comment
 
 
@@ -267,7 +267,7 @@ class NotificationServiceITest {
                 .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(0L).build();
         commentRepository.save(comment1); // new comment
 
-        notificationService.sendNotification(user, savedPost, 0L); //send notification
+        notificationService.sendNotification(user, savedPost, 0L, comment1.getCmtDepth()); //send notification
         Notification notification = notificationRepository.findAllByOwnerId(user1.getId())
                 .orElseThrow(() -> new EntityNotFoundException("알림 없음"))
                 .get(0);
@@ -313,7 +313,7 @@ class NotificationServiceITest {
         Comment comment1 = Comment.builder().community(savedPost).user(user1).content("test_comment1")
                 .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(0L).build();
         commentRepository.save(comment1); // new comment
-        notificationService.sendNotification(user, savedPost, 0L);
+        notificationService.sendNotification(user, savedPost, 0L, comment1.getCmtDepth());
 
 
         Long user1Id = user1.getId();

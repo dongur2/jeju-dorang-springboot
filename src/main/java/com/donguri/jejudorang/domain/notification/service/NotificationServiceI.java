@@ -71,7 +71,7 @@ public class NotificationServiceI implements NotificationService{
     }
 
     @Override
-    public void sendNotification(User postWriter, Community post, Long notificationId) {
+    public void sendNotification(User postWriter, Community post, Long notificationId, int commentDepth) {
         sseEmitterRepository.get(postWriter.getId()).ifPresentOrElse(sseEmitter -> {
             try {
                 String notifyData = "[" + post.getTitle() + "]" + " 글에 새 댓글이 달렸습니다.";
@@ -89,6 +89,7 @@ public class NotificationServiceI implements NotificationService{
                         .content(notifyData)
                         .post(post)
                         .isChecked(IsChecked.NOT_YET)
+                        .commentDepth(commentDepth)
                         .build()
                 );
 

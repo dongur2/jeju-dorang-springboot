@@ -12,7 +12,7 @@ public interface NotificationService {
 
     SseEmitter connectNotification(String accessToken) throws IOException;
 
-    void sendNotification(User postWriter, Community post, Long notificationId);
+    void sendNotification(User postWriter, Community post, Long notificationId, int commentDepth);
 
     List<NotificationResponse> getNotifications(String accessToken);
 
