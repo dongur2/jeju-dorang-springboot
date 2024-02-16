@@ -16,7 +16,7 @@
             <!-- 북마크: 로그인/비로그인 구분 -->
             <div class="trip-detail-bookmark-block">
                 <i sec:authorize="!isAuthenticated()" onclick="cantBookmark()" class="fa-regular fa-heart"></i>
-                <i sec:authorize="isAuthenticated()" th:if="${!trip.isBookmarked()}" th:onclick="'createBookmark('+${trip.id}+')'" class="fa-regular fa-heart">                   ></i>
+                <i sec:authorize="isAuthenticated()" th:if="${!trip.isBookmarked()}" th:onclick="'createBookmark('+${trip.id}+')'" class="fa-regular fa-heart"></i>
                 <i sec:authorize="isAuthenticated()" th:if="${trip.isBookmarked()}" th:onclick="'deleteBookmark('+${trip.id}+')'" class="fa-solid fa-heart"></i>
             </div>
 

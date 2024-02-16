@@ -117,7 +117,7 @@ public class UserController {
         Optional<Authentication> authState = userService.logOut();
 
         if (authState.isPresent()) {
-            return "/error/errorTemp";
+            return "errorPage";
         } else {
             return "redirect:/";
         }

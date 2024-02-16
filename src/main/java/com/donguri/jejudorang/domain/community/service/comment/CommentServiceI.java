@@ -9,6 +9,8 @@ import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
+import com.donguri.jejudorang.domain.notification.entity.NotifyType;
+import com.donguri.jejudorang.domain.notification.service.NotificationService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -28,16 +31,21 @@ public class CommentServiceI implements CommentService{
     // 댓글, 대댓글 통합한 순서 정렬 위한 인덱스
     private Long orderIdx = 0L;
 
+    private Long notificationId = 0L;
+
     @Autowired private final JwtProvider jwtProvider;
     @Autowired private final UserRepository userRepository;
     @Autowired private final CommentRepository commentRepository;
     @Autowired private final CommunityRepository communityRepository;
 
-    public CommentServiceI(JwtProvider jwtProvider, UserRepository userRepository, CommentRepository commentRepository, CommunityRepository communityRepository) {
+    @Autowired private final NotificationService notificationService;
+
+    public CommentServiceI(JwtProvider jwtProvider, UserRepository userRepository, CommentRepository commentRepository, CommunityRepository communityRepository, NotificationService notificationService) {
         this.jwtProvider = jwtProvider;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.communityRepository = communityRepository;
+        this.notificationService = notificationService;
     }
 
 
@@ -64,6 +72,17 @@ public class CommentServiceI implements CommentService{
 
             nowPost.addComment(savedComment);
 
+
+            // * 글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
+            if(!nowPost.getWriter().equals(savedComment.getUser())) {
+                // 새 댓글 알림 전송
+                Optional<User> writer = Optional.of(nowPost.getWriter());
+                writer.ifPresentOrElse(
+                        postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, NotifyType.COMMENT),
+                        () -> log.info("탈퇴한 회원의 글입니다.")
+                );
+            }
+
         } catch (Exception e) {
             log.error("댓글 작성 실패: {}", e.getMessage());
             throw e;
@@ -77,7 +96,7 @@ public class CommentServiceI implements CommentService{
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
 
-            Community community = communityRepository.findById(newReComment.postId())
+            Community nowPost = communityRepository.findById(newReComment.postId())
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
 
             User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
@@ -85,7 +104,7 @@ public class CommentServiceI implements CommentService{
 
 
             Comment savedReComment = commentRepository.save(Comment.builder()
-                    .community(community)
+                    .community(nowPost)
                     .user(nowUser)
                     .content(newReComment.content())
                     .cmtGroup(newReComment.cmtId())
@@ -94,7 +113,34 @@ public class CommentServiceI implements CommentService{
                     .isDeleted(IsDeleted.EXISTING)
                     .build());
 
-            community.addComment(savedReComment);
+            nowPost.addComment(savedReComment);
+
+            // * 글 작성자와 대댓글 작성자가 동일할 경우 알림 전송하지 않음
+            if(!nowPost.getWriter().equals(savedReComment.getUser())) {
+                // 새 댓글 알림 전송 ->  글 작성자에게
+                Optional<User> writer = Optional.of(nowPost.getWriter());
+                writer.ifPresentOrElse(
+                        postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, NotifyType.COMMENT),
+                        () -> log.info("탈퇴한 회원의 글입니다.")
+                );
+            }
+
+            // 댓글 작성자
+            Optional<User> cmtWriter  = Optional.ofNullable(commentRepository.findById(newReComment.cmtId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."))
+                    .getUser());
+
+            // * 대댓글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
+            // 새 대댓글 알림 전송 -> 댓글 작성자에게
+            if(cmtWriter.isPresent() && !cmtWriter.get().equals(savedReComment.getUser())) {
+                cmtWriter.ifPresentOrElse(
+                        commentWriter -> notificationService.sendNotification(commentWriter, nowPost, notificationId++, NotifyType.RECOMMENT),
+                        () -> log.info("탈퇴한 회원의 댓글입니다.")
+                );
+            }
+
+
+
 
         } catch (Exception e) {
             log.error("대댓글 작성 실패: {}", e.getMessage());

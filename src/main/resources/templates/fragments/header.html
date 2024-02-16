@@ -1,22 +1,47 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <div th:fragment="headerFragment" class="header-box">
 
-        <ul class="nav justify-content-end" style="margin-right:2%">
-            <li class="nav-item">
-                <a sec:authorize="isAuthenticated()" class="nav-link active" aria-current="page" href="#">알림</a>
+<div th:fragment="headerFragment" class="header-box" style="height:120px">
+
+        <ul class="user-header"
+            style="width:100%; height:35px; display: flex; gap: 20px; justify-items: flex-end">
+
+            <!-- 알림 시작 -->
+            <li class="notify-box" id="notify-box" sec:authorize="isAuthenticated()"
+                style="width:470px; height:300px; padding:3% 1%; opacity: 0; z-index: 50; background: #fff9f9; margin-left: auto; transition: opacity 0.3s;
+                        display: flex; flex-direction: column; gap:10px; justify-content: flex-start; align-items: flex-start;
+                        border: 1px solid rgba(110,110,110,0.65); border-radius: 13px; box-shadow: rgba(138,138,138,0.65); margin-top: 1%; overflow-y: auto;">
+                <h3>알림</h3>
+                <!-- 알림 렌더링될 위치 -->
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" sec:authorize="!isAuthenticated()"
-                   th:href="@{/user/login}">로그인</a>
+
+            <li style="width:100px;" sec:authorize="isAuthenticated()">
+                <button id='notify-card-open-btn' onclick="openNotify()" style="width:100%; background: none; border:none; color:#696969">알림</button>
             </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-                <a class="nav-link" th:href="@{/profile}">마이페이지</a>
+            <!-- 알림 끝 -->
+
+            <li style="width:100px; display: none" sec:authorize="isAuthenticated()" >
+                <a  href="#"
+                   id="authenticated-id"
+                   style="width:100%; font-size: 16px; text-decoration-line: none; color: #696969"
+                   th:text="${#authentication.name}">로그인한 아이디</a>
             </li>
-            <li class="nav-item">
-                <form th:action="@{/user/logout}" th:method="post" sec:authorize="isAuthenticated()">
-                    <button type="submit">로그아웃</button>
+
+            <li sec:authorize="isAuthenticated()" style="width:100px">
+                <a th:href="@{/profile}"
+                   style="width:100%; display:flex; justify-content:center; font-size: 16px; text-decoration-line: none; color: #696969"
+                >마이페이지</a>
+            </li>
+
+            <li sec:authorize="isAuthenticated()" style="width:100px;">
+                <form th:action="@{/user/logout}" th:method="post">
+                    <button style="width:100%; font-size: 16px; background: none; border: none; color:#696969"  type="submit">로그아웃</button>
                 </form>
+            </li>
+
+            <li sec:authorize="!isAuthenticated()" style="width:100px; margin-left: auto">
+                <a href="#" style="font-size: 16px; text-decoration-line: none; color: #696969"
+                   th:href="@{/user/login}">로그인</a>
             </li>
         </ul>
 
@@ -25,5 +50,285 @@
             <li><a th:href="@{/trip/lists}" style="text-decoration-line: none; color:#696969;">여행</a></li>
             <li><a th:href="@{/community/boards/parties(state='all')}" style="text-decoration-line: none; color:#696969;">커뮤니티</a></li>
         </ul>
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="application/javascript">
+
+
+        /*
+        * 로그인 여부 확인 후 알림 연결 요청
+        * */
+        document.addEventListener('DOMContentLoaded', function() {
+            var isAuthenticated = document.getElementById('authenticated-id');
+
+            if (isAuthenticated) {
+                const eventSource = new EventSource('/notifications/connect');
+                eventSource.addEventListener('notification', function(event) {
+                    let msg = event.data;
+                    console.log(msg);
+
+                    // 새 댓글이 달렸을 경우 실시간 알림 alert 표시
+                    if(msg !== 'Connected') {
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'info',
+                            title: '',
+                            text: msg,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+
+                    getNotify();
+                });
+            }
+        });
+
+
+        /*
+        * 알림 목록 불러와 카드로 렌더링
+        * */
+        function getNotify() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/notifications', true);
+            xhr.setRequestHeader('Content-Type', 'application/json'); // JSON 요청으로 설정
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+
+                        // JSON 데이터 파싱
+                        var notifications = JSON.parse(xhr.response);
+
+                        let popBody = document.getElementById('notify-box');
+
+                        // 기존 알림 카드들 제거
+                        popBody.innerHTML = '<h3>알림</h3>';
+
+                        if (notifications.length > 0) {
+                            for (var notify of notifications) {
+
+                                // 읽지 않은 알림이 있을 경우 알림 버튼 폰트 속성 변경
+                                if(notify.isChecked === 'NOT_YET') {
+                                    let notifyBtn = document.getElementById('notify-card-open-btn');
+                                    notifyBtn.style.color = '#FB7A51';
+                                    notifyBtn.style.fontWeight = 'bolder';
+                                }
+
+                                /* 전체 플렉스 박스 */
+                                var div = document.createElement('div');
+                                div.className = 'notification-card';
+                                div.style.width = '100%';
+                                div.style.height = '80px';
+                                div.style.display = 'flex';
+                                div.style.flexDirection = 'column';
+                                div.style.justifyContent = 'space-around';
+                                div.style.alignItems = 'center';
+                                div.style.borderRadius = '10px';
+                                div.style.border = '1px solid #b2b2b2';
+
+                                if (notify.isChecked === 'NOT_YET') {
+                                    div.style.background = 'white';
+                                } else {
+                                    div.style.background = '#e7eced';
+                                }
+
+                                /* header */
+                                var header = document.createElement('div');
+                                header.className = 'notify-header';
+                                header.style.width = '100%';
+                                header.style.height = '25px';
+                                header.style.display = 'flex';
+                                header.style.flexDirection = 'row';
+                                header.style.justifyContent = 'space-around';
+                                header.style.alignItems = 'center';
+                                header.style.background = '#f8f9fa';
+                                header.style.padding = '10px 2%';
+                                header.style.borderRadius = '10px 10px 0 0';
+
+                                /* 댓글/대댓글 구분 */
+                                var type = document.createElement('span');
+                                type.style.fontWeight = 'bold';
+                                type.style.color = '#FB7A51';
+                                type.textContent = notify.cmtType;
+                                header.append(type);
+
+                                /* 알림 발생 시간 */
+                                var date = document.createElement('small');
+                                date.style.marginLeft = '10px';
+                                date.style.color = '#696969';
+                                date.textContent = notify.createdAt;
+                                header.append(date);
+
+                                /* 삭제 버튼 */
+                                var button = document.createElement('button');
+                                button.style.marginLeft = 'auto';
+                                button.type = 'button';
+                                button.className = 'btn-close';
+                                button.ariaLabel = 'Close';
+
+                                button.onclick = (function (notifyId) {
+                                    return function (event) {
+                                        event.preventDefault();
+                                        deleteNotification(notifyId);
+                                    };
+                                })(notify.notifyId);
+
+                                header.append(button);
+
+                                div.append(header);
+
+                                /* body */
+                                var body = document.createElement('div');
+                                body.className = 'notify-body';
+                                body.style.width = '100%';
+                                body.style.height = '50px';
+
+                                // 읽음 여부 따라 CSS 구분
+                                if (notify.isChecked === 'NOT_YET') {
+                                    body.style.background = 'white';
+                                } else {
+                                    body.style.background = '#ececec';
+                                    body.style.color = '#696969';
+                                }
+
+                                body.style.display = 'flex';
+                                body.style.flexDirection = 'row';
+                                body.style.justifyContent = 'center';
+                                body.style.alignItems = 'center';
+                                body.style.padding = '10px 2%';
+                                body.style.borderRadius = '0 0 10px 10px';
+
+                                body.onclick = (function (notifyId) {
+                                    return function (event) {
+                                        event.preventDefault();
+                                        moveToPost(notifyId);
+                                    };
+                                })(notify.notifyId);
+
+                                /* 알림 내용 */
+                                var alertContent = document.createElement('div');
+                                alertContent.className = 'alert-content';
+                                alertContent.style.fontSize = '18px';
+
+                                // 제목 추출
+                                var content = notify.content;
+                                var title = content.substring(content.indexOf('[') + 1, content.indexOf(']'));
+
+                                var maxLength = 20; // 표시할 최대 글자 수
+                                var trimmedTitle = title.length > maxLength ? title.substring(0, maxLength - 3) + '...' : title;
+                                var trimmedContent = content.replace(`[${title}]`, `[${trimmedTitle}]`);
+
+                                alertContent.textContent = trimmedContent;
+                                body.append(alertContent);
+
+                                div.append(body);
+
+                                popBody.append(div);
+
+                            }
+
+                        } else {
+                            var div = document.createElement('div');
+                            div.style.width = '100%';
+                            div.style.height = '100%';
+                            div.style.padding = '1% 5%';
+                            div.style.display = 'flex';
+                            div.style.justifyContent = 'center';
+                            div.style.alignItems = 'center';
+
+                                var content = document.createElement('h4');
+                                content.textContent = '새 알림이 없습니다.';
+                                div.append(content);
+
+                            popBody.append(div);
+                        }
+
+                    } else if (xhr.status === 204) {
+                        console.log('새 알림 없음');
+
+                    } else {
+                        console.log('알림 조회 실패' + xhr.responseText);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+
+        /*
+        * 알림 팝오버 열기
+        * */
+        function openNotify() {
+            var notifyBox = document.getElementById('notify-box');
+            var computedStyle = window.getComputedStyle(notifyBox);
+            var opacity = parseFloat(computedStyle.getPropertyValue('opacity'));
+
+            if (opacity === 1) {
+                notifyBox.style.opacity = 0;
+            } else {
+                notifyBox.style.opacity = 1;
+            }
+        }
+
+
+        /*
+        * 알림 읽음 처리 후 상세글로 이동
+        * */
+        function moveToPost(alertId) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', '/notifications/check?alertId=' + alertId, true);
+            xhr.setRequestHeader('Content-Type', 'application/json'); // JSON 요청으로 설정
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // 목록 새로고침
+                        getNotify();
+
+                        // 상세글로 이동
+                        window.location.href = xhr.responseText;
+
+                    } else {
+                        alert('요청 실패');
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        /*
+        * 알림 삭제
+        * */
+        function deleteNotification(notifyId) {
+            console.log('notifyId: ' + notifyId);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('DELETE', '/notifications?alertId=' + notifyId, true);
+            xhr.setRequestHeader('Content-Type', 'application/json'); // JSON 요청으로 설정
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // 목록 새로고침
+                        getNotify();
+
+                    } else {
+                        alert('요청 실패');
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+    </script>
+
     </div>
+
+
 </html>

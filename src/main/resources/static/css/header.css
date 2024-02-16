@@ -1,18 +1,16 @@
 
 .header-box{
     width:1280px;
-    height:90px;
+    height:120px;
     display:flex;
     flex-direction:column;
     justify-content:center;
 }
 
 .user-header {
-    height:30px;
+    height:70px;
     width:300px;
     display:flex;
-    margin-left:auto;
-    margin-right:30px;
     justify-content:space-around;
 }
 .user-header > li {
@@ -21,11 +19,14 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    font-size:14px;
-    color: #696969;
+
 }
 .user-header > li:hover {
     cursor: pointer;
+}
+.user-header > li > a {
+    font-size:20px;
+    color: #696969;
 }
 
 
