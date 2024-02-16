@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.community.dto.response.comment;
 
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
+import com.donguri.jejudorang.global.common.InvalidState;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -23,10 +24,10 @@ public record CommentResponse (
         if(cmt.getIsDeleted() == IsDeleted.DELETED) {
             return CommentResponse.builder()
                     .cmtId(cmt.getId())
-                    .pic(null)
-                    .nickname("삭제된 댓글입니다.")
-                    .writerId(null)
-                    .content("삭제된 댓글입니다.")
+                    .pic(InvalidState.INVALID.toString())
+                    .nickname(InvalidState.INVALID.toString())
+                    .writerId(InvalidState.INVALID.toString())
+                    .content(InvalidState.INVALID.toString())
                     .createdAt(cmt.getCreatedAt())
                     .depth(cmt.getCmtDepth())
                     .build();

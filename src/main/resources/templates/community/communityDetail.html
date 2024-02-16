@@ -16,7 +16,6 @@
     </script>
     <script th:src="@{/js/community/deleteCommunity.js}"></script>
     <title>상세 페이지 - 제주도랑 | 커뮤니티</title>
-    <link rel="stylesheet" href="../../static/css/community/communityDetail.css">
 </head>
 <th layout:fragment="content">
 
@@ -29,8 +28,8 @@
             <div class="board-sub-header">
                 <div class="board-sub-title">
                     <h6 class="sub-title-box user-name">
-                        <a href="#" th:if="${post.nickname != null}" th:text="${post.nickname}">닉네임</a>
-                        <a href="#" th:if="${post.nickname == null}">탈퇴한 회원</a>
+                        <a href="#" th:if="${post.nickname != 'INVALID'}" th:text="${post.nickname}">닉네임</a>
+                        <a href="#" th:if="${post.nickname == 'INVALID'}">탈퇴한 회원</a>
                     </h6>
                     <div class="sub-title-box content-date">
                         <span class="sub-title sub-title-created-at">
@@ -59,7 +58,7 @@
             <div class="board-content-body" id="viewer" th:utext="${post.content}"> viewer </div>
 
             <div class="board-content-sub-body">
-                <ul class="sub-body-tags">
+                <ul class="sub-body-tags" th:if="${post.tags.size() > 0}">
                     <li class="sub-body-tag" th:each="tag : ${post.tags}" th:text="${tag}">태그</li>
                 </ul>
             </div>
@@ -67,17 +66,17 @@
             <!--    버튼    -->
             <div class="board-post-features">
                 <!-- 모집상태 -->
-                <div th:if="${post.type.name()} == 'PARTY'" class="board-post-feature board-state">
-                    <div th:if="${post.writerId == #authentication.name}">
-                        <button th:if="${post.state.name()} == 'RECRUITING'" class="feature-row board-state-btn"
+                <div th:if="${post.type.name} == 'PARTY'" class="board-post-feature board-state">
+                    <div th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}">
+                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn"
                                 th:onclick="'changeJoinState(' + ${post.id} + ')'">모집중</button>
-                        <button th:if="${post.state.name()} == 'DONE'" class="feature-row board-state-btn"
+                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn"
                                 th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
                     </div>
 
-                    <div th:if="${post.writerId != #authentication.name || !#authentication.isAuthenticated()}">
-                        <button th:if="${post.state.name()} == 'RECRUITING'" class="feature-row board-state-btn" disabled>모집중</button>
-                        <button th:if="${post.state.name()} == 'DONE'" class="feature-row board-state-btn" disabled>모집완료</button>
+                    <div th:if="${post.writerId != 'INVALID' && (post.writerId != #authentication.name || !#authentication.isAuthenticated())}">
+                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn" disabled>모집중</button>
+                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn" disabled>모집완료</button>
                     </div>
                 </div>
 
@@ -91,11 +90,11 @@
                     <!--        로그인: 북마크 여부로 분리            -->
                     <button class="feature-row board-liked-btn"
                             sec:authorize="isAuthenticated()"
-                            th:if="${post.isBookmarked()}"
+                            th:if="${post.isBookmarked}"
                             th:onclick="'deleteBookmark('+${post.id}+')'">북마크</button>
                     <button class="feature-row board-liked-btn"
                             sec:authorize="isAuthenticated()"
-                            th:if="${!post.isBookmarked()}"
+                            th:if="${!post.isBookmarked}"
                             th:onclick="'createBookmark('+${post.id}+')'">북마크</button>
 
                 </div>
@@ -105,7 +104,7 @@
                 </div>
                 <div class="board-post-feature board-modify">
                     <button class="feature-row board-modify-btn"
-                    th:if="${post.writerId == #authentication.name}"
+                    th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}"
                     th:onclick="|location.href='@{/community/post/{communityId}/modify(communityId=${post.id})}'|">수정</button>
                 </div>
                 <div class="board-post-feature board-back-to-list">
@@ -114,10 +113,10 @@
 
                 <!-- 삭제 버튼: 작성자일 경우에만 노출 -->
                 <div sec:authorize="isAuthenticated()"
-                     th:if="${#authentication.getName() == post.writerId()}"
+                     th:if="${post.writerId != 'INVALID' && #authentication.name == post.writerId}"
                      class="board-post-feature board-back-to-list" style="margin-left:5%">
                     <button class="feature-row board-share-btn"
-                            th:onclick="deletePost([[${post.type.name()}]], [[${post.id}]], 'detail')">삭제</button>
+                            th:onclick="deletePost([[${post.type.name}]], [[${post.id}]], 'detail')">삭제</button>
                 </div>
             </div>
 
@@ -134,7 +133,7 @@
         style="width: 100%; height:160px; display: flex; flex-direction: column; justify-content: flex-end">
 
             <h3 style="width:100%; margin-right:auto">
-                댓글 <span style="color: #FB7A51" th:text="${post.commentCount()}">999</span>
+                댓글 <span style="color: #FB7A51" th:text="${post.commentCount}">999</span>
             </h3>
 
             <!-- 댓글 작성 -->
@@ -142,14 +141,15 @@
             style="width: 100%; height:50px; margin-bottom:1%; display: flex; justify-content: space-between">
 
                 <input name="content" style="width: 82%">
-                <input name="postId" th:value="${post.id()}" type="hidden">
-                <input name="type" th:value="${post.type()}" type="hidden">
+                <input name="postId" th:value="${post.id}" type="hidden">
+                <input name="type" th:value="${post.type}" type="hidden">
                 <button type="submit" class="btn btn-warning cmt-new-btn" style="width:15%">등록</button>
             </form>
         </div>
 
         <div class="cmt-area-body"
         style="width: 100%; height:100%; display: flex; flex-direction: column;"
+             th:if="${cmts.size() > 0}"
              th:each="cmt : ${cmts}" >
 
             <div class="cmt-card" th:if="${cmt.depth == 0}"
@@ -166,7 +166,7 @@
                         <div class="cmt-writer-img-circle"
                              style="width:60px; height:60px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
 
-                            <img th:if="${cmt.pic() != null}" th:src="${cmt.pic()}"
+                            <img th:if="${cmt.pic != 'INVALID'}" th:src="${cmt.pic}"
                                  style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
                         </div>
 
@@ -174,34 +174,34 @@
                         <div class="cmt-writer-nickname"
                         style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
-                            <h5 th:if="${cmt.nickname() != null}" th:text="${cmt.nickname()}">닉네임</h5>
-                            <h5 th:if="${cmt.nickname() == null}">탈퇴한 회원</h5>
+                            <h5 th:if="${cmt.nickname != 'INVALID'}" th:text="${cmt.nickname}">닉네임</h5>
+                            <h5 th:if="${cmt.nickname == 'INVALID'}">탈퇴한 회원</h5>
                         </div>
 
                         <!-- 작성일 -->
                         <div class="cmt-write-date"
                         style="width: 120px; display:flex; align-items:flex-end; color:#696969">
 
-                            <h6 th:text="${#temporals.format(cmt.createdAt(), 'yy.MM.dd HH:mm')}">0000.00.00 MM:DD</h6>
+                            <h6 th:text="${#temporals.format(cmt.createdAt, 'yy.MM.dd HH:mm')}">0000.00.00 MM:DD</h6>
                         </div>
                     </div>
 
                     <!-- 대댓글 작성폼 열기 버튼: 로그인한 경우만 노출 -->
                     <div class="re-cmt-box" style="width:80px; display: flex; flex-direction: row; align-items: flex-end"
                          sec:authorize="isAuthenticated()"
-                         th:if="${cmt.nickname() != null && cmt.nickname() != '삭제된 댓글입니다.'}">
-                        <button id="re-cmt-btn" style="width:95%; height:60%;" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId()} + ')'">답글 달기</button>
+                         th:if="${cmt.nickname != 'INVALID'}">
+                        <button id="re-cmt-btn" style="width:95%; height:60%;" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId} + ')'">답글 달기</button>
                     </div>
 
                     <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                     <div class="cmt-card-header-btns"
                          sec:authorize="isAuthenticated()"
-                         th:if="${cmt.writerId() != null && #authentication.getName() == cmt.writerId()}"
+                         th:if="${cmt.writerId != 'INVALID' && #authentication.name == cmt.writerId}"
                         style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
-                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
+                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
                                 style="width:45%; height:60%;">수정</button>
-                        <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId()} + ')'">삭제</button>
+                        <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId} + ')'">삭제</button>
                     </div>
 
                 </div>
@@ -210,12 +210,13 @@
                 <div class="cmt-card-body"
                 style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white; margin-top:5px;">
 
-                    <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
+                    <p style="font-size: 18px" th:if="${cmt.content != 'INVALID'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
+                    <p style="font-size: 18px" th:if="${cmt.content == 'INVALID'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
 
-                    <div th:id="'cmt-modify-block-' + ${cmt.cmtId()}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
-                        <input th:id="'cmt-modify-input-' + ${cmt.cmtId()}" th:value="${cmt.content()}" style="width: 88%; border: none">
-                        <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
-                        <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId()} + ')'">취소</button>
+                    <div th:id="'cmt-modify-block-' + ${cmt.cmtId}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
+                        <input th:id="'cmt-modify-input-' + ${cmt.cmtId}" th:value="${cmt.content}" style="width: 88%; border: none">
+                        <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId} + ')'">등록</button>
+                        <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId} + ')'">취소</button>
                     </div>
 
                 </div>
@@ -240,7 +241,7 @@
                             <div class="re-cmt-writer-img-circle"
                                  style="width:50px; height:50px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
 
-                                <img th:if="${cmt.pic() != null}" th:src="${cmt.pic()}"
+                                <img th:if="${cmt.pic != 'INVALID'}" th:src="${cmt.pic}"
                                      style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
                             </div>
 
@@ -248,27 +249,27 @@
                             <div class="re-cmt-writer-nickname"
                                  style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
-                                <h5 th:if="${cmt.nickname() != null}" th:text="${cmt.nickname()}">닉네임</h5>
-                                <h5 th:if="${cmt.nickname() == null}">탈퇴한 회원</h5>
+                                <h5 th:if="${cmt.nickname != 'INVALID'}" th:text="${cmt.nickname}">닉네임</h5>
+                                <h5 th:if="${cmt.nickname == 'INVALID'}">탈퇴한 회원</h5>
                             </div>
 
                             <!-- 작성일 -->
                             <div class="re-cmt-write-date"
                                  style="width: 120px; display:flex; align-items:flex-end; color:#696969">
 
-                                <h6 th:text="${#temporals.format(cmt.createdAt(), 'yy.MM.dd HH:mm')}">0000.00.00 MM:DD</h6>
+                                <h6 th:text="${#temporals.format(cmt.createdAt, 'yy.MM.dd HH:mm')}">0000.00.00 MM:DD</h6>
                             </div>
                         </div>
 
                         <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                         <div class="re-cmt-card-header-btns"
                              sec:authorize="isAuthenticated()"
-                             th:if="${cmt.writerId() != null && #authentication.getName() == cmt.writerId()}"
+                             th:if="${cmt.writerId != 'INVALID' && #authentication.getName() == cmt.writerId}"
                              style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: center">
 
-                            <button type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId()} + ')'"
+                            <button type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
                                     style="width:45%; height:40px;">수정</button>
-                            <button type="button" class="btn btn-secondary re-cmt-delete-btn" style="width:45%; height:40px;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId()} + ')'">삭제</button>
+                            <button type="button" class="btn btn-secondary re-cmt-delete-btn" style="width:45%; height:40px;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId} + ')'">삭제</button>
                         </div>
                     </div>
 
@@ -276,12 +277,13 @@
                     <div class="re-cmt-card-body"
                          style="width:100%; min-height:40px; max-height:100px; padding:  1% 6.5%">
 
-                        <p style="font-size: 18px" th:text="${cmt.content()}" th:id="'cmt-content-origin-' + ${cmt.cmtId()}">댓글</p>
+                        <p style="font-size: 18px" th:if="${cmt.content != 'INVALID'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
+                        <p style="font-size: 18px" th:if="${cmt.content == 'INVALID'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
 
-                        <div th:id="'cmt-modify-block-' + ${cmt.cmtId()}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
-                            <input th:id="'cmt-modify-input-' + ${cmt.cmtId()}" th:value="${cmt.content()}" name="cmtId" style="width: 88%; border: none">
-                            <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId()} + ')'">등록</button>
-                            <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId()} + ')'">취소</button>
+                        <div th:id="'cmt-modify-block-' + ${cmt.cmtId}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
+                            <input th:id="'cmt-modify-input-' + ${cmt.cmtId}" th:value="${cmt.content}" name="cmtId" style="width: 88%; border: none">
+                            <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId} + ')'">등록</button>
+                            <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId} + ')'">취소</button>
                         </div>
 
                     </div>
@@ -290,18 +292,18 @@
             </div><!-- 대댓글 영역-->
 
             <!-- 대댓글 폼 -->
-            <div class="re-cmt-form-box" th:id="'re-cmt-form-box-' + ${cmt.cmtId()}"
+            <div class="re-cmt-form-box" th:id="'re-cmt-form-box-' + ${cmt.cmtId}"
                  style="width:100%; height:60px; display: none; flex-direction: row; align-items: center">
 
-                <form method="post" th:object="${reCommentRequest}" th:action="@{/community/comments/re(type=${post.type()})}"
+                <form method="post" th:object="${reCommentRequest}" th:action="@{/community/comments/re(type=${post.type})}"
                       style="padding-left: 5%; width:100%; display: flex; flex-direction: row; justify-content: space-between">
 
                     <input name="content" style="width: 80%; height:40px">
-                    <input type="hidden" name="postId" th:value="${post.id()}">
-                    <input type="hidden" name="cmtId" th:value="${cmt.cmtId()}">
+                    <input type="hidden" name="postId" th:value="${post.id}">
+                    <input type="hidden" name="cmtId" th:value="${cmt.cmtId}">
 
                     <button type="submit" class="btn btn-warning" style="width: 9%; height:40px">답글 등록</button>
-                    <button type="button" class="btn btn-outline-secondary" style="width: 9%; height:40px" th:onclick="'closeRecommentWriteForm(' + ${cmt.cmtId()} + ')'">취소</button>
+                    <button type="button" class="btn btn-outline-secondary" style="width: 9%; height:40px" th:onclick="'closeRecommentWriteForm(' + ${cmt.cmtId} + ')'">취소</button>
                 </form>
             </div>
 
@@ -310,17 +312,6 @@
         </div>
     </div>
 
-
-
-
-
-
-
-        </div><!-- 카드 영역-->
-
-
-
-    </div><!-- 전체 -->
 
 
     <!--  모달   -->
@@ -551,8 +542,6 @@
         function closeRecommentWriteForm(cmtId) {
             document.getElementById('re-cmt-form-box-' + cmtId).style.display = 'none';
         }
-
-
 
     </script>
 </th>

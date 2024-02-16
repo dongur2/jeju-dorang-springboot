@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.community.dto.response;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
+import com.donguri.jejudorang.global.common.InvalidState;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -29,8 +30,8 @@ public record CommunityDetailResponse(
 
 ) {
     public static CommunityDetailResponse from(Community community, List<String> tagList, String nowViewer) {
-        String nickname = null;
-        String writerId = null;
+        String nickname = InvalidState.INVALID.toString();
+        String writerId = InvalidState.INVALID.toString();
         if (community.getWriter() != null) {
             nickname = community.getWriter().getProfile().getNickname();
             writerId = community.getWriter().getProfile().getExternalId();
@@ -60,8 +61,8 @@ public record CommunityDetailResponse(
     }
 
     public static CommunityDetailResponse from(Community community, List<String> tagList) {
-        String nickname = null;
-        String writerId = null;
+        String nickname = InvalidState.INVALID.toString();
+        String writerId = InvalidState.INVALID.toString();
         if (community.getWriter() != null) {
             nickname = community.getWriter().getProfile().getNickname();
             writerId = community.getWriter().getProfile().getExternalId();

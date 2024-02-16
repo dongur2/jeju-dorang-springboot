@@ -15,6 +15,7 @@ import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagServi
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
+import com.donguri.jejudorang.global.common.InvalidState;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
