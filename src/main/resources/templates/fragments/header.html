@@ -108,34 +108,31 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === XMLHttpRequest.DONE) {
                     if (xhr.status === 200) {
-                        console.log('조회 완료');
 
                         // JSON 데이터 파싱
                         var notifications = JSON.parse(xhr.response);
 
-                        console.log(notifications);
+                        let popBody = document.getElementById('notify-box');
 
-                        for (var notify of notifications) {
-                            let popBody = document.getElementById('notify-box');
+                        if (notifications.length > 0) {
+                            for (var notify of notifications) {
+                                /* 전체 플렉스 박스 */
+                                var div = document.createElement('div');
+                                div.className = 'notification-card';
+                                div.style.width = '100%';
+                                div.style.height = '80px';
+                                div.style.display = 'flex';
+                                div.style.flexDirection = 'column';
+                                div.style.justifyContent = 'space-around';
+                                div.style.alignItems = 'center';
+                                div.style.borderRadius = '10px';
+                                div.style.border = '1px solid #b2b2b2';
 
-                            /* 전체 플렉스 박스 */
-                            var div = document.createElement('div');
-                            div.className = 'notification-card';
-                            div.style.width = '100%';
-                            div.style.height = '80px';
-                            div.style.display = 'flex';
-                            div.style.flexDirection = 'column';
-                            div.style.justifyContent = 'space-around';
-                            div.style.alignItems = 'center';
-
-                            if(notify.isChecked === 'NOT_YET') {
-                                div.style.background = 'white';
-                            } else {
-                                div.style.background = '#e7eced';
-                            }
-
-                            div.style.borderRadius = '10px';
-                            div.style.border = '1px solid #b2b2b2';
+                                if (notify.isChecked === 'NOT_YET') {
+                                    div.style.background = 'white';
+                                } else {
+                                    div.style.background = '#e7eced';
+                                }
 
                                 /* header */
                                 var header = document.createElement('div');
@@ -150,35 +147,35 @@
                                 header.style.padding = '10px 2%';
                                 header.style.borderRadius = '10px 10px 0 0';
 
-                                    /* 댓글/대댓글 구분 */
-                                    var type = document.createElement('span');
-                                    type.style.fontWeight = 'bold';
-                                    type.style.color = '#FB7A51';
-                                    type.textContent = '댓글';
-                                    header.append(type);
+                                /* 댓글/대댓글 구분 */
+                                var type = document.createElement('span');
+                                type.style.fontWeight = 'bold';
+                                type.style.color = '#FB7A51';
+                                type.textContent = '댓글';
+                                header.append(type);
 
-                                    /* 알림 발생 시간 */
-                                    var date = document.createElement('small');
-                                    date.style.marginLeft = '10px';
-                                    date.style.color = '#696969';
-                                    date.textContent = notify.createdAt;
-                                    header.append(date);
+                                /* 알림 발생 시간 */
+                                var date = document.createElement('small');
+                                date.style.marginLeft = '10px';
+                                date.style.color = '#696969';
+                                date.textContent = notify.createdAt;
+                                header.append(date);
 
-                                    /* 삭제 버튼 */
-                                    var button = document.createElement('button');
-                                    button.style.marginLeft = 'auto';
-                                    button.type = 'button';
-                                    button.className = 'btn-close';
-                                    button.ariaLabel = 'Close';
+                                /* 삭제 버튼 */
+                                var button = document.createElement('button');
+                                button.style.marginLeft = 'auto';
+                                button.type = 'button';
+                                button.className = 'btn-close';
+                                button.ariaLabel = 'Close';
 
-                                    button.onclick = (function(notifyId) {
-                                        return function(event) {
-                                            event.preventDefault();
-                                            deleteNotification(notifyId);
-                                        };
-                                    })(notify.notifyId);
+                                button.onclick = (function (notifyId) {
+                                    return function (event) {
+                                        event.preventDefault();
+                                        deleteNotification(notifyId);
+                                    };
+                                })(notify.notifyId);
 
-                                    header.append(button);
+                                header.append(button);
 
                                 div.append(header);
 
@@ -189,7 +186,7 @@
                                 body.style.height = '50px';
 
                                 // 읽음 여부 따라 CSS 구분
-                                if(notify.isChecked === 'NOT_YET') {
+                                if (notify.isChecked === 'NOT_YET') {
                                     body.style.background = 'white';
                                 } else {
                                     body.style.background = '#ececec';
@@ -203,35 +200,51 @@
                                 body.style.padding = '10px 2%';
                                 body.style.borderRadius = '0 0 10px 10px';
 
-                                body.onclick = (function(postId, notifyId) {
-                                    return function(event) {
+                                body.onclick = (function (postId, notifyId) {
+                                    return function (event) {
                                         event.preventDefault();
                                         moveToPost(postId, notifyId);
                                     };
                                 })(notify.postId, notify.notifyId);
 
-                                    /* 알림 내용 */
-                                    var alertContent = document.createElement('div');
-                                    alertContent.className = 'alert-content';
-                                    alertContent.style.fontSize = '18px';
+                                /* 알림 내용 */
+                                var alertContent = document.createElement('div');
+                                alertContent.className = 'alert-content';
+                                alertContent.style.fontSize = '18px';
 
-                                    // 제목 추출
-                                    var content = notify.content;
-                                    var title = content.substring(content.indexOf('[') + 1, content.indexOf(']'));
+                                // 제목 추출
+                                var content = notify.content;
+                                var title = content.substring(content.indexOf('[') + 1, content.indexOf(']'));
 
-                                    var maxLength = 20; // 표시할 최대 글자 수
-                                    var trimmedTitle = title.length > maxLength ? title.substring(0, maxLength - 3) + '...' : title;
-                                    var trimmedContent = content.replace(`[${title}]`, `[${trimmedTitle}]`);
+                                var maxLength = 20; // 표시할 최대 글자 수
+                                var trimmedTitle = title.length > maxLength ? title.substring(0, maxLength - 3) + '...' : title;
+                                var trimmedContent = content.replace(`[${title}]`, `[${trimmedTitle}]`);
 
-                                    alertContent.textContent = trimmedContent;
-                                    body.append(alertContent);
+                                alertContent.textContent = trimmedContent;
+                                body.append(alertContent);
 
                                 div.append(body);
 
+                                popBody.append(div);
+
+                            }
+                        } else {
+                            console.log('새 알림 없음');
+
+                            var div = document.createElement('div');
+                            div.style.width = '100%';
+                            div.style.height = '100%';
+                            div.style.padding = '1% 5%';
+                            div.style.display = 'flex';
+                            div.style.justifyContent = 'center';
+                            div.style.alignItems = 'center';
+
+                                var content = document.createElement('h4');
+                                content.textContent = '새 알림이 없습니다.';
+                                div.append(content);
+
                             popBody.append(div);
-
                         }
-
 
                     } else if (xhr.status === 204) {
                         console.log('새 알림 없음');
