@@ -26,6 +26,7 @@ import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -74,6 +75,12 @@ public class UserServiceI implements UserService {
     private final PasswordEncoder encoder;
     @Autowired
     private final JwtProvider jwtProvider;
+
+
+    @Value("${aws.s3.default-img.name}")
+    private String defaultImgName;
+    @Value("${aws.s3.default-img.url}")
+    private String defaultImgUrl;
 
     public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
@@ -189,6 +196,8 @@ public class UserServiceI implements UserService {
          * */
         try {
             User userToSave = signUpRequest.toEntity();
+            userToSave.getProfile().updateImgName(defaultImgName);
+            userToSave.getProfile().updateImgUrl(defaultImgUrl);
 
             // set password
             Password pwdToSet = Password.builder()
@@ -348,8 +357,8 @@ public class UserServiceI implements UserService {
                 if (pastImg != null) {
                     imageService.deleteImg(pastImg);
 
-                    nowUser.getProfile().updateImgName(null);
-                    nowUser.getProfile().updateImgUrl(null);
+                    nowUser.getProfile().updateImgName(defaultImgName);
+                    nowUser.getProfile().updateImgUrl(defaultImgUrl);
 
                     log.info("이전 이미지 삭제 완료");
                 }
@@ -392,8 +401,8 @@ public class UserServiceI implements UserService {
             if (pastImg != null) {
                 imageService.deleteImg(pastImg);
 
-                nowUser.getProfile().updateImgName(null);
-                nowUser.getProfile().updateImgUrl(null);
+                nowUser.getProfile().updateImgName(defaultImgName);
+                nowUser.getProfile().updateImgUrl(defaultImgUrl);
 
                 log.info("이전 이미지 삭제 완료");
             }

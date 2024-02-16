@@ -4,6 +4,7 @@ import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.global.common.InvalidState;
 import lombok.Builder;
+import lombok.Value;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,6 @@ public record CommentResponse (
 ){
 
     public static CommentResponse from(Comment cmt) {
-
         // 삭제처리된 댓글일 경우
         if(cmt.getIsDeleted() == IsDeleted.DELETED) {
             return CommentResponse.builder()
