@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.notification.dto.NotificationResponse;
 import com.donguri.jejudorang.domain.notification.entity.IsChecked;
 import com.donguri.jejudorang.domain.notification.entity.Notification;
+import com.donguri.jejudorang.domain.notification.entity.NotifyType;
 import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
 import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.yaml.snakeyaml.comments.CommentType;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -70,8 +72,15 @@ public class NotificationServiceI implements NotificationService{
     }
 
     @Override
-    public void sendNotification(User postWriter, Community post, Long notificationId, int commentDepth) {
-        String notifyData = "[" + post.getTitle() + "]" + " 글에 새 댓글이 달렸습니다.";
+    public void sendNotification(User postWriter, Community post, Long notificationId, NotifyType type) {
+
+        StringBuilder notifyData = new StringBuilder();
+
+        if(type.equals(NotifyType.COMMENT)) {
+            notifyData.append("[").append(post.getTitle()).append("] 글에 새 댓글이 달렸습니다.");
+        } else {
+            notifyData.append("[").append(post.getTitle()).append("] 글의 댓글에 새 대댓글이 달렸습니다.");
+        }
 
         sseEmitterRepository.get(postWriter.getId()).ifPresentOrElse(sseEmitter -> {
 
@@ -91,19 +100,19 @@ public class NotificationServiceI implements NotificationService{
         }, () -> log.info("sseEmitter를 찾을 수 없습니다. (현재 로그인한 회원이 아닙니다)"));
 
         // 상대방의 접속 여부와 상관없이 알림 저장
-        saveNotification(postWriter, post, commentDepth, notifyData);
+        saveNotification(postWriter, post, type, notifyData.toString());
 
     }
 
     @Override
-    public void saveNotification(User postWriter, Community post, int commentDepth, String notifyData) {
+    public void saveNotification(User postWriter, Community post, NotifyType type, String notifyData) {
         try {
             notificationRepository.save(Notification.builder()
                     .owner(postWriter)
                     .content(notifyData)
                     .post(post)
                     .isChecked(IsChecked.NOT_YET)
-                    .commentDepth(commentDepth)
+                    .type(type)
                     .build()
             );
             log.info("알림 DB에 저장 완료");

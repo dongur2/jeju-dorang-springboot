@@ -9,6 +9,7 @@ import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
+import com.donguri.jejudorang.domain.notification.entity.NotifyType;
 import com.donguri.jejudorang.domain.notification.service.NotificationService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
@@ -74,7 +75,7 @@ public class CommentServiceI implements CommentService{
             // 새 댓글 알림 전송
             Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
             writer.ifPresentOrElse(
-                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, savedComment.getCmtDepth()),
+                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, NotifyType.COMMENT),
                     () -> log.info("탈퇴한 회원의 글입니다.")
             );
 
@@ -110,12 +111,24 @@ public class CommentServiceI implements CommentService{
 
             nowPost.addComment(savedReComment);
 
-            // 새 댓글 알림 전송
+            // 새 댓글 알림 전송 ->  글 작성자에게
             Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
             writer.ifPresentOrElse(
-                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, savedReComment.getCmtDepth()),
+                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, NotifyType.COMMENT),
                     () -> log.info("탈퇴한 회원의 글입니다.")
             );
+
+            // 새 대댓글 알림 전송 -> 댓글 작성자에게
+            Optional<User> cmtWriter  = Optional.ofNullable(commentRepository.findById(newReComment.cmtId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."))
+                    .getUser());
+            cmtWriter.ifPresentOrElse(
+                    commentWriter -> notificationService.sendNotification(commentWriter, nowPost, notificationId++, NotifyType.RECOMMENT),
+                    () -> log.info("탈퇴한 회원의 댓글입니다.")
+            );
+
+
+
 
         } catch (Exception e) {
             log.error("대댓글 작성 실패: {}", e.getMessage());

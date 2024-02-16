@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.notification.service;
 
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.notification.dto.NotificationResponse;
+import com.donguri.jejudorang.domain.notification.entity.NotifyType;
 import com.donguri.jejudorang.domain.user.entity.User;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -12,9 +13,9 @@ public interface NotificationService {
 
     SseEmitter connectNotification(String accessToken) throws IOException;
 
-    void sendNotification(User postWriter, Community post, Long notificationId, int commentDepth);
+    void sendNotification(User postWriter, Community post, Long notificationId, NotifyType type);
 
-    public void saveNotification(User postWriter, Community post, int commentDepth, String notifyData);
+    public void saveNotification(User postWriter, Community post, NotifyType type, String notifyData);
 
     List<NotificationResponse> getNotifications(String accessToken);
 
