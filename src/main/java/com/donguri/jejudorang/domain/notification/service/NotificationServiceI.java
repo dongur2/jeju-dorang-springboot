@@ -1,5 +1,7 @@
 package com.donguri.jejudorang.domain.notification.service;
 
+import ch.qos.logback.core.spi.ErrorCodes;
+import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.notification.dto.NotificationResponse;
 import com.donguri.jejudorang.domain.notification.entity.IsChecked;
@@ -8,8 +10,10 @@ import com.donguri.jejudorang.domain.notification.repository.NotificationReposit
 import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -105,6 +110,42 @@ public class NotificationServiceI implements NotificationService{
         return notificationRepository.findAllByOwnerId(idFromJwtToken)
                 .map(notifications -> notifications.stream().map(NotificationResponse::from).toList())
                 .orElseThrow(() -> new NullPointerException("새 알림이 없습니다"));
+    }
+
+    @Override
+    @Transactional
+    public String updateNotificationToChecked(String accessToken, Long notificationId) {
+        Long idFromJwtToken = jwtProvider.getIdFromJwtToken(accessToken);
+
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("알림이 존재하지 않습니다."));
+
+        try {
+            if (!Objects.equals(idFromJwtToken, notification.getOwner().getId())) {
+                throw new Exception("알림은 당사자만 읽음 처리 가능합니다.");
+            }
+
+            // 읽음 처리
+            notification.updateIsChecked();
+
+            Community post = notification.getPost();
+            String type = convertUrlTypeFromCommunity(post.getType());
+
+            // 상세글 컨트롤러 url 리턴
+            return "/community/boards/" + type + "/" + post.getId();
+            
+        } catch (Exception e) {
+            log.error("잘못된 접근: 당사자가 아님 {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
+        }
+    }
+
+    private static String convertUrlTypeFromCommunity(BoardType postType) {
+        String type = "chats";
+        if (postType.equals(BoardType.PARTY)) {
+            type = "parties";
+        }
+        return type;
     }
 
 }

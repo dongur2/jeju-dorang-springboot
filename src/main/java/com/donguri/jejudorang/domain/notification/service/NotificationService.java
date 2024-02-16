@@ -15,4 +15,7 @@ public interface NotificationService {
     void sendNotification(User postWriter, Community post, Long notificationId);
 
     List<NotificationResponse> getNotifications(String accessToken);
+
+    // 알림 읽음 처리 후 상세글 요청 url 리턴
+    String updateNotificationToChecked(String accessToken, Long notificationId);
 }

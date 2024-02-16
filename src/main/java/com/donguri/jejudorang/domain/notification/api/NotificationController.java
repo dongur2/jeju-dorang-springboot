@@ -51,8 +51,17 @@ public class NotificationController {
     }
 
     @PutMapping("/check")
-    public void test(@RequestParam(name = "alertId") Long alertId) {
-        log.info("컨트롤러 진입: {}", alertId);
+    public String updateNotificationCheck(@CookieValue("access_token") Cookie token,
+                                        @RequestParam(name = "alertId") Long alertId) {
+        try {
+            return notificationService.updateNotificationToChecked(token.getValue(), alertId);
+
+        } catch (Exception e) {
+            log.error("알림 상태 업데이트 및 리다이렉트 실패: {}", e.getMessage());
+            return HttpStatus.BAD_GATEWAY.toString();
+        }
+
+
     }
 
 }

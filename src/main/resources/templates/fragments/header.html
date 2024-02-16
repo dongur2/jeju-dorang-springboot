@@ -187,6 +187,10 @@
                                 body.style.padding = '10px 2%';
                                 body.style.borderRadius = '0 0 10px 10px';
 
+                                body.onclick = function() {
+                                    moveToPost(notify.postId, notify.notifyId);
+                                };
+
                                     /* 알림 내용 */
                                     var alertContent = document.createElement('div');
                                     alertContent.className = 'alert-content';
@@ -234,6 +238,13 @@
             }
         }
 
+        function moveToPost(postId, notifyId) {
+            console.log('move to ' + postId + ' from ' + notifyId);
+
+            // 알림 읽음 처리 후 상세글로 이동
+            updateChecked(notifyId);
+        }
+
         function updateChecked(alertId) {
             console.log('alertId: ' + alertId);
 
@@ -245,7 +256,10 @@
                     if (xhr.status === 200) {
                         alert('요청 완료');
 
-                    } else { // 그 외의 경우
+                        // 상세글로 이동
+                        window.location.href = xhr.responseText;
+
+                    } else {
                         alert('요청 실패');
                     }
                 }
