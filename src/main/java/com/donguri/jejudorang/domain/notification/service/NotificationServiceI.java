@@ -109,11 +109,10 @@ public class NotificationServiceI implements NotificationService{
 
         return notificationRepository.findAllByOwnerId(idFromJwtToken)
                 .map(notifications -> notifications.stream()
-                        .map(NotificationResponse::from)
-                        .sorted(Comparator.comparing(NotificationResponse::createdAt))
-                        .toList()
-                )
+                        .sorted(Comparator.comparing(Notification::getCreatedAt).reversed())
+                        .map(NotificationResponse::from).toList())
                 .orElseThrow(() -> new NullPointerException("새 알림이 없습니다"));
+
     }
 
     @Override
