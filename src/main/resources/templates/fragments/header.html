@@ -170,6 +170,14 @@
                                     button.type = 'button';
                                     button.className = 'btn-close';
                                     button.ariaLabel = 'Close';
+
+                                    button.onclick = (function(notifyId) {
+                                        return function(event) {
+                                            event.preventDefault();
+                                            deleteNotification(notifyId);
+                                        };
+                                    })(notify.notifyId);
+
                                     header.append(button);
 
                                 div.append(header);
@@ -278,6 +286,24 @@
             xhr.send();
         }
 
+        function deleteNotification(notifyId) {
+            console.log('notifyId: ' + notifyId);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('DELETE', '/notifications?alertId=' + notifyId, true);
+            xhr.setRequestHeader('Content-Type', 'application/json'); // JSON 요청으로 설정
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert('요청 완료');
+
+                    } else {
+                        alert('요청 실패');
+                    }
+                }
+            };
+            xhr.send();
+        }
 
     </script>
 
