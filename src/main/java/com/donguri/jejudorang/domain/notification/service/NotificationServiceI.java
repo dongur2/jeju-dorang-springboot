@@ -123,8 +123,10 @@ public class NotificationServiceI implements NotificationService{
                 throw new Exception("알림은 당사자만 읽음 처리 가능합니다.");
             }
 
-            // 읽음 처리
-            notification.updateIsChecked();
+            // 안읽은 알림일 경우에만 읽음 처리 메서드 호출
+             if (notification.getIsChecked().equals(IsChecked.NOT_YET)) {
+                 notification.updateIsChecked();
+             }
 
             Community post = notification.getPost();
             String type = convertUrlTypeFromCommunity(post.getType());
