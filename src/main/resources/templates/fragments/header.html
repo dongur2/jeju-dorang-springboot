@@ -179,7 +179,15 @@
                                 body.className = 'notify-body';
                                 body.style.width = '100%';
                                 body.style.height = '50px';
-                                body.style.background = 'white';
+
+                                // 읽음 여부 따라 CSS 구분
+                                if(notify.isChecked === 'NOT_YET') {
+                                    body.style.background = 'white';
+                                } else {
+                                    body.style.background = '#ececec';
+                                    body.style.color = '#696969';
+                                }
+
                                 body.style.display = 'flex';
                                 body.style.flexDirection = 'row';
                                 body.style.justifyContent = 'center';
@@ -187,9 +195,12 @@
                                 body.style.padding = '10px 2%';
                                 body.style.borderRadius = '0 0 10px 10px';
 
-                                body.onclick = function() {
-                                    moveToPost(notify.postId, notify.notifyId);
-                                };
+                                body.onclick = (function(postId, notifyId) {
+                                    return function(event) {
+                                        event.preventDefault();
+                                        moveToPost(postId, notifyId);
+                                    };
+                                })(notify.postId, notify.notifyId);
 
                                     /* 알림 내용 */
                                     var alertContent = document.createElement('div');
