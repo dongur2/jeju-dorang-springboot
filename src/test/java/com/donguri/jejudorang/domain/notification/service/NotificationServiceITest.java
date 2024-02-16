@@ -5,6 +5,8 @@ import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.repository.comment.CommentRepository;
+import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.notification.dto.NotificationResponse;
 import com.donguri.jejudorang.domain.notification.entity.Notification;
 import com.donguri.jejudorang.domain.notification.repository.NotificationRepository;
@@ -14,6 +16,7 @@ import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
+import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
@@ -21,6 +24,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.HashSet;
@@ -35,6 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class NotificationServiceITest {
 
     @Autowired EntityManager em;
+
+    @Autowired CommunityService communityService;
+    @Autowired CommentService commentService;
 
     @Autowired RoleRepository roleRepository;
     @Autowired UserRepository userRepository;
@@ -214,8 +221,6 @@ class NotificationServiceITest {
 
         Community savedPost = communityRepository.save(newPost);
 
-        System.out.println("아이디: "+user1.getId());
-
         //when, then
         Assertions.assertThrows(NullPointerException.class,
             () -> {
@@ -271,6 +276,57 @@ class NotificationServiceITest {
 
         //then
         org.assertj.core.api.Assertions.assertThat(notificationRepository.findAllByOwnerId(user1.getId()).get().size()).isEqualTo(0);
+    }
+
+    @Test
+    @Transactional
+    void 회원_탈퇴시_알림_삭제() {
+        // given
+        User user = User.builder().loginType(LoginType.BASIC).build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
+        Password password = Password.builder().user(user).password("12345678").build();
+
+        Set<Role> testRoles = new HashSet<>();
+        Role userRole = roleRepository.findByName(ERole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+        testRoles.add(userRole);
+
+        user.updateRole(testRoles);
+        user.updateProfile(profile);
+        user.updateAuth(authentication);
+        user.updatePwd(password);
+
+        User user1 = userRepository.save(user);
+
+        // * sseEmitter instance created
+        SseEmitter sseEmitter = sseEmitterRepository.save(user.getId(), new SseEmitter(60 * 1000 * 60L));
+
+        Community newPost = Community.builder().writer(user1).title("test title1").content("test content1").build();
+        newPost.setBoardType("party");
+        newPost.setDefaultJoinState();
+
+        Community savedPost = communityRepository.save(newPost);
+
+
+        //when
+        Comment comment1 = Comment.builder().community(savedPost).user(user1).content("test_comment1")
+                .cmtDepth(0).isDeleted(IsDeleted.EXISTING).cmtOrder(0L).cmtGroup(0L).build();
+        commentRepository.save(comment1); // new comment
+        notificationService.sendNotification(user, savedPost, 0L);
+
+
+        Long user1Id = user1.getId();
+        communityService.findAllPostsByUserAndSetWriterNull(user1Id);
+        commentService.findAllCmtsByUserAndSetWriterNull(user1Id);
+
+        notificationRepository.deleteAllByOwnerId(user1Id);
+
+        userRepository.deleteById(user1Id);
+
+        //then
+        Optional<List<Notification>> allByOwnerId = notificationRepository.findAllByOwnerId(user1Id);
+        org.assertj.core.api.Assertions.assertThat(allByOwnerId.get().size()).isEqualTo(0);
 
     }
 

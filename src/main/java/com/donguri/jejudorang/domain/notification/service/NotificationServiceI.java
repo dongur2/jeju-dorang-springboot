@@ -161,6 +161,24 @@ public class NotificationServiceI implements NotificationService{
         }
     }
 
+    @Override
+    @Transactional
+    public void findAndDeleteAllNotificationsByUserId(Long userId) {
+        try {
+            notificationRepository.findAllByOwnerId(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("존재하는 알림 없음"));
+
+            notificationRepository.deleteAllByOwnerId(userId);
+
+        } catch (EntityNotFoundException e) {
+            log.info("삭제할 알림이 없습니다.");
+            return;
+        } catch (Exception e) {
+            log.error("알림 삭제 실패: {}", e.getMessage());
+            throw e;
+        }
+    }
+
     private static String convertUrlTypeFromCommunity(BoardType postType) {
         String type = "chats";
         if (postType.equals(BoardType.PARTY)) {

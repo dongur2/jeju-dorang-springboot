@@ -21,4 +21,8 @@ public interface NotificationService {
 
     // 알림 삭제
     void deleteNotification(String accessToken, Long notificationId) throws Exception;
+
+    // 회원 탈퇴시 그 회원의 모든 알림 삭제
+    void findAndDeleteAllNotificationsByUserId(Long userId);
+
 }

@@ -10,4 +10,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     Optional<List<Notification>> findAllByOwnerId(Long userId);
 
+    void deleteAllByOwnerId(Long userId);
+
 }
