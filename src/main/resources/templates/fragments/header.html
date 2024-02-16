@@ -3,44 +3,43 @@
 
 <div th:fragment="headerFragment" class="header-box" style="height:120px">
 
-
         <ul class="user-header"
-            style="width:100%; height:70px; display: flex; gap: 20px; justify-items: flex-end; background: cadetblue">
+            style="width:100%; height:35px; display: flex; gap: 20px; justify-items: flex-end">
 
-            <li class="notify-box" id="notify-box"
+            <li class="notify-box" id="notify-box" sec:authorize="isAuthenticated()"
                 style="width:470px; height:300px; padding:3% 1%; opacity: 0; z-index: 50; background: #fff9f9; margin-left: auto; transition: opacity 0.3s;
                         display: flex; flex-direction: column; gap:10px; justify-content: flex-start; align-items: flex-start;
-                        border: 1px solid rgba(110,110,110,0.65); border-radius: 13px; box-shadow: rgba(138,138,138,0.65); margin-top: 2%; overflow-y: auto;">
+                        border: 1px solid rgba(110,110,110,0.65); border-radius: 13px; box-shadow: rgba(138,138,138,0.65); margin-top: 1%; overflow-y: auto;">
                 <h3>알림</h3>
             </li>
 
 
-            <li style="width:80px; background: yellowgreen">
-                <button onclick="openNotify()">알림</button>
+            <li style="width:100px;" sec:authorize="isAuthenticated()">
+                <button id='notify-card-open-btn' onclick="openNotify()" style="width:100%; background: none; border:none; color:#696969">알림</button>
             </li>
 
 
-            <li style="width:80px; display: none" sec:authorize="isAuthenticated()" >
+            <li style="width:100px; display: none" sec:authorize="isAuthenticated()" >
                 <a  href="#"
                    id="authenticated-id"
-                   style="width:100px; font-size: 16px; text-decoration-line: none; color: #696969; margin-left:auto"
+                   style="width:100%; font-size: 16px; text-decoration-line: none; color: #696969"
                    th:text="${#authentication.name}">로그인한 아이디</a>
             </li>
 
             <li sec:authorize="isAuthenticated()" style="width:100px">
                 <a th:href="@{/profile}"
-                   style="width:150px; font-size: 16px; text-decoration-line: none; color: #696969; margin-left:auto"
+                   style="width:100%; display:flex; justify-content:center; font-size: 16px; text-decoration-line: none; color: #696969"
                 >마이페이지</a>
             </li>
 
-            <li sec:authorize="isAuthenticated()">
-                <form th:action="@{/user/logout}" th:method="post" style="width:140px;">
-                    <button style="width:140px; font-size: 16px; background: none; border: none; color:#696969"  type="submit">로그아웃</button>
+            <li sec:authorize="isAuthenticated()" style="width:100px;">
+                <form th:action="@{/user/logout}" th:method="post">
+                    <button style="width:100%; font-size: 16px; background: none; border: none; color:#696969"  type="submit">로그아웃</button>
                 </form>
             </li>
 
-            <li sec:authorize="!isAuthenticated()" style="width:80px; background: hotpink">
-                <a href="#" style="font-size: 16px; text-decoration-line: none; color: #696969; margin-left:auto"
+            <li sec:authorize="!isAuthenticated()" style="width:100px; margin-left: auto">
+                <a href="#" style="font-size: 16px; text-decoration-line: none; color: #696969"
                    th:href="@{/user/login}">로그인</a>
             </li>
         </ul>
@@ -87,8 +86,6 @@
                         });
                     }
                 });
-
-
                 console.log('알림 불러오기');
 
                 getNotify();
@@ -116,6 +113,14 @@
 
                         if (notifications.length > 0) {
                             for (var notify of notifications) {
+
+                                // 읽지 않은 알림이 있을 경우 알림 버튼 폰트 속성 변경
+                                if(notify.isChecked === 'NOT_YET') {
+                                    let notifyBtn = document.getElementById('notify-card-open-btn');
+                                    notifyBtn.style.color = '#FB7A51';
+                                    notifyBtn.style.fontWeight = 'bolder';
+                                }
+
                                 /* 전체 플렉스 박스 */
                                 var div = document.createElement('div');
                                 div.className = 'notification-card';
@@ -229,8 +234,6 @@
 
                             }
                         } else {
-                            console.log('새 알림 없음');
-
                             var div = document.createElement('div');
                             div.style.width = '100%';
                             div.style.height = '100%';
