@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -72,10 +71,11 @@ public class NotificationServiceI implements NotificationService{
 
     @Override
     public void sendNotification(User postWriter, Community post, Long notificationId, int commentDepth) {
-        sseEmitterRepository.get(postWriter.getId()).ifPresentOrElse(sseEmitter -> {
-            try {
-                String notifyData = "[" + post.getTitle() + "]" + " 글에 새 댓글이 달렸습니다.";
+        String notifyData = "[" + post.getTitle() + "]" + " 글에 새 댓글이 달렸습니다.";
 
+        sseEmitterRepository.get(postWriter.getId()).ifPresentOrElse(sseEmitter -> {
+
+            try {
                 sseEmitter.send(SseEmitter.event()
                         .id(notificationId.toString())
                         .name(NOTIFICATION_NAME)
@@ -83,24 +83,35 @@ public class NotificationServiceI implements NotificationService{
 
                 log.info("실시간 알림 전송 완료");
 
-                // 알림 저장
-                notificationRepository.save(Notification.builder()
-                        .owner(postWriter)
-                        .content(notifyData)
-                        .post(post)
-                        .isChecked(IsChecked.NOT_YET)
-                        .commentDepth(commentDepth)
-                        .build()
-                );
-
-                log.info("알림 DB에 저장 완료");
-
-
             } catch (IOException e) {
                 log.error("새로운 알림 전송에 실패했습니다: {}", e.getMessage());
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "새로운 알림 전송에 실패했습니다.");
             }
+
         }, () -> log.info("sseEmitter를 찾을 수 없습니다. (현재 로그인한 회원이 아닙니다)"));
+
+        // 상대방의 접속 여부와 상관없이 알림 저장
+        saveNotification(postWriter, post, commentDepth, notifyData);
+
+    }
+
+    @Override
+    public void saveNotification(User postWriter, Community post, int commentDepth, String notifyData) {
+        try {
+            notificationRepository.save(Notification.builder()
+                    .owner(postWriter)
+                    .content(notifyData)
+                    .post(post)
+                    .isChecked(IsChecked.NOT_YET)
+                    .commentDepth(commentDepth)
+                    .build()
+            );
+            log.info("알림 DB에 저장 완료");
+
+        } catch (Exception e) {
+            log.error("알림 저장 실패: {}", e.getMessage());
+            throw e;
+        }
     }
 
     @Override
