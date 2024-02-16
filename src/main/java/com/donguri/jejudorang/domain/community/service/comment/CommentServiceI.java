@@ -72,12 +72,16 @@ public class CommentServiceI implements CommentService{
 
             nowPost.addComment(savedComment);
 
-            // 새 댓글 알림 전송
-            Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
-            writer.ifPresentOrElse(
-                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, NotifyType.COMMENT),
-                    () -> log.info("탈퇴한 회원의 글입니다.")
-            );
+
+            // * 글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
+            if(!nowPost.getWriter().equals(savedComment.getUser())) {
+                // 새 댓글 알림 전송
+                Optional<User> writer = Optional.of(nowPost.getWriter());
+                writer.ifPresentOrElse(
+                        postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, NotifyType.COMMENT),
+                        () -> log.info("탈퇴한 회원의 글입니다.")
+                );
+            }
 
         } catch (Exception e) {
             log.error("댓글 작성 실패: {}", e.getMessage());
@@ -111,21 +115,29 @@ public class CommentServiceI implements CommentService{
 
             nowPost.addComment(savedReComment);
 
-            // 새 댓글 알림 전송 ->  글 작성자에게
-            Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
-            writer.ifPresentOrElse(
-                    postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, NotifyType.COMMENT),
-                    () -> log.info("탈퇴한 회원의 글입니다.")
-            );
+            // * 글 작성자와 대댓글 작성자가 동일할 경우 알림 전송하지 않음
+            if(!nowPost.getWriter().equals(savedReComment.getUser())) {
+                // 새 댓글 알림 전송 ->  글 작성자에게
+                Optional<User> writer = Optional.of(nowPost.getWriter());
+                writer.ifPresentOrElse(
+                        postWriter -> notificationService.sendNotification(postWriter, nowPost, notificationId++, NotifyType.COMMENT),
+                        () -> log.info("탈퇴한 회원의 글입니다.")
+                );
+            }
 
-            // 새 대댓글 알림 전송 -> 댓글 작성자에게
+            // 댓글 작성자
             Optional<User> cmtWriter  = Optional.ofNullable(commentRepository.findById(newReComment.cmtId())
                     .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."))
                     .getUser());
-            cmtWriter.ifPresentOrElse(
-                    commentWriter -> notificationService.sendNotification(commentWriter, nowPost, notificationId++, NotifyType.RECOMMENT),
-                    () -> log.info("탈퇴한 회원의 댓글입니다.")
-            );
+
+            // * 대댓글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
+            // 새 대댓글 알림 전송 -> 댓글 작성자에게
+            if(cmtWriter.isPresent() && !cmtWriter.get().equals(savedReComment.getUser())) {
+                cmtWriter.ifPresentOrElse(
+                        commentWriter -> notificationService.sendNotification(commentWriter, nowPost, notificationId++, NotifyType.RECOMMENT),
+                        () -> log.info("탈퇴한 회원의 댓글입니다.")
+                );
+            }
 
 
 
