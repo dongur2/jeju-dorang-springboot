@@ -219,7 +219,7 @@ class UserRepositoryTest {
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다"));
 
         foundUser.getProfile().updateNickname("updateNickname");
-        foundUser.getProfile().updateImgUrl("imgurl.com");
+        foundUser.getProfile().updateImg("  img.png","imgurl.com");
         foundUser.getAuth().updateEmail("new@mail.com");
 
         //then

@@ -18,6 +18,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +45,8 @@ class UserServiceITest {
 
     @Autowired PasswordEncoder passwordEncoder;
 
-    String testMail = "holymolyguri@gmail.com";
-    String testMail2 = "dongyinew@gmail.com";
+    @Value("${aws.s3.default-img.name}") private String defaultImgName;
+    @Value("${aws.s3.default-img.url}") private String defaultImgUrl;
 
     @AfterEach
     void after() {
@@ -61,7 +62,7 @@ class UserServiceITest {
     void 프로필_닉네임_변경() {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
-        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").imgName(defaultImgName).imgUrl(defaultImgUrl).build();
         Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password(passwordEncoder.encode("12345678aa!w")).build();
 
@@ -89,7 +90,7 @@ class UserServiceITest {
     void 비밀번호_수정_성공() {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
-        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").imgName(defaultImgName).imgUrl(defaultImgUrl).build();
         Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password(passwordEncoder.encode("12345678aa!w")).build();
 
@@ -126,7 +127,7 @@ class UserServiceITest {
     void 비밀번호_수정_현재_비번_불일치() {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
-        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").imgName(defaultImgName).imgUrl(defaultImgUrl).build();
         Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password(passwordEncoder.encode("12345678aa!w")).build();
 
@@ -155,7 +156,7 @@ class UserServiceITest {
     void 비밀번호_수정_새_비번_불일치() {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
-        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").imgName(defaultImgName).imgUrl(defaultImgUrl).build();
         Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password(passwordEncoder.encode("12345678aa!w")).build();
 
@@ -183,7 +184,7 @@ class UserServiceITest {
     void 이메일_변경_성공() {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
-        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").imgName(defaultImgName).imgUrl(defaultImgUrl).build();
         Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password(passwordEncoder.encode("12345678aa!w")).build();
 
@@ -214,7 +215,7 @@ class UserServiceITest {
     void 회원_탈퇴() {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
-        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").imgName(defaultImgName).imgUrl(defaultImgUrl).build();
         Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password(passwordEncoder.encode("12345678aa!w")).build();
 
@@ -242,7 +243,7 @@ class UserServiceITest {
     void 회원_탈퇴_작성글_개수_그대로_확인() {
         //given
         User user = User.builder().loginType(LoginType.BASIC).build();
-        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").build();
+        Profile profile = Profile.builder().user(user).externalId("userId").nickname("userNickname").imgName(defaultImgName).imgUrl(defaultImgUrl).build();
         Authentication authentication = Authentication.builder().user(user).email("user@mail.com").agreement(AgreeRange.ALL).build();
         Password password = Password.builder().user(user).password(passwordEncoder.encode("12345678aa!w")).build();
 

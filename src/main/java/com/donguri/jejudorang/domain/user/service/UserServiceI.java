@@ -196,8 +196,7 @@ public class UserServiceI implements UserService {
          * */
         try {
             User userToSave = signUpRequest.toEntity();
-            userToSave.getProfile().updateImgName(defaultImgName);
-            userToSave.getProfile().updateImgUrl(defaultImgUrl);
+            userToSave.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
             // set password
             Password pwdToSet = Password.builder()
@@ -357,8 +356,7 @@ public class UserServiceI implements UserService {
                 if (pastImg != null) {
                     imageService.deleteImg(pastImg);
 
-                    nowUser.getProfile().updateImgName(defaultImgName);
-                    nowUser.getProfile().updateImgUrl(defaultImgUrl);
+                    nowUser.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
                     log.info("이전 이미지 삭제 완료");
                 }
@@ -369,8 +367,8 @@ public class UserServiceI implements UserService {
                     throw new IllegalAccessException("사진 업로드에 실패했습니다.");
 
                 } else {
-                    nowUser.getProfile().updateImgName(uploadedImg.get("imgName"));
-                    nowUser.getProfile().updateImgUrl(uploadedImg.get("imgUrl"));
+                    nowUser.getProfile().updateImg(uploadedImg.get("imgName"), uploadedImg.get("imgUrl"));
+
                     log.info("이미지 업로드 완료 : {}", uploadedImg.get("imgName"));
                 }
             }
@@ -401,8 +399,7 @@ public class UserServiceI implements UserService {
             if (pastImg != null) {
                 imageService.deleteImg(pastImg);
 
-                nowUser.getProfile().updateImgName(defaultImgName);
-                nowUser.getProfile().updateImgUrl(defaultImgUrl);
+                nowUser.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
                 log.info("이전 이미지 삭제 완료");
             }
