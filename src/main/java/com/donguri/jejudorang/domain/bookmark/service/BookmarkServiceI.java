@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -148,6 +149,38 @@ public class BookmarkServiceI implements BookmarkService {
 
         } catch (Exception e) {
             log.error("북마크 불러오기에 실패했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /*
+    * 회원의 모든 북마크 삭제
+    *
+    * */
+    @Override
+    @Transactional
+    public void deleteAllBookmarksOfUser(Long userId) {
+        try {
+
+            /*
+            * 북마크한 글이 존재할 경우 북마크한 글의 북마크 삭제(전이), 없을 경우 북마크를 삭제
+            * */
+            tripBookmarkRepository.findAllByUserId(userId)
+                    .forEach(tb -> tripRepository.findById(tb.getTrip().getId())
+                            .ifPresentOrElse(
+                                    trip -> trip.deleteBookmark(tb),
+                                    () -> tripBookmarkRepository.delete(tb)));
+
+
+             communityBookmarkRepository.findAllByUserId(userId)
+                    .forEach(cb -> communityRepository.findById(cb.getCommunity().getId())
+                            .ifPresentOrElse(
+                                    community -> community.deleteBookmark(cb),
+                                    () -> communityBookmarkRepository.delete(cb)));
+
+
+        } catch (Exception e) {
+            log.error("북마크 삭제에 실패했습니다. {}",  e.getMessage());
             throw e;
         }
     }

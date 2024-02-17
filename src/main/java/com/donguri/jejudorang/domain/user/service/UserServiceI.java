@@ -565,6 +565,9 @@ public class UserServiceI implements UserService {
             // 알림 삭제
             notificationService.findAndDeleteAllNotificationsByUserId(idFromJwtToken);
 
+            // 북마크 삭제
+            bookmarkService.deleteAllBookmarksOfUser(idFromJwtToken);
+
             // 유저 삭제
             userRepository.deleteById(idFromJwtToken);
 

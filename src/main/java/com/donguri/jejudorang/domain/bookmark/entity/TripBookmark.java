@@ -18,7 +18,7 @@ public class TripBookmark extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(nullable = false, name = "user_id")
+    @JoinColumn(name = "user_id")
     @ManyToOne
     private User user;
 

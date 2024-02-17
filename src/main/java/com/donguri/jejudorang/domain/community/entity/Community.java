@@ -108,6 +108,11 @@ public class Community extends BaseEntity {
         }
     }
 
+    // 북마크 삭제
+    public void deleteBookmark(CommunityBookmark bookmark) {
+        bookmarks.remove(bookmark);
+    }
+
     // 댓글 업데이트
     public void addComment(Comment newComment) {
         if(comments == null) {

@@ -79,4 +79,8 @@ public class Trip extends BaseEntity {
             bookmarks.add(bookmark);
         }
     }
+
+    public void deleteBookmark(TripBookmark bookmark) {
+        bookmarks.remove(bookmark);
+    }
 }
