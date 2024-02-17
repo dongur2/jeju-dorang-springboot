@@ -38,7 +38,7 @@
                                 style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집완료</button>
                     </div>
 
-                    <div th:if="${post.writerId != 'INVALID' && (post.writerId != #authentication.name || !#authentication.isAuthenticated())}"
+                    <div th:if="${post.writerId != #authentication.name || !#authentication.isAuthenticated()}"
                          style="width:200px; height:100%;">
                         <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn btn btn-success" disabled
                                 style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집중</button>
