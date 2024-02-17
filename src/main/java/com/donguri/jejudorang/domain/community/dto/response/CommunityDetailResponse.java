@@ -1,89 +1,92 @@
 package com.donguri.jejudorang.domain.community.dto.response;
 
+import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
 import com.donguri.jejudorang.global.common.InvalidState;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
+@Getter
 @Builder
-public record CommunityDetailResponse(
-    Long id,
-    BoardType type,
-    JoinState state,
-    String title,
-    String nickname,
-    String writerId,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt,
-    int viewCount,
-    String content,
-    List<String> tags,
-    int bookmarkCount,
+public class CommunityDetailResponse {
+    private Long id;
+    private BoardType type;
+    private JoinState state;
+    private String title;
+    private String content;
 
-    boolean isBookmarked,
+    private String nickname;
+    private String writerId;
 
-    int commentCount
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-) {
+    private int viewCount;
+    private int commentCount;
+    private int bookmarkCount;
+
+    private List<String> tags;
+
+    private boolean isBookmarked;
+
+
+    /*
+    * 상세글 조회: 비회원일 경우 nowViewer == null
+    * */
     public static CommunityDetailResponse from(Community community, List<String> tagList, String nowViewer) {
-        String nickname = InvalidState.INVALID.toString();
-        String writerId = InvalidState.INVALID.toString();
-        if (community.getWriter() != null) {
-            nickname = community.getWriter().getProfile().getNickname();
-            writerId = community.getWriter().getProfile().getExternalId();
-        }
 
-        return CommunityDetailResponse.builder()
+        // 탈퇴한 회원의 글일 경우: community.writer == null
+        return Optional.ofNullable(community.getWriter())
+                .map(writer -> convertToDtoFrom(community, tagList, nowViewer, writer.getProfile().getNickname(), writer.getProfile().getExternalId()))
+                .orElseGet(() -> convertToDtoFrom(community, tagList, nowViewer, InvalidState.INVALID.name(), InvalidState.INVALID.name()));
+
+    }
+
+    private static CommunityDetailResponse convertToDtoFrom(Community community, List<String> tagList, String nowViewer, String writerNickname, String writerExternalId) {
+        CommunityDetailResponse dto = CommunityDetailResponse.builder()
                 .id(community.getId())
                 .type(community.getType())
                 .state(community.getState())
                 .title(community.getTitle())
-                .nickname(nickname)
-                .writerId(writerId)
+                .nickname(writerNickname)
+                .writerId(writerExternalId)
                 .content(community.getContent())
                 .createdAt(community.getCreatedAt())
                 .updatedAt(community.getUpdatedAt())
                 .viewCount(community.getViewCount())
                 .tags(tagList)
                 .bookmarkCount(community.getBookmarkCount())
-
-                // 현재 로그인한 유저의 북마크 여부 확인
-                .isBookmarked(community.getBookmarks().stream()
-                        .anyMatch(bookmark -> bookmark.getUser().getProfile().getExternalId().equals(nowViewer)))
-
                 .commentCount(community.getCommentCount())
                 .build();
 
-    }
-
-    public static CommunityDetailResponse from(Community community, List<String> tagList) {
-        String nickname = InvalidState.INVALID.toString();
-        String writerId = InvalidState.INVALID.toString();
-        if (community.getWriter() != null) {
-            nickname = community.getWriter().getProfile().getNickname();
-            writerId = community.getWriter().getProfile().getExternalId();
+        /* 회원이 조회했을 경우 북마크 여부 확인
+        * */
+        if (nowViewer != null) {
+            dto.checkAndSetIsBookmarked(community.getBookmarks(), nowViewer);
         }
 
-        return CommunityDetailResponse.builder()
-                .id(community.getId())
-                .type(community.getType())
-                .state(community.getState())
-                .title(community.getTitle())
-                .nickname(nickname)
-                .writerId(writerId)
-                .content(community.getContent())
-                .createdAt(community.getCreatedAt())
-                .updatedAt(community.getUpdatedAt())
-                .viewCount(community.getViewCount())
-                .tags(tagList)
-                .bookmarkCount(community.getBookmarkCount())
-
-                .commentCount(community.getCommentCount())
-                .build();
+        return dto;
     }
-    
+
+
+    // 북마크 여부 확인
+    private void checkAndSetIsBookmarked(Set<CommunityBookmark> bookmarks, String nowViewer) {
+        this.setIsBookmarked(bookmarks.stream()
+                .anyMatch(bookmark -> bookmark.getUser().getProfile().getExternalId().equals(nowViewer)));
+
+    }
+
+    // isBookmarked 업데이트
+    private void setIsBookmarked(boolean checkResult) {
+        this.isBookmarked = checkResult;
+    }
+
+
 }

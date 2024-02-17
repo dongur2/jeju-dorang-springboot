@@ -124,7 +124,7 @@ public class CommunityServiceI implements CommunityService {
                         idFromJwt.append(jwtProvider.getUserNameFromJwtToken(accessToken.getValue()));
                     } catch (Exception e) {
                         log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
-                        resMap.put("result", CommunityDetailResponse.from(found, tagsToStringList));
+                        resMap.put("result", CommunityDetailResponse.from(found, tagsToStringList, null));
                         resMap.put("cmts", cmtList);
                         return resMap;
                     }
@@ -138,7 +138,7 @@ public class CommunityServiceI implements CommunityService {
                 // 2. Access Token 쿠키가 없는 경우
                 } else {
                     log.info("비회원은 북마크 여부를 확인할 수 없습니다.");
-                    resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList));
+                    resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList, null));
                     resMap.put("cmts", cmtList);
                 }
 
