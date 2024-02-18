@@ -68,9 +68,8 @@ public class CommunityDetailResponse {
 
         /* 회원이 조회했을 경우 북마크 여부 확인
         * */
-        if (nowViewer != null) {
-            dto.checkAndSetIsBookmarked(community.getBookmarks(), nowViewer);
-        }
+        Optional.ofNullable(nowViewer)
+                .ifPresent(viewer -> dto.checkAndSetIsBookmarked(community.getBookmarks(), viewer));
 
         return dto;
     }
