@@ -57,8 +57,7 @@ public class Community extends BaseEntity {
     private int viewCount;
 
     @OneToMany(mappedBy = "community" // 게시글(community) 1 : 여러 사용자에 의한 북마크(Bookmark)
-            , cascade = CascadeType.ALL // Community 엔티티에 대한 변경이 Bookmark 엔티티에 전파
-            , orphanRemoval = true) //  Community 엔티티에서 제거된 Bookmark 엔티티가 자동으로 삭제
+            , cascade = CascadeType.PERSIST)
     private Set<CommunityBookmark> bookmarks = new HashSet<>();
 
     // 페이징 정렬 위한 가상 컬럼

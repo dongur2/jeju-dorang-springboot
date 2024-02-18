@@ -31,4 +31,9 @@ public class CommunityBookmark extends BaseEntity {
         this.user = user;
         this.community = community;
     }
+
+
+    public void updateCommunityWhenDeleted() {
+        this.community = null;
+    }
 }

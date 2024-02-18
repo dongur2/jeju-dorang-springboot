@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.bookmark.entity.TripBookmark;
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.bookmark.repository.TripBookmarkRepository;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityBookmarkListResponse;
+import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.repository.TripRepository;
@@ -174,7 +175,10 @@ public class BookmarkServiceI implements BookmarkService {
              communityBookmarkRepository.findAllByUserId(userId)
                     .forEach(cb -> communityRepository.findById(cb.getCommunity().getId())
                             .ifPresentOrElse(
-                                    community -> community.deleteBookmark(cb),
+                                    community -> {
+                                        community.deleteBookmark(cb);
+                                        communityBookmarkRepository.delete(cb);
+                                    },
                                     () -> communityBookmarkRepository.delete(cb)));
 
 
@@ -186,17 +190,18 @@ public class BookmarkServiceI implements BookmarkService {
 
     // Community
     private void deleteCommunityBookmark(Long boardId, User userForBookmark) throws BadRequestException {
-        Optional<CommunityBookmark> nullableBookmark = communityBookmarkRepository.findByUserAndCommunityId(userForBookmark, boardId);
-        if(nullableBookmark.isEmpty()) {
-            log.error("북마크한 글이 아닙니다.");
-            throw new BadRequestException("북마크한 글이 아닙니다");
+        Optional<CommunityBookmark> bookmark = communityBookmarkRepository.findByUserAndCommunityId(userForBookmark, boardId);
+
+        // 북마크한 글이 아닐 경우 예외 리턴
+        if(bookmark.isEmpty()) {
+            throw new BadRequestException("북마크한 글이 아닙니다.");
         }
 
-        // Community bookmarks: orphanRemoval=true -> Community엔티티에서 북마크 삭제 -> 엔티티 자동 삭제
-        communityRepository.findById(boardId)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다"))
-                        .updateBookmarks(nullableBookmark.get());
-        log.info("북마크 삭제 완료");
+        Optional<Community> community = Optional.ofNullable(bookmark.get().getCommunity());
+
+        // 북마크한 글이 삭제됐을 경우: 레포지토리에서만 삭제 / 글이 존재할 경우: 레포지토리 & 커뮤니티에서 삭제
+        communityBookmarkRepository.delete(bookmark.get());
+        community.ifPresent(post -> post.deleteBookmark(bookmark.get()));
     }
 
     // Trip

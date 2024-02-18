@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponse;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponse;
@@ -234,6 +235,9 @@ public class CommunityServiceI implements CommunityService {
             if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)) {
                 throw new IllegalAccessException("게시글은 작성자만 삭제할 수 있습니다.");
             }
+
+            // 북마크 연관관계 삭제: 게시글을 삭제해도 북마크는 남음
+            nowPost.getBookmarks().forEach(CommunityBookmark::updateCommunityWhenDeleted);
 
             communityRepository.delete(nowPost);
 
