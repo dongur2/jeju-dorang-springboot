@@ -231,18 +231,19 @@
                         <div class="cmt-writer-img-circle"
                              style="width:60px; height:60px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
 
-                            <img th:if="${cmt.pic != 'INVALID'}" th:src= "${cmt.pic}"
-                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
-                            <img th:if="${cmt.pic == 'INVALID'}" th:src= "@{/img/default-img.png}"
-                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
+                            <img th:if="${cmt.pic != 'INVALID' && cmt.pic != 'DELETED'}" th:src= "${cmt.pic}"
+                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                            <img th:if="${cmt.pic == 'INVALID' || cmt.pic == 'DELETED'}" th:src= "@{/img/default-img.png}"
+                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
                         </div>
 
                         <!-- 닉네임 -->
                         <div class="cmt-writer-nickname"
                         style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
-                            <h5 th:if="${cmt.nickname != 'INVALID'}" th:text="${cmt.nickname}">닉네임</h5>
+                            <h5 th:if="${cmt.nickname != 'INVALID' && cmt.nickname != 'DELETED'}" th:text="${cmt.nickname}">닉네임</h5>
                             <h5 th:if="${cmt.nickname == 'INVALID'}">탈퇴한 회원</h5>
+                            <h5 th:if="${cmt.nickname == 'DELETED'}">삭제된 댓글입니다.</h5>
                         </div>
 
                         <!-- 작성일 -->
@@ -255,15 +256,14 @@
 
                     <!-- 대댓글 작성폼 열기 버튼: 로그인한 경우만 노출 -->
                     <div class="re-cmt-box" style="width:120px; display: flex; flex-direction: row; align-items: flex-end"
-                         sec:authorize="isAuthenticated()"
-                         th:if="${cmt.nickname != 'INVALID'}">
+                         sec:authorize="isAuthenticated()">
                         <button class="btn btn-outline-success" id="re-cmt-btn" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId} + ')'" style="width:95%; height:60%">답글 달기</button>
                     </div>
 
                     <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                     <div class="cmt-card-header-btns"
                          sec:authorize="isAuthenticated()"
-                         th:if="${cmt.writerId != 'INVALID' && #authentication.name == cmt.writerId}"
+                         th:if="${#authentication.name == cmt.writerId}"
                         style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
                         <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
@@ -277,8 +277,8 @@
                 <div class="cmt-card-body"
                 style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white; margin-top:5px;">
 
-                    <p style="font-size: 18px" th:if="${cmt.content != 'INVALID'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
-                    <p style="font-size: 18px" th:if="${cmt.content == 'INVALID'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
+                    <p style="font-size: 18px" th:if="${cmt.content != 'DELETED'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
+                    <p style="font-size: 18px" th:if="${cmt.content == 'DELETED'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
 
                     <div th:id="'cmt-modify-block-' + ${cmt.cmtId}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
                         <input th:id="'cmt-modify-input-' + ${cmt.cmtId}" th:value="${cmt.content}" style="width: 88%; border: none">
@@ -308,9 +308,9 @@
                             <div class="re-cmt-writer-img-circle"
                                  style="width:50px; height:50px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
 
-                                <img th:if="${cmt.pic != 'INVALID'}" th:src="${cmt.pic}"
+                                <img th:if="${cmt.pic != 'INVALID' && cmt.pic != 'DELETED'}" th:src="${cmt.pic}"
                                      style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
-                                <img th:if="${cmt.pic == 'INVALID'}" th:src= "@{/img/default-img.png}"
+                                <img th:if="${cmt.pic == 'INVALID' || cmt.pic == 'DELETED'}" th:src= "@{/img/default-img.png}"
                                      style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
                             </div>
 
@@ -318,8 +318,9 @@
                             <div class="re-cmt-writer-nickname"
                                  style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
-                                <h5 th:if="${cmt.nickname != 'INVALID'}" th:text="${cmt.nickname}">닉네임</h5>
+                                <h5 th:if="${cmt.nickname != 'INVALID' && cmt.nickname != 'DELETED'}" th:text="${cmt.nickname}">닉네임</h5>
                                 <h5 th:if="${cmt.nickname == 'INVALID'}">탈퇴한 회원</h5>
+                                <h5 th:if="${cmt.nickname == 'DELETED'}">삭제된 댓글입니다.</h5>
                             </div>
 
                             <!-- 작성일 -->
@@ -333,7 +334,7 @@
                         <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                         <div class="re-cmt-card-header-btns"
                              sec:authorize="isAuthenticated()"
-                             th:if="${cmt.writerId != 'INVALID' && #authentication.getName() == cmt.writerId}"
+                             th:if="${#authentication.getName() == cmt.writerId}"
                              style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: center">
 
                             <button type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
@@ -346,8 +347,8 @@
                     <div class="re-cmt-card-body"
                          style="width:100%; min-height:40px; max-height:100px; padding:  1% 6.5%">
 
-                        <p style="font-size: 18px" th:if="${cmt.content != 'INVALID'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
-                        <p style="font-size: 18px" th:if="${cmt.content == 'INVALID'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
+                        <p style="font-size: 18px" th:if="${cmt.content != 'DELETED'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
+                        <p style="font-size: 18px" th:if="${cmt.content == 'DELETED'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
 
                         <div th:id="'cmt-modify-block-' + ${cmt.cmtId}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
                             <input th:id="'cmt-modify-input-' + ${cmt.cmtId}" th:value="${cmt.content}" name="cmtId" style="width: 88%; border: none">
