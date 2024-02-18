@@ -4,8 +4,6 @@ import com.donguri.jejudorang.domain.community.entity.comment.Comment;
 import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.global.common.InvalidState;
 import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
