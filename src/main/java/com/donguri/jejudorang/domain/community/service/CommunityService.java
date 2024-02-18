@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.community.service;
 
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityBookmarkListResponse;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponse;
 import com.donguri.jejudorang.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,10 +30,10 @@ public interface CommunityService {
 
 
     // 마이페이지: 작성한 게시글 조회
-    Page<CommunityListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable);
+    Page<CommunityBookmarkListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable);
 
     // 마이페이지: 댓글단 글 조회
-    Page<CommunityListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable);
+    Page<CommunityBookmarkListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable);
 
     // 회원 탈퇴시 작성글과 작성자 연관 관계 삭제 - null 처리
     void findAllPostsByUserAndSetWriterNull(Long userId);

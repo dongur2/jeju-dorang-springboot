@@ -3,7 +3,7 @@ package com.donguri.jejudorang.domain.community.service;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponse;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponse;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityBookmarkListResponse;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponse;
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
@@ -15,7 +15,6 @@ import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagServi
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
-import com.donguri.jejudorang.global.common.InvalidState;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -153,16 +152,16 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public Page<CommunityListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable) {
+    public Page<CommunityBookmarkListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByWriterId(writer.getId(), pageable)
-                .map(CommunityListResponse::from);
+                .map(CommunityBookmarkListResponse::from);
     }
 
     @Override
     @Transactional
-    public Page<CommunityListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
+    public Page<CommunityBookmarkListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByCommentWriterIdAndIsDeletedFalse(writer.getId(), IsDeleted.EXISTING, pageable)
-                .map(CommunityListResponse::from);
+                .map(CommunityBookmarkListResponse::from);
     }
 
 
