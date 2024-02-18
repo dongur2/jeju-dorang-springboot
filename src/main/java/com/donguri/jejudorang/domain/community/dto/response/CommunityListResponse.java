@@ -12,7 +12,7 @@ import java.util.Optional;
 @Builder
 public record CommunityListResponse(
     Long id,
-    BoardType type,
+    String type,
     String state,
     String title,
     String nickname,
@@ -44,7 +44,7 @@ public record CommunityListResponse(
     private static CommunityListResponse convertToDtoFrom(Community community, JoinState state, String nickname, String writerId) {
         return CommunityListResponse.builder()
                 .id(community.getId())
-                .type(community.getType())
+                .type(community.getType().name())
                 .state(state.name())
                 .title(community.getTitle())
                 .nickname(nickname)
