@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListResponse;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.notification.service.NotificationService;
@@ -26,6 +26,7 @@ import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -74,6 +75,12 @@ public class UserServiceI implements UserService {
     private final PasswordEncoder encoder;
     @Autowired
     private final JwtProvider jwtProvider;
+
+
+    @Value("${aws.s3.default-img.name}")
+    private String defaultImgName;
+    @Value("${aws.s3.default-img.url}")
+    private String defaultImgUrl;
 
     public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
@@ -189,6 +196,7 @@ public class UserServiceI implements UserService {
          * */
         try {
             User userToSave = signUpRequest.toEntity();
+            userToSave.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
             // set password
             Password pwdToSet = Password.builder()
@@ -348,8 +356,7 @@ public class UserServiceI implements UserService {
                 if (pastImg != null) {
                     imageService.deleteImg(pastImg);
 
-                    nowUser.getProfile().updateImgName(null);
-                    nowUser.getProfile().updateImgUrl(null);
+                    nowUser.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
                     log.info("이전 이미지 삭제 완료");
                 }
@@ -360,8 +367,8 @@ public class UserServiceI implements UserService {
                     throw new IllegalAccessException("사진 업로드에 실패했습니다.");
 
                 } else {
-                    nowUser.getProfile().updateImgName(uploadedImg.get("imgName"));
-                    nowUser.getProfile().updateImgUrl(uploadedImg.get("imgUrl"));
+                    nowUser.getProfile().updateImg(uploadedImg.get("imgName"), uploadedImg.get("imgUrl"));
+
                     log.info("이미지 업로드 완료 : {}", uploadedImg.get("imgName"));
                 }
             }
@@ -392,8 +399,7 @@ public class UserServiceI implements UserService {
             if (pastImg != null) {
                 imageService.deleteImg(pastImg);
 
-                nowUser.getProfile().updateImgName(null);
-                nowUser.getProfile().updateImgUrl(null);
+                nowUser.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
                 log.info("이전 이미지 삭제 완료");
             }
@@ -559,6 +565,9 @@ public class UserServiceI implements UserService {
             // 알림 삭제
             notificationService.findAndDeleteAllNotificationsByUserId(idFromJwtToken);
 
+            // 북마크 삭제
+            bookmarkService.deleteAllBookmarksOfUser(idFromJwtToken);
+
             // 유저 삭제
             userRepository.deleteById(idFromJwtToken);
 
@@ -576,7 +585,7 @@ public class UserServiceI implements UserService {
     *
     * */
     @Override
-    public Page<CommunityListResponse> getMyCommunityWritings(String token, Pageable pageable) {
+    public Page<CommunityMyPageListResponse> getMyCommunityWritings(String token, Pageable pageable) {
 
         try {
             User nowUser = getNowUser(token);
@@ -598,7 +607,7 @@ public class UserServiceI implements UserService {
      * */
     @Override
     @Transactional
-    public Page<CommunityListResponse> getMyCommunityComments(String accessToken, Pageable pageable) {
+    public Page<CommunityMyPageListResponse> getMyCommunityComments(String accessToken, Pageable pageable) {
         try {
             User nowUser = getNowUser(accessToken);
 

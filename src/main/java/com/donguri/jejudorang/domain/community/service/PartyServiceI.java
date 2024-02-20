@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.community.service;
 
-import com.donguri.jejudorang.domain.community.dto.response.PartyListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
@@ -27,7 +27,7 @@ public class PartyServiceI implements PartyService{
 
     @Override
     @Transactional
-    public Page<PartyListResponse> getPartyPostList(Pageable pageable, String paramState, String searchWord, String searchTag) {
+    public Page<CommunityListResponse> getPartyPostList(Pageable pageable, String paramState, String searchWord, String searchTag) {
 
         // 넘어온 String state -> null / Enum 변환
         JoinState state = setStateToSort(paramState);
@@ -70,7 +70,7 @@ public class PartyServiceI implements PartyService{
 
         // entity -> dto
         return entities.map(
-                party -> PartyListResponse.from(party, party.getTags().stream()
+                party -> CommunityListResponse.from(party, party.getTags().stream()
                         .map(tag -> tag.getTag().getKeyword())
                         .toList())
         );

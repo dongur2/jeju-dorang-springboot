@@ -26,20 +26,20 @@
             <div style="margin: 4% 0">
                 <div th:each="post : ${posts}">
                     <div class="card border mb-3" style="margin: 2% 0">
-                        <h5 class="card-header bg-transparent border" th:if="${post.type.name() == 'PARTY'}">
+                        <h5 class="card-header bg-transparent border" th:if="${post.type == 'PARTY'}">
                             모임 &#183;
-                            <span th:if="${post.state.name() == 'RECRUITING'}" style="color: #FB7A51">모집중</span>
-                            <span th:if="${post.state.name() == 'DONE'}" style="color: #696969">모집완료</span>
+                            <span th:if="${post.state == 'RECRUITING'}" style="color: #FB7A51">모집중</span>
+                            <span th:if="${post.state == 'DONE'}" style="color: #696969">모집완료</span>
                         </h5>
-                        <h5 class="card-header bg-transparent border" th:if="${post.type.name() == 'CHAT'}">잡담</h5>
+                        <h5 class="card-header bg-transparent border" th:if="${post.type == 'CHAT'}">잡담</h5>
 
                         <div class="card-body text">
-                            <a th:if="${post.type.name() == 'PARTY'}" th:href="@{/community/boards/parties/{communityId}(communityId=${post.id})}"
+                            <a th:if="${post.type == 'PARTY'}" th:href="@{/community/boards/parties/{communityId}(communityId=${post.id})}"
                                 style="color: #696969; text-decoration-line: none; font-weight: bold">
                                 <h5 class="card-title"  th:text="${post.title}">Special title treatment</h5>
                             </a>
 
-                            <a th:if="${post.type.name() == 'CHAT'}" th:href="@{/community/boards/chats/{communityId}(communityId=${post.id})}"
+                            <a th:if="${post.type == 'CHAT'}" th:href="@{/community/boards/chats/{communityId}(communityId=${post.id})}"
                                style="color: #696969; text-decoration-line: none; font-weight: bold">
                                 <h5 class="card-title" th:text="${post.title}">Special title treatment</h5>
                             </a>
@@ -56,7 +56,7 @@
                                 <button href="#" class="btn btn-secondary"
                                         sec:authorize="isAuthenticated()"
                                         th:if="${#authentication.getName() == post.writerId()}"
-                                        th:onclick="deletePost([[${post.type.name()}]], [[${post.id}]], 'myWritings')">삭제</button>
+                                        th:onclick="deletePost([[${post.type}]], [[${post.id}]], 'myWritings')">삭제</button>
                             </div>
                         </div>
 
@@ -113,7 +113,6 @@
 
             xhr.onload = function () {
                 if (xhr.status === 200) {
-                    alert('비밀번호 변경이 완료되었습니다.');
                     window.location.reload();
 
                 } else {

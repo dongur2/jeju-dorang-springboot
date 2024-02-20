@@ -52,7 +52,7 @@ public class CommentController {
         } catch (Exception e) {
             log.error("댓글 생성에 실패했습니다: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "errorPage";
+            return "/error/errorPage";
         }
     }
 
@@ -81,7 +81,7 @@ public class CommentController {
         } catch (Exception e) {
             log.error("대댓글 작성에 실패했습니다. {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "errorPage";
+            return "/error/errorPage";
         }
     }
 

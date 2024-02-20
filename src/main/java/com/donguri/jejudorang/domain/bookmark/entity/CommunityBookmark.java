@@ -18,11 +18,11 @@ public class CommunityBookmark extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(nullable = false, name = "user_id")
+    @JoinColumn(name = "user_id")
     @ManyToOne
     private User user;
 
-    @JoinColumn(nullable = false, name = "community_id")
+    @JoinColumn(name = "community_id")
     @ManyToOne
     private Community community;
 
@@ -30,5 +30,10 @@ public class CommunityBookmark extends BaseEntity {
     public CommunityBookmark(User user, Community community) {
         this.user = user;
         this.community = community;
+    }
+
+
+    public void updateCommunityWhenDeleted() {
+        this.community = null;
     }
 }

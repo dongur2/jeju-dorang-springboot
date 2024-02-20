@@ -45,10 +45,9 @@ public class Profile extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public void updateImgName(String imgName) { this.imgName = imgName; }
-
-    public void updateImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
+    public void updateImg(String name, String url) {
+        this.imgName = name;
+        this.imgUrl = url;
     }
 
 }

@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class MyPageController {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
 
-            Page<CommunityListResponse> data = userService.getMyCommunityWritings(token.getValue(), pageable);
+            Page<CommunityMyPageListResponse> data = userService.getMyCommunityWritings(token.getValue(), pageable);
 
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
@@ -50,7 +50,7 @@ public class MyPageController {
         } catch (Exception e) {
             log.error("커뮤니티 작성글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "errorPage";
+            return "/error/errorPage";
         }
     }
 
@@ -66,7 +66,7 @@ public class MyPageController {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
 
-            Page<CommunityListResponse> data = userService.getMyCommunityComments(token.getValue(), pageable);
+            Page<CommunityMyPageListResponse> data = userService.getMyCommunityComments(token.getValue(), pageable);
 
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
@@ -77,7 +77,7 @@ public class MyPageController {
         } catch (Exception e) {
             log.error("커뮤니티 작성댓글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "errorPage";
+            return "/error/errorPage";
         }
     }
 
@@ -89,8 +89,8 @@ public class MyPageController {
      * */
     @GetMapping("/bookmarks")
     public String getMyBookmarkPage (@CookieValue("access_token") Cookie token, Model model,
-            @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
-            @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage){
+                                        @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
+                                        @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage){
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
             Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);
@@ -104,7 +104,7 @@ public class MyPageController {
         } catch (Exception e) {
             log.error("북마크 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "errorPage";
+            return "/error/errorPage";
         }
     }
 

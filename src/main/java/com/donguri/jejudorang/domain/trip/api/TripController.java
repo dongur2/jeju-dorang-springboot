@@ -80,7 +80,7 @@ public class TripController {
         } catch (Exception e) {
             log.error("여행 리스트 데이터 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "errorPage";
+            return "/error/errorPage";
         }
 
     }
@@ -103,7 +103,7 @@ public class TripController {
         } catch (Exception e) {
             log.error("여행 상세글 조회에 실패했습니다. {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "errorPage";
+            return "/error/errorPage";
         }
     }
 

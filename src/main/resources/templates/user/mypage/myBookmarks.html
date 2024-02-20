@@ -39,7 +39,10 @@
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
-                                    <h5 class="card-title" th:text="${post.getName()}">Card title</h5>
+                                    <div style="width:100%; display: flex; flex-direction: row; justify-content: space-between">
+                                        <h5 style="width: 90%" class="card-title" th:text="${post.getName()}">Card title</h5>
+                                        <a th:onclick="'deleteTripBookmark(' + ${post.id} + ')'" class="btn btn-secondary">삭제</a>
+                                    </div>
                                     <p class="card-text" ><small class="text-body-secondary" th:text="${post.getTags()}">Last updated 3 mins ago</small></p>
                                 </div>
                             </div>
@@ -53,21 +56,23 @@
             <!--    카드 : 커뮤니티      -->
             <div th:if="${type == 'community'}" style="margin: 4% 0">
                 <div th:each="post : ${posts}">
-                    <div class="card border mb-3" style="margin: 2% 0">
-                        <h5 class="card-header bg-transparent border" th:if="${post.type.name() == 'PARTY'}">
+
+                    <!-- 삭제되지 않은 글의 북마크 -->
+                    <div th:if="${post.type != 'DELETED'}" class="card border mb-3" style="margin: 2% 0">
+                        <h5 class="card-header bg-transparent border" th:if="${post.type == 'PARTY'}">
                             모임 &#183;
-                            <span th:if="${post.state.name() == 'RECRUITING'}" style="color: #FB7A51">모집중</span>
-                            <span th:if="${post.state.name() == 'DONE'}" style="color: #696969">모집완료</span>
+                            <span th:if="${post.state == 'RECRUITING'}" style="color: #FB7A51">모집중</span>
+                            <span th:if="${post.state== 'DONE'}" style="color: #696969">모집완료</span>
                         </h5>
-                        <h5 class="card-header bg-transparent border" th:if="${post.type.name() == 'CHAT'}">잡담</h5>
+                        <h5 class="card-header bg-transparent border" th:if="${post.type == 'CHAT'}">잡담</h5>
 
                         <div class="card-body text">
-                            <a th:if="${post.type.name() == 'PARTY'}" th:href="@{/community/boards/parties/{communityId}(communityId=${post.id})}"
+                            <a th:if="${post.type == 'PARTY'}" th:href="@{/community/boards/parties/{communityId}(communityId=${post.id})}"
                                style="color: #696969; text-decoration-line: none; font-weight: bold">
                                 <h5 class="card-title"  th:text="${post.title}">Special title treatment</h5>
                             </a>
 
-                            <a th:if="${post.type.name() == 'CHAT'}" th:href="@{/community/boards/chats/{communityId}(communityId=${post.id})}"
+                            <a th:if="${post.type == 'CHAT'}" th:href="@{/community/boards/chats/{communityId}(communityId=${post.id})}"
                                style="color: #696969; text-decoration-line: none; font-weight: bold">
                                 <h5 class="card-title" th:text="${post.title}">Special title treatment</h5>
                             </a>
@@ -76,21 +81,35 @@
                         <div class="card-footer bg-transparent border" style="display: flex; justify-content: space-between;">
                             <div style="width: 200px; display: flex; align-items: flex-end">
                                 작성자:
-                                <span th:if="${post.nickname != null}" th:text="${post.nickname}">닉네임</span>
-                                <span th:if="${post.nickname == null}">탈퇴한 회원</span>
+                                <span th:if="${post.nickname != 'INVALID'}" th:text="${post.nickname}">닉네임</span>
+                                <span th:if="${post.nickname == 'INVALID'}">탈퇴한 회원</span>
                             </div>
 
-                            <div style="width:450px; display: flex; justify-content: space-around; align-items: flex-end">
+                            <div style="width:450px; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
                                 <div>
                                     북마크 <span th:text="${post.bookmarkCount}">0</span> &#183;
                                     조회 <span th:text="${post.viewCount}">0</span> &#183;
                                     댓글 <span th:text="${post.commentCount}">0</span>
                                 </div>
                                 <span th:text="${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일')}"></span>
-                                <a href="#" class="btn btn-secondary">삭제</a>
+                                <a th:onclick="'deleteCommunityBookmark(' + ${post.id} + ')'" class="btn btn-secondary">삭제</a>
                             </div>
                         </div>
 
+                    </div>
+
+                    <!-- 삭제된 글의 북마크 -->
+                    <div th:if="${post.type == 'DELETED'}" class="card border mb-3" style="margin: 2% 0; color: #9b9b9b;">
+                        <h5 class="card-header bg-transparent border">삭제된 글입니다.</h5>
+
+                        <div class="card-body text">
+                            <a href="#" style="color: #9b9b9b; text-decoration-line: none; font-weight: bold">
+                                <h5 class="card-title">삭제된 글입니다.</h5>
+                            </a>
+                        </div>
+                        <div class="card-footer bg-transparent border" style="display: flex">
+                            <a th:onclick="'deleteCommunityBookmarkDeleted(' + ${post.bookmarkId}+ ')'" class="btn btn-secondary" style="margin-left:auto">삭제</a>
+                        </div>
                     </div>
 
                 </div>
@@ -126,6 +145,46 @@
             </nav>
         </div>
 
+        <script>
+            function deleteCommunityBookmark(postId) {
+                var url = '/bookmarks?type=community&id=' + postId;
+
+                sendRequest(url);
+            }
+
+            function deleteCommunityBookmarkDeleted(bookmarkId) {
+                var url = "/bookmarks/deleted?id=" + bookmarkId;
+
+                sendRequest(url);
+            }
+
+            function deleteTripBookmark(postId) {
+                var url = '/bookmarks?type=trip&id=' + postId;
+
+                sendRequest(url);
+            }
+
+            function sendRequest(url) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("DELETE", url, true);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            window.location.reload();
+
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }
+                }
+                xhr.send();
+            }
+
+
+
+
+        </script>
 
     </div>
 

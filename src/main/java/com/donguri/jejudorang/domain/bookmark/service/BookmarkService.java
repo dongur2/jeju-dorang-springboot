@@ -13,9 +13,14 @@ public interface BookmarkService {
     void addBookmark(String accessToken, String boardName, Long boardId);
 
     // 북마크 삭제
-    void deleteBookmark(String accessToken, String boardName, Long boardId);
+    void deleteBookmark(String accessToken, String postType, Long postId);
+    void deleteCommunityBookmarkOnDeletedPost(String accessToken, Long bookmarkId);
 
     // 북마크 조회
     Page<?> getMyBookmarks(User user, String type, Pageable pageable);
+
+
+    // 회원 탈퇴 시 그 회원의 모든 북마크 삭제
+    void deleteAllBookmarksOfUser(Long userId);
 
 }

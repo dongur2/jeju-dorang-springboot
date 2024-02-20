@@ -58,11 +58,17 @@
 
             xhr.onload = function () {
                 if (xhr.status === 200) {
-                    alert('비밀번호 변경이 완료되었습니다.');
+                    alert('비밀번호가 변경되었습니다.');
                     window.location.reload();
 
                 } else {
-                    alert(xhr.responseText);
+                    Swal.fire({
+                        position: 'middle',
+                        icon: 'error',
+                        title: '',
+                        text: xhr.responseText,
+                        showConfirmButton: true,
+                    });
                 }
             };
             xhr.send(formData);

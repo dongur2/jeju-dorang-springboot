@@ -65,6 +65,7 @@ public class Comment extends BaseEntity {
     public void updateCmtGroup() {
         this.cmtGroup = this.id;
     }
+    public void updateCmtOrder() { this.cmtOrder = this.id; }
 
     // * 댓글 삭제 상태 업데이트
     public void updateIsDeleted() {

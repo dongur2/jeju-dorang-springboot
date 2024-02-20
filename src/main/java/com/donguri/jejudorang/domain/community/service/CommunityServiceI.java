@@ -1,9 +1,10 @@
 package com.donguri.jejudorang.domain.community.service;
 
+import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponse;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponse;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListResponse;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponse;
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
@@ -15,7 +16,6 @@ import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagServi
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
-import com.donguri.jejudorang.global.common.InvalidState;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -124,7 +124,7 @@ public class CommunityServiceI implements CommunityService {
                         idFromJwt.append(jwtProvider.getUserNameFromJwtToken(accessToken.getValue()));
                     } catch (Exception e) {
                         log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
-                        resMap.put("result", CommunityDetailResponse.from(found, tagsToStringList));
+                        resMap.put("result", CommunityDetailResponse.from(found, tagsToStringList, null));
                         resMap.put("cmts", cmtList);
                         return resMap;
                     }
@@ -138,7 +138,7 @@ public class CommunityServiceI implements CommunityService {
                 // 2. Access Token 쿠키가 없는 경우
                 } else {
                     log.info("비회원은 북마크 여부를 확인할 수 없습니다.");
-                    resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList));
+                    resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList, null));
                     resMap.put("cmts", cmtList);
                 }
 
@@ -153,16 +153,16 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public Page<CommunityListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable) {
+    public Page<CommunityMyPageListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByWriterId(writer.getId(), pageable)
-                .map(CommunityListResponse::from);
+                .map(CommunityMyPageListResponse::from);
     }
 
     @Override
     @Transactional
-    public Page<CommunityListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
+    public Page<CommunityMyPageListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByCommentWriterIdAndIsDeletedFalse(writer.getId(), IsDeleted.EXISTING, pageable)
-                .map(CommunityListResponse::from);
+                .map(CommunityMyPageListResponse::from);
     }
 
 
@@ -235,6 +235,9 @@ public class CommunityServiceI implements CommunityService {
             if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)) {
                 throw new IllegalAccessException("게시글은 작성자만 삭제할 수 있습니다.");
             }
+
+            // 북마크 연관관계 삭제: 게시글을 삭제해도 북마크는 남음
+            nowPost.getBookmarks().forEach(CommunityBookmark::updateCommunityWhenDeleted);
 
             communityRepository.delete(nowPost);
 

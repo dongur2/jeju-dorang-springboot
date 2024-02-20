@@ -22,8 +22,32 @@
     <div class="board-whole-content-box">
         <!-- 헤더: 제목, 작성자(닉네임), 작성/수정날짜, 조회수   -->
         <div class="board-post-info">
-            <div class="board-header">
-                <h1 th:text="${post.title}" id="board-post-title"></h1>
+            <div class="board-header"
+                 style="width:100%; height:50px; display:flex; flex-direction:row">
+
+                <!-- 모집상태 -->
+                <div th:if="${post.type.name} == 'PARTY'" class="board-post-feature board-state"
+                style="width:150px; height:100%">
+                    <div th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}"
+                    style="width:150px; height:100%;">
+                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn btn btn-success"
+                                th:onclick="'changeJoinState(' + ${post.id} + ')'"
+                                style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집중</button>
+                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn btn btn-secondary"
+                                th:onclick="'changeJoinState(' + ${post.id} + ')'"
+                                style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집완료</button>
+                    </div>
+
+                    <div th:if="${post.writerId != #authentication.name || !#authentication.isAuthenticated()}"
+                         style="width:200px; height:100%;">
+                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn btn btn-success" disabled
+                                style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집중</button>
+                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn btn btn-secondary" disabled
+                                style="width:130px; height:100%; font-size: 20px; font-weight: bolder">모집완료</button>
+                    </div>
+                </div>
+
+                <h1 th:text="${post.title}" id="board-post-title" style="width:90%; height:100%"></h1>
             </div>
             <div class="board-sub-header">
                 <div class="board-sub-title">
@@ -31,7 +55,7 @@
                         <a href="#" th:if="${post.nickname != 'INVALID'}" th:text="${post.nickname}">닉네임</a>
                         <a href="#" th:if="${post.nickname == 'INVALID'}">탈퇴한 회원</a>
                     </h6>
-                    <div class="sub-title-box content-date">
+                    <div class="sub-title-box content-date" style="width:100%; height:40px; display: flex; flex-direction: row; align-items: center">
                         <span class="sub-title sub-title-created-at">
                             <span class="sub-title-title">작성일</span>
                             <span class="sub-title-value" th:text="${#temporals.format(post.createdAt, 'yy.MM.dd HH:mm')}">24.01.08 16:30</span>
@@ -48,6 +72,22 @@
                             <span class="sub-title-title">북마크수</span>
                             <span class="sub-title-value" th:text="${post.bookmarkCount}">00</span>
                         </span>
+
+                        <!-- 수정 버튼: 작성자일 경우에만 노출 -->
+                        <div class="board-post-feature board-modify" style="margin-left:auto; width:90px; height:100%">
+                            <button class="feature-row board-modify-btn btn btn-outline-secondary"
+                                    style="width:100%; height:96%"
+                                    th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}"
+                                    th:onclick="|location.href='@{/community/post/{communityId}/modify(communityId=${post.id})}'|">수정</button>
+                        </div>
+                        <!-- 삭제 버튼: 작성자일 경우에만 노출 -->
+                        <div sec:authorize="isAuthenticated()"
+                             th:if="${post.writerId != 'INVALID' && #authentication.name == post.writerId}"
+                             class="board-post-feature board-back-to-list" style="margin-left:1%; width:90px; height:100% ">
+                            <button class="feature-row board-share-btn btn btn-secondary" style="width:100%; height:96%"
+                                    th:onclick="deletePost([[${post.type.name}]], [[${post.id}]], 'detail')">삭제</button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -64,60 +104,85 @@
             </div>
 
             <!--    버튼    -->
-            <div class="board-post-features">
-                <!-- 모집상태 -->
-                <div th:if="${post.type.name} == 'PARTY'" class="board-post-feature board-state">
-                    <div th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}">
-                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn"
-                                th:onclick="'changeJoinState(' + ${post.id} + ')'">모집중</button>
-                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn"
-                                th:onclick="'changeJoinState(' + ${post.id} + ')'">모집완료</button>
-                    </div>
+            <div class="board-post-features"
+                 style="width:100%; height: 80px; display: flex;">
 
-                    <div th:if="${post.writerId != 'INVALID' && (post.writerId != #authentication.name || !#authentication.isAuthenticated())}">
-                        <button th:if="${post.state.name} == 'RECRUITING'" class="feature-row board-state-btn" disabled>모집중</button>
-                        <button th:if="${post.state.name} == 'DONE'" class="feature-row board-state-btn" disabled>모집완료</button>
-                    </div>
-                </div>
-
-                <div class="board-post-feature board-liked">
+                <div class="board-post-feature board-liked" style="width: 90px; height:100%;  display:flex; justify-content:center; align-items:center" >
 
                     <!--        북마크: 로그인/비로그인 분리           -->
-                    <button class="feature-row board-liked-btn"
+                    <div class="feature-row board-liked-btn"
                             sec:authorize="!isAuthenticated()"
-                            th:onclick="cantBookmark()">북마크</button>
+                            th:onclick="cantBookmark()"
+                            style="cursor:pointer; width:80px; height:80px; display:flex; justify-content:center; align-items:center;"
+                    ><i class="fa-regular fa-heart" style="font-size:40px; color:#3F3D3A"></i></div>
 
                     <!--        로그인: 북마크 여부로 분리            -->
-                    <button class="feature-row board-liked-btn"
+                    <div class="feature-row board-liked-btn"
                             sec:authorize="isAuthenticated()"
                             th:if="${post.isBookmarked}"
-                            th:onclick="'deleteBookmark('+${post.id}+')'">북마크</button>
-                    <button class="feature-row board-liked-btn"
+                            th:onclick="'deleteBookmark('+${post.id}+')'"
+                            style="cursor:pointer; width:80px; height:80px; display:flex; justify-content:center; align-items:center;"
+                    ><i class="fa-solid fa-heart" style="font-size:40px; color:#FB7A51"></i></div>
+                    <div class="feature-row board-liked-btn"
                             sec:authorize="isAuthenticated()"
                             th:if="${!post.isBookmarked}"
-                            th:onclick="'createBookmark('+${post.id}+')'">북마크</button>
+                            th:onclick="'createBookmark('+${post.id}+')'"
+                            style="cursor:pointer; width:80px; height:80px; display:flex; justify-content:center; align-items:center;"
+                    ><i class="fa-regular fa-heart" style="font-size:40px; color:#3F3D3A"></i></div>
 
                 </div>
-                <div class="board-post-feature board-share">
-                    <button class="feature-row board-share-btn"
-                    th:onclick="openSnsModal()">공유</button>
-                </div>
-                <div class="board-post-feature board-modify">
-                    <button class="feature-row board-modify-btn"
-                    th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}"
-                    th:onclick="|location.href='@{/community/post/{communityId}/modify(communityId=${post.id})}'|">수정</button>
-                </div>
-                <div class="board-post-feature board-back-to-list">
-                    <button class="feature-row board-share-btn" th:onclick="|window.history.back()|">목록</button>
+
+                <div class="board-post-feature board-share" style="width:100px; height:80px; display: flex; justify-content: center; align-items: center;">
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#shareModal"
+                            style="width:90%; height: 50%">
+                        공유
+                    </button>
                 </div>
 
-                <!-- 삭제 버튼: 작성자일 경우에만 노출 -->
-                <div sec:authorize="isAuthenticated()"
-                     th:if="${post.writerId != 'INVALID' && #authentication.name == post.writerId}"
-                     class="board-post-feature board-back-to-list" style="margin-left:5%">
-                    <button class="feature-row board-share-btn"
-                            th:onclick="deletePost([[${post.type.name}]], [[${post.id}]], 'detail')">삭제</button>
+                <!-- 모달 -->
+                <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="shareModalLabel">글 공유하기</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="modal-sns-btns-box">
+                                    <div class="modal-sns-share-btn-kakao kakao-share-btn">
+                                        <a id="kakaotalk-sharing-btn" href="javascript:;">
+                                            <img src="https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png"
+                                                 alt="카카오톡 공유 보내기 버튼" />
+                                        </a>
+                                    </div>
+
+                                    <div class="modal-sns-share-btn etc-btns">
+                                        <button class="etc-btn facebook-share-button" th:onclick="shareFacebook()">
+                                            페이스북으로 공유
+                                        </button>
+                                        <button class="etc-btn twitter-share-button" th:onclick="shareTwitter()">
+                                            트위터로 공유
+                                        </button>
+                                        <button class="etc-btn copy-share-button" th:onclick="shareCopiedLink()">
+                                            링크 복사
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="board-post-feature board-back-to-list" style="width:100px; height:80px; display: flex; justify-content: center; align-items: center;">
+                    <button class="feature-row board-share-btn btn btn-light" th:onclick="|window.history.back()|"
+                            style="width:90%; height: 50%"
+                    >목록</button>
+                </div>
+
+
             </div>
 
         </div>
@@ -166,16 +231,19 @@
                         <div class="cmt-writer-img-circle"
                              style="width:60px; height:60px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
 
-                            <img th:if="${cmt.pic != 'INVALID'}" th:src="${cmt.pic}"
-                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
+                            <img th:if="${cmt.pic != 'INVALID' && cmt.pic != 'DELETED'}" th:src= "${cmt.pic}"
+                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                            <img th:if="${cmt.pic == 'INVALID' || cmt.pic == 'DELETED'}" th:src= "@{/img/default-img.png}"
+                                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
                         </div>
 
                         <!-- 닉네임 -->
                         <div class="cmt-writer-nickname"
                         style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
-                            <h5 th:if="${cmt.nickname != 'INVALID'}" th:text="${cmt.nickname}">닉네임</h5>
+                            <h5 th:if="${cmt.nickname != 'INVALID' && cmt.nickname != 'DELETED'}" th:text="${cmt.nickname}">닉네임</h5>
                             <h5 th:if="${cmt.nickname == 'INVALID'}">탈퇴한 회원</h5>
+                            <h5 th:if="${cmt.nickname == 'DELETED'}">삭제된 댓글입니다.</h5>
                         </div>
 
                         <!-- 작성일 -->
@@ -188,15 +256,14 @@
 
                     <!-- 대댓글 작성폼 열기 버튼: 로그인한 경우만 노출 -->
                     <div class="re-cmt-box" style="width:120px; display: flex; flex-direction: row; align-items: flex-end"
-                         sec:authorize="isAuthenticated()"
-                         th:if="${cmt.nickname != 'INVALID'}">
+                         sec:authorize="isAuthenticated()">
                         <button class="btn btn-outline-success" id="re-cmt-btn" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId} + ')'" style="width:95%; height:60%">답글 달기</button>
                     </div>
 
                     <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                     <div class="cmt-card-header-btns"
                          sec:authorize="isAuthenticated()"
-                         th:if="${cmt.writerId != 'INVALID' && #authentication.name == cmt.writerId}"
+                         th:if="${#authentication.name == cmt.writerId}"
                         style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
                         <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
@@ -210,8 +277,8 @@
                 <div class="cmt-card-body"
                 style="width:100%; min-height:70px; max-height:100px; padding:  1.5% 6.5%; background: white; margin-top:5px;">
 
-                    <p style="font-size: 18px" th:if="${cmt.content != 'INVALID'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
-                    <p style="font-size: 18px" th:if="${cmt.content == 'INVALID'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
+                    <p style="font-size: 18px" th:if="${cmt.content != 'DELETED'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
+                    <p style="font-size: 18px" th:if="${cmt.content == 'DELETED'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
 
                     <div th:id="'cmt-modify-block-' + ${cmt.cmtId}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
                         <input th:id="'cmt-modify-input-' + ${cmt.cmtId}" th:value="${cmt.content}" style="width: 88%; border: none">
@@ -241,16 +308,19 @@
                             <div class="re-cmt-writer-img-circle"
                                  style="width:50px; height:50px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(208,208,208,0.86);">
 
-                                <img th:if="${cmt.pic != 'INVALID'}" th:src="${cmt.pic}"
-                                     style="width: 100%; height: 100%; object-fit: cover; object-position: center;">>
+                                <img th:if="${cmt.pic != 'INVALID' && cmt.pic != 'DELETED'}" th:src="${cmt.pic}"
+                                     style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                                <img th:if="${cmt.pic == 'INVALID' || cmt.pic == 'DELETED'}" th:src= "@{/img/default-img.png}"
+                                     style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
                             </div>
 
                             <!-- 닉네임 -->
                             <div class="re-cmt-writer-nickname"
                                  style="min-width: 100px; max-width: 60%; display:flex; align-items:flex-end;">
 
-                                <h5 th:if="${cmt.nickname != 'INVALID'}" th:text="${cmt.nickname}">닉네임</h5>
+                                <h5 th:if="${cmt.nickname != 'INVALID' && cmt.nickname != 'DELETED'}" th:text="${cmt.nickname}">닉네임</h5>
                                 <h5 th:if="${cmt.nickname == 'INVALID'}">탈퇴한 회원</h5>
+                                <h5 th:if="${cmt.nickname == 'DELETED'}">삭제된 댓글입니다.</h5>
                             </div>
 
                             <!-- 작성일 -->
@@ -264,7 +334,7 @@
                         <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
                         <div class="re-cmt-card-header-btns"
                              sec:authorize="isAuthenticated()"
-                             th:if="${cmt.writerId != 'INVALID' && #authentication.getName() == cmt.writerId}"
+                             th:if="${#authentication.getName() == cmt.writerId}"
                              style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: center">
 
                             <button type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
@@ -277,8 +347,8 @@
                     <div class="re-cmt-card-body"
                          style="width:100%; min-height:40px; max-height:100px; padding:  1% 6.5%">
 
-                        <p style="font-size: 18px" th:if="${cmt.content != 'INVALID'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
-                        <p style="font-size: 18px" th:if="${cmt.content == 'INVALID'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
+                        <p style="font-size: 18px" th:if="${cmt.content != 'DELETED'}" th:text="${cmt.content}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">댓글</p>
+                        <p style="font-size: 18px" th:if="${cmt.content == 'DELETED'}" th:id="'cmt-content-origin-' + ${cmt.cmtId}">삭제된 댓글입니다.</p>
 
                         <div th:id="'cmt-modify-block-' + ${cmt.cmtId}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
                             <input th:id="'cmt-modify-input-' + ${cmt.cmtId}" th:value="${cmt.content}" name="cmtId" style="width: 88%; border: none">
@@ -314,35 +384,6 @@
 
 
 
-    <!--  모달   -->
-    <div class="modal-sns-share-box hidden-modal" id="modal-sns-share-box">
-        <div class="modal-sns-header">
-            <h4 class="modal-sns-title">글 공유하기</h4>
-            <button class="modal-sns-share-btn close-share-btn" th:onclick="openSnsModal()">X</button>
-        </div>
-        <div class="modal-sns-btns-box">
-            <div class="modal-sns-share-btn-kakao kakao-share-btn">
-                <a id="kakaotalk-sharing-btn" href="javascript:;">
-                    <img src="https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png"
-                         alt="카카오톡 공유 보내기 버튼" />
-                </a>
-            </div>
-
-            <div class="modal-sns-share-btn etc-btns">
-                <button class="etc-btn facebook-share-button" th:onclick="shareFacebook()">
-                    페이스북으로 공유
-                </button>
-                <button class="etc-btn twitter-share-button" th:onclick="shareTwitter()">
-                    트위터로 공유
-                </button>
-                <button class="etc-btn copy-share-button" th:onclick="shareCopiedLink()">
-                    링크 복사
-                </button>
-            </div>
-        </div>
-    </div>
-
-
     <script>
 
         /*
@@ -355,7 +396,6 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert("모집 상태 변경 완료");
                         window.location.href = '/community/boards/parties/' + communityId;
 
                     } else {
@@ -373,23 +413,33 @@
         * */
         // 로그인 하지 않은 경우
         function cantBookmark() {
-            alert("북마크하려면 로그인이 필요합니다.");
+            Swal.fire({
+                position: 'middle',
+                icon: 'warning',
+                title: '',
+                text: "북마크하려면 로그인이 필요합니다.",
+                showConfirmButton: true
+            });
         }
         // 로그인한 경우 - 북마크 하지 않은 글
         function createBookmark(communityId) {
-            alert('create');
-
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', '/bookmarks/communities/' + communityId, true);
+            var url = '/bookmarks?type=community&id=' + communityId;
+            xhr.open('POST', url, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert(xhr.responseText);
                         window.location.reload();
 
                     } else { // 그 외의 경우
-                        alert(xhr.responseText);
+                        Swal.fire({
+                            position: 'middle',
+                            icon: 'error',
+                            title: '',
+                            text: xhr.responseText,
+                            showConfirmButton: true
+                        });
                     }
                 }
             };
@@ -397,19 +447,24 @@
         }
         // 로그인한 경우 - 북마크 한 글
         function deleteBookmark(communityId) {
-            alert('delete');
+            var url = '/bookmarks?type=community&id=' + communityId;
 
             let xhr = new XMLHttpRequest();
-            xhr.open('DELETE', '/bookmarks/communities/' + communityId, true);
+            xhr.open('DELETE', url, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert(xhr.responseText);
                         window.location.reload();
 
                     } else { // 그 외의 경우
-                        alert(xhr.responseText);
+                        Swal.fire({
+                            position: 'middle',
+                            icon: 'error',
+                            title: '',
+                            text: xhr.responseText,
+                            showConfirmButton: true
+                        });
                     }
                 }
             };
@@ -459,7 +514,14 @@
             };
 
             copiedLink().then(() => { // Promise 성공적인 반환 후 실행
-                alert("링크 복사 완료");
+                Swal.fire({
+                    position: 'middle',
+                    icon: 'success',
+                    title: '',
+                    text: '링크가 복사되었습니다.',
+                    showConfirmButton: true,
+                    timer: 1400
+                });
             }).catch((error) => {
                 console.error('복사 실패:', error);
             });
@@ -497,7 +559,6 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert("댓글 수정이 완료되었습니다.");
                         window.location.reload();
 
                     } else {
@@ -519,7 +580,6 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert("댓글 삭제가 완료되었습니다.");
                         window.location.reload();
 
                     } else {

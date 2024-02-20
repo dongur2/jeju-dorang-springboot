@@ -117,7 +117,7 @@ public class UserController {
         Optional<Authentication> authState = userService.logOut();
 
         if (authState.isPresent()) {
-            return "errorPage";
+            return "/error/errorPage";
         } else {
             return "redirect:/";
         }
@@ -158,7 +158,7 @@ public class UserController {
 
     private static String bindErrorPage(BindingResult bindingResult, Model model) {
         model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
-        return "/error/errorTemp";
+        return "/error/errorPage";
     }
 
     /*

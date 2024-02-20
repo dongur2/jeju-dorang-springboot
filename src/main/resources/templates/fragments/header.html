@@ -8,14 +8,14 @@
 
             <!-- 알림 시작 -->
             <li class="notify-box" id="notify-box" sec:authorize="isAuthenticated()"
-                style="width:470px; height:300px; padding:3% 1%; opacity: 0; z-index: 50; background: #fff9f9; margin-left: auto; transition: opacity 0.3s;
-                        display: flex; flex-direction: column; gap:10px; justify-content: flex-start; align-items: flex-start;
+                style="width:470px; height:300px; padding:3% 1%; z-index: 50; background: #fff9f9; margin-left: auto; transition: opacity 0.3s;
+                        display: none; flex-direction: column; gap:10px; justify-content: flex-start; align-items: flex-start;
                         border: 1px solid rgba(110,110,110,0.65); border-radius: 13px; box-shadow: rgba(138,138,138,0.65); margin-top: 1%; overflow-y: auto;">
                 <h3>알림</h3>
                 <!-- 알림 렌더링될 위치 -->
             </li>
 
-            <li style="width:100px;" sec:authorize="isAuthenticated()">
+            <li style="width:100px; margin-left: auto" id="notify-box-open-li" sec:authorize="isAuthenticated()">
                 <button id='notify-card-open-btn' onclick="openNotify()" style="width:100%; background: none; border:none; color:#696969">알림</button>
             </li>
             <!-- 알림 끝 -->
@@ -267,13 +267,14 @@
         * */
         function openNotify() {
             var notifyBox = document.getElementById('notify-box');
-            var computedStyle = window.getComputedStyle(notifyBox);
-            var opacity = parseFloat(computedStyle.getPropertyValue('opacity'));
+            var notifyBtn = document.getElementById('notify-box-open-li');
 
-            if (opacity === 1) {
-                notifyBox.style.opacity = 0;
+            if (notifyBox.style.display === 'flex') {
+                notifyBox.style.display = 'none';
+                notifyBtn.style.marginLeft = 'auto';
             } else {
-                notifyBox.style.opacity = 1;
+                notifyBox.style.display = 'flex';
+                notifyBtn.style.marginLeft = null;
             }
         }
 
