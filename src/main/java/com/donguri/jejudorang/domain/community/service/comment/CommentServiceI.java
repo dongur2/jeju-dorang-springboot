@@ -72,22 +72,14 @@ public class CommentServiceI implements CommentService{
 
             nowPost.addComment(savedComment);
 
-
-            // * 글 작성자가 없거나 글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
-            Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
-            if(writer.isPresent() && !writer.get().equals(savedComment.getUser())) {
-                // 새 댓글 알림 전송
-                notificationService.sendNotification(writer.get(), nowPost, notificationId++, NotifyType.COMMENT);
-            } else {
-                log.info("알림을 전송할 수 없는 대상입니다.");
-            }
+            // 알림 전송
+            sendNotificationToPostWriter(nowPost, savedComment);
 
         } catch (Exception e) {
             log.error("댓글 작성 실패: {}", e.getMessage());
             throw e;
         }
     }
-
 
     @Override
     @Transactional
@@ -114,35 +106,36 @@ public class CommentServiceI implements CommentService{
 
             nowPost.addComment(savedReComment);
 
-            // * 글 작성자가 없거나 글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
-            Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
-            if(writer.isPresent() && !writer.get().equals(savedReComment.getUser())) {
-                // 새 댓글 알림 전송 ->  글 작성자에게
-                notificationService.sendNotification(writer.get(), nowPost, notificationId++, NotifyType.COMMENT);
-            } else {
-                log.info("알림을 전송할 수 없는 대상입니다.");
-            }
-
-            // 댓글 작성자
-            Optional<User> cmtWriter  = Optional.ofNullable(commentRepository.findById(newReComment.cmtId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."))
-                    .getUser());
-
-            // * 대댓글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
-            // 새 대댓글 알림 전송 -> 댓글 작성자에게
-            if(cmtWriter.isPresent() && !cmtWriter.get().equals(savedReComment.getUser())) {
-                cmtWriter.ifPresentOrElse(
-                        commentWriter -> notificationService.sendNotification(commentWriter, nowPost, notificationId++, NotifyType.RECOMMENT),
-                        () -> log.info("탈퇴한 회원의 댓글입니다.")
-                );
-            }
-
-
-
+            // 알림 전송
+            sendNotificationToPostWriter(nowPost, savedReComment);
+            sendNotificationToCmtWriter(newReComment, savedReComment, nowPost);
 
         } catch (Exception e) {
             log.error("대댓글 작성 실패: {}", e.getMessage());
             throw e;
+        }
+    }
+
+    private void sendNotificationToPostWriter(Community nowPost, Comment savedComment) {
+        // * 글 작성자가 없거나 글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
+        Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
+        if(writer.isPresent() && !writer.get().equals(savedComment.getUser())) {
+            // 새 댓글 알림 전송
+            notificationService.sendNotification(writer.get(), nowPost, notificationId++, NotifyType.COMMENT);
+        } else {
+            log.info("알림을 전송할 수 없는 대상입니다.");
+        }
+    }
+
+    private void sendNotificationToCmtWriter(ReCommentRequest newReComment, Comment savedReComment, Community nowPost) {
+        Optional<User> cmtWriter  = Optional.ofNullable(commentRepository.findById(newReComment.cmtId())
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."))
+                .getUser());
+
+        // * 대댓글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
+        // 새 대댓글 알림 전송 -> 댓글 작성자에게
+        if(cmtWriter.isPresent() && !cmtWriter.get().equals(savedReComment.getUser())) {
+            notificationService.sendNotification(cmtWriter.get(), nowPost, notificationId++, NotifyType.RECOMMENT);
         }
     }
 
