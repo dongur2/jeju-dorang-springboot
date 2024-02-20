@@ -30,11 +30,13 @@ import java.util.Optional;
 public class UserController {
 
     private final int cookieTime;
+    private final String kakaoApiKey;
     @Autowired private final UserService userService;
 
-    public UserController(@Value("${jwt.cookie-expire}") int cookieTime, UserService userService) {
+    public UserController(@Value("${jwt.cookie-expire}") int cookieTime, UserService userService, @Value("${kakao.key}") String kakaoApiKey) {
         this.cookieTime = cookieTime;
         this.userService = userService;
+        this.kakaoApiKey = kakaoApiKey;
     }
 
 
@@ -69,7 +71,8 @@ public class UserController {
     *
     * */
     @GetMapping("/login")
-    public String signInForm() {
+    public String signInForm(Model model) {
+        model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/user/login/signInForm";
     }
 
