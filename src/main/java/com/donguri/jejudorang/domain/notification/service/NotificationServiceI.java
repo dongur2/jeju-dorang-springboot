@@ -88,7 +88,7 @@ public class NotificationServiceI implements NotificationService{
                 sseEmitter.send(SseEmitter.event()
                         .id(notificationId.toString())
                         .name(NOTIFICATION_NAME)
-                        .data(notifyData));
+                        .data(notifyData.toString()));
 
                 log.info("실시간 알림 전송 완료");
 
