@@ -384,12 +384,6 @@
 
 
 
-    <!--  모달   -->
-    <div class="modal-sns-share-box hidden-modal" id="modal-sns-share-box">
-
-    </div>
-
-
     <script>
 
         /*
@@ -402,7 +396,6 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert("모집 상태 변경 완료");
                         window.location.href = '/community/boards/parties/' + communityId;
 
                     } else {
@@ -420,12 +413,16 @@
         * */
         // 로그인 하지 않은 경우
         function cantBookmark() {
-            alert("북마크하려면 로그인이 필요합니다.");
+            Swal.fire({
+                position: 'middle',
+                icon: 'warning',
+                title: '',
+                text: "북마크하려면 로그인이 필요합니다.",
+                showConfirmButton: true
+            });
         }
         // 로그인한 경우 - 북마크 하지 않은 글
         function createBookmark(communityId) {
-            alert('create');
-
             let xhr = new XMLHttpRequest();
             var url = '/bookmarks?type=community&id=' + communityId;
             xhr.open('POST', url, true);
@@ -433,11 +430,16 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert(xhr.responseText);
                         window.location.reload();
 
                     } else { // 그 외의 경우
-                        alert(xhr.responseText);
+                        Swal.fire({
+                            position: 'middle',
+                            icon: 'error',
+                            title: '',
+                            text: xhr.responseText,
+                            showConfirmButton: true
+                        });
                     }
                 }
             };
@@ -445,7 +447,6 @@
         }
         // 로그인한 경우 - 북마크 한 글
         function deleteBookmark(communityId) {
-            alert('delete');
             var url = '/bookmarks?type=community&id=' + communityId;
 
             let xhr = new XMLHttpRequest();
@@ -454,11 +455,16 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert(xhr.responseText);
                         window.location.reload();
 
                     } else { // 그 외의 경우
-                        alert(xhr.responseText);
+                        Swal.fire({
+                            position: 'middle',
+                            icon: 'error',
+                            title: '',
+                            text: xhr.responseText,
+                            showConfirmButton: true
+                        });
                     }
                 }
             };
@@ -508,7 +514,14 @@
             };
 
             copiedLink().then(() => { // Promise 성공적인 반환 후 실행
-                alert("링크 복사 완료");
+                Swal.fire({
+                    position: 'middle',
+                    icon: 'success',
+                    title: '',
+                    text: '링크가 복사되었습니다.',
+                    showConfirmButton: true,
+                    timer: 1400
+                });
             }).catch((error) => {
                 console.error('복사 실패:', error);
             });
@@ -546,7 +559,6 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert("댓글 수정이 완료되었습니다.");
                         window.location.reload();
 
                     } else {
@@ -568,7 +580,6 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert("댓글 삭제가 완료되었습니다.");
                         window.location.reload();
 
                     } else {

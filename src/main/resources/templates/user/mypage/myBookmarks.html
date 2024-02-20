@@ -147,21 +147,18 @@
 
         <script>
             function deleteCommunityBookmark(postId) {
-                alert('delete community bk');
                 var url = '/bookmarks?type=community&id=' + postId;
 
                 sendRequest(url);
             }
 
             function deleteCommunityBookmarkDeleted(bookmarkId) {
-                alert('already deleted');
                 var url = "/bookmarks/deleted?id=" + bookmarkId;
 
                 sendRequest(url);
             }
 
             function deleteTripBookmark(postId) {
-                alert('delete trip bk');
                 var url = '/bookmarks?type=trip&id=' + postId;
 
                 sendRequest(url);
@@ -174,7 +171,6 @@
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
-                            alert("북마크 삭제가 완료되었습니다.");
                             window.location.reload();
 
                         } else {

@@ -87,7 +87,13 @@
                         formData.append('image', blob);
 
                         if(formData.get("image").size > 3000000) {
-                            alert("파일 크기는 3MB를 초과할 수 없습니다.");
+                            Swal.fire({
+                                position: 'middle',
+                                icon: 'error',
+                                title: '',
+                                text: "파일 크기는 3MB를 초과할 수 없습니다.",
+                                showConfirmButton: true
+                            });
                             return;
                         }
 
@@ -134,7 +140,6 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        alert("게시글 작성이 완료되었습니다.");
                         window.location.href = "/community/boards/"+xhr.responseText;
 
                     } else {
