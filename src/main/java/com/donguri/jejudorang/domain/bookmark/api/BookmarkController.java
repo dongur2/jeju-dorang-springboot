@@ -67,14 +67,13 @@ public class BookmarkController {
 
     /*
     * 이미 삭제된 글의 북마크 삭제
-    *
+    * 커뮤니티만
     * */
     @DeleteMapping("/deleted")
     public ResponseEntity<String> deleteCommunityBookmarkDirectly(@CookieValue("access_token") Cookie accessToken,
-                                                                  @RequestParam("type") String type,
                                                                   @RequestParam("id") Long bookmarkId) {
         try {
-            bookmarkService.deleteBookmarkOnDeletedPost(accessToken.getValue(), type, bookmarkId);
+            bookmarkService.deleteCommunityBookmarkOnDeletedPost(accessToken.getValue(), bookmarkId);
             return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
 
         } catch (Exception e) {

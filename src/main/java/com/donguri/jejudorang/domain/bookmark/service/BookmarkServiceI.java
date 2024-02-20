@@ -134,17 +134,17 @@ public class BookmarkServiceI implements BookmarkService {
         }
     }
 
+    /*
+    * 삭제된 글에 대한 북마크 삭제: 커뮤니티
+    *
+    * */
     @Override
     @Transactional
-    public void deleteBookmarkOnDeletedPost(String accessToken, String postType, Long bookmarkId) {
+    public void deleteCommunityBookmarkOnDeletedPost(String accessToken, Long bookmarkId) {
         try {
             jwtProvider.validateJwtToken(accessToken);
 
-            if(postType.equals("community")) {
-                deleteCommunityBookmarkAlreadyDeleted(bookmarkId);
-            } else {
-//                deleteTripBookmarkDirectly(bookmarkId);
-            }
+            deleteCommunityBookmarkAlreadyDeleted(bookmarkId);
 
         } catch (Exception e) {
             log.error("북마크 삭제 실패: {}", e.getMessage());
@@ -169,6 +169,7 @@ public class BookmarkServiceI implements BookmarkService {
         community.ifPresent(post -> post.deleteBookmark(bookmark.get()));
     }
 
+    // * 이미 삭제된 커뮤니티글의 북마크 삭제
     private void deleteCommunityBookmarkAlreadyDeleted(Long bookmarkId) throws BadRequestException {
         Optional<CommunityBookmark> bookmark = communityBookmarkRepository.findById(bookmarkId);
 

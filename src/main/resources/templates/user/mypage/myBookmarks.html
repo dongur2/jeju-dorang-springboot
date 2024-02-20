@@ -155,7 +155,7 @@
 
             function deleteCommunityBookmarkDeleted(bookmarkId) {
                 alert('already deleted');
-                var url = "/bookmarks/deleted?type=community&id=" + bookmarkId;
+                var url = "/bookmarks/deleted?id=" + bookmarkId;
 
                 sendRequest(url);
             }
