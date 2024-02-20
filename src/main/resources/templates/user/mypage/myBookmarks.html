@@ -105,7 +105,7 @@
                             </a>
                         </div>
                         <div class="card-footer bg-transparent border" style="display: flex">
-                            <a th:onclick="'deleteCommunityBookmark(' + ${post.id}+ ')'" class="btn btn-secondary" style="margin-left:auto">삭제</a>
+                            <a th:onclick="'deleteCommunityBookmarkDeleted(' + ${post.bookmarkId}+ ')'" class="btn btn-secondary" style="margin-left:auto">삭제</a>
                         </div>
                     </div>
 
@@ -150,6 +150,13 @@
                 sendRequest(url, postId);
             }
 
+            function deleteCommunityBookmarkDeleted(bookmarkId) {
+                alert('already deleted');
+                var url = "/bookmarks/deleted?type=community&id=" + bookmarkId;
+
+                sendRequest(url);
+            }
+
             function deleteTripBookmark(postId) {
                 alert('delete trip bk');
                 var url = '/bookmarks?type=trip&id=' + postId;
@@ -174,6 +181,8 @@
                 }
                 xhr.send();
             }
+
+
 
 
         </script>

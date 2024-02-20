@@ -57,7 +57,24 @@ public class BookmarkController {
 
         try {
             bookmarkService.deleteBookmark(accessToken.getValue(), type, postId);
-            log.info("북마크 해제 완료");
+            return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("북마크 해제 실패: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /*
+    * 이미 삭제된 글의 북마크 삭제
+    *
+    * */
+    @DeleteMapping("/deleted")
+    public ResponseEntity<String> deleteCommunityBookmarkDirectly(@CookieValue("access_token") Cookie accessToken,
+                                                                  @RequestParam("type") String type,
+                                                                  @RequestParam("id") Long bookmarkId) {
+        try {
+            bookmarkService.deleteBookmarkOnDeletedPost(accessToken.getValue(), type, bookmarkId);
             return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
 
         } catch (Exception e) {

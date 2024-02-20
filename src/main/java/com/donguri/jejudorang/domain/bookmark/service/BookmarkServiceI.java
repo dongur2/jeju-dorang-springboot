@@ -134,6 +134,24 @@ public class BookmarkServiceI implements BookmarkService {
         }
     }
 
+    @Override
+    @Transactional
+    public void deleteBookmarkOnDeletedPost(String accessToken, String postType, Long bookmarkId) {
+        try {
+            jwtProvider.validateJwtToken(accessToken);
+
+            if(postType.equals("community")) {
+                deleteCommunityBookmarkAlreadyDeleted(bookmarkId);
+            } else {
+//                deleteTripBookmarkDirectly(bookmarkId);
+            }
+
+        } catch (Exception e) {
+            log.error("북마크 삭제 실패: {}", e.getMessage());
+            throw (RuntimeException) e;
+        }
+    }
+
 
     // * 커뮤니티 북마크 삭제
     private void deleteCommunityBookmark(Long postId, User userForBookmark) throws BadRequestException {
@@ -151,18 +169,29 @@ public class BookmarkServiceI implements BookmarkService {
         community.ifPresent(post -> post.deleteBookmark(bookmark.get()));
     }
 
+    private void deleteCommunityBookmarkAlreadyDeleted(Long bookmarkId) throws BadRequestException {
+        Optional<CommunityBookmark> bookmark = communityBookmarkRepository.findById(bookmarkId);
+
+        if(bookmark.isEmpty()) {
+            throw new BadRequestException("북마크한 글이 아닙니다.");
+        }
+
+        communityBookmarkRepository.delete(bookmark.get());
+    }
+
     // * 여행 북마크 삭제
-    private void deleteTripBookmark(Long boardId, User userForBookmark) throws BadRequestException {
-        Optional<TripBookmark> nullableBookmark = tripBookmarkRepository.findByUserAndTripId(userForBookmark, boardId);
-        if(nullableBookmark.isEmpty()) {
+    private void deleteTripBookmark(Long postId, User userForBookmark) throws BadRequestException {
+        Optional<TripBookmark> bookmark = tripBookmarkRepository.findByUserAndTripId(userForBookmark, postId);
+
+        if(bookmark.isEmpty()) {
             log.error("북마크한 글이 아닙니다.");
             throw new BadRequestException("북마크한 글이 아닙니다");
         }
 
         // Trip bookmarks: orphanRemoval=true -> Trip엔티티에서 북마크 삭제 -> 엔티티 자동 삭제
-        tripRepository.findById(boardId)
+        tripRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다"))
-                .updateBookmarks(nullableBookmark.get());
+                .updateBookmarks(bookmark.get());
         log.info("북마크 삭제 완료");
     }
 

@@ -14,6 +14,7 @@ public interface BookmarkService {
 
     // 북마크 삭제
     void deleteBookmark(String accessToken, String postType, Long postId);
+    void deleteBookmarkOnDeletedPost(String accessToken, String postType, Long bookmarkId);
 
     // 북마크 조회
     Page<?> getMyBookmarks(User user, String type, Pageable pageable);
