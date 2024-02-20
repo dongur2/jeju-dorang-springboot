@@ -4,7 +4,7 @@ import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.bookmark.entity.TripBookmark;
 import com.donguri.jejudorang.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.donguri.jejudorang.domain.bookmark.repository.TripBookmarkRepository;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityBookmarkListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
@@ -208,7 +208,7 @@ public class BookmarkServiceI implements BookmarkService {
                             .map(bookmark -> new TripListResponseDto(bookmark.getTrip()));
             } else {
                 return communityBookmarkRepository.findAllByUser(user, pageable)
-                        .map(bookmark -> CommunityBookmarkListResponse.from(bookmark.getId(), bookmark.getCommunity()));
+                        .map(bookmark -> CommunityMyPageListResponse.from(bookmark.getId(), bookmark.getCommunity()));
             }
 
         } catch (Exception e) {

@@ -4,7 +4,7 @@ import com.donguri.jejudorang.domain.bookmark.entity.CommunityBookmark;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityDetailResponse;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityForModifyResponse;
-import com.donguri.jejudorang.domain.community.dto.response.CommunityBookmarkListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListResponse;
 import com.donguri.jejudorang.domain.community.dto.response.CommunityTypeResponse;
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
@@ -153,16 +153,16 @@ public class CommunityServiceI implements CommunityService {
 
     @Override
     @Transactional
-    public Page<CommunityBookmarkListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable) {
+    public Page<CommunityMyPageListResponse> getAllPostsWrittenByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByWriterId(writer.getId(), pageable)
-                .map(CommunityBookmarkListResponse::from);
+                .map(CommunityMyPageListResponse::from);
     }
 
     @Override
     @Transactional
-    public Page<CommunityBookmarkListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
+    public Page<CommunityMyPageListResponse> getAllPostsWithCommentsByUser(User writer, Pageable pageable) {
         return communityRepository.findAllByCommentWriterIdAndIsDeletedFalse(writer.getId(), IsDeleted.EXISTING, pageable)
-                .map(CommunityBookmarkListResponse::from);
+                .map(CommunityMyPageListResponse::from);
     }
 
 

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Builder
-public record CommunityBookmarkListResponse(
+public record CommunityMyPageListResponse(
     Long id,
     String type,
     String state,
@@ -24,7 +24,7 @@ public record CommunityBookmarkListResponse(
     Long bookmarkId
 
 ) {
-    public static CommunityBookmarkListResponse from(Long bookmarkId, Community community) {
+    public static CommunityMyPageListResponse from(Long bookmarkId, Community community) {
         if(community == null) {
             return convertToDtoWhenCommunityDeleted(bookmarkId);
         }
@@ -45,7 +45,7 @@ public record CommunityBookmarkListResponse(
 
     }
 
-    public static CommunityBookmarkListResponse from(Community community) {
+    public static CommunityMyPageListResponse from(Community community) {
 
         // 모임/잡담글 구분: 잡담글일 경우 NOT_PARTY
         JoinState state = Optional.ofNullable(community.getState()).orElseGet(() -> JoinState.NOT_PARTY);
@@ -54,8 +54,8 @@ public record CommunityBookmarkListResponse(
     }
 
 
-    private static CommunityBookmarkListResponse convertToWritingDtoFrom(Community community, String state) {
-        return CommunityBookmarkListResponse.builder()
+    private static CommunityMyPageListResponse convertToWritingDtoFrom(Community community, String state) {
+        return CommunityMyPageListResponse.builder()
                 .id(community.getId())
                 .type(community.getType().name())
                 .state(state)
@@ -67,8 +67,8 @@ public record CommunityBookmarkListResponse(
                 .build();
     }
 
-    private static CommunityBookmarkListResponse convertToBookmarkDtoFrom(Community community, String state, String nickname, String writerId, Long bookmarkId) {
-        return CommunityBookmarkListResponse.builder()
+    private static CommunityMyPageListResponse convertToBookmarkDtoFrom(Community community, String state, String nickname, String writerId, Long bookmarkId) {
+        return CommunityMyPageListResponse.builder()
                 .id(community.getId())
                 .type(community.getType().name())
                 .state(state)
@@ -79,12 +79,11 @@ public record CommunityBookmarkListResponse(
                 .viewCount(community.getViewCount())
                 .bookmarkCount(community.getBookmarkCount())
                 .commentCount(community.getCommentCount())
-                .bookmarkId(bookmarkId)
                 .build();
     }
 
-    private static CommunityBookmarkListResponse convertToDtoWhenCommunityDeleted(Long bookmarkId) {
-        return CommunityBookmarkListResponse.builder()
+    private static CommunityMyPageListResponse convertToDtoWhenCommunityDeleted(Long bookmarkId) {
+        return CommunityMyPageListResponse.builder()
                 .type(IsDeleted.DELETED.name())
                 .bookmarkId(bookmarkId)
                 .build();

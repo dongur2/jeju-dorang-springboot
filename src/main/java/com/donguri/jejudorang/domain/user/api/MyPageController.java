@@ -1,6 +1,6 @@
 package com.donguri.jejudorang.domain.user.api;
 
-import com.donguri.jejudorang.domain.community.dto.response.CommunityBookmarkListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class MyPageController {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
 
-            Page<CommunityBookmarkListResponse> data = userService.getMyCommunityWritings(token.getValue(), pageable);
+            Page<CommunityMyPageListResponse> data = userService.getMyCommunityWritings(token.getValue(), pageable);
 
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
@@ -66,7 +66,7 @@ public class MyPageController {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
 
-            Page<CommunityBookmarkListResponse> data = userService.getMyCommunityComments(token.getValue(), pageable);
+            Page<CommunityMyPageListResponse> data = userService.getMyCommunityComments(token.getValue(), pageable);
 
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());

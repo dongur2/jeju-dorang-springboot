@@ -1,7 +1,7 @@
 package com.donguri.jejudorang.domain.user.service;
 
 
-import com.donguri.jejudorang.domain.community.dto.response.CommunityBookmarkListResponse;
+import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListResponse;
 import com.donguri.jejudorang.domain.user.dto.request.*;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
@@ -63,10 +63,10 @@ public interface UserService {
     void withdrawUser(String accessToken);
 
     // 마이페이지: 내 작성글 목록 조회
-    Page<CommunityBookmarkListResponse> getMyCommunityWritings(String accessToken, Pageable pageable);
+    Page<CommunityMyPageListResponse> getMyCommunityWritings(String accessToken, Pageable pageable);
 
     // 마이페이지: 내가 댓글단 글 목록 조회
-    Page<CommunityBookmarkListResponse> getMyCommunityComments(String accessToken, Pageable pageable);
+    Page<CommunityMyPageListResponse> getMyCommunityComments(String accessToken, Pageable pageable);
 
 
     // 마이페이지: 내 북마크 목록 조회
