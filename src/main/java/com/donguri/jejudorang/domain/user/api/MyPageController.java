@@ -89,8 +89,8 @@ public class MyPageController {
      * */
     @GetMapping("/bookmarks")
     public String getMyBookmarkPage (@CookieValue("access_token") Cookie token, Model model,
-            @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
-            @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage){
+                                        @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
+                                        @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage){
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
             Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);

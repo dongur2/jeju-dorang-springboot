@@ -39,7 +39,10 @@
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
-                                    <h5 class="card-title" th:text="${post.getName()}">Card title</h5>
+                                    <div style="width:100%; display: flex; flex-direction: row; justify-content: space-between">
+                                        <h5 style="width: 90%" class="card-title" th:text="${post.getName()}">Card title</h5>
+                                        <a th:onclick="'deleteTripBookmark(' + ${post.id} + ')'" class="btn btn-secondary">삭제</a>
+                                    </div>
                                     <p class="card-text" ><small class="text-body-secondary" th:text="${post.getTags()}">Last updated 3 mins ago</small></p>
                                 </div>
                             </div>
@@ -147,7 +150,7 @@
                 alert('delete community bk');
                 var url = '/bookmarks?type=community&id=' + postId;
 
-                sendRequest(url, postId);
+                sendRequest(url);
             }
 
             function deleteCommunityBookmarkDeleted(bookmarkId) {
@@ -160,6 +163,13 @@
             function deleteTripBookmark(postId) {
                 alert('delete trip bk');
                 var url = '/bookmarks?type=trip&id=' + postId;
+
+                sendRequest(url);
+            }
+
+            function deleteTripBookmarkDeleted(bookmarkId) {
+                alert('already deleted');
+                var url = "/bookmarks/deleted?type=trip&id=" + bookmarkId;
 
                 sendRequest(url);
             }
