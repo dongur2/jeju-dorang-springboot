@@ -44,17 +44,19 @@ public class BookmarkController {
 
     /*
     * 북마크 삭제
-    * /bookmarks/{boardName}/{boardId}
+    * /bookmarks
     * DELETE
     *
+    * @param type: trip/community
+    *
     *  */
-    @DeleteMapping("/{boardName}/{boardId}")
+    @DeleteMapping
     public ResponseEntity<String> deleteBookmark(@CookieValue("access_token") Cookie accessToken,
-                                                          @PathVariable("boardName") String boardName,
-                                                          @PathVariable("boardId") Long boardId) {
+                                                 @RequestParam("type") String type,
+                                                 @RequestParam("id") Long postId) {
 
         try {
-            bookmarkService.deleteBookmark(accessToken.getValue(), boardName, boardId);
+            bookmarkService.deleteBookmark(accessToken.getValue(), type, postId);
             log.info("북마크 해제 완료");
             return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
 
@@ -63,8 +65,5 @@ public class BookmarkController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
-
-
 
 }

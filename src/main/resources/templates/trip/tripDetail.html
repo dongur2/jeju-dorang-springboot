@@ -48,11 +48,11 @@
             alert("북마크하려면 로그인이 필요합니다.");
         }
         // 로그인한 경우 - 북마크 하지 않은 글
-        function createBookmark(communityId) {
+        function createBookmark(tripId) {
             alert('create');
 
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', '/bookmarks/trips/' + communityId, true);
+            xhr.open('POST', '/bookmarks/trips/' + tripId, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
@@ -68,11 +68,12 @@
             xhr.send();
         }
         // 로그인한 경우 - 북마크 한 글
-        function deleteBookmark(communityId) {
+        function deleteBookmark(tripId) {
             alert('delete');
+            var url = '/bookmarks?type=trip&id=' + tripId;
 
             let xhr = new XMLHttpRequest();
-            xhr.open('DELETE', '/bookmarks/trips/' + communityId, true);
+            xhr.open('DELETE', url, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {

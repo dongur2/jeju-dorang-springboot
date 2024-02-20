@@ -53,7 +53,9 @@
             <!--    카드 : 커뮤니티      -->
             <div th:if="${type == 'community'}" style="margin: 4% 0">
                 <div th:each="post : ${posts}">
-                    <div class="card border mb-3" style="margin: 2% 0">
+
+                    <!-- 삭제되지 않은 글의 북마크 -->
+                    <div th:if="${post.type != 'DELETED'}" class="card border mb-3" style="margin: 2% 0">
                         <h5 class="card-header bg-transparent border" th:if="${post.type == 'PARTY'}">
                             모임 &#183;
                             <span th:if="${post.state == 'RECRUITING'}" style="color: #FB7A51">모집중</span>
@@ -80,17 +82,31 @@
                                 <span th:if="${post.nickname == 'INVALID'}">탈퇴한 회원</span>
                             </div>
 
-                            <div style="width:450px; display: flex; justify-content: space-around; align-items: flex-end">
+                            <div style="width:450px; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
                                 <div>
                                     북마크 <span th:text="${post.bookmarkCount}">0</span> &#183;
                                     조회 <span th:text="${post.viewCount}">0</span> &#183;
                                     댓글 <span th:text="${post.commentCount}">0</span>
                                 </div>
                                 <span th:text="${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일')}"></span>
-                                <a href="#" class="btn btn-secondary">삭제</a>
+                                <a th:onclick="'deleteCommunityBookmark(' + ${post.id} + ')'" class="btn btn-secondary">삭제</a>
                             </div>
                         </div>
 
+                    </div>
+
+                    <!-- 삭제된 글의 북마크 -->
+                    <div th:if="${post.type == 'DELETED'}" class="card border mb-3" style="margin: 2% 0; color: #9b9b9b;">
+                        <h5 class="card-header bg-transparent border">삭제된 글입니다.</h5>
+
+                        <div class="card-body text">
+                            <a href="#" style="color: #9b9b9b; text-decoration-line: none; font-weight: bold">
+                                <h5 class="card-title">삭제된 글입니다.</h5>
+                            </a>
+                        </div>
+                        <div class="card-footer bg-transparent border" style="display: flex">
+                            <a th:onclick="'deleteCommunityBookmark(' + ${post.id}+ ')'" class="btn btn-secondary" style="margin-left:auto">삭제</a>
+                        </div>
                     </div>
 
                 </div>
@@ -126,6 +142,41 @@
             </nav>
         </div>
 
+        <script>
+            function deleteCommunityBookmark(postId) {
+                alert('delete community bk');
+                var url = '/bookmarks?type=community&id=' + postId;
+
+                sendRequest(url, postId);
+            }
+
+            function deleteTripBookmark(postId) {
+                alert('delete trip bk');
+                var url = '/bookmarks?type=trip&id=' + postId;
+
+                sendRequest(url);
+            }
+
+            function sendRequest(url) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("DELETE", url, true);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            alert("북마크 삭제가 완료되었습니다.");
+                            window.location.reload();
+
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }
+                }
+                xhr.send();
+            }
+
+
+        </script>
 
     </div>
 

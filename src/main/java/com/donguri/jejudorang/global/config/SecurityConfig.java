@@ -101,8 +101,7 @@ public class SecurityConfig {
                                         "/community/post/**", "/tui-editor/**",
                                         "/community/comments/**",
                                         "/community/parties/{communityId}/state",
-                                        "/bookmarks/communities/{communityId}",
-                                        "/bookmarks/trips/{tripId}"
+                                        "/bookmarks/**", "/bookmarks"
                                 ).authenticated()
                         )
                 )

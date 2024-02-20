@@ -445,9 +445,10 @@
         // 로그인한 경우 - 북마크 한 글
         function deleteBookmark(communityId) {
             alert('delete');
+            var url = '/bookmarks?type=community&id=' + communityId;
 
             let xhr = new XMLHttpRequest();
-            xhr.open('DELETE', '/bookmarks/communities/' + communityId, true);
+            xhr.open('DELETE', url, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
