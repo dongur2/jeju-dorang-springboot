@@ -28,9 +28,6 @@ import java.util.Optional;
 @Service
 public class CommentServiceI implements CommentService{
 
-    // 댓글, 대댓글 통합한 순서 정렬 위한 인덱스
-    private Long orderIdx = 0L;
-
     private Long notificationId = 0L;
 
     @Autowired private final JwtProvider jwtProvider;
@@ -65,10 +62,10 @@ public class CommentServiceI implements CommentService{
                     .user(nowUser)
                     .content(newComment.content())
                     .cmtDepth(0)
-                    .cmtOrder(orderIdx++)
                     .isDeleted(IsDeleted.EXISTING)
                     .build());
             savedComment.updateCmtGroup();
+            savedComment.updateCmtOrder();
 
             nowPost.addComment(savedComment);
 
@@ -100,10 +97,10 @@ public class CommentServiceI implements CommentService{
                     .content(newReComment.content())
                     .cmtGroup(newReComment.cmtId())
                     .cmtDepth(1)
-                    .cmtOrder(orderIdx++)
                     .isDeleted(IsDeleted.EXISTING)
                     .build());
 
+            savedReComment.updateCmtOrder();
             nowPost.addComment(savedReComment);
 
             // 알림 전송
