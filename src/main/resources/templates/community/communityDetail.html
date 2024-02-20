@@ -15,7 +15,7 @@
         let nowPostTitleForShare = [[${post.title}]];
     </script>
     <script th:src="@{/js/community/deleteCommunity.js}"></script>
-    <title>상세 페이지 - 제주도랑 | 커뮤니티</title>
+    <title>상세 페이지 - 커뮤니티 | 제주도랑</title>
 </head>
 <th layout:fragment="content">
 
@@ -282,8 +282,10 @@
 
                     <div th:id="'cmt-modify-block-' + ${cmt.cmtId}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
                         <input th:id="'cmt-modify-input-' + ${cmt.cmtId}" th:value="${cmt.content}" style="width: 88%; border: none">
-                        <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId} + ')'">등록</button>
-                        <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId} + ')'">취소</button>
+                        <button th:onclick="'modifyCmtRequest(' + ${cmt.cmtId} + ')'"
+                                style="width: 5%; background: none; border: none; font-weight: bolder">등록</button>
+                        <button th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId} + ')'"
+                                style="width:5%; background: none; border: none; color:#FB7A51" >취소</button>
                     </div>
 
                 </div>
@@ -352,8 +354,10 @@
 
                         <div th:id="'cmt-modify-block-' + ${cmt.cmtId}"  style="display: none; width: 100%; flex-direction: row; justify-content: space-between">
                             <input th:id="'cmt-modify-input-' + ${cmt.cmtId}" th:value="${cmt.content}" name="cmtId" style="width: 88%; border: none">
-                            <button style="width: 5%;" th:onclick="'modifyCmtRequest(' + ${cmt.cmtId} + ')'">등록</button>
-                            <button style="width:5%" th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId} + ')'">취소</button>
+                            <button th:onclick="'modifyCmtRequest(' + ${cmt.cmtId} + ')'"
+                                    style="width: 5%; background: none; border: none; font-weight: bolder" >등록</button>
+                            <button th:onclick="'closeCmtModifyInput(' + ${cmt.cmtId} + ')'"
+                                    style="width:5%; background: none; border: none; color:#FB7A51" >취소</button>
                         </div>
 
                     </div>

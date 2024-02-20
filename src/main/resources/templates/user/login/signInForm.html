@@ -4,7 +4,7 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{/fragments/layout}">
 <head>
-    <title>로그인 - 제주도랑</title>
+    <title>로그인 | 제주도랑</title>
     <script th:src="@{/js/bootstrap.min.js}"></script>
     <script th:src="@{/js/user/verifyEmail.js}"></script>
     <script th:inline="javascript">
@@ -29,7 +29,7 @@
             <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordHelpBlock"
                    style="width:100%; margin:0 auto">
 
-            <input class="btn btn-primary" type="submit" value="로그인"
+            <input class="btn btn-success" type="submit" value="로그인"
                     style="margin-top:20px; height:50px">
         </form>
 
@@ -60,7 +60,7 @@
                         <div style="display: flex; flex-direction: column; gap:5px">
                             <label for="email" class="form-label">가입한 이메일</label>
                             <input type="email" id="emailForId" name="email" class="form-control btn-verify">
-                            <button type="button" class="btn btn-warning btn-send" onclick="sendMail()" data-bs-dismiss="modal">이메일로 아이디 전송</button>
+                            <button type="button" class="btn btn-outline-secondary btn-send" onclick="sendMail()" data-bs-dismiss="modal">이메일로 아이디 전송</button>
                         </div>
 
                     </div>

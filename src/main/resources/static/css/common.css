@@ -65,3 +65,7 @@ a{
 li{
     list-style: none;
 }
+
+.home-btn:hover {
+    cursor:pointer;
+}
