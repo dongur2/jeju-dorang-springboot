@@ -427,7 +427,8 @@
             alert('create');
 
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', '/bookmarks/communities/' + communityId, true);
+            var url = '/bookmarks?type=community&id=' + communityId;
+            xhr.open('POST', url, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {

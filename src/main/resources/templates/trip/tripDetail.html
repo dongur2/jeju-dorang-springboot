@@ -52,7 +52,8 @@
             alert('create');
 
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', '/bookmarks/trips/' + tripId, true);
+            var url = '/bookmarks?type=trip&id=' + tripId;
+            xhr.open('POST', url, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {

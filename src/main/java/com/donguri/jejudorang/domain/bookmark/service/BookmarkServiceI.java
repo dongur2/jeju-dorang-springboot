@@ -56,8 +56,8 @@ public class BookmarkServiceI implements BookmarkService {
 
             // 요청 매핑의 게시판 이름에 따른 메서드 호출
             switch (boardName) {
-                case "communities": addCommunityBookmark(boardId, userForBookmark); break;
-                case "trips": addTripBookmark(boardId, userForBookmark); break;
+                case "community": addCommunityBookmark(boardId, userForBookmark); break;
+                case "trip": addTripBookmark(boardId, userForBookmark); break;
             }
 
         } catch (BadRequestException e) {

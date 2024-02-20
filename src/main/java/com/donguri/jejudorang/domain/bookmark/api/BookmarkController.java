@@ -20,19 +20,19 @@ public class BookmarkController {
 
     /*
     * 북마크 생성
-    * /bookmarks/{boardName}/{boardId}
+    * /bookmarks
     * POST
     *
     * */
-    @PostMapping("/{boardName}/{boardId}")
+    @PostMapping
     public ResponseEntity<String> createBookmark(@CookieValue("access_token") Cookie accessToken,
-                                                          @PathVariable("boardName") String boardName,
-                                                          @PathVariable("boardId") Long boardId) {
+                                                  @RequestParam("type") String type,
+                                                  @RequestParam("id") Long postId) {
 
         try {
-            bookmarkService.addBookmark(accessToken.getValue(), boardName, boardId);
+            bookmarkService.addBookmark(accessToken.getValue(), type, postId);
 
-            log.info("북마크 설정 완료: {}", boardId);
+            log.info("북마크 설정 완료: {}", postId);
             return new ResponseEntity<>("북마크가 설정되었습니다", HttpStatus.OK);
 
         } catch (Exception e) {
