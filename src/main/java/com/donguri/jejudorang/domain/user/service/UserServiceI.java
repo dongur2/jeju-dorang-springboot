@@ -11,6 +11,7 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdReques
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
+import com.donguri.jejudorang.domain.user.dto.response.KakaoTokenResponse;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
@@ -37,6 +38,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -81,6 +84,8 @@ public class UserServiceI implements UserService {
     private String defaultImgName;
     @Value("${aws.s3.default-img.url}")
     private String defaultImgUrl;
+
+    @Value("${kakao.key}") private String kakaoKey;
 
     public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
@@ -235,6 +240,35 @@ public class UserServiceI implements UserService {
         } catch (Exception e) {
             log.error("회원 가입에 실패했습니다: {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public String getToken(String code) {
+        String requestUrl = "https://kauth.kakao.com/oauth/token";
+
+        try {
+
+            WebClient client = WebClient.builder()
+                    .baseUrl(requestUrl)
+                    .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+                    .build();
+
+            Mono<KakaoTokenResponse> tokenResponse = client.post().uri(uriBuilder -> uriBuilder
+                            .queryParam("grant_type", "authorization_code")
+                            .queryParam("client_id", kakaoKey)
+                            .queryParam("redirect_uri", "http://localhost:8080/user/oauth")
+                            .queryParam("code", code)
+                            .build())
+                    .retrieve()
+                    .bodyToMono(KakaoTokenResponse.class);
+
+            return tokenResponse.toString();
+
+        } catch (Exception e) {
+            log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
+            throw e;
         }
     }
 

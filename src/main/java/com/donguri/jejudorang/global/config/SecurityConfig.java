@@ -88,7 +88,7 @@ public class SecurityConfig {
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
-                                        "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
+                                        "/user/login", "/user/signup", "/user/signup/**", "/user/logout", "/user/oauth",
                                         "/email/**",
                                         "/trip/lists**", "/trip/places/*",
                                         "/community/boards/**",

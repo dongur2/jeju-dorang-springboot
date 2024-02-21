@@ -16,10 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.util.Map;
 import java.util.Optional;
@@ -62,6 +61,15 @@ public class UserController {
             log.error("회원 가입 실패");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
+    }
+
+    @GetMapping("/oauth")
+    @ResponseBody
+    public String getTokenFromKakao(@RequestParam("code") String code) {
+
+        String token = userService.getToken(code);
+
+        return "token: "+ token;
     }
 
 
