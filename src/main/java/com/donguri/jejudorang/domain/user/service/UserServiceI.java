@@ -250,7 +250,7 @@ public class UserServiceI implements UserService {
 
     @Override
     @Transactional
-    public String getToken(String code) {
+    public Map<String, String> getToken(String code) {
         String requestUrl = "https://kauth.kakao.com/oauth/token";
 
         try {
@@ -269,26 +269,31 @@ public class UserServiceI implements UserService {
                     .retrieve()
                     .bodyToMono(KakaoTokenResponse.class);
 
+            Mono<Map<String, String>> mapMono = tokenResponse.flatMap(token -> {
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", token.access_token());
+                tokens.put("refresh_token", token.refresh_token());
 
-            return tokenResponse.flatMap(token -> getUserInfo(token.access_token())
-                            .map(res -> res.toString()) // Mono<String>을 String으로 변환
-                            .onErrorReturn("토큰 반환 실패")) // 에러가 발생한 경우 "토큰 반환 실패" 문자열을 반환
-                            .block(); // Mono를 블록킹하여 결과를 얻음
+                return getUserInfo(tokens);
+            });
+
+            return mapMono.block();
 
 
         } catch (Exception e) {
             log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
             throw e;
         }
+
     }
 
     @Override
     @Transactional
-    public Mono<String> getUserInfo(String accessToken) {
+    public Mono<Map<String, String>> getUserInfo(Map<String, String> tokens) {
         try {
             WebClient client = WebClient.builder()
                     .baseUrl("https://kapi.kakao.com/v2/user/me")
-                    .defaultHeader("Authorization", "Bearer " + accessToken)
+                    .defaultHeader("Authorization", "Bearer " + tokens.get("access_token"))
                     .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
                     .build();
 
@@ -298,7 +303,8 @@ public class UserServiceI implements UserService {
 
                         // 이미 연결한 회원
                         if(socialLoginRepository.existsById(Long.valueOf(response.id()))) {
-                            return Mono.just(accessToken);
+                            log.info("이미 연결된 회원");
+                            return Mono.just(tokens);
 
                         // 연결하지 않은 회원
                         } else {
@@ -315,7 +321,7 @@ public class UserServiceI implements UserService {
                             userRepository.save(user);
 
                             log.info("유저 디비 저장 완료");
-                            return Mono.just(accessToken);
+                            return Mono.just(tokens);
                         }
                     });
 

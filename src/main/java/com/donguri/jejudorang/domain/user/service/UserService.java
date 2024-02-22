@@ -26,10 +26,10 @@ public interface UserService {
     // 회원가입
     void signUp(SignUpRequest signUpRequest);
 
-    Mono<String> getUserInfo(String accessToken);
+    Mono<Map<String, String>> getUserInfo(Map<String, String> accessToken);
 
     // 카카오 로그인 토큰 발급
-    String getToken(String code);
+    Map<String, String> getToken(String code);
 
     // 로그인
     Map<String, String> signIn(LoginRequest loginRequest);

@@ -65,12 +65,12 @@ public class UserController {
     }
 
     @GetMapping("/oauth")
-    @ResponseBody
-    public String getTokenFromKakao(@RequestParam("code") String code) {
+    public String getTokenFromKakao(@RequestParam("code") String code, HttpServletResponse response) {
 
-        String result = userService.getToken(code);
+        Map<String, String> tokens = userService.getToken(code);
+        setCookieForToken(tokens, response);
 
-        return "token: "+ result;
+        return "redirect:/";
     }
 
 
