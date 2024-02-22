@@ -10,6 +10,7 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.response.KakaoUserResponse;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.response.KakaoTokenResponse;
 import com.donguri.jejudorang.domain.user.entity.*;
@@ -264,7 +265,39 @@ public class UserServiceI implements UserService {
                     .retrieve()
                     .bodyToMono(KakaoTokenResponse.class);
 
-            return tokenResponse.toString();
+
+            Mono<KakaoUserResponse> kakaoUserResponseMono = tokenResponse.flatMap(token -> getUserInfo(token.access_token()));
+            log.info("유저 정보 불러왔음: {}", kakaoUserResponseMono.toString());
+
+            kakaoUserResponseMono.subscribe(
+                    res -> {
+                        System.out.println("res.id() = " + res.id());
+                        System.out.println("res.kakao_account().profile().nickname() = " + res.kakao_account().profile().nickname());
+                        System.out.println("res.kakao_account().email() = " + res.kakao_account().email());
+                    },
+                    error -> {
+                        log.error("유저 정보 불러오기 실패: {}", error.getMessage());
+                    }
+            );
+
+            return kakaoUserResponseMono.toString();
+
+        } catch (Exception e) {
+            log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    private Mono<KakaoUserResponse> getUserInfo(String accessToken) {
+        try {
+            WebClient client = WebClient.builder()
+                    .baseUrl("https://kapi.kakao.com/v2/user/me")
+                    .defaultHeader("Authorization", "Bearer " + accessToken)
+                    .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+                    .build();
+
+            return client.get().retrieve()
+                    .bodyToMono(KakaoUserResponse.class);
 
         } catch (Exception e) {
             log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
