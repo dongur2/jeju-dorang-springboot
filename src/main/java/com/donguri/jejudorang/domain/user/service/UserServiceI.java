@@ -15,6 +15,7 @@ import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.dto.response.KakaoTokenResponse;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
+import com.donguri.jejudorang.domain.user.entity.auth.SocialLogin;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.domain.user.repository.auth.SocialLoginRepository;
@@ -36,6 +37,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,6 +50,7 @@ import reactor.core.publisher.Mono;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -302,9 +307,9 @@ public class UserServiceI implements UserService {
                     .flatMap(response -> {
 
                         // 이미 연결한 회원
-                        if(socialLoginRepository.existsById(Long.valueOf(response.id()))) {
+                        Optional<SocialLogin> userInDB = socialLoginRepository.findById(Long.valueOf(response.id()));
+                        if(userInDB.isPresent()) {
                             log.info("이미 연결된 회원");
-                            return Mono.just(tokens);
 
                         // 연결하지 않은 회원
                         } else {
@@ -318,11 +323,13 @@ public class UserServiceI implements UserService {
                             user.updateRole(roles);
                             log.info("유저 역할까지 업데이트");
 
-                            userRepository.save(user);
+                            User savedUser = userRepository.save(user);
 
                             log.info("유저 디비 저장 완료");
-                            return Mono.just(tokens);
                         }
+
+                        return Mono.just(tokens);
+
                     });
 
         } catch (Exception e) {
