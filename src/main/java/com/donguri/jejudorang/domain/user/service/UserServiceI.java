@@ -17,6 +17,7 @@ import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
+import com.donguri.jejudorang.domain.user.repository.auth.SocialLoginRepository;
 import com.donguri.jejudorang.domain.user.service.auth.MailService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
@@ -73,6 +74,8 @@ public class UserServiceI implements UserService {
     private final UserRepository userRepository;
     @Autowired
     private final RoleRepository roleRepository;
+    @Autowired
+    private final SocialLoginRepository socialLoginRepository;
 
 
     @Autowired
@@ -88,7 +91,7 @@ public class UserServiceI implements UserService {
 
     @Value("${kakao.key}") private String kakaoKey;
 
-    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
+    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, SocialLoginRepository socialLoginRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
         this.mailService = mailService;
         this.bookmarkService = bookmarkService;
@@ -99,6 +102,7 @@ public class UserServiceI implements UserService {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.communityService = communityService;
+        this.socialLoginRepository = socialLoginRepository;
         this.encoder = encoder;
         this.jwtProvider = jwtProvider;
     }
@@ -266,21 +270,11 @@ public class UserServiceI implements UserService {
                     .bodyToMono(KakaoTokenResponse.class);
 
 
-            Mono<KakaoUserResponse> kakaoUserResponseMono = tokenResponse.flatMap(token -> getUserInfo(token.access_token()));
-            log.info("유저 정보 불러왔음: {}", kakaoUserResponseMono.toString());
+            return tokenResponse.flatMap(token -> getUserInfo(token.access_token())
+                            .map(res -> res.toString()) // Mono<String>을 String으로 변환
+                            .onErrorReturn("토큰 반환 실패")) // 에러가 발생한 경우 "토큰 반환 실패" 문자열을 반환
+                            .block(); // Mono를 블록킹하여 결과를 얻음
 
-            kakaoUserResponseMono.subscribe(
-                    res -> {
-                        System.out.println("res.id() = " + res.id());
-                        System.out.println("res.kakao_account().profile().nickname() = " + res.kakao_account().profile().nickname());
-                        System.out.println("res.kakao_account().email() = " + res.kakao_account().email());
-                    },
-                    error -> {
-                        log.error("유저 정보 불러오기 실패: {}", error.getMessage());
-                    }
-            );
-
-            return kakaoUserResponseMono.toString();
 
         } catch (Exception e) {
             log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
@@ -288,7 +282,9 @@ public class UserServiceI implements UserService {
         }
     }
 
-    private Mono<KakaoUserResponse> getUserInfo(String accessToken) {
+    @Override
+    @Transactional
+    public Mono<String> getUserInfo(String accessToken) {
         try {
             WebClient client = WebClient.builder()
                     .baseUrl("https://kapi.kakao.com/v2/user/me")
@@ -297,13 +293,38 @@ public class UserServiceI implements UserService {
                     .build();
 
             return client.get().retrieve()
-                    .bodyToMono(KakaoUserResponse.class);
+                    .bodyToMono(KakaoUserResponse.class)
+                    .flatMap(response -> {
+
+                        // 이미 연결한 회원
+                        if(socialLoginRepository.existsById(Long.valueOf(response.id()))) {
+                            return Mono.just(accessToken);
+
+                        // 연결하지 않은 회원
+                        } else {
+                            User user = response.to();
+                            user.getProfile().updateImg(defaultImgName, defaultImgUrl);
+                            log.info("유저 엔티티까지 완료");
+
+                            Set<Role> roles = new HashSet<>();
+                            roles.add(roleRepository.findByName(ERole.USER)
+                                    .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다.")));
+                            user.updateRole(roles);
+                            log.info("유저 역할까지 업데이트");
+
+                            userRepository.save(user);
+
+                            log.info("유저 디비 저장 완료");
+                            return Mono.just(accessToken);
+                        }
+                    });
 
         } catch (Exception e) {
             log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
             throw e;
         }
     }
+
 
 
     /*

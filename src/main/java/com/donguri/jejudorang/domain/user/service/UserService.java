@@ -12,6 +12,7 @@ import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +25,8 @@ public interface UserService {
 
     // 회원가입
     void signUp(SignUpRequest signUpRequest);
+
+    Mono<String> getUserInfo(String accessToken);
 
     // 카카오 로그인 토큰 발급
     String getToken(String code);

@@ -19,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Optional;
@@ -67,9 +68,9 @@ public class UserController {
     @ResponseBody
     public String getTokenFromKakao(@RequestParam("code") String code) {
 
-        String token = userService.getToken(code);
+        String result = userService.getToken(code);
 
-        return "token: "+ token;
+        return "token: "+ result;
     }
 
 
