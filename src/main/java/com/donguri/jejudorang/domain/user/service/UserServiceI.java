@@ -10,15 +10,11 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
-import com.donguri.jejudorang.domain.user.dto.response.KakaoUserResponse;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
-import com.donguri.jejudorang.domain.user.dto.response.KakaoTokenResponse;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
-import com.donguri.jejudorang.domain.user.entity.auth.SocialLogin;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
-import com.donguri.jejudorang.domain.user.repository.auth.SocialLoginRepository;
 import com.donguri.jejudorang.domain.user.service.auth.MailService;
 import com.donguri.jejudorang.domain.user.service.s3.ImageService;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
@@ -37,31 +33,18 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserServiceI implements UserService {
-
-    private final WebClient webClient;
 
     @Autowired
     private final ImageService imageService;
@@ -86,8 +69,6 @@ public class UserServiceI implements UserService {
     private final UserRepository userRepository;
     @Autowired
     private final RoleRepository roleRepository;
-    @Autowired
-    private final SocialLoginRepository socialLoginRepository;
 
 
     @Autowired
@@ -101,10 +82,8 @@ public class UserServiceI implements UserService {
     @Value("${aws.s3.default-img.url}")
     private String defaultImgUrl;
 
-    @Value("${kakao.key}") private String kakaoKey;
 
-    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, SocialLoginRepository socialLoginRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
-        this.webClient = WebClient.create();
+    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
         this.imageService = imageService;
         this.mailService = mailService;
         this.bookmarkService = bookmarkService;
@@ -115,35 +94,10 @@ public class UserServiceI implements UserService {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.communityService = communityService;
-        this.socialLoginRepository = socialLoginRepository;
         this.encoder = encoder;
         this.jwtProvider = jwtProvider;
     }
 
-
-    @Override
-    public KakaoTokenResponse requestAccessToken(String code) {
-        return webClient.post()
-                .uri("https://kauth.kakao.com/oauth/token")
-                .body(BodyInserters.fromFormData("grant_type", "authorization_code")
-                        .with("client_id", "e038aef2615fa27107f4e6f973970d09")
-                        .with("redirect_uri", "http://localhost:8080/login/oauth2/code/kakao")
-                        .with("code", code))
-                .retrieve()
-                .bodyToMono(KakaoTokenResponse.class)
-                .block(); // 실제로는 비동기적으로 처리해야 합니다.
-    }
-
-    public String getKakaoUserInfo(KakaoTokenResponse token) {
-        String accessToken = token.access_token();
-
-        return webClient.get()
-                .uri("https://kapi.kakao.com/v2/user/me")
-                .header("Authorization", "Bearer " + accessToken)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block(); // 실제로는 비동기적으로 처리해야 합니다.
-    }
 
     /*
     * 이메일 확인 - 중복 확인 후 인증 번호 전송
@@ -284,85 +238,6 @@ public class UserServiceI implements UserService {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    @Override
-    @Transactional
-    public OAuth2AccessToken getKakaoToken(String code) {
-        String requestUrl = "https://kauth.kakao.com/oauth/token";
-
-        try {
-
-            WebClient client = WebClient.builder()
-                    .baseUrl(requestUrl)
-                    .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
-                    .build();
-
-            KakaoTokenResponse tokenResponse = client.post()
-                    .uri(uriBuilder -> uriBuilder
-                            .queryParam("grant_type", "authorization_code")
-                            .queryParam("client_id", kakaoKey)
-                            .queryParam("redirect_uri", "http://localhost:8080/login/oauth2/code/kakao")
-                            .queryParam("code", code)
-                            .build())
-                    .retrieve()
-                    .bodyToMono(KakaoTokenResponse.class).block();
-
-            log.info("토큰 발급 완료");
-
-            return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, tokenResponse.access_token(), Instant.now(), Instant.now().plusSeconds(Long.parseLong(tokenResponse.expires_in())));
-
-        } catch (Exception e) {
-            log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
-            throw e;
-        }
-    }
-
-    @Override
-    @Transactional
-    public Mono<KakaoUserResponse> getUserInfo(String token) {
-        try {
-            WebClient client = WebClient.builder()
-                    .baseUrl("https://kapi.kakao.com/v2/user/me")
-                    .defaultHeader("Authorization", "Bearer " + token)
-                    .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
-                    .build();
-
-            return client.get().retrieve()
-                    .bodyToMono(KakaoUserResponse.class)
-                    .flatMap(response -> {
-
-                        // 이미 연결한 회원
-                        Optional<SocialLogin> userInDB = socialLoginRepository.findById(Long.valueOf(response.id()));
-                        if(userInDB.isPresent()) {
-                            log.info("이미 연결된 회원");
-
-                        // 연결하지 않은 회원
-                        } else {
-                            User user = response.to();
-                            user.getProfile().updateImg(defaultImgName, defaultImgUrl);
-                            log.info("유저 엔티티까지 완료");
-
-                            Set<Role> roles = new HashSet<>();
-                            roles.add(roleRepository.findByName(ERole.USER)
-                                    .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다.")));
-                            user.updateRole(roles);
-                            log.info("유저 역할까지 업데이트");
-
-                            User savedUser = userRepository.save(user);
-
-                            log.info("유저 디비 저장 완료");
-
-                        }
-
-                        return Mono.just(response);
-                    });
-
-        } catch (Exception e) {
-            log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
-            throw e;
-        }
-    }
-
 
 
     /*

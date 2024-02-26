@@ -3,45 +3,37 @@ package com.donguri.jejudorang.domain.user.dto.response;
 
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.SocialLogin;
+import lombok.Builder;
 
-import java.util.HashSet;
-import java.util.Set;
 
+@Builder
 public record KakaoUserResponse(
     String id,
-    KakaoAccount kakao_account
+    String email,
+    String nickname
 ) {
-    public record KakaoAccount(
-            Profile profile,
-            String email
-    ) {
-        public record Profile (
-                String nickname
-        ){}
-    }
 
-    public User to() {
+    public User toEntity() {
         User user = User.builder()
                 .loginType(LoginType.KAKAO)
                 .build();
 
         SocialLogin sns = SocialLogin.builder()
                 .socialCode(id)
-                .socialExternalId(kakao_account.email)
+                .socialExternalId(email)
                 .user(user)
                 .build();
 
         Profile profile = Profile.builder()
                 .user(user)
-                .externalId(kakao_account.email)
-                .nickname(kakao_account.profile.nickname)
+                .externalId(email)
+                .nickname(nickname)
                 .build();
 
         user.updateSocialLogin(sns);
         user.updateProfile(profile);
 
         return user;
-
     }
 
 }
