@@ -54,10 +54,13 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        log.info("attributes: {}", attributes);
 
         OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(loginType, userNameAttributeName, attributes);
 
         User user = getUser(oAuth2Attributes, loginType);
+        log.info("user: {}", user);
+        log.info("roles: {}", user.getRoles());
 
         DefaultOAuth2User defaultOAuth2User = new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getRoles().iterator().next().getName().name())),
                 attributes, oAuth2Attributes.getAttributeKey());
@@ -95,15 +98,24 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User getUser(OAuth2Attributes oAuth2Attributes, LoginType loginType) {
+        log.info("getUser()");
         Optional<User> optionalUser = userRepository.findByLoginTypeAndSocialCode(loginType, oAuth2Attributes.getOAuth2UserInfo().getId());
         return optionalUser.orElseGet(() -> saveUser(oAuth2Attributes, loginType));
     }
 
     private User saveUser(OAuth2Attributes oAuth2Attributes, LoginType loginType) {
+        log.info("saveUser()");
         User newUser = oAuth2Attributes.toEntity(loginType, oAuth2Attributes.getOAuth2UserInfo());
+
+        log.info("profile: {}", newUser.getProfile().getExternalId());
+        log.info("auth: {}", newUser.getAuth().getAgreement());
+
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByName(ERole.USER).get());
         newUser.updateRole(roles);
+
+        log.info("roles: {}", roles);
+
         return userRepository.save(newUser);
     }
 

@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.global.auth.jwt;
 
+import com.donguri.jejudorang.domain.user.entity.LoginType;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,13 +40,25 @@ public class JwtUserDetails implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
 
-        return new JwtUserDetails(
-                user.getId(),
-                user.getProfile().getExternalId(),
-                user.getAuth().getEmail(),
-                user.getPwd().getPassword(),
-                authorities
-        );
+        if(user.getLoginType() == LoginType.BASIC) {
+            return new JwtUserDetails(
+                    user.getId(),
+                    user.getProfile().getExternalId(),
+                    user.getAuth().getEmail(),
+                    user.getPwd().getPassword(),
+                    authorities
+            );
+
+        } else {
+            return new JwtUserDetails(
+                    user.getId(),
+                    user.getProfile().getExternalId(),
+                    user.getAuth().getEmail(),
+                    user.getAuth().getEmail(),
+                    authorities
+            );
+        }
+
     }
 
     @Override

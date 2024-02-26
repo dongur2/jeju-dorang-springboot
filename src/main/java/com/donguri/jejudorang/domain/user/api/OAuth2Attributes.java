@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.entity.*;
+import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.auth.SocialLogin;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Getter
@@ -64,8 +66,15 @@ public class OAuth2Attributes {
                 .socialExternalId(oAuth2UserInfo.getEmail())
                 .build();
 
+        Authentication authentication = Authentication.builder()
+                        .user(user)
+                        .email(UUID.randomUUID() + "@socialUser.com")
+                        .agreement(AgreeRange.NECESSARY)
+                        .build();
+
         user.updateProfile(profile);
         user.updateSocialLogin(socialLogin);
+        user.updateAuth(authentication);
 
         return user;
     }

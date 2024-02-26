@@ -45,6 +45,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
             String accessToken = jwtProvider.generateOAuth2AccessToken(oauth2User);
             String refreshToken = jwtProvider.generateOAuth2RefreshToken(oauth2User);
+            log.info("accessToken: {}", accessToken);
+            log.info("refreshToken: {}", refreshToken);
 
             Cookie cookieForAT = new Cookie("access_token", accessToken);
             Cookie cookieForRT = new Cookie("refresh_token", refreshToken);
@@ -62,6 +64,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             response.addCookie(cookieForRT);
 
             log.info("쿠키 업데이트 완료");
+
+            response.sendRedirect("/");
 
         } catch (Exception e) {
             log.error("onAuthenticationSuccess error: {}", e.getMessage());

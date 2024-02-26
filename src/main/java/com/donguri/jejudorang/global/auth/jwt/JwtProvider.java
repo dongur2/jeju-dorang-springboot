@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -53,12 +54,14 @@ public class JwtProvider {
 
     public String generateOAuth2AccessToken(DefaultOAuth2User oAuth2User) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        String authorities = getUserAuthoritiesWithOAuth(oAuth2User);
+        log.info("generateOAuth2AccessToken authorities: {}", authorities);
         return Jwts.builder()
                 .setSubject(kakaoAccount.get("email").toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs))
                 .signWith(key)
-                .claim(AUTHORITIES_CLAIM, oAuth2User.getAuthorities())
+                .claim(AUTHORITIES_CLAIM, authorities)
                 .claim(ID_CLAIM, oAuth2User.getName())
                 .compact();
     }
@@ -79,12 +82,13 @@ public class JwtProvider {
 
     public String generateOAuth2RefreshToken(DefaultOAuth2User oAuth2User) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        String authorities = getUserAuthoritiesWithOAuth(oAuth2User);
         return Jwts.builder()
                 .setSubject(kakaoAccount.get("email").toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationInMs))
                 .signWith(key)
-                .claim(AUTHORITIES_CLAIM, oAuth2User.getAuthorities())
+                .claim(AUTHORITIES_CLAIM, authorities)
                 .claim(ID_CLAIM, oAuth2User.getName())
                 .compact();
     }
@@ -141,11 +145,14 @@ public class JwtProvider {
     *
     * */
     public List<GrantedAuthority> getAuthoritiesFromJWT(String token) {
+        log.info("getAuthoritiesFromJWT");
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
+        log.info("claims: {}", claims);
 
         return Arrays.stream(claims.get(AUTHORITIES_CLAIM).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
@@ -158,6 +165,14 @@ public class JwtProvider {
     * */
     private String getUserAuthorities(JwtUserDetails userDetails) {
         return userDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+    }
+
+    private String getUserAuthoritiesWithOAuth(DefaultOAuth2User oAuth2User) {
+        return oAuth2User
                 .getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
