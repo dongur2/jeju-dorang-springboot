@@ -1,19 +1,12 @@
 package com.donguri.jejudorang.domain.community.api;
 
-import com.donguri.jejudorang.domain.user.service.s3.ImageService;
+import com.donguri.jejudorang.global.common.s3.ImageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
-import java.util.UUID;
 
 
 /*
