@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record ProfileResponse (
+        String loginType,
         String nickname,
         String externalId,
         String email,
@@ -13,6 +14,7 @@ public record ProfileResponse (
 
     public ProfileResponse from(User user) {
         return ProfileResponse.builder()
+                .loginType(user.getLoginType().name())
                 .nickname(user.getProfile().getNickname())
                 .externalId(user.getProfile().getExternalId())
                 .email(user.getAuth().getEmail())

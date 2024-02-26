@@ -16,10 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,11 +27,13 @@ import java.util.Optional;
 public class UserController {
 
     private final int cookieTime;
+    private final String kakaoApiKey;
     @Autowired private final UserService userService;
 
-    public UserController(@Value("${jwt.cookie-expire}") int cookieTime, UserService userService) {
+    public UserController(@Value("${jwt.cookie-expire}") int cookieTime, UserService userService, @Value("${kakao.key}") String kakaoApiKey) {
         this.cookieTime = cookieTime;
         this.userService = userService;
+        this.kakaoApiKey = kakaoApiKey;
     }
 
 
@@ -69,7 +68,8 @@ public class UserController {
     *
     * */
     @GetMapping("/login")
-    public String signInForm() {
+    public String signInForm(Model model) {
+        model.addAttribute("kakaoApiKey", kakaoApiKey);
         return "/user/login/signInForm";
     }
 
@@ -130,9 +130,15 @@ public class UserController {
      *
      * */
     @PostMapping("/quit")
-    public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token) {
+    public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token,
+                                        @RequestParam("type") String loginType) {
         try {
-            userService.withdrawUser(token.getValue());
+            if(loginType.equals("BASIC")) {
+                userService.withdrawUser(token.getValue());
+            } else {
+                userService.withdrawKakaoUser(token.getValue());
+            }
+
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
@@ -140,9 +146,6 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
-
-
 
 
     // 토큰을 쿠키에 저장

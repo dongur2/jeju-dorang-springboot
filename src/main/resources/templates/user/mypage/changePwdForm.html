@@ -38,8 +38,14 @@
                     <input type="password" id="newPasswordForCheck" name="newPwdToCheck" style="width:100%; height:40px; "/>
                 </div>
 
-                <button type="button" class="btn btn-success" onclick="submitForm()"
-                        style="width:90%; height:60px; margin-top:5%;">비밀번호 변경</button>
+                <button th:if="${loginType == 'BASIC'}"
+                        type="button" class="btn btn-success" onclick="submitForm()"
+                        style="width:90%; height:60px; margin-top:5%;">비밀번호 변경
+                </button>
+                <button th:if="${loginType != 'BASIC'}"
+                        type="button" class="btn btn-secondary disabled" onclick="submitForm()"
+                        style="width:90%; height:60px; margin-top:5%;">비밀번호 변경
+                </button>
 
             </form>
         </div>

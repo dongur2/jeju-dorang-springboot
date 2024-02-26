@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -33,7 +35,13 @@ public class JwtProvider {
         this.jwtRefreshExpirationInMs = jwtRefreshExpirationInMs;
     }
 
-    // Authentication -> Access Token 생성
+
+    /*
+    * 일반 로그인
+    * Authentication -> Access Token 발급
+    * 로그인 아이디(externalId), DB_id
+    *
+    * */
     public String generateAccessToken(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
         String authorities = getUserAuthorities(userPrincipal);
@@ -48,7 +56,31 @@ public class JwtProvider {
                 .compact(); // JWT build
     }
 
-    // Refresh Token 생성
+    /*
+    * OAuth2 로그인
+    * DefaultOAuth2User -> Access Token 발급
+    * 로그인 아이디(email), social_code
+    *
+    * */
+    public String generateOAuth2AccessToken(DefaultOAuth2User oAuth2User) {
+        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        String authorities = getUserAuthoritiesWithOAuth(oAuth2User);
+        log.info("generateOAuth2AccessToken authorities: {}", authorities);
+        return Jwts.builder()
+                .setSubject(kakaoAccount.get("email").toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs))
+                .signWith(key)
+                .claim(AUTHORITIES_CLAIM, authorities)
+                .claim(ID_CLAIM, oAuth2User.getName())
+                .compact();
+    }
+
+    /*
+    * 일반 로그인 Refresh Token 발급
+    * Authentication
+    *
+    * */
     public String generateRefreshTokenFromUserId(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
         String authorities = getUserAuthorities(userPrincipal);
@@ -61,6 +93,25 @@ public class JwtProvider {
                 .signWith(key)
                 .compact();
     }
+
+    /*
+     * OAuth 로그인 Refresh Token 발급
+     * DefaultOAuth2User
+     *
+     * */
+    public String generateOAuth2RefreshToken(DefaultOAuth2User oAuth2User) {
+        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        String authorities = getUserAuthoritiesWithOAuth(oAuth2User);
+        return Jwts.builder()
+                .setSubject(kakaoAccount.get("email").toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationInMs))
+                .signWith(key)
+                .claim(AUTHORITIES_CLAIM, authorities)
+                .claim(ID_CLAIM, oAuth2User.getName())
+                .compact();
+    }
+
 
     /*
     * JWT에서 externalId 추출
@@ -113,11 +164,14 @@ public class JwtProvider {
     *
     * */
     public List<GrantedAuthority> getAuthoritiesFromJWT(String token) {
+        log.info("getAuthoritiesFromJWT");
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
+        log.info("claims: {}", claims);
 
         return Arrays.stream(claims.get(AUTHORITIES_CLAIM).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
@@ -125,11 +179,25 @@ public class JwtProvider {
     }
 
     /*
-    * 유저 권한(authority)를 추출하기 위한 메서드 - private
+    * 일반 로그인
+    * 유저 권한(authority)를 추출하기 위한 메서드
     *
     * */
     private String getUserAuthorities(JwtUserDetails userDetails) {
         return userDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+    }
+
+    /*
+     * OAuth 로그인
+     * 유저 권한(authority)를 추출하기 위한 메서드
+     *
+     * */
+    private String getUserAuthoritiesWithOAuth(DefaultOAuth2User oAuth2User) {
+        return oAuth2User
                 .getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)

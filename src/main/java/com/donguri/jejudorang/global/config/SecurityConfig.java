@@ -1,5 +1,8 @@
 package com.donguri.jejudorang.global.config;
 
+import com.donguri.jejudorang.global.auth.oauth.OAuth2FailureHandler;
+import com.donguri.jejudorang.global.auth.oauth.OAuth2SuccessHandler;
+import com.donguri.jejudorang.global.auth.oauth.OAuth2UserService;
 import com.donguri.jejudorang.global.auth.jwt.JwtAuthEntryPoint;
 import com.donguri.jejudorang.global.auth.jwt.JwtAuthenticationFilter;
 import com.donguri.jejudorang.global.auth.jwt.JwtUserDetailsService;
@@ -29,9 +32,17 @@ public class SecurityConfig {
 
     @Autowired private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
-    public SecurityConfig(JwtUserDetailsService jwtUserDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint) {
+    @Autowired private final OAuth2UserService oAuth2UserService;
+
+    @Autowired private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    @Autowired private final OAuth2FailureHandler oAuth2FailureHandler;
+
+    public SecurityConfig(JwtUserDetailsService jwtUserDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint, OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler, OAuth2FailureHandler oAuth2FailureHandler) {
         this.jwtUserDetailsService = jwtUserDetailsService;
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
+        this.oAuth2UserService = oAuth2UserService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+        this.oAuth2FailureHandler = oAuth2FailureHandler;
     }
 
     @Bean
@@ -89,6 +100,7 @@ public class SecurityConfig {
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
                                         "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
+                                        "/login/**",
                                         "/email/**",
                                         "/trip/lists**", "/trip/places/*",
                                         "/community/boards/**",
@@ -110,7 +122,13 @@ public class SecurityConfig {
 
                 .authenticationProvider(authenticationProvider())// 사용자의 인증 정보를 제공하는 authenticationProvider 설정: 사용자 로그인 정보 기반 인증 수행
 
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+
+                .oauth2Login(oauth2 -> {
+                    oauth2.userInfoEndpoint(endpointConfig -> endpointConfig.userService(oAuth2UserService));
+                    oauth2.successHandler(oAuth2SuccessHandler);
+                    oauth2.failureHandler(oAuth2FailureHandler);
+                });
 
         return http.build();
     }

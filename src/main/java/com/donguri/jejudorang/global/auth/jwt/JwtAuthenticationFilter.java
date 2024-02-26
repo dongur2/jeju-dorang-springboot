@@ -69,6 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("현재 인증 대상 유저: {}", username);
 
                 setContextAuthWithToken(request, username, accessToken); // SecurityContext에 인증 정보 설정
+                log.info("SecurityContext에 인증 정보 설정 완료");
             }
 
         } catch (IllegalArgumentException e) {
@@ -164,6 +165,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UsernamePasswordAuthenticationToken setContextAuthWithToken(HttpServletRequest request, String username, String accessToken) {
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username); // externalId 기반 UserDetails(사용자 상세 정보 - 권한+a) 로드
         List<GrantedAuthority> authorities = jwtProvider.getAuthoritiesFromJWT(accessToken); // 토큰에서 사용자 권한 추출
+        log.info("authorities: {}", authorities);
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities); // 인증 토큰 생성
 
         // 인증된 사용자 설정

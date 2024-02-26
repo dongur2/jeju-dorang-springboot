@@ -59,7 +59,13 @@
                         <input disabled type="email" id="emailDisabled" name="emailDisabled" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
                                style="height:40px; width:75%"/>
 
-                        <button type="button" class="btn btn-outline-success" style="height:40px; width:20%" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <button  th:if="${profileResponse.loginType() == 'BASIC'}"
+                                 type="button" class="btn btn-outline-success" style="height:40px; width:20%" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            이메일 변경
+                        </button>
+                        <!-- 소셜 로그인 회원의 경우 이메일 변경 불가능 -->
+                        <button  th:if="${profileResponse.loginType() != 'BASIC'}"
+                                 type="button" class="btn btn-secondary disabled" style="height:40px; width:20%" data-bs-toggle="modal" data-bs-target="#exampleModal">
                             이메일 변경
                         </button>
                     </div>
@@ -90,6 +96,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <input type="hidden" id="now-user-login-type" th:value="${profileResponse.loginType()}">
                         <button type="button" class="btn btn-outline-dark" onclick="quitUser()" data-bs-dismiss="modal">탈퇴</button>
                     </div>
                 </div>
@@ -252,8 +259,10 @@
         * 회원 탈퇴 요청
         * */
         function quitUser() {
+            let type = document.getElementById('now-user-login-type').value;
+
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/user/quit", true);
+            xhr.open("POST", "/user/quit?type=" + type, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
@@ -269,7 +278,6 @@
 
             xhr.send();
         }
-
 
     </script>
 </th>

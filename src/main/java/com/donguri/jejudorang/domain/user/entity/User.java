@@ -25,7 +25,7 @@ public class User {
     @Enumerated(EnumType.STRING) // BASIC, KAKAO
     private LoginType loginType;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable( name = "user_roles",
                 joinColumns = @JoinColumn(name = "user_id"),
                 inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -44,7 +44,8 @@ public class User {
             mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Password pwd;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY,
+            mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "social_login_code")
     private SocialLogin socialLogin;
 

@@ -42,6 +42,8 @@ public class ProfileController {
 
             ProfileResponse profileData = userService.getProfileData(accessToken);
 
+            log.info("profileResponse.loginType: {}", profileData.loginType());
+
             model.addAttribute(profileData);
             return "/user/mypage/profile";
 
@@ -128,7 +130,10 @@ public class ProfileController {
      *
      * */
     @GetMapping("/pwd")
-    public String getUpdatePasswordForm() {
+    public String getUpdatePasswordForm(@CookieValue("access_token") Cookie token, Model model) {
+        String loginType = userService.checkLoginType(token.getValue());
+
+        model.addAttribute("loginType", loginType);
         return "/user/mypage/changePwdForm";
     }
 

@@ -24,7 +24,7 @@ public class Authentication extends BaseEntity {
     @OneToOne
     private User user;
 
-    @Size(max = 50)
+    @Size(max = 80)
     @Column(nullable = false)
     private String email;
 
