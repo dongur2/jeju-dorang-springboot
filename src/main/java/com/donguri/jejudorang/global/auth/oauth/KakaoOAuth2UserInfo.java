@@ -1,7 +1,11 @@
-package com.donguri.jejudorang.domain.user.api;
+package com.donguri.jejudorang.global.auth.oauth;
 
 import java.util.Map;
 
+/*
+* 카카오 로그인 정보 조회
+*
+* */
 public class KakaoOAuth2UserInfo extends OAuth2UserInfo{
 
     public KakaoOAuth2UserInfo(Map<String, Object> attributes) {

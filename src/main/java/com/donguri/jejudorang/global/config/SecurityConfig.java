@@ -1,8 +1,8 @@
 package com.donguri.jejudorang.global.config;
 
-import com.donguri.jejudorang.domain.user.api.OAuth2FailureHandler;
-import com.donguri.jejudorang.domain.user.api.OAuth2SuccessHandler;
-import com.donguri.jejudorang.domain.user.api.OAuth2UserService;
+import com.donguri.jejudorang.global.auth.oauth.OAuth2FailureHandler;
+import com.donguri.jejudorang.global.auth.oauth.OAuth2SuccessHandler;
+import com.donguri.jejudorang.global.auth.oauth.OAuth2UserService;
 import com.donguri.jejudorang.global.auth.jwt.JwtAuthEntryPoint;
 import com.donguri.jejudorang.global.auth.jwt.JwtAuthenticationFilter;
 import com.donguri.jejudorang.global.auth.jwt.JwtUserDetailsService;

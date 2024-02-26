@@ -1,6 +1,5 @@
-package com.donguri.jejudorang.domain.user.api;
+package com.donguri.jejudorang.global.auth.oauth;
 
-import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -15,22 +14,23 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Slf4j
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    @Autowired private final JwtProvider jwtProvider;
-    @Autowired private final UserRepository userRepository;
     private final int cookieTime;
+    @Autowired private final JwtProvider jwtProvider;
 
-    public OAuth2SuccessHandler(JwtProvider jwtProvider, UserRepository userRepository, @Value("${jwt.cookie-expire}") int cookieTime) {
+    public OAuth2SuccessHandler(JwtProvider jwtProvider, @Value("${jwt.cookie-expire}") int cookieTime) {
         this.jwtProvider = jwtProvider;
-        this.userRepository = userRepository;
         this.cookieTime = cookieTime;
     }
 
+    /*
+    * OAuth 로그인 성공시 수행: 토큰 발급 & 리다이렉트
+    *
+    * */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("** OAuth2 Login SUCCESS **");
@@ -38,38 +38,38 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         try {
             DefaultOAuth2User oauth2User = (DefaultOAuth2User) authentication.getPrincipal();
 
-            log.info("oauth2User: {}", oauth2User);
-
-            Map<String, Object> kakaoAccount = (Map<String, Object>) oauth2User.getAttributes().get("kakao_account");
-            log.info("email: {}, authorities: {}, id: {}", kakaoAccount.get("email").toString(), oauth2User.getAuthorities(), oauth2User.getName());
-
+            // JWT 토큰 발급
             String accessToken = jwtProvider.generateOAuth2AccessToken(oauth2User);
             String refreshToken = jwtProvider.generateOAuth2RefreshToken(oauth2User);
-            log.info("accessToken: {}", accessToken);
-            log.info("refreshToken: {}", refreshToken);
 
-            Cookie cookieForAT = new Cookie("access_token", accessToken);
-            Cookie cookieForRT = new Cookie("refresh_token", refreshToken);
+            // 토큰 쿠키에 설정
+            setCookiesForToken(response, accessToken, refreshToken);
 
-            cookieForAT.setPath("/");
-            cookieForRT.setPath("/");
-
-            cookieForAT.setMaxAge(cookieTime);
-            cookieForRT.setMaxAge(cookieTime);
-
-            cookieForAT.setHttpOnly(true);
-            cookieForRT.setHttpOnly(true);
-
-            response.addCookie(cookieForAT);
-            response.addCookie(cookieForRT);
-
-            log.info("쿠키 업데이트 완료");
-
+            // 로그인 성공 후 리다이렉트 -> 홈
             response.sendRedirect("/");
 
         } catch (Exception e) {
             log.error("onAuthenticationSuccess error: {}", e.getMessage());
             throw e;
         }
+    }
+
+    private void setCookiesForToken(HttpServletResponse response, String accessToken, String refreshToken) {
+        Cookie cookieForAT = new Cookie("access_token", accessToken);
+        Cookie cookieForRT = new Cookie("refresh_token", refreshToken);
+
+        cookieForAT.setPath("/");
+        cookieForRT.setPath("/");
+
+        cookieForAT.setMaxAge(cookieTime);
+        cookieForRT.setMaxAge(cookieTime);
+
+        cookieForAT.setHttpOnly(true);
+        cookieForRT.setHttpOnly(true);
+
+        response.addCookie(cookieForAT);
+        response.addCookie(cookieForRT);
+
+        log.info("쿠키 업데이트 완료");
     }
 }

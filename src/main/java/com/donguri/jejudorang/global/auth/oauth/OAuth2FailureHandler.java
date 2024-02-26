@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.user.api;
+package com.donguri.jejudorang.global.auth.oauth;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

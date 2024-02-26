@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -37,7 +36,12 @@ public class JwtProvider {
     }
 
 
-    // Authentication -> Access Token 생성
+    /*
+    * 일반 로그인
+    * Authentication -> Access Token 발급
+    * 로그인 아이디(externalId), DB_id
+    *
+    * */
     public String generateAccessToken(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
         String authorities = getUserAuthorities(userPrincipal);
@@ -52,6 +56,12 @@ public class JwtProvider {
                 .compact(); // JWT build
     }
 
+    /*
+    * OAuth2 로그인
+    * DefaultOAuth2User -> Access Token 발급
+    * 로그인 아이디(email), social_code
+    *
+    * */
     public String generateOAuth2AccessToken(DefaultOAuth2User oAuth2User) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
         String authorities = getUserAuthoritiesWithOAuth(oAuth2User);
@@ -66,7 +76,11 @@ public class JwtProvider {
                 .compact();
     }
 
-    // Refresh Token 생성
+    /*
+    * 일반 로그인 Refresh Token 발급
+    * Authentication
+    *
+    * */
     public String generateRefreshTokenFromUserId(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
         String authorities = getUserAuthorities(userPrincipal);
@@ -80,6 +94,11 @@ public class JwtProvider {
                 .compact();
     }
 
+    /*
+     * OAuth 로그인 Refresh Token 발급
+     * DefaultOAuth2User
+     *
+     * */
     public String generateOAuth2RefreshToken(DefaultOAuth2User oAuth2User) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
         String authorities = getUserAuthoritiesWithOAuth(oAuth2User);
@@ -160,7 +179,8 @@ public class JwtProvider {
     }
 
     /*
-    * 유저 권한(authority)를 추출하기 위한 메서드 - private
+    * 일반 로그인
+    * 유저 권한(authority)를 추출하기 위한 메서드
     *
     * */
     private String getUserAuthorities(JwtUserDetails userDetails) {
@@ -171,6 +191,11 @@ public class JwtProvider {
                 .collect(Collectors.joining(","));
     }
 
+    /*
+     * OAuth 로그인
+     * 유저 권한(authority)를 추출하기 위한 메서드
+     *
+     * */
     private String getUserAuthoritiesWithOAuth(DefaultOAuth2User oAuth2User) {
         return oAuth2User
                 .getAuthorities()

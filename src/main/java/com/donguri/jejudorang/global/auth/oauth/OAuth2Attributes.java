@@ -1,24 +1,26 @@
-package com.donguri.jejudorang.domain.user.api;
+package com.donguri.jejudorang.global.auth.oauth;
 
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Authentication;
 import com.donguri.jejudorang.domain.user.entity.auth.SocialLogin;
-import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
+/*
+* 소셜로그인별로 전달받는 데이터의 형식이 다르므로
+* 데이터를 각각 처리하게 해주는 DTO
+*
+* */
 @Slf4j
 @Getter
 public class OAuth2Attributes {
-    private String attributeKey;
-    private OAuth2UserInfo oAuth2UserInfo;
+    private String attributeKey; // OAuth 2.0 프로바이더에서 사용자의 고유 식별자(attribute): 사용자 식별에 사용되는 속성
+    private OAuth2UserInfo oAuth2UserInfo; // 소셜 로그인 조회 유저 정보
 
     @Value("${aws.s3.default-img.name}")
     private String defaultImgName;
@@ -31,6 +33,9 @@ public class OAuth2Attributes {
         this.oAuth2UserInfo = oAuth2UserInfo;
     }
 
+    /*
+    * 각 소셜 서비스에 맞는 메서드를 호출
+    * */
     public static OAuth2Attributes of(LoginType loginType, String userAttributeName, Map<String, Object> attributes) {
         if(loginType == LoginType.KAKAO) {
             return ofKakao(userAttributeName, attributes);
@@ -47,7 +52,6 @@ public class OAuth2Attributes {
     }
 
     public User toEntity(LoginType loginType, OAuth2UserInfo oAuth2UserInfo) {
-
         User user = User.builder()
                 .loginType(loginType)
                 .build();
@@ -68,7 +72,7 @@ public class OAuth2Attributes {
 
         Authentication authentication = Authentication.builder()
                         .user(user)
-                        .email(UUID.randomUUID() + "@socialUser.com")
+                        .email(UUID.randomUUID() + "@socialUser.com") // JWT 토큰 발급시 password로 사용
                         .agreement(AgreeRange.NECESSARY)
                         .build();
 
