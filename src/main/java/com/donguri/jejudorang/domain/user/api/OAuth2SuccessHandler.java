@@ -65,8 +65,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         } catch (Exception e) {
             log.error("onAuthenticationSuccess error: {}", e.getMessage());
+            throw e;
         }
-
-
     }
 }
