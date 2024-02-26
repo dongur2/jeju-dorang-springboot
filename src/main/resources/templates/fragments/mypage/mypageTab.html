@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
     <div th:fragment="mypageTabFragment" class="board-item board-tab" style="width: 300px; gap: 10%;">
         <ul class="nav flex-column">
@@ -8,7 +7,7 @@
                 <a class="nav-link active" aria-current="page" href="#" style="color: #696969;"
                    th:href="@{/profile}">프로필</a>
             </li>
-            <li class="nav-item" style="font-size: 20px;" >
+            <li class="nav-item" style="font-size: 20px;">
                 <a class="nav-link" href="#" style="color: #696969;"
                    th:href="@{/profile/pwd}">비밀번호 변경</a>
             </li>

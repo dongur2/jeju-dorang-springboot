@@ -412,6 +412,11 @@ public class UserServiceI implements UserService {
         }
     }
 
+    @Override
+    public String checkLoginType(String accessToken) {
+        return getNowUser(accessToken).getLoginType().name();
+    }
+
 
     /*
     * 비밀번호 변경

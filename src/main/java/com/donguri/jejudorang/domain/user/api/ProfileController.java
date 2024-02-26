@@ -6,6 +6,7 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +131,10 @@ public class ProfileController {
      *
      * */
     @GetMapping("/pwd")
-    public String getUpdatePasswordForm() {
+    public String getUpdatePasswordForm(@CookieValue("access_token") Cookie token, Model model) {
+        String loginType = userService.checkLoginType(token.getValue());
+
+        model.addAttribute("loginType", loginType);
         return "/user/mypage/changePwdForm";
     }
 

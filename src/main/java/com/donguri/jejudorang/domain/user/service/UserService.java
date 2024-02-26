@@ -42,6 +42,9 @@ public interface UserService {
     // 프로필 사진 삭제
     void deleteProfileImg(String accessToken);
 
+    // 로그인타입 조회
+    String checkLoginType(String accessToken);
+
     // 비밀번호 수정
     void updatePassword(String accessToken, PasswordRequest pwdToUpdate) throws Exception;
 
