@@ -17,9 +17,6 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Optional;
@@ -136,7 +133,6 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token,
                                         @RequestParam("type") String loginType) {
         try {
-
             if(loginType.equals("BASIC")) {
                 userService.withdrawUser(token.getValue());
             } else {

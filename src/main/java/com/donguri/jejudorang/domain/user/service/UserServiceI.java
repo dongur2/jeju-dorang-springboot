@@ -559,7 +559,6 @@ public class UserServiceI implements UserService {
     @Override
     @Transactional
     public void withdrawUser(String token) {
-        log.info("withdrawUser BASIC");
         try {
             Long idFromJwtToken = jwtProvider.getIdFromJwtToken(token);
 
@@ -586,14 +585,11 @@ public class UserServiceI implements UserService {
 
         // 유저 삭제
         userRepository.deleteById(idFromJwtToken);
-
-        log.info("회원 탈퇴 완료");
     }
 
     @Override
     @Transactional
     public void withdrawKakaoUser(String accessToken) {
-        log.info("withdrawUser KAKAO");
         try {
             Long socialCodeFromJwt = jwtProvider.getIdFromJwtToken(accessToken);
             Long nowUserId = userRepository.findByLoginTypeAndSocialCode(LoginType.KAKAO, String.valueOf(socialCodeFromJwt))
@@ -618,7 +614,6 @@ public class UserServiceI implements UserService {
     * */
     @Override
     public Page<CommunityMyPageListResponse> getMyCommunityWritings(String token, Pageable pageable) {
-
         try {
             User nowUser = getNowUser(token);
 
