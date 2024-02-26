@@ -59,7 +59,13 @@
                         <input disabled type="email" id="emailDisabled" name="emailDisabled" th:placeholder="${profileResponse.email()}" th:value="${profileResponse.email()}"
                                style="height:40px; width:75%"/>
 
-                        <button type="button" class="btn btn-outline-success" style="height:40px; width:20%" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <button  th:if="${profileResponse.loginType() == 'BASIC'}"
+                                 type="button" class="btn btn-outline-success" style="height:40px; width:20%" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            이메일 변경
+                        </button>
+                        <!-- 소셜 로그인 회원의 경우 이메일 변경 불가능 -->
+                        <button  th:if="${profileResponse.loginType() != 'BASIC'}"
+                                 type="button" class="btn btn-secondary disabled" style="height:40px; width:20%" data-bs-toggle="modal" data-bs-target="#exampleModal">
                             이메일 변경
                         </button>
                     </div>
@@ -69,7 +75,8 @@
                         style="width:90%; height:60px; margin-top:3%;">수정</button>
             </form>
 
-            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#quitModal"
+            <button th:if="${profileResponse.loginType() == 'BASIC'}"
+                    type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#quitModal"
                     style="width:100px; margin-left:auto; margin-top:-1%;">
                 회원 탈퇴
             </button>

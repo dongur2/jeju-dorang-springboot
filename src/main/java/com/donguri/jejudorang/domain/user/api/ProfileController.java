@@ -42,6 +42,8 @@ public class ProfileController {
 
             ProfileResponse profileData = userService.getProfileData(accessToken);
 
+            log.info("profileResponse.loginType: {}", profileData.loginType());
+
             model.addAttribute(profileData);
             return "/user/mypage/profile";
 
