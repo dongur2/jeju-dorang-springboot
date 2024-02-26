@@ -6,7 +6,6 @@ import com.donguri.jejudorang.domain.user.entity.auth.SocialLogin;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Map;
 import java.util.UUID;
@@ -21,11 +20,6 @@ import java.util.UUID;
 public class OAuth2Attributes {
     private String attributeKey; // OAuth 2.0 프로바이더에서 사용자의 고유 식별자(attribute): 사용자 식별에 사용되는 속성
     private OAuth2UserInfo oAuth2UserInfo; // 소셜 로그인 조회 유저 정보
-
-    @Value("${aws.s3.default-img.name}")
-    private String defaultImgName;
-    @Value("${aws.s3.default-img.url}")
-    private String defaultImgUrl;
 
     @Builder
     public OAuth2Attributes(String attributeKey, OAuth2UserInfo oAuth2UserInfo) {
@@ -60,8 +54,6 @@ public class OAuth2Attributes {
                 .user(user)
                 .nickname(oAuth2UserInfo.getNickname())
                 .externalId(oAuth2UserInfo.getEmail())
-                .imgName(defaultImgName)
-                .imgUrl(defaultImgUrl)
                 .build();
 
         SocialLogin socialLogin = SocialLogin.builder()

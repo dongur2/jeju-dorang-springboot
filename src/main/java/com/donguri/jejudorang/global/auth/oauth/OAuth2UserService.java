@@ -8,6 +8,7 @@ import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -27,9 +28,16 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private static final String KAKAO = "kakao";
 
-    public OAuth2UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    private final String defaultImgName;
+    private final String defaultImgUrl;
+
+    public OAuth2UserService(UserRepository userRepository, RoleRepository roleRepository,
+                             @Value("${aws.s3.default-img.name}") String defaultImgName,
+                             @Value("${aws.s3.default-img.url}") String defaultImgUrl) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.defaultImgName = defaultImgName;
+        this.defaultImgUrl = defaultImgUrl;
     }
 
 
@@ -74,6 +82,9 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     // DB에 저장
     private User saveUser(OAuth2Attributes oAuth2Attributes, LoginType loginType) {
         User newUser = oAuth2Attributes.toEntity(loginType, oAuth2Attributes.getOAuth2UserInfo());
+
+        // 기본 프로필 사진 설정
+        newUser.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
         // 권한 설정해서 저장
         Set<Role> roles = new HashSet<>();
