@@ -33,6 +33,7 @@ public class JwtProvider {
         this.jwtRefreshExpirationInMs = jwtRefreshExpirationInMs;
     }
 
+
     // Authentication -> Access Token 생성
     public String generateAccessToken(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();

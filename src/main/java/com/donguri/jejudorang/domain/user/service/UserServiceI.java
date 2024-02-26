@@ -42,19 +42,26 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserServiceI implements UserService {
+
+    private final WebClient webClient;
 
     @Autowired
     private final ImageService imageService;
@@ -97,6 +104,7 @@ public class UserServiceI implements UserService {
     @Value("${kakao.key}") private String kakaoKey;
 
     public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, SocialLoginRepository socialLoginRepository, PasswordEncoder encoder, JwtProvider jwtProvider) {
+        this.webClient = WebClient.create();
         this.imageService = imageService;
         this.mailService = mailService;
         this.bookmarkService = bookmarkService;
@@ -112,6 +120,30 @@ public class UserServiceI implements UserService {
         this.jwtProvider = jwtProvider;
     }
 
+
+    @Override
+    public KakaoTokenResponse requestAccessToken(String code) {
+        return webClient.post()
+                .uri("https://kauth.kakao.com/oauth/token")
+                .body(BodyInserters.fromFormData("grant_type", "authorization_code")
+                        .with("client_id", "e038aef2615fa27107f4e6f973970d09")
+                        .with("redirect_uri", "http://localhost:8080/login/oauth2/code/kakao")
+                        .with("code", code))
+                .retrieve()
+                .bodyToMono(KakaoTokenResponse.class)
+                .block(); // 실제로는 비동기적으로 처리해야 합니다.
+    }
+
+    public String getKakaoUserInfo(KakaoTokenResponse token) {
+        String accessToken = token.access_token();
+
+        return webClient.get()
+                .uri("https://kapi.kakao.com/v2/user/me")
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block(); // 실제로는 비동기적으로 처리해야 합니다.
+    }
 
     /*
     * 이메일 확인 - 중복 확인 후 인증 번호 전송
@@ -255,7 +287,7 @@ public class UserServiceI implements UserService {
 
     @Override
     @Transactional
-    public Map<String, String> getToken(String code) {
+    public OAuth2AccessToken getKakaoToken(String code) {
         String requestUrl = "https://kauth.kakao.com/oauth/token";
 
         try {
@@ -265,40 +297,33 @@ public class UserServiceI implements UserService {
                     .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
                     .build();
 
-            Mono<KakaoTokenResponse> tokenResponse = client.post().uri(uriBuilder -> uriBuilder
+            KakaoTokenResponse tokenResponse = client.post()
+                    .uri(uriBuilder -> uriBuilder
                             .queryParam("grant_type", "authorization_code")
                             .queryParam("client_id", kakaoKey)
-                            .queryParam("redirect_uri", "http://localhost:8080/user/oauth")
+                            .queryParam("redirect_uri", "http://localhost:8080/login/oauth2/code/kakao")
                             .queryParam("code", code)
                             .build())
                     .retrieve()
-                    .bodyToMono(KakaoTokenResponse.class);
+                    .bodyToMono(KakaoTokenResponse.class).block();
 
-            Mono<Map<String, String>> mapMono = tokenResponse.flatMap(token -> {
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", token.access_token());
-                tokens.put("refresh_token", token.refresh_token());
+            log.info("토큰 발급 완료");
 
-                return getUserInfo(tokens);
-            });
-
-            return mapMono.block();
-
+            return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, tokenResponse.access_token(), Instant.now(), Instant.now().plusSeconds(Long.parseLong(tokenResponse.expires_in())));
 
         } catch (Exception e) {
             log.error("카카오 유저 정보 불러오기 실패: {}", e.getMessage());
             throw e;
         }
-
     }
 
     @Override
     @Transactional
-    public Mono<Map<String, String>> getUserInfo(Map<String, String> tokens) {
+    public Mono<KakaoUserResponse> getUserInfo(String token) {
         try {
             WebClient client = WebClient.builder()
                     .baseUrl("https://kapi.kakao.com/v2/user/me")
-                    .defaultHeader("Authorization", "Bearer " + tokens.get("access_token"))
+                    .defaultHeader("Authorization", "Bearer " + token)
                     .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
                     .build();
 
@@ -326,10 +351,10 @@ public class UserServiceI implements UserService {
                             User savedUser = userRepository.save(user);
 
                             log.info("유저 디비 저장 완료");
+
                         }
 
-                        return Mono.just(tokens);
-
+                        return Mono.just(response);
                     });
 
         } catch (Exception e) {

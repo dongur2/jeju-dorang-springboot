@@ -64,15 +64,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/oauth")
-    public String getTokenFromKakao(@RequestParam("code") String code, HttpServletResponse response) {
-
-        Map<String, String> tokens = userService.getToken(code);
-        setCookieForToken(tokens, response);
-
-        return "redirect:/";
-    }
-
 
     /*
     * 로그인

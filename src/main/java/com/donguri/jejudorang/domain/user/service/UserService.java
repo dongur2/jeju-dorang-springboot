@@ -7,17 +7,25 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendForPwdRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailSendRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.domain.user.dto.response.KakaoTokenResponse;
+import com.donguri.jejudorang.domain.user.dto.response.KakaoUserResponse;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Optional;
 
 public interface UserService {
+
+    KakaoTokenResponse requestAccessToken(String code);
+
+    String getKakaoUserInfo(KakaoTokenResponse accessToken);
 
     // 이메일 인증번호 전송, 확인
     void checkMailDuplicatedAndSendVerifyCode(MailSendRequest mailSendRequest) throws MessagingException;
@@ -26,10 +34,10 @@ public interface UserService {
     // 회원가입
     void signUp(SignUpRequest signUpRequest);
 
-    Mono<Map<String, String>> getUserInfo(Map<String, String> accessToken);
+    Mono<KakaoUserResponse> getUserInfo(String accessToken);
 
     // 카카오 로그인 토큰 발급
-    Map<String, String> getToken(String code);
+    OAuth2AccessToken getKakaoToken(String code);
 
     // 로그인
     Map<String, String> signIn(LoginRequest loginRequest);
