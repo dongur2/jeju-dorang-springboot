@@ -1,6 +1,8 @@
 package com.donguri.jejudorang.global.auth.oauth;
 
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
+import com.donguri.jejudorang.global.auth.jwt.RefreshToken;
+import com.donguri.jejudorang.global.auth.jwt.RefreshTokenRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +16,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -21,10 +24,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final int cookieTime;
     @Autowired private final JwtProvider jwtProvider;
+    @Autowired private final RefreshTokenRepository refreshTokenRepository;
 
-    public OAuth2SuccessHandler(JwtProvider jwtProvider, @Value("${jwt.cookie-expire}") int cookieTime) {
+    public OAuth2SuccessHandler(JwtProvider jwtProvider, @Value("${jwt.cookie-expire}") int cookieTime, RefreshTokenRepository refreshTokenRepository) {
         this.jwtProvider = jwtProvider;
         this.cookieTime = cookieTime;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     /*
@@ -38,9 +43,29 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         try {
             DefaultOAuth2User oauth2User = (DefaultOAuth2User) authentication.getPrincipal();
 
-            // JWT 토큰 발급
+            // JWT 토큰 발급: Access Token
             String accessToken = jwtProvider.generateOAuth2AccessToken(oauth2User);
-            String refreshToken = jwtProvider.generateOAuth2RefreshToken(oauth2User);
+            log.info("[OAuth2SuccessHandler] Access Token 발급 완료");
+
+            // Refresh Token
+            String refreshToken = null;
+            Optional<RefreshToken> refreshOp = refreshTokenRepository.findByUserId(oauth2User.getName());
+            if(refreshOp.isPresent()) {
+                log.info("Redis에 해당 아이디의 유효한 Refresh Token이 존재: {}", refreshOp.get().getRefreshToken());
+                refreshToken = refreshOp.get().getRefreshToken();
+
+            } else {
+                log.info("Redis에 해당 아이디의 Refresh Token이 없음: {}", oauth2User.getName());
+
+                refreshToken = jwtProvider.generateOAuth2RefreshToken(oauth2User);
+                RefreshToken refreshTokenToSave = RefreshToken.builder()
+                        .refreshToken(refreshToken)
+                        .userId(oauth2User.getName()) // code
+                        .build();
+
+                RefreshToken saved = refreshTokenRepository.save(refreshTokenToSave);
+                log.info("Redis에 Refresh Token이 저장되었습니다 : {}", saved.getRefreshToken());
+            }
 
             // 토큰 쿠키에 설정
             setCookiesForToken(response, accessToken, refreshToken);
