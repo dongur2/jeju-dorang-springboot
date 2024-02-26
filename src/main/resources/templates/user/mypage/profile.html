@@ -75,8 +75,7 @@
                         style="width:90%; height:60px; margin-top:3%;">수정</button>
             </form>
 
-            <button th:if="${profileResponse.loginType() == 'BASIC'}"
-                    type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#quitModal"
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#quitModal"
                     style="width:100px; margin-left:auto; margin-top:-1%;">
                 회원 탈퇴
             </button>
@@ -97,6 +96,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <input type="hidden" id="now-user-login-type" th:value="${profileResponse.loginType()}">
                         <button type="button" class="btn btn-outline-dark" onclick="quitUser()" data-bs-dismiss="modal">탈퇴</button>
                     </div>
                 </div>
@@ -259,8 +259,10 @@
         * 회원 탈퇴 요청
         * */
         function quitUser() {
+            let type = document.getElementById('now-user-login-type').value;
+
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/user/quit", true);
+            xhr.open("POST", "/user/quit?type=" + type, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
@@ -276,7 +278,6 @@
 
             xhr.send();
         }
-
 
     </script>
 </th>

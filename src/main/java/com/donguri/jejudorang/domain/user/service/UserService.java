@@ -65,6 +65,8 @@ public interface UserService {
     // 회원 탈퇴
     void withdrawUser(String accessToken);
 
+    void withdrawKakaoUser(String accessToken);
+
     // 마이페이지: 내 작성글 목록 조회
     Page<CommunityMyPageListResponse> getMyCommunityWritings(String accessToken, Pageable pageable);
 

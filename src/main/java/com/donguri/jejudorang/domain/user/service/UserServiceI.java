@@ -559,29 +559,55 @@ public class UserServiceI implements UserService {
     @Override
     @Transactional
     public void withdrawUser(String token) {
+        log.info("withdrawUser BASIC");
         try {
             Long idFromJwtToken = jwtProvider.getIdFromJwtToken(token);
 
-            // 추출한 아이디로 작성글 - 작성자 연관관계 삭제
-            communityService.findAllPostsByUserAndSetWriterNull(idFromJwtToken);
-
-            // 추출한 아이디로 작성 댓글 - 작성자 연관관계 삭제
-            commentService.findAllCmtsByUserAndSetWriterNull(idFromJwtToken);
-
-            // 알림 삭제
-            notificationService.findAndDeleteAllNotificationsByUserId(idFromJwtToken);
-
-            // 북마크 삭제
-            bookmarkService.deleteAllBookmarksOfUser(idFromJwtToken);
-
-            // 유저 삭제
-            userRepository.deleteById(idFromJwtToken);
+            cutRelationshipAndDeleteAll(idFromJwtToken);
 
         } catch (Exception e) {
             log.error("회원을 삭제하지 못했습니다. {}", e.getMessage());
             throw e;
         }
     }
+
+    private void cutRelationshipAndDeleteAll(Long idFromJwtToken) {
+        // 추출한 아이디로 작성글 - 작성자 연관관계 삭제
+        communityService.findAllPostsByUserAndSetWriterNull(idFromJwtToken);
+
+        // 추출한 아이디로 작성 댓글 - 작성자 연관관계 삭제
+        commentService.findAllCmtsByUserAndSetWriterNull(idFromJwtToken);
+
+        // 알림 삭제
+        notificationService.findAndDeleteAllNotificationsByUserId(idFromJwtToken);
+
+        // 북마크 삭제
+        bookmarkService.deleteAllBookmarksOfUser(idFromJwtToken);
+
+        // 유저 삭제
+        userRepository.deleteById(idFromJwtToken);
+
+        log.info("회원 탈퇴 완료");
+    }
+
+    @Override
+    @Transactional
+    public void withdrawKakaoUser(String accessToken) {
+        log.info("withdrawUser KAKAO");
+        try {
+            Long socialCodeFromJwt = jwtProvider.getIdFromJwtToken(accessToken);
+            Long nowUserId = userRepository.findByLoginTypeAndSocialCode(LoginType.KAKAO, String.valueOf(socialCodeFromJwt))
+                    .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없음"))
+                    .getId();
+
+            cutRelationshipAndDeleteAll(nowUserId);
+
+        } catch (Exception e) {
+            log.error("회원을 삭제하지 못했습니다. {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     /*
     * 마이 페이지

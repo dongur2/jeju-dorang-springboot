@@ -133,9 +133,16 @@ public class UserController {
      *
      * */
     @PostMapping("/quit")
-    public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token) {
+    public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token,
+                                        @RequestParam("type") String loginType) {
         try {
-            userService.withdrawUser(token.getValue());
+
+            if(loginType.equals("BASIC")) {
+                userService.withdrawUser(token.getValue());
+            } else {
+                userService.withdrawKakaoUser(token.getValue());
+            }
+
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
@@ -143,9 +150,6 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
-
-
 
 
     // 토큰을 쿠키에 저장
