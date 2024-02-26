@@ -59,7 +59,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
         User user = getUser(oAuth2Attributes, loginType);
 
-        DefaultOAuth2User defaultOAuth2User = new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getRoles().stream().toList().get(0).getName().name())),
+        DefaultOAuth2User defaultOAuth2User = new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getRoles().iterator().next().getName().name())),
                 attributes, oAuth2Attributes.getAttributeKey());
         log.info("defaultOAuth2User: {}", defaultOAuth2User);
         return defaultOAuth2User;

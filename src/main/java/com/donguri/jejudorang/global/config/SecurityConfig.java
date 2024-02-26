@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.global.config;
 
+import com.donguri.jejudorang.domain.user.api.OAuth2SuccessHandler;
 import com.donguri.jejudorang.domain.user.api.OAuth2UserService;
 import com.donguri.jejudorang.global.auth.jwt.JwtAuthEntryPoint;
 import com.donguri.jejudorang.global.auth.jwt.JwtAuthenticationFilter;
@@ -32,10 +33,13 @@ public class SecurityConfig {
 
     @Autowired private final OAuth2UserService oAuth2UserService;
 
-    public SecurityConfig(JwtUserDetailsService jwtUserDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint, OAuth2UserService oAuth2UserService) {
+    @Autowired private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    public SecurityConfig(JwtUserDetailsService jwtUserDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint, OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler) {
         this.jwtUserDetailsService = jwtUserDetailsService;
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
         this.oAuth2UserService = oAuth2UserService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
 
     @Bean
@@ -117,7 +121,10 @@ public class SecurityConfig {
 
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
-                .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(endpointConfig -> endpointConfig.userService(oAuth2UserService)));
+                .oauth2Login(oauth2 -> {
+                    oauth2.userInfoEndpoint(endpointConfig -> endpointConfig.userService(oAuth2UserService));
+                    oauth2.successHandler(oAuth2SuccessHandler);
+                });
 
         return http.build();
     }
