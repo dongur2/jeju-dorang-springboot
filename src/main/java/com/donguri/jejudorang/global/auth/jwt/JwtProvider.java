@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -49,6 +51,18 @@ public class JwtProvider {
                 .compact(); // JWT build
     }
 
+    public String generateOAuth2AccessToken(DefaultOAuth2User oAuth2User) {
+        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        return Jwts.builder()
+                .setSubject(kakaoAccount.get("email").toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs))
+                .signWith(key)
+                .claim(AUTHORITIES_CLAIM, oAuth2User.getAuthorities())
+                .claim(ID_CLAIM, oAuth2User.getName())
+                .compact();
+    }
+
     // Refresh Token 생성
     public String generateRefreshTokenFromUserId(Authentication authentication) {
         JwtUserDetails userPrincipal = (JwtUserDetails) authentication.getPrincipal();
@@ -62,6 +76,19 @@ public class JwtProvider {
                 .signWith(key)
                 .compact();
     }
+
+    public String generateOAuth2RefreshToken(DefaultOAuth2User oAuth2User) {
+        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        return Jwts.builder()
+                .setSubject(kakaoAccount.get("email").toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationInMs))
+                .signWith(key)
+                .claim(AUTHORITIES_CLAIM, oAuth2User.getAuthorities())
+                .claim(ID_CLAIM, oAuth2User.getName())
+                .compact();
+    }
+
 
     /*
     * JWT에서 externalId 추출
