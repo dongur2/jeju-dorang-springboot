@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.user.service.s3;
+package com.donguri.jejudorang.global.common.s3;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +34,13 @@ public class ImageServiceI implements ImageService {
     public Map<String, String> uploadImg(MultipartFile imgFile) {
         try {
             String originalName = imgFile.getOriginalFilename();
-            String fileType = originalName.substring(originalName.length() - 4).toLowerCase();
+            log.info("이미지 파일의 사용자 저장 이름 : {}", originalName);
+            String fileType = originalName.substring(originalName.length() - 4);
+            log.info("파일 확장자 : {}", fileType);
 
-            if (!(fileType.contains("png") || fileType.contains("jpg") || fileType.contains("jpeg"))) {
+            if (!(fileType.contains("png") || fileType.contains("jpg") || fileType.contains("jpeg")
+                || fileType.contains("PNG") || fileType.contains("JPG") || fileType.contains("JPEG"))) {
+
                 throw new IllegalAccessException("파일은 png, jpg, jpeg만 가능합니다");
             }
 
@@ -51,6 +55,7 @@ public class ImageServiceI implements ImageService {
                     .build();
 
             s3Client.putObject(putOb, RequestBody.fromBytes(imgFile.getBytes()));
+            log.info(" ** S3에 사진 업로드 완료 ** name: {}", objectKey);
 
             GetUrlRequest request = GetUrlRequest.builder()
                     .bucket(bucketName)
@@ -58,6 +63,8 @@ public class ImageServiceI implements ImageService {
                     .build();
 
             URL url = s3Client.utilities().getUrl(request);
+            log.info(" ** S3에 저장된 사진 URL 불러오기 완료 ** ");
+            log.info("The URL for {} is {}", objectKey, url);
 
             Map<String, String> result = new HashMap<>();
             result.put("imgName", objectKey);
@@ -101,6 +108,7 @@ public class ImageServiceI implements ImageService {
             log.error("S3의 이미지 삭제 실패 : {}", e.awsErrorDetails().errorMessage());
             System.exit(1);
         }
+
+        log.info("S3의 이미지 삭제 완료");
     }
-    
 }
