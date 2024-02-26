@@ -583,8 +583,23 @@ public class UserServiceI implements UserService {
         // 북마크 삭제
         bookmarkService.deleteAllBookmarksOfUser(idFromJwtToken);
 
+        // 프로필 사진 삭제
+        deleteProfileImage(idFromJwtToken);
+
         // 유저 삭제
         userRepository.deleteById(idFromJwtToken);
+    }
+
+    private void deleteProfileImage(Long idFromJwtToken) {
+        String imgName = userRepository.findById(idFromJwtToken)
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없음"))
+                .getProfile().getImgName();
+
+        // 기본 사진이 아닐 경우 삭제
+        if (!imgName.equals("default-img.png")) {
+            log.info("기본 사진이 아니므로 삭제합니다. 이름: {}", imgName);
+            imageService.deleteImg(imgName);
+        }
     }
 
     @Override
