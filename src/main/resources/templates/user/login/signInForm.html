@@ -34,8 +34,8 @@
             <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordHelpBlock"
                    style="width:100%; margin:0 auto">
 
-            <input class="btn btn-success" type="submit" value="로그인"
-                    style="margin-top:20px; height:67.5px; font-size: 22px">
+            <button class="btn btn-success" type="button" onclick="requestSignIn()"
+                    style="margin-top:20px; height:67.5px; font-size: 22px">로그인</button>
 
             <a id="kakao-login-btn" href="http://localhost:8080/oauth2/authorization/kakao"
                style="width:100%; height:90px; display: flex; justify-content: center; align-items: flex-end">
@@ -126,6 +126,55 @@
     </div>
 
     <script>
+
+        /*
+        * 로그인
+        * */
+        function requestSignIn() {
+            let externalId = document.getElementById('externalId').value;
+            let password = document.getElementById('password').value;
+
+            if(externalId == null || externalId.trim() === '') {
+                Swal.fire({
+                    position: 'middle',
+                    icon: 'warning',
+                    title: '',
+                    text: "아이디를 입력해주세요.",
+                    showConfirmButton: true,
+                });
+            } else if (password == null || password.trim() === '') {
+                Swal.fire({
+                    position: 'middle',
+                    icon: 'warning',
+                    title: '',
+                    text: "비밀번호를 입력해주세요.",
+                    showConfirmButton: true,
+                });
+            } else {
+                var xhr = new XMLHttpRequest();
+                var form = document.getElementById('sign-in-form');
+                var formData = new FormData(form);
+
+                xhr.open("POST", "/user/login", true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            window.location.href="/";
+
+                        } else {
+                            Swal.fire({
+                                position: 'middle',
+                                icon: 'warning',
+                                title: '',
+                                text: xhr.responseText,
+                                showConfirmButton: true,
+                            });
+                        }
+                    }
+                }
+                xhr.send(formData);
+            }
+        }
 
         /*
         * 아이디 찾기 이메일 전송

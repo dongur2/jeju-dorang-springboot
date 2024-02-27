@@ -74,11 +74,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
-                                   HttpServletResponse response, Model model) {
+    public ResponseEntity<?> authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
+                                   HttpServletResponse response) {
         // 유효성 검사 에러
         if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
+            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -86,23 +86,20 @@ public class UserController {
 
             if (tokens == null || tokens.get("access_token") == null) {
                 log.error("해당 아이디의 비밀번호가 올바르지 않습니다: {}", loginRequest.externalId());
-                model.addAttribute("errorMsg", "비밀번호를 확인해주세요");
-                return "/user/login/signInForm";
+                return new ResponseEntity<>("비밀번호를 확인해주세요", HttpStatus.BAD_REQUEST);
 
             } else {
                 setCookieForToken(tokens, response);
-                return "redirect:/";
+                return new ResponseEntity<>(HttpStatus.OK);
             }
 
         } catch (UnexpectedRollbackException e) {
             log.error("가입된 아이디가 아닙니다 : {}", e.getMessage());
-            model.addAttribute("errorMsg", "가입된 아이디가 없습니다");
-            return "/user/login/signInForm";
+            return new ResponseEntity<>("가입된 아이디가 없습니다", HttpStatus.BAD_REQUEST);
 
         } catch (Exception e) {
             log.error("로그인에 실패했습니다: {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/user/login/signInForm";
+            return new ResponseEntity<>("로그인에 실패했습니다", HttpStatus.BAD_REQUEST);
         }
     }
 
