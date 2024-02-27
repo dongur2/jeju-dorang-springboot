@@ -8,7 +8,6 @@ import com.donguri.jejudorang.domain.trip.repository.TripRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
