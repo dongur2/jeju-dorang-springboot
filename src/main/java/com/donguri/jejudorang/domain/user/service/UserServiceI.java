@@ -21,6 +21,8 @@ import com.donguri.jejudorang.global.auth.jwt.JwtUserDetails;
 import com.donguri.jejudorang.global.auth.jwt.RefreshToken;
 import com.donguri.jejudorang.global.auth.jwt.RefreshTokenRepository;
 import com.donguri.jejudorang.global.common.s3.ImageService;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
@@ -133,7 +135,7 @@ public class UserServiceI implements UserService {
         try {
             return mailService.checkAuthMail(mailVerifyRequest);
 
-        }  catch (NullPointerException e) {
+        }  catch (CustomException e) {
             log.error("인증번호가 만료되었습니다.");
             throw e;
 
@@ -147,7 +149,7 @@ public class UserServiceI implements UserService {
     private void checkMailDuplicated(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             log.debug("이미 가입된 이메일입니다 : {}", email);
-            throw new RuntimeException("이미 가입된 이메일입니다.");
+            throw new CustomException(CustomErrorCode.EMAIL_ALREADY_EXISTED);
         }
     }
 
@@ -180,16 +182,15 @@ public class UserServiceI implements UserService {
     @Transactional
     public void signUp(SignUpRequest signUpRequest) {
         if (userRepository.findByExternalId(signUpRequest.externalId()).isPresent()) {
-            throw new DuplicateRequestException("이미 존재하는 아이디입니다.");
+            throw new CustomException(CustomErrorCode.ID_ALREADY_EXISTED);
         }
 
         if (userRepository.findByEmail(signUpRequest.emailToSend()).isPresent()) {
-            throw new DuplicateRequestException("이미 가입된 이메일입니다.");
+            throw new CustomException(CustomErrorCode.EMAIL_ALREADY_EXISTED);
         }
 
-
         if (!signUpRequest.password().equals(signUpRequest.passwordForCheck())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
         }
 
         /*
@@ -212,18 +213,18 @@ public class UserServiceI implements UserService {
 
             if (strRoles == null) {
                 Role userRole = roleRepository.findByName(ERole.USER)
-                        .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다"));
+                        .orElseThrow(() -> new CustomException(CustomErrorCode.ROLE_NOT_FOUND));
                 roles.add(userRole);
 
             } else {
                 strRoles.forEach(role -> {
                     if (role.equals("admin")) {
                         Role adminRole = roleRepository.findByName(ERole.ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
+                                .orElseThrow(() -> new CustomException(CustomErrorCode.ROLE_NOT_FOUND));
                         roles.add(adminRole);
                     } else {
                         Role userRole = roleRepository.findByName(ERole.USER)
-                                .orElseThrow(() -> new RuntimeException("Error: 권한을 찾을 수 없습니다."));
+                                .orElseThrow(() -> new CustomException(CustomErrorCode.ROLE_NOT_FOUND));
                         roles.add(userRole);
                     }
                 });

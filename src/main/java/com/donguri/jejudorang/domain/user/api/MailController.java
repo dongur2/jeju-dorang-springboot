@@ -2,6 +2,8 @@ package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.dto.request.email.*;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +34,18 @@ public class MailController {
     @PostMapping("/available")
     public ResponseEntity<?> checkDuplicatedAndSendEmailCode(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             userService.checkMailDuplicatedAndSendVerifyCode(mailSendRequest);
 
             log.info("이메일 인증 번호 전송 완료");
             return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (CustomException e) {
+            log.error("CUSTOM 이메일 인증 번호 전송 실패");
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (NullPointerException e) {
             log.error("이메일 인증 번호 전송 실패: {}", e.getMessage());
@@ -70,9 +78,9 @@ public class MailController {
                 return new ResponseEntity<>("인증 번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
             }
 
-        } catch (NullPointerException e) {
-            log.error("이메일 인증 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (CustomException e) {
+            log.error("이메일 인증 실패: {}", e.getCustomErrorCode().getMessage());
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error(e.getMessage());

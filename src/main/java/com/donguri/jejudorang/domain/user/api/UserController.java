@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.api;
 import com.donguri.jejudorang.domain.user.dto.request.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.request.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -49,11 +50,17 @@ public class UserController {
     public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
 
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             userService.signUp(signUpRequest);
             log.info("회원 가입 완료");
             return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (CustomException e) {
+            log.error("CUSTOM 회원 가입 실패");
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("회원 가입 실패");

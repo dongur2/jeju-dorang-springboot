@@ -1,6 +1,8 @@
 package com.donguri.jejudorang.domain.user.service.auth;
 
 import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -105,12 +107,8 @@ public class MailServiceI implements MailService {
             return originalCode.equals(mailVerifyRequest.code());
 
         } catch (NullPointerException e) {
-            log.error("인증 번호가 만료되었습니다.");
-            throw new NullPointerException("인증 번호가 만료되었습니다.");
-
-        } catch (Exception e) {
-            log.error("이메일 인증 실패 : {}", e.getMessage());
-            throw e;
+            log.error("인증 번호가 만료되었습니다: {}", e.getMessage());
+            throw new CustomException(CustomErrorCode.EMAIL_AUTH_CODE_EXPIRED);
         }
     }
 
