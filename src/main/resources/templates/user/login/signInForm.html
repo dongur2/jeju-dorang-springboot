@@ -126,7 +126,6 @@
     </div>
 
     <script>
-
         /*
         * 로그인
         * */
@@ -135,21 +134,11 @@
             let password = document.getElementById('password').value;
 
             if(externalId == null || externalId.trim() === '') {
-                Swal.fire({
-                    position: 'middle',
-                    icon: 'warning',
-                    title: '',
-                    text: "아이디를 입력해주세요.",
-                    showConfirmButton: true,
-                });
+                showAlert('warning', '아이디를 입력해주세요.', true);
+
             } else if (password == null || password.trim() === '') {
-                Swal.fire({
-                    position: 'middle',
-                    icon: 'warning',
-                    title: '',
-                    text: "비밀번호를 입력해주세요.",
-                    showConfirmButton: true,
-                });
+                showAlert('warning', '비밀번호를 입력해주세요.', true);
+
             } else {
                 var xhr = new XMLHttpRequest();
                 var form = document.getElementById('sign-in-form');
@@ -160,15 +149,8 @@
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             window.location.href="/";
-
                         } else {
-                            Swal.fire({
-                                position: 'middle',
-                                icon: 'warning',
-                                title: '',
-                                text: xhr.responseText,
-                                showConfirmButton: true,
-                            });
+                            showAlert('error', xhr.responseText, true);
                         }
                     }
                 }
@@ -184,15 +166,8 @@
                 email: document.getElementById("emailForId").value
             };
 
-            if (mailSendRequest.email == null
-                || mailSendRequest.email.trim() === "") {
-                Swal.fire({
-                    position: 'middle',
-                    icon: 'warning',
-                    title: '',
-                    text: "이메일을 입력해주세요.",
-                    showConfirmButton: true,
-                });
+            if (mailSendRequest.email == null || mailSendRequest.email.trim() === "") {
+                showAlert('warning', '이메일을 입력해주세요.', true);
 
             } else {
                 var xhr = new XMLHttpRequest();
@@ -202,20 +177,13 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
-                            Swal.fire({
-                                position: 'middle',
-                                icon: 'success',
-                                title: '',
-                                text: "입력한 이메일로 아이디가 전송되었습니다. 전송된 메일을 확인해주세요.",
-                                showConfirmButton: true,
-                            });
+                            showAlert('success', '입력한 이메일로 아이디가 전송되었습니다. 전송된 메일을 확인해주세요.', true);
 
                         } else {
-                            alert(xhr.responseText);
+                            showAlert('error', xhr.responseText, true);
                         }
                     }
                 }
-
                 xhr.send(JSON.stringify(mailSendRequest));
             }
         }
@@ -236,20 +204,13 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        Swal.fire({
-                            position: 'middle',
-                            icon: 'success',
-                            title: '',
-                            text: "입력한 이메일로 임시 비밀번호가 전송되었습니다. 전송된 메일을 확인해주세요.",
-                            showConfirmButton: true,
-                        });
+                        showAlert('success', '입력한 이메일로 임시 비밀번호가 전송되었습니다. 전송된 메일을 확인해주세요.', true);
 
                     } else {
-                        alert(xhr.responseText);
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             }
-
             xhr.send(JSON.stringify(mailSendForPwdRequest));
         }
 
@@ -262,25 +223,11 @@
                 externalId: document.getElementById("externalIdForPwd").value
             };
 
-            if (mailSendForPwdRequest.email == null
-                || mailSendForPwdRequest.email.trim() === "") {
-                Swal.fire({
-                    position: 'middle',
-                    icon: 'warning',
-                    title: '',
-                    text: "이메일을 입력해주세요.",
-                    showConfirmButton: true,
-                });
+            if (mailSendForPwdRequest.email == null || mailSendForPwdRequest.email.trim() === "") {
+                showAlert('warning', '이메일을 입력해주세요.', true);
 
-            } else if (mailSendForPwdRequest.externalId == null
-                || mailSendForPwdRequest.externalId.trim() === ""){
-                Swal.fire({
-                    position: 'middle',
-                    icon: 'warning',
-                    title: '',
-                    text: "아이디를 입력해주세요.",
-                    showConfirmButton: true,
-                });
+            } else if (mailSendForPwdRequest.externalId == null || mailSendForPwdRequest.externalId.trim() === ""){
+                showAlert('warning', '아이디를 입력해주세요.', true);
 
             } else {
                 var xhr = new XMLHttpRequest();
@@ -290,28 +237,19 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
-                            Swal.fire({
-                                position: 'middle',
-                                icon: 'success',
-                                title: '',
-                                text: "이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.",
-                                showConfirmButton: true,
-                            });
+                            showAlert('success', '이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.', true);
 
                             // 인증 번호 입력란, 인증 번호 확인 버튼 노출
                             document.getElementById("email-verify-container").style.display = "block";
 
                         } else {
-                            alert(xhr.responseText);
+                            showAlert('error', xhr.responseText, true);
                         }
                     }
                 }
-
                 xhr.send(JSON.stringify(mailSendForPwdRequest));
             }
         }
-
-
     </script>
 
 </th>
