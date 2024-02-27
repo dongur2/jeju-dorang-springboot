@@ -23,7 +23,6 @@ import com.donguri.jejudorang.global.auth.jwt.RefreshTokenRepository;
 import com.donguri.jejudorang.global.common.s3.ImageService;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
-import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;

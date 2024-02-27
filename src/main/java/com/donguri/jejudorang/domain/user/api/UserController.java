@@ -48,7 +48,6 @@ public class UserController {
     }
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
-
         try {
             if (bindingResult.hasErrors()) {
                 return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
@@ -117,7 +116,7 @@ public class UserController {
      *  SecurityConfig의 securityFilterChain() .logout() 설정으로 인해서 이 컨트롤러 메서드는 실행되지 않음
      * */
     @PostMapping("/logout")
-    public String deleteUser(HttpServletResponse response) {
+    public String deleteUser() {
         Optional<Authentication> authState = userService.logOut();
 
         if (authState.isPresent()) {
@@ -161,21 +160,6 @@ public class UserController {
             newCookieToAdd.setPath("/");
             response.addCookie(newCookieToAdd);
         });
-    }
-
-    private static String bindErrorPage(BindingResult bindingResult, Model model) {
-        model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
-        return "/error/errorPage";
-    }
-
-    /*
-     * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
-     * */
-    private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {
-        if (bindingResult.hasErrors()) {
-            log.error("실패: {}", bindingResult.getFieldError().getDefaultMessage());
-            throw new Exception(bindingResult.getFieldError().getDefaultMessage());
-        }
     }
 
 }

@@ -66,7 +66,9 @@ public class MailController {
     @PostMapping("/verify")
     public ResponseEntity<?> checkEmailCode(@RequestBody @Valid MailVerifyRequest mailVerifyRequest, BindingResult bindingResult) {
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             boolean checkRes = userService.checkVerifyMail(mailVerifyRequest);
             if (checkRes) {
@@ -89,8 +91,6 @@ public class MailController {
     }
 
 
-
-
     /*
     * 아이디 찾기 이메일 전송
     * POST
@@ -99,7 +99,9 @@ public class MailController {
     @PostMapping("/help/id")
     public ResponseEntity<?> findId(@RequestBody @Valid MailSendRequest mailSendRequest, BindingResult bindingResult) {
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             userService.sendMailWithId(mailSendRequest);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -119,7 +121,9 @@ public class MailController {
     @PostMapping("/help/forPwd")
     public ResponseEntity<?> findPwd(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             userService.checkUserAndSendVerifyCode(mailSendForPwdRequest);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -139,7 +143,9 @@ public class MailController {
     @PostMapping("/help/pwd")
     public ResponseEntity<?> changePwd(@RequestBody @Valid MailSendForPwdRequest mailSendForPwdRequest, BindingResult bindingResult) {
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             userService.changePwdRandomlyAndSendMail(mailSendForPwdRequest);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -149,23 +155,5 @@ public class MailController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
-
-
-
-
-
-
-    /*
-    * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
-    * */
-    private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {
-        if (bindingResult.hasErrors()) {
-            log.error("실패: {}", bindingResult.getFieldError().getDefaultMessage());
-            throw new Exception(bindingResult.getFieldError().getDefaultMessage());
-        }
-    }
-
-
 
 }
