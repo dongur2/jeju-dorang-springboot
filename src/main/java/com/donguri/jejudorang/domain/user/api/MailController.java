@@ -106,6 +106,9 @@ public class MailController {
             userService.sendMailWithId(mailSendRequest);
             return new ResponseEntity<>(HttpStatus.OK);
 
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
         } catch (Exception e) {
             log.error("아이디 찾기 실패: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -127,6 +130,9 @@ public class MailController {
 
             userService.checkUserAndSendVerifyCode(mailSendForPwdRequest);
             return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("아이디 찾기 실패: {}", e.getMessage());

@@ -494,6 +494,9 @@ public class UserServiceI implements UserService {
                                 + "<p>아이디: <b style='color:#FB7A51'>" + foundId + "</b></p><br><br>";
             mailService.sendMail(mailSendRequest.email(), subject, mailBody);
 
+        } catch (CustomException e) {
+            throw e;
+
         } catch (Exception e) {
             log.error(e.getMessage());
             throw e;
@@ -518,6 +521,9 @@ public class UserServiceI implements UserService {
             String mailBody = "<h3> 하단의 인증번호를 정확하게 입력해주세요.</h3>"
                     + "<p>인증번호: <b style='color:#FB7A51'>" + code + "</b></p><br><br>";
             mailService.sendAuthMail(mailSendForPwdRequest.email(), subject, mailBody, code);
+
+        } catch (CustomException e) {
+            throw e;
 
         } catch (Exception e) {
             log.error("인증번호 전송에 실패했습니다. {}", e.getMessage());
