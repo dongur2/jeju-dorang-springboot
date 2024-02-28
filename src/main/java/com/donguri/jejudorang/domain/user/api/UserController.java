@@ -92,7 +92,7 @@ public class UserController {
 
             if (tokens == null || tokens.get("access_token") == null) {
                 log.error("해당 아이디의 비밀번호가 올바르지 않습니다: {}", loginRequest.externalId());
-                return new ResponseEntity<>("비밀번호를 확인해주세요", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("비밀번호를 확인해주세요", HttpStatus.UNAUTHORIZED);
 
             } else {
                 setCookieForToken(tokens, response);
@@ -101,11 +101,11 @@ public class UserController {
 
         } catch (UnexpectedRollbackException e) {
             log.error("가입된 아이디가 아닙니다 : {}", e.getMessage());
-            return new ResponseEntity<>("가입된 아이디가 없습니다", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("가입된 아이디가 없습니다", HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
             log.error("로그인에 실패했습니다: {}", e.getMessage());
-            return new ResponseEntity<>("로그인에 실패했습니다", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("로그인에 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -146,7 +146,7 @@ public class UserController {
 
         } catch (Exception e) {
             log.error("회원 삭제 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
