@@ -223,11 +223,11 @@
                 externalId: document.getElementById("externalIdForPwd").value
             };
 
-            if (mailSendForPwdRequest.email == null || mailSendForPwdRequest.email.trim() === "") {
-                showAlert('warning', '이메일을 입력해주세요.', true);
-
-            } else if (mailSendForPwdRequest.externalId == null || mailSendForPwdRequest.externalId.trim() === ""){
+            if (mailSendForPwdRequest.externalId == null || mailSendForPwdRequest.externalId.trim() === "") {
                 showAlert('warning', '아이디를 입력해주세요.', true);
+
+            } else if (mailSendForPwdRequest.email == null || mailSendForPwdRequest.email.trim() === ""){
+                showAlert('warning', '이메일을 입력해주세요.', true);
 
             } else {
                 var xhr = new XMLHttpRequest();
