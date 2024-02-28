@@ -327,12 +327,15 @@ public class UserServiceI implements UserService {
     public ProfileResponse getProfileData(String token) {
         try {
             User nowUser = getNowUser(token);
-            return ProfileResponse.builder().build()
-                    .from(nowUser);
+            return ProfileResponse.builder().build().from(nowUser);
+
+        } catch (CustomException e) {
+            log.error("Custom 프로필 조회 실패: {}", e.getCustomErrorCode().getMessage());
+            throw e;
 
         } catch (Exception e) {
             log.error("프로필 조회에 실패했습니다 : {}", e.getMessage());
-            return null;
+            throw e;
         }
     }
 
@@ -344,13 +347,13 @@ public class UserServiceI implements UserService {
     * */
     @Override
     @Transactional
-    public void updateProfileData(String token, ProfileRequest dataToUpdate) throws IllegalAccessException {
+    public void updateProfileData(String token, ProfileRequest dataToUpdate) {
         try {
             User nowUser = getNowUser(token);
 
             if (!dataToUpdate.img().isEmpty()) {
                 if (dataToUpdate.img().getSize() > 1000000) {
-                    throw new IllegalAccessException("파일 크기는 1MB를 초과할 수 없습니다");
+                    throw new CustomException(CustomErrorCode.IMAGE_TOO_LARGE);
                 }
 
                 String pastImg = nowUser.getProfile().getImgName();
@@ -365,7 +368,7 @@ public class UserServiceI implements UserService {
                 Map<String, String> uploadedImg = imageService.uploadImg(dataToUpdate.img());
 
                 if (uploadedImg == null) {
-                    throw new IllegalAccessException("사진 업로드에 실패했습니다.");
+                    throw new CustomException(CustomErrorCode.FAILED_TO_UPLOAD_IMAGE);
 
                 } else {
                     nowUser.getProfile().updateImg(uploadedImg.get("imgName"), uploadedImg.get("imgUrl"));
@@ -432,11 +435,11 @@ public class UserServiceI implements UserService {
 
             if (!encoder.matches(pwdToUpdate.oldPwd(), nowUser.getPwd().getPassword())) {
                 log.error("현재 비밀번호가 일치하지 않습니다.");
-                throw new BadCredentialsException("현재 비밀번호가 일치하지 않습니다.");
+                throw new CustomException(CustomErrorCode.INVALID_PASSWORD);
 
             } else if (!pwdToUpdate.newPwd().equals(pwdToUpdate.newPwdToCheck())) {
                 log.error("입력한 비밀번호가 일치하지 않습니다.");
-                throw new Exception("입력한 비밀번호가 일치하지 않습니다.");
+                throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
 
             } else {
                 nowUser.getPwd().updatePassword(encoder, pwdToUpdate.newPwd());
@@ -483,7 +486,7 @@ public class UserServiceI implements UserService {
     public void sendMailWithId(MailSendRequest mailSendRequest) throws MessagingException {
         try {
             String foundId = userRepository.findByEmail(mailSendRequest.email())
-                    .orElseThrow(() -> new EntityNotFoundException("해당 이메일로 가입한 아이디가 없습니다."))
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND))
                     .getProfile().getExternalId();
 
             String subject = "[제주도랑] 아이디 찾기 결과입니다.";
@@ -508,7 +511,7 @@ public class UserServiceI implements UserService {
     public void checkUserAndSendVerifyCode(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
         try {
             userRepository.findByEmailAndExternalId(mailSendForPwdRequest.email(), mailSendForPwdRequest.externalId())
-                    .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
 
             String subject = "[제주도랑] 비밀번호 찾기 인증번호입니다.";
             String code = createNumber();
@@ -532,7 +535,7 @@ public class UserServiceI implements UserService {
     public void changePwdRandomlyAndSendMail(MailSendForPwdRequest mailSendForPwdRequest) throws MessagingException {
         try {
             User userToUpdatePwd = userRepository.findByEmailAndExternalId(mailSendForPwdRequest.email(), mailSendForPwdRequest.externalId())
-                    .orElseThrow(() -> new EntityNotFoundException("입력하신 정보와 일치하는 회원이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
 
             // 임시 비밀번호 생성
             String randomPwd = createNumber();
@@ -592,7 +595,7 @@ public class UserServiceI implements UserService {
 
     private void deleteProfileImage(Long idFromJwtToken) {
         String imgName = userRepository.findById(idFromJwtToken)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없음"))
+                .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND))
                 .getProfile().getImgName();
 
         // 기본 사진이 아닐 경우 삭제
@@ -608,7 +611,7 @@ public class UserServiceI implements UserService {
         try {
             Long socialCodeFromJwt = jwtProvider.getIdFromJwtToken(accessToken);
             Long nowUserId = userRepository.findByLoginTypeAndSocialCode(LoginType.KAKAO, String.valueOf(socialCodeFromJwt))
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없음"))
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND))
                     .getId();
 
             cutRelationshipAndDeleteAll(nowUserId);
@@ -687,7 +690,7 @@ public class UserServiceI implements UserService {
         String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
 
         return userRepository.findByExternalId(userNameFromJwtToken)
-                .orElseThrow(() -> new RuntimeException("아이디에 해당하는 유저가 없습니다: " + userNameFromJwtToken));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
     }
 
 }

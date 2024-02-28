@@ -1,8 +1,11 @@
 package com.donguri.jejudorang.global.common.s3;
 
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,13 +38,11 @@ public class ImageServiceI implements ImageService {
         try {
             String originalName = imgFile.getOriginalFilename();
             log.info("이미지 파일의 사용자 저장 이름 : {}", originalName);
-            String fileType = originalName.substring(originalName.length() - 4);
+            String fileType = originalName.substring(originalName.length() - 4).toLowerCase();
             log.info("파일 확장자 : {}", fileType);
 
-            if (!(fileType.contains("png") || fileType.contains("jpg") || fileType.contains("jpeg")
-                || fileType.contains("PNG") || fileType.contains("JPG") || fileType.contains("JPEG"))) {
-
-                throw new IllegalAccessException("파일은 png, jpg, jpeg만 가능합니다");
+            if (!(fileType.contains("png") || fileType.contains("jpg") || fileType.contains("jpeg"))) {
+                throw new CustomException(CustomErrorCode.NOT_SUPPORTED_TYPE_FOR_IMAGE);
             }
 
             UUID uuid = UUID.randomUUID();
@@ -75,11 +76,11 @@ public class ImageServiceI implements ImageService {
         } catch (S3Exception e) {
             log.error("사진 업로드 실패: S3 통신 오류 {}", e.getMessage());
             System.exit(1);
-            return null;
+            throw e;
 
-        } catch (IllegalAccessException e) {
-            log.error("사진 업로드 실패: {}", e.getMessage());
-            return null;
+        } catch (CustomException e) {
+            log.error("사진 업로드 실패: {}", e.getCustomErrorCode().getMessage());
+            throw e;
 
         } catch (IOException e) {
             log.error("사진 업로드 실패");
