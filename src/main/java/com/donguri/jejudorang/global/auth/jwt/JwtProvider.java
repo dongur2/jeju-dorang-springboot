@@ -62,7 +62,7 @@ public class JwtProvider {
     * 로그인 아이디(email), social_code
     *
     * */
-    public String generateOAuth2AccessToken(DefaultOAuth2User oAuth2User) {
+    public String generateOAuth2AccessToken(DefaultOAuth2User oAuth2User, Long userId) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
         String authorities = getUserAuthoritiesWithOAuth(oAuth2User);
         log.info("generateOAuth2AccessToken authorities: {}", authorities);
@@ -72,7 +72,7 @@ public class JwtProvider {
                 .setExpiration(new Date((new Date()).getTime() + jwtAccessExpirationInMs))
                 .signWith(key)
                 .claim(AUTHORITIES_CLAIM, authorities)
-                .claim(ID_CLAIM, oAuth2User.getName())
+                .claim(ID_CLAIM, userId)
                 .compact();
     }
 
@@ -99,7 +99,7 @@ public class JwtProvider {
      * DefaultOAuth2User
      *
      * */
-    public String generateOAuth2RefreshToken(DefaultOAuth2User oAuth2User) {
+    public String generateOAuth2RefreshToken(DefaultOAuth2User oAuth2User, Long userId) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
         String authorities = getUserAuthoritiesWithOAuth(oAuth2User);
         return Jwts.builder()
@@ -108,7 +108,7 @@ public class JwtProvider {
                 .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationInMs))
                 .signWith(key)
                 .claim(AUTHORITIES_CLAIM, authorities)
-                .claim(ID_CLAIM, oAuth2User.getName())
+                .claim(ID_CLAIM, userId)
                 .compact();
     }
 
