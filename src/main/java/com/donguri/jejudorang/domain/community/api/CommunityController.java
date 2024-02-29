@@ -90,15 +90,15 @@ public class CommunityController {
     *
     * */
     @GetMapping("/post/{communityId}/modify")
-    public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
+    public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model, HttpServletResponse response) {
         try {
             model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("result"));
             return "/community/communityModifyForm";
 
-        } catch (Exception e) {
-            log.error("수정 데이터 불러오기 실패: {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+        } catch (CustomException e) {
+            response.setStatus(404);
+            model.addAttribute("message", e.getCustomErrorCode().getMessage());
+            return "/error/error404";
         }
     }
 
