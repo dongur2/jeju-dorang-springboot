@@ -2,11 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" th:href="@{/css/common.css}">
 <link rel="stylesheet" th:href="@{/css/community/communityPostForm.css}">
-<link th:href="@{/css/bootstrap.min.css}"
-      href="../css/bootstrap.min.css" rel="stylesheet">
-<link th:href="@{/js/bootstrap.js}"
-      href="../js/bootstrap.js" rel="js">
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
 <head>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+
+    <!-- SweetAlert library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/sweetAlert.js}"></script>
+
     <!-- Editor's Style -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
     <!--  tagify  -->
@@ -99,16 +103,19 @@
                         const formData = new FormData();
                         formData.append('image', blob);
 
+                        if(formData.get("image").size > 3000000) {
+                            showAlert('error', '파일 크기는 3MB를 초과할 수 없습니다.', true);
+                            return;
+                        }
+
                         const response = await fetch('/tui-editor/img-upload', {
                             method: 'POST',
                             body: formData,
                         });
 
                         const filename = await response.text(); // public String uploadEditorImage()
-                        console.log('서버에 저장된 파일명 : ', filename);
 
                         const imageUrl = `/tui-editor/img-print?filename=${filename}`; // public byte[] printEditorImage
-                        console.log(imageUrl);
                         callback(imageUrl, 'imgUrl');
 
                     } catch (error) {
@@ -138,8 +145,31 @@
         // 폼 데이터 전달
         function submitForm() {
             let formContent = editor.getHTML();
+            formContent = formContent.replace(/<p>|<\/p>|<br>/gi, '').trim();
+
+            if(formContent === null || formContent === '') {
+                showAlert('warning', '내용을 입력해주세요.', true);
+                return;
+            }
+
             document.getElementById("board-form-content").setAttribute("value", formContent);
-            document.getElementById("board-write-form").submit();
+
+            var form = document.getElementById('board-write-form');
+            var formData = new FormData(form);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', form.action, true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        window.location.href = xhr.responseText;
+                    } else {
+                        showAlert('error', xhr.responseText, true);
+                    }
+                }
+            }
+            xhr.send(formData);
         }
 
         // tagify

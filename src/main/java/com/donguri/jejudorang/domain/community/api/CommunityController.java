@@ -103,20 +103,19 @@ public class CommunityController {
     }
 
     @PutMapping("/post/{communityId}/modify")
-    public String modifyCommunity(@PathVariable("communityId") Long communityId,
-                                  @Valid CommunityWriteRequest postToUpdate,
-                                  BindingResult bindingResult, Model model) {
+    public ResponseEntity<?> modifyCommunity(@PathVariable("communityId") Long communityId,
+                                              @Valid CommunityWriteRequest postToUpdate,
+                                              BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
-                throw new IllegalArgumentException(bindingResult.getFieldError().getDefaultMessage());
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
 
             CommunityTypeResponse redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
-            return "redirect:/community/boards/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
+            return new ResponseEntity<>("/community/boards/" + redirectTypeDto.typeForRedirect() + "/" + communityId, HttpStatus.OK);
 
         } catch (Exception e) {
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
