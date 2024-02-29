@@ -87,12 +87,6 @@ public class MyPageController {
         }
     }
 
-    private static void setNoDataMessage(Page<CommunityMyPageListResponse> data, Model model, String attributeValue) {
-        if (data.getTotalPages() == 0) {
-            model.addAttribute("message", attributeValue);
-        }
-    }
-
 
     /*
      * 마이페이지 - 북마크 목록: 여행/커뮤니티
@@ -107,10 +101,14 @@ public class MyPageController {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
             Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);
 
+
             model.addAttribute("type", type);
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);
+
+            setNoDataMessage(data, model, "북마크한 글이 없습니다.");
+
             return "/user/mypage/myBookmarks";
 
         } catch (Exception e) {
@@ -120,5 +118,11 @@ public class MyPageController {
         }
     }
 
+
+    private static void setNoDataMessage(Page<?> data, Model model, String attributeValue) {
+        if (data.getTotalPages() == 0) {
+            model.addAttribute("message", attributeValue);
+        }
+    }
 
 }
