@@ -103,14 +103,11 @@
                     </ul>
                 </nav>
             </div>
-
         </div>
-
     </div>
 
 
     <script>
-
         function submitForm() {
             var form = document.getElementById('profile-modify-form-pwd');
             var formData = new FormData(form);
@@ -129,8 +126,17 @@
             xhr.send(formData);
         }
 
+        /*
+        * 작성글/작성댓글 탭 클릭 CSS 효과 부여
+        * */
+        if(window.location.href.includes('writings')) {
+            document.getElementById('my-writings-link-writings').classList.add('active');
+            document.getElementById('my-writings-link-writings').style.fontWeight = 'bold';
+        } else {
+            document.getElementById('my-writings-link-comments').classList.add('active');
+            document.getElementById('my-writings-link-comments').style.fontWeight = 'bold';
+        }
     </script>
-
 
 </th>
 </html>

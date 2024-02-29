@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
     <div th:fragment="mypageWritingsTabFragment">
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#"
+                <a class="nav-link" id="my-writings-link-writings" aria-current="page" href="#" style="color:#696969"
                    th:href="@{/mypage/writings}">내가 작성한 게시글</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#"
+                <a class="nav-link" id="my-writings-link-comments" href="#" style="color:#696969"
                    th:href="@{/mypage/comments}">내가 댓글단 글</a>
             </li>
         </ul>
 
     </div>
-
 </html>
