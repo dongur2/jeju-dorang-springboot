@@ -176,13 +176,6 @@
                     </div>
                 </div>
 
-                <div class="board-post-feature board-back-to-list" style="width:100px; height:80px; display: flex; justify-content: center; align-items: center;">
-                    <button class="feature-row board-share-btn btn btn-light" th:onclick="|window.history.back()|"
-                            style="width:90%; height: 50%"
-                    >목록</button>
-                </div>
-
-
             </div>
 
         </div>
@@ -417,14 +410,9 @@
         * */
         // 로그인 하지 않은 경우
         function cantBookmark() {
-            Swal.fire({
-                position: 'middle',
-                icon: 'warning',
-                title: '',
-                text: "북마크하려면 로그인이 필요합니다.",
-                showConfirmButton: true
-            });
+            showAlert('warning', '북마크하려면 로그인이 필요합니다.', true);
         }
+
         // 로그인한 경우 - 북마크 하지 않은 글
         function createBookmark(communityId) {
             let xhr = new XMLHttpRequest();
@@ -437,13 +425,7 @@
                         window.location.reload();
 
                     } else { // 그 외의 경우
-                        Swal.fire({
-                            position: 'middle',
-                            icon: 'error',
-                            title: '',
-                            text: xhr.responseText,
-                            showConfirmButton: true
-                        });
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             };
@@ -462,13 +444,7 @@
                         window.location.reload();
 
                     } else { // 그 외의 경우
-                        Swal.fire({
-                            position: 'middle',
-                            icon: 'error',
-                            title: '',
-                            text: xhr.responseText,
-                            showConfirmButton: true
-                        });
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             };
@@ -566,7 +542,7 @@
                         window.location.reload();
 
                     } else {
-                        alert(xhr.responseText);
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             }
@@ -587,7 +563,7 @@
                         window.location.reload();
 
                     } else {
-                        alert(xhr.responseText);
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             }
