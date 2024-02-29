@@ -554,20 +554,31 @@
         *
         * */
         function deleteCmtRequest(cmtId) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("DELETE", "/community/comments?cmtId=" + cmtId, true);
+            Swal.fire({
+                position: 'center',
+                icon: 'question',
+                title: '',
+                text: '댓글을 삭제하시겠습니까?',
+                showConfirmButton: true,
 
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        window.location.reload();
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("DELETE", "/community/comments?cmtId=" + cmtId, true);
 
-                    } else {
-                        showAlert('error', xhr.responseText, true);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200) {
+                                window.location.reload();
+
+                            } else {
+                                showAlert('error', xhr.responseText, true);
+                            }
+                        }
                     }
+                    xhr.send();
                 }
-            }
-            xhr.send();
+            });
         }
 
 
