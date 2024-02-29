@@ -28,10 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -111,21 +108,18 @@ public class CommunityServiceI implements CommunityService {
             * */
             } else {
 
+                Optional<Cookie[]> cookies = Optional.ofNullable(request.getCookies());
+
                 // 1. Access Token 쿠키가 존재하는 경우
-                if(request.getCookies() != null
-                        && Arrays.stream(request.getCookies())
-                        .anyMatch(cookie -> cookie.getName().equals("access_token"))) {
+                if(cookies.isPresent() && Arrays.stream(cookies.get()).anyMatch(cookie -> cookie.getName().equals("access_token"))) {
 
-                    log.info("액세스 쿠키가 존재합니다.");
-                    Cookie accessToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("access_token")).findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다"));
+                    Cookie accessToken = Arrays.stream(cookies.get()).filter(cookie -> cookie.getName().equals("access_token")).findFirst().get();
 
-                    // 1-1. Access Token이 유효한지 확인 -> catch: 유효하지 않은 경우
+                    // 1-1. Access Token이 유효한지 확인 -> catch: 유효하지 않은 경우 비회원이므로 북마크 여부 확인할 수 없음
                     StringBuilder idFromJwt = new StringBuilder();
                     try {
                         idFromJwt.append(jwtProvider.getUserNameFromJwtToken(accessToken.getValue()));
                     } catch (Exception e) {
-                        log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
                         resMap.put("result", CommunityDetailResponse.from(found, tagsToStringList, null));
                         resMap.put("cmts", cmtList);
                         return resMap;
@@ -134,12 +128,9 @@ public class CommunityServiceI implements CommunityService {
                     // 1-2. Access Token이 유효 -> from(.., idFromJwt) 북마크 여부 확인
                     resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList, idFromJwt.toString()));
                     resMap.put("cmts", cmtList);
-                    log.info("{}가 북마크한 글입니다. isBookmarked == {}", idFromJwt,
-                            CommunityDetailResponse.from(found, tagsToStringList, idFromJwt.toString()).isBookmarked());
 
-                // 2. Access Token 쿠키가 없는 경우
+                // 2. Access Token 쿠키가 없는 경우: 비회원
                 } else {
-                    log.info("비회원은 북마크 여부를 확인할 수 없습니다.");
                     resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList, null));
                     resMap.put("cmts", cmtList);
                 }
