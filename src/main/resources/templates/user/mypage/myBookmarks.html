@@ -21,10 +21,10 @@
             <!-- 여행 / 커뮤니티 탭 -->
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" th:href="@{/mypage/bookmarks}">여행</a>
+                    <a class="nav-link" id='my-bookmark-trip' aria-current="page" style="color:#696969" th:href="@{/mypage/bookmarks}">여행</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" th:href="@{/mypage/bookmarks(type='community')}">커뮤니티</a>
+                    <a class="nav-link" id='my-bookmark-community' style="color:#696969" th:href="@{/mypage/bookmarks(type='community')}">커뮤니티</a>
                 </li>
             </ul>
 
@@ -154,19 +154,16 @@
         <script>
             function deleteCommunityBookmark(postId) {
                 var url = '/bookmarks?type=community&id=' + postId;
-
                 sendRequest(url);
             }
 
             function deleteCommunityBookmarkDeleted(bookmarkId) {
                 var url = "/bookmarks/deleted?id=" + bookmarkId;
-
                 sendRequest(url);
             }
 
             function deleteTripBookmark(postId) {
                 var url = '/bookmarks?type=trip&id=' + postId;
-
                 sendRequest(url);
             }
 
@@ -180,7 +177,7 @@
                             window.location.reload();
 
                         } else {
-                            alert(xhr.responseText);
+                            showAlert('error', xhr.responseText, true);
                         }
                     }
                 }
@@ -188,8 +185,16 @@
             }
 
 
-
-
+            /*
+            * 여행/커뮤니티 탭 클릭 CSS 효과 부여
+            * */
+            if(window.location.href.includes('community')) {
+                document.getElementById('my-bookmark-community').classList.add('active');
+                document.getElementById('my-bookmark-community').style.fontWeight = 'bold';
+            } else {
+                document.getElementById('my-bookmark-trip').classList.add('active');
+                document.getElementById('my-bookmark-trip').style.fontWeight = 'bold';
+            }
         </script>
 
     </div>
