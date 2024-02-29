@@ -32,21 +32,21 @@
             <!-- 모임: 전체/모집중/모집완료 -->
             <ul th:if="${nowType == 'parties'}" class="nav nav-tabs">
                 <li class="nav-item">
-                    <a th:if="${currentSearchWord} != null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    <a th:if="${currentSearchWord} != null" class="nav-link community-all" aria-current="page" href="#" style="font-size: 20px; color:#696969"
                     th:href="@{/community/boards/parties(state='all', search=${currentSearchWord}, tags=${currentSearchTag})}">전체</a>
-                    <a th:if="${currentSearchWord} == null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    <a th:if="${currentSearchWord} == null" class="nav-link community-all" aria-current="page" href="#" style="font-size: 20px; color:#696969"
                     th:href="@{/community/boards/parties(state='all', tags=${currentSearchTag})}">전체</a>
                 </li>
                 <li class="nav-item">
-                    <a th:if="${currentSearchWord} != null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    <a th:if="${currentSearchWord} != null" class="nav-link  community-recruiting" aria-current="page" href="#" style="font-size: 20px; color:#696969"
                        th:href="@{/community/boards/parties(state='recruiting', search=${currentSearchWord}, tags=${currentSearchTag})}">모집중</a>
-                    <a th:if="${currentSearchWord} == null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    <a th:if="${currentSearchWord} == null" class="nav-link community-recruiting" aria-current="page" href="#" style="font-size: 20px; color:#696969"
                        th:href="@{/community/boards/parties(state='recruiting', tags=${currentSearchTag})}">모집중</a>
                 </li>
                 <li class="nav-item">
-                    <a th:if="${currentSearchWord} != null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    <a th:if="${currentSearchWord} != null" class="nav-link community-done" aria-current="page" href="#" style="font-size: 20px; color:#696969"
                        th:href="@{/community/boards/parties(state='done', search=${currentSearchWord}, tags=${currentSearchTag})}">모집완료</a>
-                    <a th:if="${currentSearchWord} == null" class="nav-link active" aria-current="page" href="#" style="font-size: 20px"
+                    <a th:if="${currentSearchWord} == null" class="nav-link community-done" aria-current="page" href="#" style="font-size: 20px; color:#696969"
                        th:href="@{/community/boards/parties(state='done', tags=${currentSearchTag})}">모집완료</a>
                 </li>
             </ul>
@@ -82,26 +82,26 @@
                 <ul th:if="${nowType == 'parties'}" class="nav">
                     <li  class="nav-item">
                         <a th:if="${currentSearchWord} != null"
-                           class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-latest" aria-current="page" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/parties(state=${nowState}, search=${currentSearchWord}, tags=${currentSearchTag})}">최신순</a>
                         <a th:if="${currentSearchWord} == null"
-                           class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-latest" aria-current="page" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/parties(state=${nowState}, tags=${currentSearchTag})}">최신순</a>
                     </li>
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
-                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-comments" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/parties(state=${nowState}, search=${currentSearchWord}, order='comment', tags=${currentSearchTag})}">댓글많은순</a>
                         <a th:if="${currentSearchWord} == null"
-                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-comments" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/parties(state=${nowState}, order='comment', tags=${currentSearchTag})}">댓글많은순</a>
                     </li>
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
-                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-bookmarks" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/parties(state=${nowState}, search=${currentSearchWord}, order='bookmark', tags=${currentSearchTag})}">북마크순</a>
                         <a th:if="${currentSearchWord} == null"
-                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-bookmarks" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/parties(state=${nowState}, order='bookmark', tags=${currentSearchTag})}">북마크순</a>
                     </li>
                 </ul>
@@ -110,26 +110,26 @@
                 <ul th:if="${nowType == 'chats'}" class="nav">
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
-                           class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-latest" aria-current="page" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/chats(search=${currentSearchWord}, tags=${currentSearchTag})}">최신순</a>
                         <a th:if="${currentSearchWord} == null"
-                           class="nav-link active" aria-current="page" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-latest" aria-current="page" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/chats(tags=${currentSearchTag})}">최신순</a>
                     </li>
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
-                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-comments" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/chats(search=${currentSearchWord}, order='comment', tags=${currentSearchTag})}">댓글많은순</a>
                         <a th:if="${currentSearchWord} == null"
-                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-comments" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/chats(order='comment', tags=${currentSearchTag})}">댓글많은순</a>
                     </li>
                     <li class="nav-item">
                         <a th:if="${currentSearchWord} != null"
-                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-bookmarks" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/chats(search=${currentSearchWord}, order='bookmark', tags=${currentSearchTag})}">북마크순</a>
                         <a th:if="${currentSearchWord} == null"
-                           class="nav-link" href="#" style="font-size: 18px; color: #696969"
+                           class="nav-link community-bookmarks" href="#" style="font-size: 18px; color: #696969"
                            th:href="@{/community/boards/chats(order='bookmark', tags=${currentSearchTag})}">북마크순</a>
                     </li>
                 </ul>
@@ -261,8 +261,9 @@
         </div>
     </div>
 
-    <!-- tagify -->
     <script>
+
+        /* tagify */
         var input;
         if(document.querySelector('#search-form-tags-party')) {
             input = document.querySelector('#search-form-tags-party')
@@ -278,6 +279,41 @@
                 duplicate: "Duplicates are not allowed"
             },
         })
+
+
+        /* 모집상태 탭 */
+        if (window.location.href.includes('/parties')) {
+            let elements;
+            if (window.location.href.includes('state=all')) {
+                elements = document.querySelectorAll('.community-all');
+            } else if (window.location.href.includes('state=recruiting')) {
+                elements = document.querySelectorAll('.community-recruiting');
+            } else if (window.location.href.includes('state=done')) {
+                elements = document.querySelectorAll('.community-done');
+            }
+
+            for (var e of elements) {
+                e.classList.add('active');
+                e.style.fontWeight = 'bold';
+            }
+        }
+
+        /* 정렬 탭 */
+        let orderTab;
+        if (window.location.href.includes('order=comment')) {
+            orderTab = document.querySelectorAll('.community-comments');
+        } else if (window.location.href.includes('order=bookmark')) {
+            orderTab = document.querySelectorAll('.community-bookmarks');
+        } else {
+            orderTab = document.querySelectorAll('.community-latest');
+        }
+
+        for (var o of orderTab) {
+            o.classList.add('active');
+            o.style.fontWeight = 'bold';
+            o.style.color = '#FB7A51';
+        }
+
     </script>
 
 </th>
