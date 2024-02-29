@@ -10,7 +10,6 @@
 
     <div class="board-whole-box">
 
-
         <!-- 마이페이지 좌측 탭  -->
         <div th:replace="~{fragments/mypage/mypageTab :: mypageTabFragment}"></div>
 
@@ -54,7 +53,6 @@
 
 
     <script>
-
         function submitForm() {
             var form = document.getElementById('profile-modify-form-pwd');
             var formData = new FormData(form);
@@ -63,25 +61,26 @@
             xhr.open('PUT', form.action, true);
 
             xhr.onload = function () {
+                // 모달창 닫혀야 새로고침 수행
                 if (xhr.status === 200) {
-                    alert('비밀번호가 변경되었습니다.');
-                    window.location.reload();
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: '',
+                        text: '비밀번호가 변경되었습니다.',
+                        showConfirmButton: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
 
                 } else {
-                    Swal.fire({
-                        position: 'middle',
-                        icon: 'error',
-                        title: '',
-                        text: xhr.responseText,
-                        showConfirmButton: true,
-                    });
+                    showAlert('error', xhr.responseText, true);
                 }
             };
             xhr.send(formData);
         }
-
     </script>
-
-
 </th>
 </html>
