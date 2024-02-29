@@ -6,6 +6,8 @@
         layout:decorate="~{/fragments/layout}">
 
 <head>
+    <script th:src="@{/js/community/deleteCommunity.js}"></script>
+
     <!-- 카카오톡 공유  -->
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js"
             integrity="sha384-6MFdIr0zOira1CHQkedUqJVql0YtcZA1P0nbPrQYJXVJZUkTk/oX4U9GhUIs3/z8" crossorigin="anonymous"></script>
@@ -14,7 +16,6 @@
         // 카카오톡 공유 텍스트 설정 - 글 제목
         let nowPostTitleForShare = [[${post.title}]];
     </script>
-    <script th:src="@{/js/community/deleteCommunity.js}"></script>
     <title>상세 페이지 - 커뮤니티 | 제주도랑</title>
 </head>
 <th layout:fragment="content">
@@ -396,7 +397,7 @@
                         window.location.href = '/community/boards/parties/' + communityId;
 
                     } else {
-                        alert("모집 상태 변경 실패");
+                        console.log("모집 상태 변경 실패");
                     }
                 }
             };
