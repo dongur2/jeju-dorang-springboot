@@ -41,6 +41,7 @@ public class MyPageController {
 
             Page<CommunityMyPageListResponse> data = userService.getMyCommunityWritings(token.getValue(), pageable);
 
+            model.addAttribute("requestType", "WRITING"); // 페이지네이션 구분 위한 값 부여
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);
@@ -70,6 +71,7 @@ public class MyPageController {
 
             Page<CommunityMyPageListResponse> data = userService.getMyCommunityComments(token.getValue(), pageable);
 
+            model.addAttribute("requestType", "COMMENT"); // 페이지네이션 구분 위한 값 부여
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);

@@ -73,8 +73,8 @@
 
             </div>
 
-            <!-- 페이지네이션 -->
-            <div th:if="${endPage > 1}">
+            <!-- 페이지네이션: 작성글 -->
+            <div th:if="${endPage > 1 && requestType == 'WRITING'}">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination">
 
@@ -99,10 +99,40 @@
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
-
                     </ul>
                 </nav>
             </div>
+
+            <!-- 페이지네이션: 작성댓글 -->
+            <div th:if="${endPage > 1 && requestType == 'COMMENT'}">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+
+                        <li class="page-item">
+                            <a class="page-link" href="#" th:href="@{/mypage/comments}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li th:if="${nowPage > 0}" class="page-item">
+                            <a class="page-link" href="#" th:text="${nowPage - 1}" th:href="@{/mypage/comments(page=${nowPage - 1})}">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#" th:text="${nowPage}" th:href="@{/mypage/comments(page=${nowPage})}">2</a>
+                        </li>
+                        <li th:if="${nowPage < endPage - 1}" class="page-item">
+                            <a class="page-link" href="#" th:text="${nowPage + 1}" th:href="@{/mypage/comments(page=${nowPage + 1})}">3</a>
+                        </li>
+
+                        <li class="page-item">
+                            <a class="page-link" href="#" th:href="@{/mypage/comments(page=${endPage - 1})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
         </div>
     </div>
 
