@@ -45,6 +45,8 @@ public class MyPageController {
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);
 
+            setNoDataMessage(data, model, "작성한 글이 없습니다.");
+
             return "/user/mypage/myWritings";
 
         } catch (Exception e) {
@@ -72,12 +74,20 @@ public class MyPageController {
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);
 
+            setNoDataMessage(data, model, "작성한 댓글이 없습니다.");
+
             return "/user/mypage/myWritings";
 
         } catch (Exception e) {
             log.error("커뮤니티 작성댓글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
             return "/error/errorPage";
+        }
+    }
+
+    private static void setNoDataMessage(Page<CommunityMyPageListResponse> data, Model model, String attributeValue) {
+        if (data.getTotalPages() == 0) {
+            model.addAttribute("message", attributeValue);
         }
     }
 
