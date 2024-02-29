@@ -22,19 +22,19 @@
                   style="width:100%; height:400px; margin-bottom:auto;
                             display: flex; flex-direction: column; gap: 5%; justify-content: center; align-items: center;">
 
-                <div style="width:90%;">
+                <div class="form-floating" style="width:90%;">
+                    <input type="password" class="form-control" id="nowPassword" placeholder="현재 비밀번호" name="oldPwd" style="width:100%; height:40px; "/>
                     <label for="nowPassword">현재 비밀번호</label>
-                    <input type="password" id="nowPassword" name="oldPwd" style="width:100%; height:40px; "/>
                 </div>
 
-                <div style="width:90%; margin-top: 3%">
+                <div class="form-floating" style="width:90%; margin-top: 3%">
+                    <input type="password" class="form-control" id="newPassword"  placeholder="새로운 비밀번호" name="newPwd" style="width:100%; height:40px; "/>
                     <label for="newPassword">새로운 비밀번호</label>
-                    <input type="password" id="newPassword" name="newPwd" style="width:100%; height:40px; "/>
                 </div>
 
-                <div style="width:90%; margin-top: 1%">
+                <div class="form-floating" style="width:90%; margin-top: 1%">
+                    <input type="password" class="form-control" id="newPasswordForCheck"  placeholder="새로운 비밀번호 확인" name="newPwdToCheck" style="width:100%; height:40px; "/>
                     <label for="newPasswordForCheck">새로운 비밀번호 확인</label>
-                    <input type="password" id="newPasswordForCheck" name="newPwdToCheck" style="width:100%; height:40px; "/>
                 </div>
 
                 <button th:if="${loginType == 'BASIC'}"
