@@ -24,6 +24,7 @@ public enum CustomErrorCode {
      * 404 서버가 요청받은 리소스를 찾을 수 없음
      * */
     TRIP_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 여행지를 찾을 수 없습니다."),
+    COMMUNITY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 게시글을 찾을 수 없습니다."),
 
     /*
      * 409 리소스 간 충돌

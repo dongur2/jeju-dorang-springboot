@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.community.dto.response.*;
 import com.donguri.jejudorang.domain.community.service.ChatService;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.community.service.PartyService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -91,7 +92,6 @@ public class CommunityController {
     @GetMapping("/post/{communityId}/modify")
     public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
         try {
-
             model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("result"));
             return "/community/communityModifyForm";
 
@@ -105,9 +105,7 @@ public class CommunityController {
     @PutMapping("/post/{communityId}/modify")
     public String modifyCommunity(@PathVariable("communityId") Long communityId,
                                   @Valid CommunityWriteRequest postToUpdate,
-                                  BindingResult bindingResult,
-                                  Model model) {
-
+                                  BindingResult bindingResult, Model model) {
         try {
             if (bindingResult.hasErrors()) {
                 throw new IllegalArgumentException(bindingResult.getFieldError().getDefaultMessage());
@@ -236,6 +234,11 @@ public class CommunityController {
             model.addAttribute("kakaoApiKey", kakaoApiKey);
 
             return "/community/communityDetail";
+
+        } catch (CustomException e) {
+            response.setStatus(404);
+            model.addAttribute("message", e.getCustomErrorCode().getMessage());
+            return "/error/error404";
 
         } catch (Exception e) {
             log.error("상세글 불러오기 실패: {}", e.getMessage());

@@ -16,6 +16,8 @@ import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagServi
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -90,7 +92,7 @@ public class CommunityServiceI implements CommunityService {
             Map<String, Object> resMap = new HashMap<>();
 
             Community found = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             List<String> tagsToStringList = found.getTags().stream()
                     .map(communityWithTag -> communityWithTag.getTag().getKeyword())
