@@ -356,11 +356,11 @@ public class UserServiceI implements UserService {
                     throw new CustomException(CustomErrorCode.IMAGE_TOO_LARGE);
                 }
 
-                String pastImg = nowUser.getProfile().getImgName();
-                if (pastImg != null) {
-                    imageService.deleteImg(pastImg);
+                Profile profile = nowUser.getProfile();
+                if (profile.getImgUrl() != null && !profile.getImgUrl().equals(defaultImgUrl)) {
+                    imageService.deleteImg(profile.getImgName());
 
-                    nowUser.getProfile().updateImg(defaultImgName, defaultImgUrl);
+                    profile.updateImg(defaultImgName, defaultImgUrl);
 
                     log.info("이전 이미지 삭제 완료");
                 }
@@ -371,7 +371,7 @@ public class UserServiceI implements UserService {
                     throw new CustomException(CustomErrorCode.FAILED_TO_UPLOAD_IMAGE);
 
                 } else {
-                    nowUser.getProfile().updateImg(uploadedImg.get("imgName"), uploadedImg.get("imgUrl"));
+                    profile.updateImg(uploadedImg.get("imgName"), uploadedImg.get("imgUrl"));
 
                     log.info("이미지 업로드 완료 : {}", uploadedImg.get("imgName"));
                 }
@@ -399,11 +399,11 @@ public class UserServiceI implements UserService {
         try {
             User nowUser = getNowUser(token);
 
-            String pastImg = nowUser.getProfile().getImgName();
-            if (pastImg != null) {
-                imageService.deleteImg(pastImg);
+            Profile profile = nowUser.getProfile();
+            if (profile.getImgUrl() != null && !profile.getImgUrl().equals(defaultImgUrl)) {
+                imageService.deleteImg(profile.getImgName());
 
-                nowUser.getProfile().updateImg(defaultImgName, defaultImgUrl);
+                profile.updateImg(defaultImgName, defaultImgUrl);
 
                 log.info("이전 이미지 삭제 완료");
             }
@@ -600,14 +600,14 @@ public class UserServiceI implements UserService {
     }
 
     private void deleteProfileImage(Long idFromJwtToken) {
-        String imgName = userRepository.findById(idFromJwtToken)
+        Profile profile = userRepository.findById(idFromJwtToken)
                 .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND))
-                .getProfile().getImgName();
+                .getProfile();
 
         // 기본 사진이 아닐 경우 삭제
-        if (!imgName.equals("default-img.png")) {
-            log.info("기본 사진이 아니므로 삭제합니다. 이름: {}", imgName);
-            imageService.deleteImg(imgName);
+        if (!profile.getImgUrl().equals(defaultImgUrl)) {
+            log.info("기본 사진이 아니므로 삭제합니다. 이름: {}", profile.getImgUrl());
+            imageService.deleteImg(profile.getImgName());
         }
     }
 
