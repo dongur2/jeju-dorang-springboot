@@ -4,6 +4,7 @@ import com.donguri.jejudorang.domain.community.dto.request.comment.CommentReques
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
 import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequest;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,11 @@ public class CommentController {
 
             return "redirect:/community/boards/" + type + "/" + commentRequest.postId();
 
+        } catch (CustomException e) {
+            log.error("대댓글 작성에 실패했습니다. {}", e.getCustomErrorCode().getMessage());
+            model.addAttribute("errorMsg", e.getCustomErrorCode().getMessage());
+            return "/error/errorPage";
+
         } catch (Exception e) {
             log.error("댓글 생성에 실패했습니다: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
@@ -78,6 +84,11 @@ public class CommentController {
 
             return "redirect:/community/boards/" + type + "/" + request.postId();
 
+        } catch (CustomException e) {
+            log.error("대댓글 작성에 실패했습니다. {}", e.getCustomErrorCode().getMessage());
+            model.addAttribute("errorMsg", e.getCustomErrorCode().getMessage());
+            return "/error/errorPage";
+
         } catch (Exception e) {
             log.error("대댓글 작성에 실패했습니다. {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
@@ -106,7 +117,7 @@ public class CommentController {
                                            @RequestBody @Valid CommentRequestWithId commentRequest, BindingResult bindingResult) {
 
         try {
-            if(bindingResult.hasErrors()) {
+            if (bindingResult.hasErrors()) {
                 throw new Exception(bindingResult.getFieldError().getDefaultMessage());
             }
 
@@ -114,9 +125,13 @@ public class CommentController {
 
             return new ResponseEntity<>(HttpStatus.OK);
 
+        } catch (CustomException e) {
+            log.error("댓글 수정 실패: {}", e.getCustomErrorCode().getMessage());
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
         } catch (Exception e) {
             log.error("댓글 수정 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -133,13 +148,14 @@ public class CommentController {
 
             return new ResponseEntity<>(HttpStatus.OK);
 
+        } catch (CustomException e) {
+            log.error("댓글 삭제 실패: {}", e.getCustomErrorCode().getMessage());
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
         } catch (Exception e) {
             log.error("댓글 삭제 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
 
 }
