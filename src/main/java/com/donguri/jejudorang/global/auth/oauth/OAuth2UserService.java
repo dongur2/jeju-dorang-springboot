@@ -23,14 +23,15 @@ import java.util.*;
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
-    @Autowired private final UserRepository userRepository;
-    @Autowired private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     private static final String KAKAO = "kakao";
 
     private final String defaultImgName;
     private final String defaultImgUrl;
 
+    @Autowired
     public OAuth2UserService(UserRepository userRepository, RoleRepository roleRepository,
                              @Value("${aws.s3.default-img.name}") String defaultImgName,
                              @Value("${aws.s3.default-img.url}") String defaultImgUrl) {
