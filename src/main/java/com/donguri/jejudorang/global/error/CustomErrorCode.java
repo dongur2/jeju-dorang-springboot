@@ -9,6 +9,11 @@ import org.springframework.http.HttpStatus;
 public enum CustomErrorCode {
 
     /*
+     * 204 요청이 성공했지만 응답에는 컨텐츠가 없음
+     * */
+    NO_NOTIFICATION(HttpStatus.NO_CONTENT, "새 알림이 없습니다."),
+
+    /*
      * 400 데이터의 불일치; 클라이언트가 제공한 데이터가 잘못되었거나 누락됨
      * */
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "입력한 비밀번호가 일치하지 않습니다."),
@@ -21,10 +26,18 @@ public enum CustomErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "현재 비밀번호가 일치하지 않습니다."),
 
     /*
+     * 403 클라이언트가 서버에 요청 -> 서버가 해당 요청을 거부; 클라이언트가 해당 권한 없음
+     * */
+    PERMISSION_ERROR(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+
+    /*
      * 404 서버가 요청받은 리소스를 찾을 수 없음
      * */
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "알림이 존재하지 않습니다"),
     TRIP_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 여행지를 찾을 수 없습니다."),
     COMMUNITY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 게시글을 찾을 수 없습니다."),
+    ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."),
 
     /*
      * 409 리소스 간 충돌
@@ -45,9 +58,7 @@ public enum CustomErrorCode {
     /*
      * 500
      * */
-    FAILED_TO_UPLOAD_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR, "사진 업로드에 실패했습니다."),
-    ROLE_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "권한을 찾을 수 없습니다."),
-    USER_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "유저를 찾을 수 없습니다.");
+    FAILED_TO_UPLOAD_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR, "사진 업로드에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;
