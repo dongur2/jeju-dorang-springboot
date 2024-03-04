@@ -18,6 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
+application.yaml
 application.properties
 application-API-KEY.properties
 application-AWS.properties

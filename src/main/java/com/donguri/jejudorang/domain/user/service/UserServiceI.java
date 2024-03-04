@@ -47,44 +47,29 @@ import java.util.*;
 @Service
 public class UserServiceI implements UserService {
 
-    @Autowired
     private final ImageService imageService;
-    @Autowired
     private final MailService mailService;
 
-    @Autowired
     private final CommunityService communityService;
-    @Autowired
     private final BookmarkService bookmarkService;
-    @Autowired
     private final CommentService commentService;
-    @Autowired
     private final NotificationService notificationService;
 
-    @Autowired
     private final AuthenticationManager authenticationManager;
-    @Autowired
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final RoleRepository roleRepository;
 
-
-    @Autowired
     private final PasswordEncoder encoder;
-    @Autowired
     private final JwtProvider jwtProvider;
 
+    private final String defaultImgName;
+    private final String defaultImgUrl;
 
-    @Value("${aws.s3.default-img.name}")
-    private String defaultImgName;
-    @Value("${aws.s3.default-img.url}")
-    private String defaultImgUrl;
-
-
-    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider) {
+    @Autowired
+    public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider,
+                        @Value("${aws.s3.default-img.name}")String defaultImgName, @Value("${aws.s3.default-img.url}")String defaultImgUrl) {
         this.imageService = imageService;
         this.mailService = mailService;
         this.bookmarkService = bookmarkService;
@@ -97,6 +82,8 @@ public class UserServiceI implements UserService {
         this.communityService = communityService;
         this.encoder = encoder;
         this.jwtProvider = jwtProvider;
+        this.defaultImgName = defaultImgName;
+        this.defaultImgUrl = defaultImgUrl;
     }
 
 

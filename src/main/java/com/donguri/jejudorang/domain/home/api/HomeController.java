@@ -8,8 +8,13 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/")
 public class HomeController {
-    @GetMapping@PostMapping
+    @GetMapping
     public String home() {
         return "/home/home";
+    }
+
+    @PostMapping
+    public String redirectHome() {
+        return "/";
     }
 }
