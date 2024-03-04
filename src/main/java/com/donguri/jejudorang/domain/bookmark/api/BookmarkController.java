@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.bookmark.api;
 
 import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,9 @@ public class BookmarkController {
             log.info("북마크 설정 완료: {}", postId);
             return new ResponseEntity<>("북마크가 설정되었습니다", HttpStatus.OK);
 
-        } catch (Exception e) {
-            log.error("북마크 설정 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (CustomException e) {
+            log.error("북마크 설정 실패: {}", e.getCustomErrorCode().getMessage());
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
         }
     }
 
@@ -59,9 +60,9 @@ public class BookmarkController {
             bookmarkService.deleteBookmark(accessToken.getValue(), type, postId);
             return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("북마크 해제 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
         }
     }
 
@@ -76,9 +77,9 @@ public class BookmarkController {
             bookmarkService.deleteCommunityBookmarkOnDeletedPost(accessToken.getValue(), bookmarkId);
             return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("북마크 해제 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
         }
     }
 

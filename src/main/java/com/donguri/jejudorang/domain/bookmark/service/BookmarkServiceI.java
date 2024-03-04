@@ -12,9 +12,9 @@ import com.donguri.jejudorang.domain.trip.repository.TripRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
-import jakarta.persistence.EntityNotFoundException;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,50 +60,45 @@ public class BookmarkServiceI implements BookmarkService {
                 case "trip": addTripBookmark(boardId, userForBookmark); break;
             }
 
-        } catch (BadRequestException e) {
-            log.error("북마크 생성 실패 -- 중복: {}", e.getMessage());
-            throw new RuntimeException("이미 북마크한 글입니다.");
-
-        } catch (Exception e) {
-            log.error("북마크 생성 실패: {}", e.getMessage());
+        } catch (CustomException e) {
+            log.error("북마크 생성 실패: {}", e.getCustomErrorCode().getMessage());
             throw e;
         }
-
     }
 
     private User getViewerFromJwt(String accessToken) {
         String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
         return userRepository.findByExternalId(userNameFromJwtToken)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 유저가 없습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
     }
 
     // Trip
-    private void addTripBookmark(Long boardId, User userForBookmark) throws BadRequestException {
+    private void addTripBookmark(Long boardId, User userForBookmark) {
         if (tripBookmarkRepository.findByUserAndTripId(userForBookmark, boardId).isPresent()) {
             log.error("이미 북마크한 글입니다.");
-            throw new BadRequestException("이미 북마크한 글입니다");
+            throw new CustomException(CustomErrorCode.ALREADY_BOOKMARKED);
         }
 
         TripBookmark newBookmark = TripBookmark.builder()
                 .user(userForBookmark)
                 .trip(tripRepository.findById(boardId)
-                        .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다")))
+                        .orElseThrow(() -> new CustomException(CustomErrorCode.TRIP_NOT_FOUND)))
                 .build();
 
         tripBookmarkRepository.save(newBookmark);
     }
 
     // Community
-    private void addCommunityBookmark(Long boardId, User userForBookmark) throws BadRequestException {
+    private void addCommunityBookmark(Long boardId, User userForBookmark) {
         if (communityBookmarkRepository.findByUserAndCommunityId(userForBookmark, boardId).isPresent()) {
             log.error("이미 북마크한 글입니다.");
-            throw new BadRequestException("이미 북마크한 글입니다");
+            throw new CustomException(CustomErrorCode.ALREADY_BOOKMARKED);
         }
 
         CommunityBookmark newBookmark = CommunityBookmark.builder()
                 .user(userForBookmark)
                 .community(communityRepository.findById(boardId)
-                        .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다")))
+                        .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND)))
                 .build();
 
         communityBookmarkRepository.save(newBookmark);
@@ -128,9 +123,9 @@ public class BookmarkServiceI implements BookmarkService {
                 deleteTripBookmark(postId, userForBookmark);
             }
 
-        } catch (Exception e) {
-            log.error("북마크 삭제 실패: {}", e.getMessage());
-            throw (RuntimeException) e;
+        } catch (CustomException e) {
+            log.error("북마크 삭제 실패: {}", e.getCustomErrorCode().getMessage());
+            throw e;
         }
     }
 
@@ -154,12 +149,12 @@ public class BookmarkServiceI implements BookmarkService {
 
 
     // * 커뮤니티 북마크 삭제
-    private void deleteCommunityBookmark(Long postId, User userForBookmark) throws BadRequestException {
+    private void deleteCommunityBookmark(Long postId, User userForBookmark) {
         Optional<CommunityBookmark> bookmark = communityBookmarkRepository.findByUserAndCommunityId(userForBookmark, postId);
 
         // 북마크한 글이 아닐 경우 예외 리턴
         if(bookmark.isEmpty()) {
-            throw new BadRequestException("북마크한 글이 아닙니다.");
+            throw new CustomException(CustomErrorCode.NOT_BOOKMARKED);
         }
 
         Optional<Community> community = Optional.ofNullable(bookmark.get().getCommunity());
@@ -170,28 +165,28 @@ public class BookmarkServiceI implements BookmarkService {
     }
 
     // * 이미 삭제된 커뮤니티글의 북마크 삭제
-    private void deleteCommunityBookmarkAlreadyDeleted(Long bookmarkId) throws BadRequestException {
+    private void deleteCommunityBookmarkAlreadyDeleted(Long bookmarkId) {
         Optional<CommunityBookmark> bookmark = communityBookmarkRepository.findById(bookmarkId);
 
         if(bookmark.isEmpty()) {
-            throw new BadRequestException("북마크한 글이 아닙니다.");
+            throw new CustomException(CustomErrorCode.NOT_BOOKMARKED);
         }
 
         communityBookmarkRepository.delete(bookmark.get());
     }
 
     // * 여행 북마크 삭제
-    private void deleteTripBookmark(Long postId, User userForBookmark) throws BadRequestException {
+    private void deleteTripBookmark(Long postId, User userForBookmark) {
         Optional<TripBookmark> bookmark = tripBookmarkRepository.findByUserAndTripId(userForBookmark, postId);
 
         if(bookmark.isEmpty()) {
             log.error("북마크한 글이 아닙니다.");
-            throw new BadRequestException("북마크한 글이 아닙니다");
+            throw new CustomException(CustomErrorCode.NOT_BOOKMARKED);
         }
 
         // Trip bookmarks: orphanRemoval=true -> Trip엔티티에서 북마크 삭제 -> 엔티티 자동 삭제
         tripRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다"))
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TRIP_NOT_FOUND))
                 .updateBookmarks(bookmark.get());
         log.info("북마크 삭제 완료");
     }
@@ -246,12 +241,9 @@ public class BookmarkServiceI implements BookmarkService {
                                     },
                                     () -> communityBookmarkRepository.delete(cb)));
 
-
         } catch (Exception e) {
             log.error("북마크 삭제에 실패했습니다. {}",  e.getMessage());
             throw e;
         }
     }
-
-
 }

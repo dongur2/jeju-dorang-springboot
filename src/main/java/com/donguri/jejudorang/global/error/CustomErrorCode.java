@@ -12,6 +12,7 @@ public enum CustomErrorCode {
      * 204 요청이 성공했지만 응답에는 컨텐츠가 없음
      * */
     NO_NOTIFICATION(HttpStatus.NO_CONTENT, "새 알림이 없습니다."),
+    NOT_BOOKMARKED(HttpStatus.NO_CONTENT, "북마크한 글이 아닙니다."),
 
     /*
      * 400 데이터의 불일치; 클라이언트가 제공한 데이터가 잘못되었거나 누락됨
@@ -42,6 +43,7 @@ public enum CustomErrorCode {
     /*
      * 409 리소스 간 충돌
      * */
+    ALREADY_BOOKMARKED(HttpStatus.CONFLICT, "이미 북마크한 글입니다."),
     EMAIL_ALREADY_EXISTED(HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
     ID_ALREADY_EXISTED(HttpStatus.CONFLICT, "이미 가입된 아이디입니다."),
 
