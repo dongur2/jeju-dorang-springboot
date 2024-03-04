@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.user.dto.request.ProfileRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -146,6 +147,9 @@ public class ProfileController {
 
             userService.updatePassword(token.getValue(), passwordRequest);
             return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("비밀번호 수정 실패: {}", e.getMessage());

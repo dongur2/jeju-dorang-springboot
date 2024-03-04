@@ -1,8 +1,12 @@
 package com.donguri.jejudorang.global.auth.oauth;
 
+import com.donguri.jejudorang.domain.user.entity.LoginType;
+import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.auth.jwt.RefreshToken;
 import com.donguri.jejudorang.global.auth.jwt.RefreshTokenRepository;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,11 +29,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final int cookieTime;
     @Autowired private final JwtProvider jwtProvider;
     @Autowired private final RefreshTokenRepository refreshTokenRepository;
+    @Autowired private final UserRepository userRepository;
 
-    public OAuth2SuccessHandler(JwtProvider jwtProvider, @Value("${jwt.cookie-expire}") int cookieTime, RefreshTokenRepository refreshTokenRepository) {
+    public OAuth2SuccessHandler(JwtProvider jwtProvider, @Value("${jwt.cookie-expire}") int cookieTime, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
         this.jwtProvider = jwtProvider;
         this.cookieTime = cookieTime;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
     }
 
     /*
@@ -43,8 +49,16 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         try {
             DefaultOAuth2User oauth2User = (DefaultOAuth2User) authentication.getPrincipal();
 
+            // 토큰 ID_CLAIM 값 설정 위한 USER table user_id
+            Long userId = null;
+            if(oauth2User.getAttributes().containsKey("kakao_account")) {
+                userId = userRepository.findByLoginTypeAndSocialCode(LoginType.KAKAO, oauth2User.getAttribute("id").toString())
+                        .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND))
+                        .getId();
+            }
+
             // JWT 토큰 발급: Access Token
-            String accessToken = jwtProvider.generateOAuth2AccessToken(oauth2User);
+            String accessToken = jwtProvider.generateOAuth2AccessToken(oauth2User, userId);
             log.info("[OAuth2SuccessHandler] Access Token 발급 완료");
 
             // Refresh Token
@@ -57,7 +71,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             } else {
                 log.info("Redis에 해당 아이디의 Refresh Token이 없음: {}", oauth2User.getName());
 
-                refreshToken = jwtProvider.generateOAuth2RefreshToken(oauth2User);
+                refreshToken = jwtProvider.generateOAuth2RefreshToken(oauth2User, userId);
                 RefreshToken refreshTokenToSave = RefreshToken.builder()
                         .refreshToken(refreshToken)
                         .userId(oauth2User.getName()) // code

@@ -3,7 +3,9 @@ package com.donguri.jejudorang.domain.trip.api;
 import com.donguri.jejudorang.domain.trip.dto.response.TripDetailResponseDto;
 import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.service.TripService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -88,7 +90,7 @@ public class TripController {
     @GetMapping("/places/{placeId}")
     public String tripDetail(@PathVariable("placeId") Long placeId,
                              @CookieValue(required = false, name = "access_token") Cookie accessToken,
-                             Model model) {
+                             Model model, HttpServletResponse response) {
 
         try {
             String token = null;
@@ -100,8 +102,14 @@ public class TripController {
             model.addAttribute("trip", tripDetail);
             return "/trip/tripDetail";
 
+        } catch (CustomException e) {
+            log.error("잘못된 아이디 접근: {}", e.getCustomErrorCode().getMessage());
+            model.addAttribute("message", e.getCustomErrorCode().getMessage());
+            return "/error/error404";
+
         } catch (Exception e) {
             log.error("여행 상세글 조회에 실패했습니다. {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             model.addAttribute("errorMsg", e.getMessage());
             return "/error/errorPage";
         }

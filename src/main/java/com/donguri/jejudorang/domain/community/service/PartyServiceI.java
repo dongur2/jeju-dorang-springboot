@@ -5,6 +5,8 @@ import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.JoinState;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +95,7 @@ public class PartyServiceI implements PartyService{
     public void changePartyJoinState(Long communityId) {
         try {
             Community toUpdateState = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 존재하지 않습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
             toUpdateState.changeJoinState();
 
         } catch (Exception e) {

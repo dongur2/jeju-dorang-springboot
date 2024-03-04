@@ -16,6 +16,8 @@ import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagServi
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,10 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -58,20 +57,16 @@ public class CommunityServiceI implements CommunityService {
             // 토큰에서 현재 작성자 추출
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
             User writer = userRepository.findByExternalId(userNameFromJwtToken)
-                    .orElseThrow(() -> new EntityNotFoundException("아이디에 해당하는 유저가 없습니다. " + userNameFromJwtToken));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
 
             // 태그 제외 entity 생성 & 저장
             Community savedCommunity = communityRepository.save(postToWrite.toEntity(writer));
 
             // 작성된 태그가 존재할 경우에만 태그 저장 메서드 실행
             if (postToWrite.tags() != null) {
-                log.info("태그 존재함");
                 communityWithTagService.saveTagToPost(savedCommunity, postToWrite.tags());
             }
             
-            log.info("게시글 작성 완료 : {} written by {}", savedCommunity.getTitle(),
-                                                        savedCommunity.getWriter().getProfile().getExternalId());
-
             // 리다이렉트할 때 넣어줄 글타입
             return new CommunityTypeResponse(setTypeForRedirect(savedCommunity));
 
@@ -90,7 +85,7 @@ public class CommunityServiceI implements CommunityService {
             Map<String, Object> resMap = new HashMap<>();
 
             Community found = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             List<String> tagsToStringList = found.getTags().stream()
                     .map(communityWithTag -> communityWithTag.getTag().getKeyword())
@@ -109,21 +104,18 @@ public class CommunityServiceI implements CommunityService {
             * */
             } else {
 
+                Optional<Cookie[]> cookies = Optional.ofNullable(request.getCookies());
+
                 // 1. Access Token 쿠키가 존재하는 경우
-                if(request.getCookies() != null
-                        && Arrays.stream(request.getCookies())
-                        .anyMatch(cookie -> cookie.getName().equals("access_token"))) {
+                if(cookies.isPresent() && Arrays.stream(cookies.get()).anyMatch(cookie -> cookie.getName().equals("access_token"))) {
 
-                    log.info("액세스 쿠키가 존재합니다.");
-                    Cookie accessToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("access_token")).findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다"));
+                    Cookie accessToken = Arrays.stream(cookies.get()).filter(cookie -> cookie.getName().equals("access_token")).findFirst().get();
 
-                    // 1-1. Access Token이 유효한지 확인 -> catch: 유효하지 않은 경우
+                    // 1-1. Access Token이 유효한지 확인 -> catch: 유효하지 않은 경우 비회원이므로 북마크 여부 확인할 수 없음
                     StringBuilder idFromJwt = new StringBuilder();
                     try {
                         idFromJwt.append(jwtProvider.getUserNameFromJwtToken(accessToken.getValue()));
                     } catch (Exception e) {
-                        log.info("유효한 토큰이 아닙니다. 비회원은 북마크 여부를 확인할 수 없습니다.");
                         resMap.put("result", CommunityDetailResponse.from(found, tagsToStringList, null));
                         resMap.put("cmts", cmtList);
                         return resMap;
@@ -132,12 +124,9 @@ public class CommunityServiceI implements CommunityService {
                     // 1-2. Access Token이 유효 -> from(.., idFromJwt) 북마크 여부 확인
                     resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList, idFromJwt.toString()));
                     resMap.put("cmts", cmtList);
-                    log.info("{}가 북마크한 글입니다. isBookmarked == {}", idFromJwt,
-                            CommunityDetailResponse.from(found, tagsToStringList, idFromJwt.toString()).isBookmarked());
 
-                // 2. Access Token 쿠키가 없는 경우
+                // 2. Access Token 쿠키가 없는 경우: 비회원
                 } else {
-                    log.info("비회원은 북마크 여부를 확인할 수 없습니다.");
                     resMap.put("post", CommunityDetailResponse.from(found, tagsToStringList, null));
                     resMap.put("cmts", cmtList);
                 }
@@ -171,7 +160,7 @@ public class CommunityServiceI implements CommunityService {
     public CommunityTypeResponse updatePost(Long communityId, CommunityWriteRequest postToUpdate) {
         try {
             Community existingCommunity = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             // 제목, 글분류, 글내용, 모집상태 업데이트 (dirty checking)
             existingCommunity.update(postToUpdate);
@@ -197,7 +186,7 @@ public class CommunityServiceI implements CommunityService {
     public void updateView(Long communityId) {
         try {
             Community postToUpdate = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             postToUpdate.upViewCount();
 
@@ -230,10 +219,10 @@ public class CommunityServiceI implements CommunityService {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
             Community nowPost = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)) {
-                throw new IllegalAccessException("게시글은 작성자만 삭제할 수 있습니다.");
+                throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
             }
 
             // 북마크 연관관계 삭제: 게시글을 삭제해도 북마크는 남음
@@ -241,9 +230,9 @@ public class CommunityServiceI implements CommunityService {
 
             communityRepository.delete(nowPost);
 
-        } catch (IllegalAccessException e) {
-            log.error("작성자가 아니면 삭제할 수 없습니다.");
-            throw new RuntimeException(e);
+        } catch (CustomException e) {
+            log.error("게시글 삭제 실패: {}", e.getCustomErrorCode().getMessage());
+            throw e;
 
         } catch (Exception e) {
             log.error("게시글 삭제 실패: {}", e.getMessage());

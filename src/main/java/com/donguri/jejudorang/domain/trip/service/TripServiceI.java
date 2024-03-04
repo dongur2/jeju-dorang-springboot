@@ -6,7 +6,8 @@ import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.entity.Trip;
 import com.donguri.jejudorang.domain.trip.repository.TripRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
-import jakarta.persistence.EntityNotFoundException;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -118,7 +119,7 @@ public class TripServiceI implements TripService{
     public TripDetailResponseDto getTripDetail(String token, Long tripId) {
         try {
             Trip tripEntity = tripRepository.findById(tripId)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.TRIP_NOT_FOUND));
 
             // Access Token 쿠키가 있고
             if (token != null) {

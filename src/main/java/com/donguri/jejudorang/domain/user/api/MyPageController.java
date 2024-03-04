@@ -41,9 +41,12 @@ public class MyPageController {
 
             Page<CommunityMyPageListResponse> data = userService.getMyCommunityWritings(token.getValue(), pageable);
 
+            model.addAttribute("requestType", "WRITING"); // 페이지네이션 구분 위한 값 부여
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);
+
+            setNoDataMessage(data, model, "작성한 글이 없습니다.");
 
             return "/user/mypage/myWritings";
 
@@ -68,9 +71,12 @@ public class MyPageController {
 
             Page<CommunityMyPageListResponse> data = userService.getMyCommunityComments(token.getValue(), pageable);
 
+            model.addAttribute("requestType", "COMMENT"); // 페이지네이션 구분 위한 값 부여
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);
+
+            setNoDataMessage(data, model, "작성한 댓글이 없습니다.");
 
             return "/user/mypage/myWritings";
 
@@ -95,10 +101,14 @@ public class MyPageController {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
             Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);
 
+
             model.addAttribute("type", type);
             model.addAttribute("nowPage", nowPage);
             model.addAttribute("endPage", data.getTotalPages());
             model.addAttribute("posts", data);
+
+            setNoDataMessage(data, model, "북마크한 글이 없습니다.");
+
             return "/user/mypage/myBookmarks";
 
         } catch (Exception e) {
@@ -108,5 +118,11 @@ public class MyPageController {
         }
     }
 
+
+    private static void setNoDataMessage(Page<?> data, Model model, String attributeValue) {
+        if (data.getTotalPages() == 0) {
+            model.addAttribute("message", attributeValue);
+        }
+    }
 
 }

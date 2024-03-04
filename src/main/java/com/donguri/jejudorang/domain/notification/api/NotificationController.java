@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.notification.api;
 
 import com.donguri.jejudorang.domain.notification.dto.NotificationResponse;
 import com.donguri.jejudorang.domain.notification.service.NotificationService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +41,8 @@ public class NotificationController {
             List<NotificationResponse> notifications = notificationService.getNotifications(token.getValue());
             return ResponseEntity.ok(notifications);
 
-        } catch (NullPointerException e) {
-            log.info("새 알림이 없습니다.");
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NO_CONTENT);
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("알림 조회 실패: {}", e.getMessage());
@@ -51,10 +51,12 @@ public class NotificationController {
     }
 
     @PutMapping("/check")
-    public String updateNotificationCheck(@CookieValue("access_token") Cookie token,
-                                        @RequestParam(name = "alertId") Long alertId) {
+    public String updateNotificationCheck(@CookieValue("access_token") Cookie token, @RequestParam(name = "alertId") Long alertId) {
         try {
             return notificationService.updateNotificationToChecked(token.getValue(), alertId);
+
+        } catch (CustomException e) {
+            return e.getCustomErrorCode().getMessage();
 
         } catch (Exception e) {
             log.error("알림 상태 업데이트 및 리다이렉트 실패: {}", e.getMessage());
@@ -68,6 +70,9 @@ public class NotificationController {
         try {
             notificationService.deleteNotification(token.getValue(), alertId);
             return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("알림 삭제 실패: {}", e.getMessage());

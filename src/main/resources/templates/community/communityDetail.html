@@ -6,6 +6,8 @@
         layout:decorate="~{/fragments/layout}">
 
 <head>
+    <script th:src="@{/js/community/deleteCommunity.js}"></script>
+
     <!-- 카카오톡 공유  -->
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js"
             integrity="sha384-6MFdIr0zOira1CHQkedUqJVql0YtcZA1P0nbPrQYJXVJZUkTk/oX4U9GhUIs3/z8" crossorigin="anonymous"></script>
@@ -14,7 +16,6 @@
         // 카카오톡 공유 텍스트 설정 - 글 제목
         let nowPostTitleForShare = [[${post.title}]];
     </script>
-    <script th:src="@{/js/community/deleteCommunity.js}"></script>
     <title>상세 페이지 - 커뮤니티 | 제주도랑</title>
 </head>
 <th layout:fragment="content">
@@ -175,13 +176,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="board-post-feature board-back-to-list" style="width:100px; height:80px; display: flex; justify-content: center; align-items: center;">
-                    <button class="feature-row board-share-btn btn btn-light" th:onclick="|window.history.back()|"
-                            style="width:90%; height: 50%"
-                    >목록</button>
-                </div>
-
 
             </div>
 
@@ -403,7 +397,7 @@
                         window.location.href = '/community/boards/parties/' + communityId;
 
                     } else {
-                        alert("모집 상태 변경 실패");
+                        console.log("모집 상태 변경 실패");
                     }
                 }
             };
@@ -417,14 +411,9 @@
         * */
         // 로그인 하지 않은 경우
         function cantBookmark() {
-            Swal.fire({
-                position: 'middle',
-                icon: 'warning',
-                title: '',
-                text: "북마크하려면 로그인이 필요합니다.",
-                showConfirmButton: true
-            });
+            showAlert('warning', '북마크하려면 로그인이 필요합니다.', true);
         }
+
         // 로그인한 경우 - 북마크 하지 않은 글
         function createBookmark(communityId) {
             let xhr = new XMLHttpRequest();
@@ -437,13 +426,7 @@
                         window.location.reload();
 
                     } else { // 그 외의 경우
-                        Swal.fire({
-                            position: 'middle',
-                            icon: 'error',
-                            title: '',
-                            text: xhr.responseText,
-                            showConfirmButton: true
-                        });
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             };
@@ -462,13 +445,7 @@
                         window.location.reload();
 
                     } else { // 그 외의 경우
-                        Swal.fire({
-                            position: 'middle',
-                            icon: 'error',
-                            title: '',
-                            text: xhr.responseText,
-                            showConfirmButton: true
-                        });
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             };
@@ -566,7 +543,7 @@
                         window.location.reload();
 
                     } else {
-                        alert(xhr.responseText);
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             }
@@ -578,20 +555,31 @@
         *
         * */
         function deleteCmtRequest(cmtId) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("DELETE", "/community/comments?cmtId=" + cmtId, true);
+            Swal.fire({
+                position: 'center',
+                icon: 'question',
+                title: '',
+                text: '댓글을 삭제하시겠습니까?',
+                showConfirmButton: true,
 
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        window.location.reload();
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("DELETE", "/community/comments?cmtId=" + cmtId, true);
 
-                    } else {
-                        alert(xhr.responseText);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200) {
+                                window.location.reload();
+
+                            } else {
+                                showAlert('error', xhr.responseText, true);
+                            }
+                        }
                     }
+                    xhr.send();
                 }
-            }
-            xhr.send();
+            });
         }
 
 

@@ -10,7 +10,8 @@ import com.donguri.jejudorang.domain.notification.repository.NotificationReposit
 import com.donguri.jejudorang.domain.notification.repository.SseEmitterRepository;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
-import jakarta.persistence.EntityNotFoundException;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.yaml.snakeyaml.comments.CommentType;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -132,7 +132,7 @@ public class NotificationServiceI implements NotificationService{
                 .map(notifications -> notifications.stream()
                         .sorted(Comparator.comparing(Notification::getCreatedAt).reversed())
                         .map(NotificationResponse::from).toList())
-                .orElseThrow(() -> new NullPointerException("새 알림이 없습니다"));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.NO_NOTIFICATION));
 
     }
 
@@ -142,11 +142,11 @@ public class NotificationServiceI implements NotificationService{
         Long idFromJwtToken = jwtProvider.getIdFromJwtToken(accessToken);
 
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new EntityNotFoundException("알림이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.NOTIFICATION_NOT_FOUND));
 
         try {
             if (!Objects.equals(idFromJwtToken, notification.getOwner().getId())) {
-                throw new Exception("알림은 당사자만 읽음 처리 가능합니다.");
+                throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
             }
 
             // 안읽은 알림일 경우에만 읽음 처리 메서드 호출
@@ -172,11 +172,11 @@ public class NotificationServiceI implements NotificationService{
         Long idFromJwtToken = jwtProvider.getIdFromJwtToken(accessToken);
 
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new EntityNotFoundException("알림이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.NOTIFICATION_NOT_FOUND));
 
         try {
             if (!Objects.equals(idFromJwtToken, notification.getOwner().getId())) {
-                throw new Exception("알림은 당사자만 삭제 가능합니다.");
+                throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
             }
 
             notificationRepository.delete(notification);
@@ -192,13 +192,13 @@ public class NotificationServiceI implements NotificationService{
     public void findAndDeleteAllNotificationsByUserId(Long userId) {
         try {
             notificationRepository.findAllByOwnerId(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("존재하는 알림 없음"));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.NO_NOTIFICATION));
 
             notificationRepository.deleteAllByOwnerId(userId);
 
-        } catch (EntityNotFoundException e) {
+        } catch (CustomException e) {
             log.info("삭제할 알림이 없습니다.");
-            return;
+
         } catch (Exception e) {
             log.error("알림 삭제 실패: {}", e.getMessage());
             throw e;

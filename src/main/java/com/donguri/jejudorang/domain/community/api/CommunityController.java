@@ -5,6 +5,8 @@ import com.donguri.jejudorang.domain.community.dto.response.*;
 import com.donguri.jejudorang.domain.community.service.ChatService;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.community.service.PartyService;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -75,6 +77,9 @@ public class CommunityController {
             CommunityTypeResponse communityTypeResponseDto = communityService.saveNewPost(postToWrite, token.getValue());
             return new ResponseEntity<>(communityTypeResponseDto.typeForRedirect(), HttpStatus.OK);
 
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
         } catch (Exception e) {
             log.error("게시글 작성에 실패했습니다 : {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -89,36 +94,36 @@ public class CommunityController {
     *
     * */
     @GetMapping("/post/{communityId}/modify")
-    public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model) {
+    public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model, HttpServletResponse response) {
         try {
-
             model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("result"));
             return "/community/communityModifyForm";
 
-        } catch (Exception e) {
-            log.error("수정 데이터 불러오기 실패: {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+        } catch (CustomException e) {
+            response.setStatus(404);
+            model.addAttribute("message", e.getCustomErrorCode().getMessage());
+            return "/error/error404";
         }
     }
 
     @PutMapping("/post/{communityId}/modify")
-    public String modifyCommunity(@PathVariable("communityId") Long communityId,
-                                  @Valid CommunityWriteRequest postToUpdate,
-                                  BindingResult bindingResult,
-                                  Model model) {
-
+    public ResponseEntity<?> modifyCommunity(@PathVariable("communityId") Long communityId,
+                                              @Valid CommunityWriteRequest postToUpdate,
+                                              BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
-                throw new IllegalArgumentException(bindingResult.getFieldError().getDefaultMessage());
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
 
             CommunityTypeResponse redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
-            return "redirect:/community/boards/" + redirectTypeDto.typeForRedirect() + "/{communityId}";
+            return new ResponseEntity<>("/community/boards/" + redirectTypeDto.typeForRedirect() + "/" + communityId, HttpStatus.OK);
+
+
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -237,6 +242,11 @@ public class CommunityController {
 
             return "/community/communityDetail";
 
+        } catch (CustomException e) {
+            response.setStatus(e.getCustomErrorCode().getStatus().value());
+            model.addAttribute("message", e.getCustomErrorCode().getMessage());
+            return "/error/error404";
+
         } catch (Exception e) {
             log.error("상세글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
@@ -256,6 +266,10 @@ public class CommunityController {
         try {
             communityService.deleteCommunityPost(accessToken.getValue(), communityId);
             return new ResponseEntity<>("/community/boards/" + type, HttpStatus.OK);
+
+        } catch (CustomException e) {
+            log.error("게시글 삭제 실패");
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("게시글 삭제 실패");

@@ -1,9 +1,8 @@
-package com.donguri.jejudorang.domain.user.service.s3;
+package com.donguri.jejudorang.global.common.s3;
 
-import com.donguri.jejudorang.domain.user.repository.ProfileRepository;
-import com.donguri.jejudorang.domain.user.repository.UserRepository;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,14 +25,10 @@ public class ImageServiceI implements ImageService {
 
     private final String bucketName;
     @Autowired private final S3Client s3Client;
-    @Autowired private final UserRepository userRepository;
-    @Autowired private final ProfileRepository profileRepository;
 
-    public ImageServiceI(@Value("${aws.s3.bucket.name}") String bucketName, S3Client s3Client, UserRepository userRepository, ProfileRepository profileRepository) {
+    public ImageServiceI(@Value("${aws.s3.bucket.name}") String bucketName, S3Client s3Client) {
         this.bucketName = bucketName;
         this.s3Client = s3Client;
-        this.userRepository = userRepository;
-        this.profileRepository = profileRepository;
     }
 
     @Override
@@ -41,14 +36,10 @@ public class ImageServiceI implements ImageService {
     public Map<String, String> uploadImg(MultipartFile imgFile) {
         try {
             String originalName = imgFile.getOriginalFilename();
-            log.info("이미지 파일의 사용자 저장 이름 : {}", originalName);
-            String fileType = originalName.substring(originalName.length() - 4);
-            log.info("파일 확장자 : {}", fileType);
+            String fileType = originalName.substring(originalName.length() - 4).toLowerCase();
 
-            if (!(fileType.contains("png") || fileType.contains("jpg") || fileType.contains("jpeg")
-                || fileType.contains("PNG") || fileType.contains("JPG") || fileType.contains("JPEG"))) {
-
-                throw new IllegalAccessException("파일은 png, jpg, jpeg만 가능합니다");
+            if (!(fileType.contains("png") || fileType.contains("jpg") || fileType.contains("jpeg"))) {
+                throw new CustomException(CustomErrorCode.NOT_SUPPORTED_TYPE_FOR_IMAGE);
             }
 
             UUID uuid = UUID.randomUUID();
@@ -62,7 +53,6 @@ public class ImageServiceI implements ImageService {
                     .build();
 
             s3Client.putObject(putOb, RequestBody.fromBytes(imgFile.getBytes()));
-            log.info(" ** S3에 사진 업로드 완료 ** name: {}", objectKey);
 
             GetUrlRequest request = GetUrlRequest.builder()
                     .bucket(bucketName)
@@ -70,8 +60,6 @@ public class ImageServiceI implements ImageService {
                     .build();
 
             URL url = s3Client.utilities().getUrl(request);
-            log.info(" ** S3에 저장된 사진 URL 불러오기 완료 ** ");
-            log.info("The URL for {} is {}", objectKey, url);
 
             Map<String, String> result = new HashMap<>();
             result.put("imgName", objectKey);
@@ -82,11 +70,11 @@ public class ImageServiceI implements ImageService {
         } catch (S3Exception e) {
             log.error("사진 업로드 실패: S3 통신 오류 {}", e.getMessage());
             System.exit(1);
-            return null;
+            throw e;
 
-        } catch (IllegalAccessException e) {
-            log.error("사진 업로드 실패: {}", e.getMessage());
-            return null;
+        } catch (CustomException e) {
+            log.error("사진 업로드 실패: {}", e.getCustomErrorCode().getMessage());
+            throw e;
 
         } catch (IOException e) {
             log.error("사진 업로드 실패");
@@ -115,7 +103,6 @@ public class ImageServiceI implements ImageService {
             log.error("S3의 이미지 삭제 실패 : {}", e.awsErrorDetails().errorMessage());
             System.exit(1);
         }
-
         log.info("S3의 이미지 삭제 완료");
     }
 }

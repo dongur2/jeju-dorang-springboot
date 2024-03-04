@@ -2,11 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" th:href="@{/css/common.css}">
 <link rel="stylesheet" th:href="@{/css/community/communityPostForm.css}">
-<link th:href="@{/css/bootstrap.min.css}"
-      href="../css/bootstrap.min.css" rel="stylesheet">
-<link th:href="@{/js/bootstrap.js}"
-      href="../js/bootstrap.js" rel="js">
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
 <head>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+
+    <!-- SweetAlert library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/sweetAlert.js}"></script>
+
     <!-- Editor's Style -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
     <!--  tagify  -->
@@ -87,13 +91,7 @@
                         formData.append('image', blob);
 
                         if(formData.get("image").size > 3000000) {
-                            Swal.fire({
-                                position: 'middle',
-                                icon: 'error',
-                                title: '',
-                                text: "파일 크기는 3MB를 초과할 수 없습니다.",
-                                showConfirmButton: true
-                            });
+                            showAlert('error', '파일 크기는 3MB를 초과할 수 없습니다.', true);
                             return;
                         }
 
@@ -103,7 +101,6 @@
                         });
 
                         const imageUrl = await response.text(); // public String uploadEditorImage()
-                        console.log('서버에 저장된 파일의 url : ', imageUrl);
 
                         // 이미지 삽입 콜백 호출
                         callback(imageUrl, 'imgUrl');
@@ -115,12 +112,12 @@
             }
         });
 
-        // 폼 데이터 전달
+        /* 폼 데이터 전달 */
         function submitForm() {
             let formContent = editor.getHTML();
 
-            // 공백 기본값 <p><br></p> 제거 후 공백 확인
-            formContent = formContent.replace(/<p><br><\/p>/gi, '').trim();
+            // <p>, <br>, </p> 제거 후 공백 확인
+            formContent = formContent.replace(/<p>|<\/p>|<br>/gi, '').trim();
             document.getElementById("board-form-content").setAttribute("value", formContent);
 
             // 글 타입 전달
@@ -143,11 +140,10 @@
                         window.location.href = "/community/boards/"+xhr.responseText;
 
                     } else {
-                        alert(xhr.responseText);
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             }
-
             xhr.send(formData);
         }
 

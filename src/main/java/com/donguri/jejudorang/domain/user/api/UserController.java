@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.api;
 import com.donguri.jejudorang.domain.user.dto.request.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.request.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -47,13 +48,18 @@ public class UserController {
     }
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
-
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             userService.signUp(signUpRequest);
             log.info("회원 가입 완료");
             return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (CustomException e) {
+            log.error("CUSTOM 회원 가입 실패");
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("회원 가입 실패");
@@ -74,11 +80,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
-                                   HttpServletResponse response, Model model) {
+    public ResponseEntity<?> authenticateUser(@Valid LoginRequest loginRequest, BindingResult bindingResult,
+                                   HttpServletResponse response) {
         // 유효성 검사 에러
         if (bindingResult.hasErrors()) {
-            return bindErrorPage(bindingResult, model);
+            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -86,23 +92,20 @@ public class UserController {
 
             if (tokens == null || tokens.get("access_token") == null) {
                 log.error("해당 아이디의 비밀번호가 올바르지 않습니다: {}", loginRequest.externalId());
-                model.addAttribute("errorMsg", "비밀번호를 확인해주세요");
-                return "/user/login/signInForm";
+                return new ResponseEntity<>("비밀번호를 확인해주세요", HttpStatus.UNAUTHORIZED);
 
             } else {
                 setCookieForToken(tokens, response);
-                return "redirect:/";
+                return new ResponseEntity<>(HttpStatus.OK);
             }
 
         } catch (UnexpectedRollbackException e) {
             log.error("가입된 아이디가 아닙니다 : {}", e.getMessage());
-            model.addAttribute("errorMsg", "가입된 아이디가 없습니다");
-            return "/user/login/signInForm";
+            return new ResponseEntity<>("가입된 아이디가 없습니다", HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
             log.error("로그인에 실패했습니다: {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "/user/login/signInForm";
+            return new ResponseEntity<>("로그인에 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -113,7 +116,7 @@ public class UserController {
      *  SecurityConfig의 securityFilterChain() .logout() 설정으로 인해서 이 컨트롤러 메서드는 실행되지 않음
      * */
     @PostMapping("/logout")
-    public String deleteUser(HttpServletResponse response) {
+    public String deleteUser() {
         Optional<Authentication> authState = userService.logOut();
 
         if (authState.isPresent()) {
@@ -143,7 +146,7 @@ public class UserController {
 
         } catch (Exception e) {
             log.error("회원 삭제 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -157,21 +160,6 @@ public class UserController {
             newCookieToAdd.setPath("/");
             response.addCookie(newCookieToAdd);
         });
-    }
-
-    private static String bindErrorPage(BindingResult bindingResult, Model model) {
-        model.addAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
-        return "/error/errorPage";
-    }
-
-    /*
-     * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
-     * */
-    private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {
-        if (bindingResult.hasErrors()) {
-            log.error("실패: {}", bindingResult.getFieldError().getDefaultMessage());
-            throw new Exception(bindingResult.getFieldError().getDefaultMessage());
-        }
     }
 
 }

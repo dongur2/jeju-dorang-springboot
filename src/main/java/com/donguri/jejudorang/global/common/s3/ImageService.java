@@ -1,4 +1,4 @@
-package com.donguri.jejudorang.domain.user.service.s3;
+package com.donguri.jejudorang.global.common.s3;
 
 import org.springframework.web.multipart.MultipartFile;
 

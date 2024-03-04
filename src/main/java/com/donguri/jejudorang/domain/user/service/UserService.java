@@ -37,7 +37,7 @@ public interface UserService {
 
 
     // 프로필 사진, 닉네임, 이메일 수정
-    void updateProfileData(String accessToken, ProfileRequest dataToUpdate) throws IllegalAccessException;
+    void updateProfileData(String accessToken, ProfileRequest dataToUpdate);
 
     // 프로필 사진 삭제
     void deleteProfileImg(String accessToken);

@@ -4,12 +4,12 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{/fragments/layout}">
 <head>
+    <script th:src="@{/js/mypage/mypageTabClicked.js}"></script>
     <title>비밀번호 변경 - 마이페이지 | 제주도랑</title>
 </head>
 <th layout:fragment="content">
 
     <div class="board-whole-box">
-
 
         <!-- 마이페이지 좌측 탭  -->
         <div th:replace="~{fragments/mypage/mypageTab :: mypageTabFragment}"></div>
@@ -23,19 +23,19 @@
                   style="width:100%; height:400px; margin-bottom:auto;
                             display: flex; flex-direction: column; gap: 5%; justify-content: center; align-items: center;">
 
-                <div style="width:90%;">
+                <div class="form-floating" style="width:90%;">
+                    <input type="password" class="form-control" id="nowPassword" placeholder="현재 비밀번호" name="oldPwd" style="width:100%; height:40px; "/>
                     <label for="nowPassword">현재 비밀번호</label>
-                    <input type="password" id="nowPassword" name="oldPwd" style="width:100%; height:40px; "/>
                 </div>
 
-                <div style="width:90%; margin-top: 3%">
+                <div class="form-floating" style="width:90%; margin-top: 3%">
+                    <input type="password" class="form-control" id="newPassword"  placeholder="새로운 비밀번호" name="newPwd" style="width:100%; height:40px; "/>
                     <label for="newPassword">새로운 비밀번호</label>
-                    <input type="password" id="newPassword" name="newPwd" style="width:100%; height:40px; "/>
                 </div>
 
-                <div style="width:90%; margin-top: 1%">
+                <div class="form-floating" style="width:90%; margin-top: 1%">
+                    <input type="password" class="form-control" id="newPasswordForCheck"  placeholder="새로운 비밀번호 확인" name="newPwdToCheck" style="width:100%; height:40px; "/>
                     <label for="newPasswordForCheck">새로운 비밀번호 확인</label>
-                    <input type="password" id="newPasswordForCheck" name="newPwdToCheck" style="width:100%; height:40px; "/>
                 </div>
 
                 <button th:if="${loginType == 'BASIC'}"
@@ -54,7 +54,6 @@
 
 
     <script>
-
         function submitForm() {
             var form = document.getElementById('profile-modify-form-pwd');
             var formData = new FormData(form);
@@ -63,25 +62,26 @@
             xhr.open('PUT', form.action, true);
 
             xhr.onload = function () {
+                // 모달창 닫혀야 새로고침 수행
                 if (xhr.status === 200) {
-                    alert('비밀번호가 변경되었습니다.');
-                    window.location.reload();
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: '',
+                        text: '비밀번호가 변경되었습니다.',
+                        showConfirmButton: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
 
                 } else {
-                    Swal.fire({
-                        position: 'middle',
-                        icon: 'error',
-                        title: '',
-                        text: xhr.responseText,
-                        showConfirmButton: true,
-                    });
+                    showAlert('error', xhr.responseText, true);
                 }
             };
             xhr.send(formData);
         }
-
     </script>
-
-
 </th>
 </html>

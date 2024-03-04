@@ -14,7 +14,8 @@ import com.donguri.jejudorang.domain.notification.service.NotificationService;
 import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
-import jakarta.persistence.EntityNotFoundException;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,10 +53,10 @@ public class CommentServiceI implements CommentService{
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
             User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
-                    .orElseThrow(() -> new EntityNotFoundException("가입된 사용자가 아닙니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
 
             Community nowPost = communityRepository.findById(newComment.postId())
-                    .orElseThrow(() -> new EntityNotFoundException("존재하는 게시물이 아닙니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             Comment savedComment = commentRepository.save(Comment.builder()
                     .community(nowPost)
@@ -85,10 +86,10 @@ public class CommentServiceI implements CommentService{
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
 
             Community nowPost = communityRepository.findById(newReComment.postId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             User nowUser = userRepository.findByExternalId(userNameFromJwtToken)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 회원이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
 
 
             Comment savedReComment = commentRepository.save(Comment.builder()
@@ -126,7 +127,7 @@ public class CommentServiceI implements CommentService{
 
     private void sendNotificationToCmtWriter(ReCommentRequest newReComment, Comment savedReComment, Community nowPost) {
         Optional<User> cmtWriter  = Optional.ofNullable(commentRepository.findById(newReComment.cmtId())
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."))
+                .orElseThrow(() -> new CustomException(CustomErrorCode.COMMENT_NOT_FOUND))
                 .getUser());
 
         // * 대댓글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
@@ -140,16 +141,16 @@ public class CommentServiceI implements CommentService{
 
     @Override
     @Transactional
-    public void modifyComment(String accessToken, CommentRequestWithId commentToUpdate) throws IllegalAccessException {
+    public void modifyComment(String accessToken, CommentRequestWithId commentToUpdate) {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
 
             Comment originalCmt = commentRepository.findById(commentToUpdate.cmtId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMENT_NOT_FOUND));
 
             // 로그인 유저가 댓글 작성자가 아닐 경우 예외 처리
             if(!userNameFromJwtToken.equals(originalCmt.getUser().getProfile().getExternalId())) {
-                throw new IllegalAccessException("댓글 작성자 당사자만 댓글을 수정할 수 있습니다.");
+                throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
             }
 
             // 댓글 내용 수정
@@ -164,16 +165,16 @@ public class CommentServiceI implements CommentService{
 
     @Override
     @Transactional
-    public void deleteComment(String accessToken, Long cmtId) throws IllegalAccessException {
+    public void deleteComment(String accessToken, Long cmtId) {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
 
             Comment cmtToDelete = commentRepository.findById(cmtId)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 댓글이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMENT_NOT_FOUND));
 
             // 로그인 유저가 댓글 작성자가 아닐 경우 예외 처리
             if(!userNameFromJwtToken.equals(cmtToDelete.getUser().getProfile().getExternalId())) {
-                throw new IllegalAccessException("댓글 작성자 당사자만 댓글을 삭제할 수 있습니다.");
+                throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
             }
 
             // 삭제 처리
