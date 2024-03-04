@@ -57,20 +57,16 @@ public class CommunityServiceI implements CommunityService {
             // 토큰에서 현재 작성자 추출
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(token);
             User writer = userRepository.findByExternalId(userNameFromJwtToken)
-                    .orElseThrow(() -> new EntityNotFoundException("아이디에 해당하는 유저가 없습니다. " + userNameFromJwtToken));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
 
             // 태그 제외 entity 생성 & 저장
             Community savedCommunity = communityRepository.save(postToWrite.toEntity(writer));
 
             // 작성된 태그가 존재할 경우에만 태그 저장 메서드 실행
             if (postToWrite.tags() != null) {
-                log.info("태그 존재함");
                 communityWithTagService.saveTagToPost(savedCommunity, postToWrite.tags());
             }
             
-            log.info("게시글 작성 완료 : {} written by {}", savedCommunity.getTitle(),
-                                                        savedCommunity.getWriter().getProfile().getExternalId());
-
             // 리다이렉트할 때 넣어줄 글타입
             return new CommunityTypeResponse(setTypeForRedirect(savedCommunity));
 
@@ -164,7 +160,7 @@ public class CommunityServiceI implements CommunityService {
     public CommunityTypeResponse updatePost(Long communityId, CommunityWriteRequest postToUpdate) {
         try {
             Community existingCommunity = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("다음 ID에 해당하는 글을 찾을 수 없습니다: " + communityId));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             // 제목, 글분류, 글내용, 모집상태 업데이트 (dirty checking)
             existingCommunity.update(postToUpdate);
@@ -190,7 +186,7 @@ public class CommunityServiceI implements CommunityService {
     public void updateView(Long communityId) {
         try {
             Community postToUpdate = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             postToUpdate.upViewCount();
 
@@ -223,10 +219,10 @@ public class CommunityServiceI implements CommunityService {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
             Community nowPost = communityRepository.findById(communityId)
-                    .orElseThrow(() -> new EntityNotFoundException("해당하는 게시글이 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)) {
-                throw new IllegalAccessException("게시글은 작성자만 삭제할 수 있습니다.");
+                throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
             }
 
             // 북마크 연관관계 삭제: 게시글을 삭제해도 북마크는 남음
@@ -234,9 +230,9 @@ public class CommunityServiceI implements CommunityService {
 
             communityRepository.delete(nowPost);
 
-        } catch (IllegalAccessException e) {
-            log.error("작성자가 아니면 삭제할 수 없습니다.");
-            throw new RuntimeException(e);
+        } catch (CustomException e) {
+            log.error("게시글 삭제 실패: {}", e.getCustomErrorCode().getMessage());
+            throw e;
 
         } catch (Exception e) {
             log.error("게시글 삭제 실패: {}", e.getMessage());

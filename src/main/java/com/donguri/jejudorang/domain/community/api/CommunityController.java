@@ -5,6 +5,7 @@ import com.donguri.jejudorang.domain.community.dto.response.*;
 import com.donguri.jejudorang.domain.community.service.ChatService;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.community.service.PartyService;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -76,6 +77,9 @@ public class CommunityController {
             CommunityTypeResponse communityTypeResponseDto = communityService.saveNewPost(postToWrite, token.getValue());
             return new ResponseEntity<>(communityTypeResponseDto.typeForRedirect(), HttpStatus.OK);
 
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
         } catch (Exception e) {
             log.error("게시글 작성에 실패했습니다 : {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -113,6 +117,10 @@ public class CommunityController {
 
             CommunityTypeResponse redirectTypeDto = communityService.updatePost(communityId, postToUpdate);
             return new ResponseEntity<>("/community/boards/" + redirectTypeDto.typeForRedirect() + "/" + communityId, HttpStatus.OK);
+
+
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -235,7 +243,7 @@ public class CommunityController {
             return "/community/communityDetail";
 
         } catch (CustomException e) {
-            response.setStatus(404);
+            response.setStatus(e.getCustomErrorCode().getStatus().value());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
             return "/error/error404";
 
@@ -258,6 +266,10 @@ public class CommunityController {
         try {
             communityService.deleteCommunityPost(accessToken.getValue(), communityId);
             return new ResponseEntity<>("/community/boards/" + type, HttpStatus.OK);
+
+        } catch (CustomException e) {
+            log.error("게시글 삭제 실패");
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("게시글 삭제 실패");

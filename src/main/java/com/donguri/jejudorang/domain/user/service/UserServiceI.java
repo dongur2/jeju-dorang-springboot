@@ -353,7 +353,7 @@ public class UserServiceI implements UserService {
 
             if (!dataToUpdate.img().isEmpty()) {
                 if (dataToUpdate.img().getSize() > 1000000) {
-                    throw new CustomException(CustomErrorCode.IMAGE_TOO_LARGE);
+                    throw new CustomException(CustomErrorCode.IMAGE_TOO_LARGE_FOR_PROFILE);
                 }
 
                 Profile profile = nowUser.getProfile();

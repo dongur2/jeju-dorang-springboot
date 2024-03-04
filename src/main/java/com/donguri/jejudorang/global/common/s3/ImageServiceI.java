@@ -5,7 +5,6 @@ import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,9 +36,7 @@ public class ImageServiceI implements ImageService {
     public Map<String, String> uploadImg(MultipartFile imgFile) {
         try {
             String originalName = imgFile.getOriginalFilename();
-            log.info("이미지 파일의 사용자 저장 이름 : {}", originalName);
             String fileType = originalName.substring(originalName.length() - 4).toLowerCase();
-            log.info("파일 확장자 : {}", fileType);
 
             if (!(fileType.contains("png") || fileType.contains("jpg") || fileType.contains("jpeg"))) {
                 throw new CustomException(CustomErrorCode.NOT_SUPPORTED_TYPE_FOR_IMAGE);
@@ -56,7 +53,6 @@ public class ImageServiceI implements ImageService {
                     .build();
 
             s3Client.putObject(putOb, RequestBody.fromBytes(imgFile.getBytes()));
-            log.info(" ** S3에 사진 업로드 완료 ** name: {}", objectKey);
 
             GetUrlRequest request = GetUrlRequest.builder()
                     .bucket(bucketName)
@@ -64,8 +60,6 @@ public class ImageServiceI implements ImageService {
                     .build();
 
             URL url = s3Client.utilities().getUrl(request);
-            log.info(" ** S3에 저장된 사진 URL 불러오기 완료 ** ");
-            log.info("The URL for {} is {}", objectKey, url);
 
             Map<String, String> result = new HashMap<>();
             result.put("imgName", objectKey);
@@ -109,7 +103,6 @@ public class ImageServiceI implements ImageService {
             log.error("S3의 이미지 삭제 실패 : {}", e.awsErrorDetails().errorMessage());
             System.exit(1);
         }
-
         log.info("S3의 이미지 삭제 완료");
     }
 }

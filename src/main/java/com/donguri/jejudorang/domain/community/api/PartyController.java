@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.community.api;
 
 import com.donguri.jejudorang.domain.community.service.PartyService;
+import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,9 @@ public class PartyController {
         try {
             partyService.changePartyJoinState(communityId);
             return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);

@@ -17,6 +17,7 @@ public enum CustomErrorCode {
     /*
      * 400 데이터의 불일치; 클라이언트가 제공한 데이터가 잘못되었거나 누락됨
      * */
+    NO_REQUEST_IMAGE(HttpStatus.BAD_REQUEST, "첨부된 이미지가 없습니다."),
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "입력한 비밀번호가 일치하지 않습니다."),
     EMAIL_AUTH_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다."),
 
@@ -50,7 +51,8 @@ public enum CustomErrorCode {
     /*
      * 413 요청 엔터티 > 서버에 의해 정의된 제한
      * */
-    IMAGE_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, "파일 크기는 1MB를 초과할 수 없습니다."),
+    IMAGE_TOO_LARGE_FOR_PROFILE(HttpStatus.PAYLOAD_TOO_LARGE, "파일 크기는 1MB를 초과할 수 없습니다."),
+    IMAGE_TOO_LARGE_FOR_COMMUNITY(HttpStatus.PAYLOAD_TOO_LARGE, "파일 크기는 3MB를 초과할 수 없습니다."),
 
     /*
      * 415 클라이언트가 보낸 페이로드가 지원하지 않는 형식이기 때문에 서버가 요청을 수락하지 않음
