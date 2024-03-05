@@ -3,7 +3,7 @@
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-        layout:decorate="~{/fragments/layout}">
+        layout:decorate="fragments/layout">
 <head>
     <script th:src="@{/js/mypage/mypageTabClicked.js}"></script>
     <script th:src="@{/js/community/deleteCommunity.js}"></script>
@@ -15,14 +15,14 @@
 
 
         <!-- 마이페이지 좌측 탭  -->
-        <div th:replace="~{fragments/mypage/mypageTab :: mypageTabFragment}"></div>
+        <div th:replace="fragments/mypage/mypageTab :: mypageTabFragment"></div>
 
         <!-- 컨텐츠 블록  -->
         <div class="board-item board-main"
              style="width: 100%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%;">
 
             <!-- 작성글/작성댓글 탭 -->
-            <div th:replace="~{fragments/mypage/mypageWritingsTab :: mypageWritingsTabFragment}"></div>
+            <div th:replace="fragments/mypage/mypageWritingsTab :: mypageWritingsTabFragment"></div>
 
             <!-- 데이터 없을 경우  -->
             <div th:if="${endPage == 0}"
