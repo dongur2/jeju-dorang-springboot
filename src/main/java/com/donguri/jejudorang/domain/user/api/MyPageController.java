@@ -48,12 +48,12 @@ public class MyPageController {
 
             setNoDataMessage(data, model, "작성한 글이 없습니다.");
 
-            return "/user/mypage/myWritings";
+            return "user/mypage/myWritings";
 
         } catch (Exception e) {
             log.error("커뮤니티 작성글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return "error/errorPage";
         }
     }
 
@@ -78,12 +78,12 @@ public class MyPageController {
 
             setNoDataMessage(data, model, "작성한 댓글이 없습니다.");
 
-            return "/user/mypage/myWritings";
+            return "user/mypage/myWritings";
 
         } catch (Exception e) {
             log.error("커뮤니티 작성댓글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return "error/errorPage";
         }
     }
 
@@ -109,12 +109,12 @@ public class MyPageController {
 
             setNoDataMessage(data, model, "북마크한 글이 없습니다.");
 
-            return "/user/mypage/myBookmarks";
+            return "user/mypage/myBookmarks";
 
         } catch (Exception e) {
             log.error("북마크 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return "error/errorPage";
         }
     }
 

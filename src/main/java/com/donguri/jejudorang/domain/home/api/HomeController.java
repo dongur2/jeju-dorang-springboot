@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 public class HomeController {
     @GetMapping
     public String home() {
-        return "/home/home";
+        return "home";
     }
 
     @PostMapping
     public String redirectHome() {
-        return "/";
+        return "redirect:/";
     }
 }

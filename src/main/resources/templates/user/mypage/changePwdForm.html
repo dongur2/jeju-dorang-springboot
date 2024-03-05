@@ -2,7 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{/fragments/layout}">
+        layout:decorate="fragments/layout">
 <head>
     <script th:src="@{/js/mypage/mypageTabClicked.js}"></script>
     <title>비밀번호 변경 - 마이페이지 | 제주도랑</title>
@@ -12,7 +12,7 @@
     <div class="board-whole-box">
 
         <!-- 마이페이지 좌측 탭  -->
-        <div th:replace="~{fragments/mypage/mypageTab :: mypageTabFragment}"></div>
+        <div th:replace="fragments/mypage/mypageTab :: mypageTabFragment"></div>
 
         <!-- 컨텐츠 블록  -->
         <div class="board-item board-main"

@@ -46,7 +46,7 @@ public class ProfileController {
             log.info("profileResponse.loginType: {}", profileData.loginType());
 
             model.addAttribute(profileData);
-            return "/user/mypage/profile";
+            return "user/mypage/profile";
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -135,7 +135,7 @@ public class ProfileController {
         String loginType = userService.checkLoginType(token.getValue());
 
         model.addAttribute("loginType", loginType);
-        return "/user/mypage/changePwdForm";
+        return "user/mypage/changePwdForm";
     }
 
     @PutMapping("/pwd")
