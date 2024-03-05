@@ -77,12 +77,12 @@ public class TripController {
                 model.addAttribute("endPage", result.getTotalPages());
             }
 
-            return "/trip/tripList";
+            return "trip/tripList";
 
         } catch (Exception e) {
             log.error("여행 리스트 데이터 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return "error/errorPage";
         }
 
     }
@@ -100,18 +100,18 @@ public class TripController {
 
             TripDetailResponseDto tripDetail = tripService.getTripDetail(token, placeId);
             model.addAttribute("trip", tripDetail);
-            return "/trip/tripDetail";
+            return "trip/tripDetail";
 
         } catch (CustomException e) {
             log.error("잘못된 아이디 접근: {}", e.getCustomErrorCode().getMessage());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
-            return "/error/error404";
+            return "error/error404";
 
         } catch (Exception e) {
             log.error("여행 상세글 조회에 실패했습니다. {}", e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return "error/errorPage";
         }
     }
 

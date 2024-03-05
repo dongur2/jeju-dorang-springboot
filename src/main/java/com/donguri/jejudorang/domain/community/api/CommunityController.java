@@ -62,7 +62,7 @@ public class CommunityController {
     @GetMapping("/post/new")
     public String getCommunityWriteForm(@RequestParam(name = "type") String preType, Model model) {
         model.addAttribute("type", preType); // 미리 설정되는 글타입
-        return "/community/communityPostForm";
+        return "community/communityPostForm";
     }
 
     @PostMapping("/post/new")
@@ -97,12 +97,12 @@ public class CommunityController {
     public String getCommunityModifyForm(@PathVariable("communityId") Long communityId, Model model, HttpServletResponse response) {
         try {
             model.addAttribute("post", communityService.getCommunityPost(communityId, true, null).get("result"));
-            return "/community/communityModifyForm";
+            return "community/communityModifyForm";
 
         } catch (CustomException e) {
             response.setStatus(404);
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
-            return "/error/error404";
+            return "error/error404";
         }
     }
 
@@ -193,12 +193,12 @@ public class CommunityController {
             model.addAttribute("endPage", data.getTotalPages()); // 총 페이지 수
             model.addAttribute("posts", data); // 데이터
 
-            return "/community/communityList";
+            return "community/communityList";
 
         } catch (Exception e) {
             log.error("게시글 목록 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return "error/errorPage";
         }
     }
 
@@ -240,17 +240,17 @@ public class CommunityController {
             model.addAttribute("cmts", result.get("cmts"));
             model.addAttribute("kakaoApiKey", kakaoApiKey);
 
-            return "/community/communityDetail";
+            return "community/communityDetail";
 
         } catch (CustomException e) {
             response.setStatus(e.getCustomErrorCode().getStatus().value());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
-            return "/error/error404";
+            return "error/error404";
 
         } catch (Exception e) {
             log.error("상세글 불러오기 실패: {}", e.getMessage());
             model.addAttribute("errorMsg", e.getMessage());
-            return "/error/errorPage";
+            return "error/errorPage";
         }
     }
 

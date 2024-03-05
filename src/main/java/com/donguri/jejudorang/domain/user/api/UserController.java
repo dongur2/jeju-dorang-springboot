@@ -76,7 +76,7 @@ public class UserController {
     @GetMapping("/login")
     public String signInForm(Model model) {
         model.addAttribute("kakaoApiKey", kakaoApiKey);
-        return "/user/login/signInForm";
+        return "user/login/signInForm";
     }
 
     @PostMapping("/login")
@@ -120,7 +120,7 @@ public class UserController {
         Optional<Authentication> authState = userService.logOut();
 
         if (authState.isPresent()) {
-            return "/error/errorPage";
+            return "error/errorPage";
         } else {
             return "redirect:/";
         }
