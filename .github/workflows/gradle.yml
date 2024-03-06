@@ -33,7 +33,7 @@ jobs:
     - name: Create application.yml
       run: |
         cd ./src/main
-        mkdir resources
+        mkdir -p resources
         cd ./resources
 
         # application.yml 생성 후 시크릿키에서 내용 가져와 덮어쓰기
