@@ -126,7 +126,7 @@ public class CommentServiceI implements CommentService{
                         .getUser());
 
         if(writer.isPresent() && !writer.get().equals(savedComment.getUser())
-            || writer.isPresent() && headCmtWriter.isPresent() && !writer.get().equals(headCmtWriter.get())) {
+            || writer.isPresent() && headCmtWriter.isPresent() && !writer.get().equals((User) headCmtWriter.get())) {
             // 새 댓글 알림 전송
             notificationService.sendNotification(writer.get(), nowPost, notificationId++, NotifyType.COMMENT);
         } else {
