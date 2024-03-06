@@ -28,8 +28,21 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+
+    # application.yml 생성
+    - name: Create application.yml
+      run: |
+        cd ./src/main
+        mkdir resources
+        cd ./resources
+
+        # application.yml 생성 후 시크릿키에서 내용 가져와 덮어쓰기
+        touch ./application.yml
+        echo "${{ secrets.APPLICATION_YML }}" >> ./application.yml
+
+      shell: bash
     
-    # Spring Boot 어플리케이션 Build
+    # Spring Boot 어플리케이션 Build: .jar 생성
     - name: Build with Gradle
       run: ./gradlew clean build -x test
     
