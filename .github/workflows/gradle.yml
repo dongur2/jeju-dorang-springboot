@@ -1,0 +1,43 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+# main branch에 push & pull request 발생하면 동작
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# 발생할 워크플로우
+jobs:
+  deploy: 
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    # Spring Boot 어플리케이션 Build
+    - name: Build Spring Boot
+      run: ./gradlew clean build -x test
+    
+    # Docker Image Build
+    - name: Build Docker Image
+      run: docker build --platform linux/amd64 --no-cache -t dongur2/jeju-dorang .
+    
+    # DockerHub Login
+    - name: Login Docker
+      uses: docker/login-action@v2
+      with: 
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # Docker Image -> Docker Hub push
+    - name: Push on Docker Hub
+      run: docker push dongur2/jeju-dorang
