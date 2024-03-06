@@ -60,3 +60,20 @@ jobs:
     # Docker Image -> Docker Hub push
     - name: Push on Docker Hub
       run: docker push dongur2/jeju-dorang
+
+    # Execute SSH & Deploy on EC2
+    - name: Execute SSH and Deploy on EC2
+      uses: appleboy/ssh-action@main
+      with:
+        host: ${{ secrets.SSH_HOST }} # EC2 퍼블릭 IPv4 DNS
+        username: ubuntu
+        port: 22
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          docker stop jeju-dorang
+          docker rm jeju-dorang
+          docker rmi dongur2/jeju-dorang
+
+          docker pull dongur2/jeju-dorang
+          sudo docker run -d -p 8080:8080 --name jeju-dorang dongur2/jeju-dorang
+          
