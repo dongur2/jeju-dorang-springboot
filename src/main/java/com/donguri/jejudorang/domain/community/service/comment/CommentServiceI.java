@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -115,9 +116,17 @@ public class CommentServiceI implements CommentService{
     }
 
     private void sendNotificationToPostWriter(Community nowPost, Comment savedComment) {
-        // * 글 작성자가 없거나 글 작성자와 댓글 작성자가 동일할 경우 알림 전송하지 않음
+        // * 글 작성자가 없거나 글 작성자와 새로운 댓글 작성자가 동일할 경우, 글 작성자와 대댓글의 원댓글 작성자가 동일할 경우 알림 전송하지 않음
         Optional<User> writer = Optional.ofNullable(nowPost.getWriter());
-        if(writer.isPresent() && !writer.get().equals(savedComment.getUser())) {
+        Optional<User> headCmtWriter = Optional.ofNullable(
+                Objects.requireNonNull(commentRepository.findById(savedComment.getCmtGroup())
+                                .orElseGet(() -> {
+                                    log.info("댓글이 존재하지 않습니다.");
+                                    return null;}))
+                        .getUser());
+
+        if(writer.isPresent() && !writer.get().equals(savedComment.getUser())
+            || writer.isPresent() && headCmtWriter.isPresent() && !writer.get().equals(headCmtWriter.get())) {
             // 새 댓글 알림 전송
             notificationService.sendNotification(writer.get(), nowPost, notificationId++, NotifyType.COMMENT);
         } else {
