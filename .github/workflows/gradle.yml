@@ -72,8 +72,8 @@ jobs:
         script: |
           sudo docker stop jeju-dorang
           sudo docker rm jeju-dorang
-          sudo docker rmi dongur2/jeju-dorang
 
           sudo docker pull dongur2/jeju-dorang
           sudo docker run -d -p 8080:8080 --name jeju-dorang dongur2/jeju-dorang
           
+          sudo docker image prune -f # 사용하지 않는 이미지 삭제
