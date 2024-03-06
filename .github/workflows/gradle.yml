@@ -51,8 +51,11 @@ jobs:
       run: docker build --platform linux/amd64 --no-cache -t dongur2/jeju-dorang .
     
     # DockerHub Login
-    - name: Login Docker
-      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PW }}
+    - name: Login DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # Docker Image -> Docker Hub push
     - name: Push on Docker Hub
