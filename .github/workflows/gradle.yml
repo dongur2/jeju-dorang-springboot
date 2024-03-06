@@ -70,10 +70,10 @@ jobs:
         port: 22
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          docker stop jeju-dorang
-          docker rm jeju-dorang
-          docker rmi dongur2/jeju-dorang
+          sudo docker stop jeju-dorang
+          sudo docker rm jeju-dorang
+          sudo docker rmi dongur2/jeju-dorang
 
-          docker pull dongur2/jeju-dorang
+          sudo docker pull dongur2/jeju-dorang
           sudo docker run -d -p 8080:8080 --name jeju-dorang dongur2/jeju-dorang
           
