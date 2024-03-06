@@ -63,7 +63,7 @@ jobs:
 
     # Execute SSH & Deploy on EC2
     - name: Execute SSH and Deploy on EC2
-      uses: appleboy/ssh-action@main
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SSH_HOST }} # EC2 퍼블릭 IPv4 DNS
         username: ubuntu
