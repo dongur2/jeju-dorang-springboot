@@ -107,7 +107,7 @@ public class NotificationServiceI implements NotificationService{
     @Override
     public void saveNotification(User postWriter, Community post, NotifyType type, String notifyData) {
         try {
-            notificationRepository.save(Notification.builder()
+            Notification save = notificationRepository.save(Notification.builder()
                     .owner(postWriter)
                     .content(notifyData)
                     .post(post)
@@ -115,7 +115,7 @@ public class NotificationServiceI implements NotificationService{
                     .type(type)
                     .build()
             );
-            log.info("알림 DB에 저장 완료");
+            log.info("알림 DB에 저장 완료: {} - {}", save.getType().name(), save.getContent());
 
         } catch (Exception e) {
             log.error("알림 저장 실패: {}", e.getMessage());
