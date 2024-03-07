@@ -141,8 +141,8 @@ public class TripServiceI implements TripService{
                 return new TripDetailResponseDto(tripEntity);
             }
 
-        } catch (Exception e) {
-            log.error("여행 상세글 조회 실패: {}", e.getMessage());
+        } catch (CustomException e) {
+            log.error("여행 상세글 조회 실패: {}", e.getCustomErrorCode().getMessage());
             throw e;
         }
     }

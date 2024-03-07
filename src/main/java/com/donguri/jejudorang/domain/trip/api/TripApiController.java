@@ -1,7 +1,14 @@
 package com.donguri.jejudorang.domain.trip.api;
 
+import com.donguri.jejudorang.domain.trip.api.swagger.TripApiControllerDocs;
 import com.donguri.jejudorang.domain.trip.dto.TripApiDataDto;
 import com.donguri.jejudorang.domain.trip.service.TripService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +23,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-public class TripApiController {
+public class TripApiController implements TripApiControllerDocs {
     @Value("${jeju.key}")
     private String apiKey;
     @Value("${jeju.url}")
