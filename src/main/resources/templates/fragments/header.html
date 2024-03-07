@@ -71,7 +71,6 @@
                 const eventSource = new EventSource('/notifications/connect');
                 eventSource.addEventListener('notification', function(event) {
                     let msg = event.data;
-                    console.log(msg);
 
                     // 새 댓글이 달렸을 경우 실시간 알림 alert 표시
                     if(msg !== 'Connected') {
