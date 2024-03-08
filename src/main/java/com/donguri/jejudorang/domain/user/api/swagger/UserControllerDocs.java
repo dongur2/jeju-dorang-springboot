@@ -27,11 +27,9 @@ public interface UserControllerDocs {
     @Operation(summary = "회원가입", description = "사용자가 제공한 정보(SignUpRequest)를 기반으로 새로운 회원을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입 성공"),
-            @ApiResponse(responseCode = "400", description = "회원가입 실패: 사용자 제공 정보(SignUpRequest)의 조건 미충족"),
-            @ApiResponse(responseCode = "409", description = "회원가입 실패: 아이디 중복"),
-            @ApiResponse(responseCode = "409", description = "회원가입 실패: 이메일 중복"),
-            @ApiResponse(responseCode = "400", description = "회원가입 실패: 비밀번호와 비밀번호 확인 불일치"),
+            @ApiResponse(responseCode = "400", description = "회원가입 실패: 사용자 제공 정보(SignUpRequest)의 조건 미충족/비밀번호와 비밀번호 확인 불일치"),
             @ApiResponse(responseCode = "404", description = "회원가입 실패: 존재하지 않는 권한"),
+            @ApiResponse(responseCode = "409", description = "회원가입 실패: 아이디 중복/이메일 중복"),
             @ApiResponse(responseCode = "500", description = "회원가입 실패: 서버 에러 발생")
     })
     ResponseEntity<?> registerUser(@Valid @ParameterObject SignUpRequest signUpRequest, BindingResult bindingResult);

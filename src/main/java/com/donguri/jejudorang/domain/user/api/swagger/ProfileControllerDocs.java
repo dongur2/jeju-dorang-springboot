@@ -71,8 +71,7 @@ public interface ProfileControllerDocs {
     @Operation(summary = "비밀번호 변경", description = "현재 로그인한 사용자의 비밀번호를 변경합니다. 소셜 로그인 사용자의 경우에는 이 기능을 사용할 수 없습니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공"),
-            @ApiResponse(responseCode = "400", description = "비밀번호 변경 실패: 사용자 제공 정보(PasswordRequest)의 조건 미충족"),
-            @ApiResponse(responseCode = "400", description = "비밀번호 변경 실패: 새 비밀번호와 비밀번호 확인 불일치"),
+            @ApiResponse(responseCode = "400", description = "비밀번호 변경 실패: 사용자 제공 정보(PasswordRequest)의 조건 미충족/새 비밀번호와 비밀번호 확인 불일치"),
             @ApiResponse(responseCode = "401", description = "비밀번호 변경 실패: 현재 비밀번호 불일치"),
             @ApiResponse(responseCode = "404", description = "비밀번호 변경 실패: 가입된 회원 없음"),
             @ApiResponse(responseCode = "500", description = "비밀번호 변경 실패: 서버 에러 발생")
