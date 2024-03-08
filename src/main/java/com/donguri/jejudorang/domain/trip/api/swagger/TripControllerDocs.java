@@ -2,6 +2,7 @@ package com.donguri.jejudorang.domain.trip.api.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,8 +29,7 @@ public interface TripControllerDocs {
                        @RequestParam(name = "category", required = false, defaultValue = "전체") String category,
                        Model model, HttpServletResponse response);
 
-    @Parameter(name = "placeId", description = "여행지 ID")
-    @Parameter(name = "access_token", description = "JWT 액세스 토큰", required = false)
+    @Parameter(name = "access_token", description = "사용자의 액세스 토큰", required = false, schema = @Schema(type = "string", format = "JWT"))
     @Operation(summary = "여행지 상세글 조회", description = "여행지 상세 데이터를 조회하여 표시한 여행지 ID에 해당하는 상세글 화면을 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상세글 조회 성공"),

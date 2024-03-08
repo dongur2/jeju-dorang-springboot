@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.api;
 
+import com.donguri.jejudorang.domain.user.api.swagger.UserControllerDocs;
 import com.donguri.jejudorang.domain.user.dto.request.LoginRequest;
 import com.donguri.jejudorang.domain.user.dto.request.SignUpRequest;
 import com.donguri.jejudorang.domain.user.service.UserService;
@@ -25,7 +26,7 @@ import java.util.Optional;
 @Slf4j
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final int cookieTime;
     private final String kakaoApiKey;
@@ -58,12 +59,12 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (CustomException e) {
-            log.error("CUSTOM 회원 가입 실패");
+            log.error("CUSTOM 회원 가입 실패: {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
             log.error("회원 가입 실패");
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -111,30 +112,12 @@ public class UserController {
 
 
     /*
-     *  로그아웃
-     *  POST
-     *  SecurityConfig의 securityFilterChain() .logout() 설정으로 인해서 이 컨트롤러 메서드는 실행되지 않음
-     * */
-    @PostMapping("/logout")
-    public String deleteUser() {
-        Optional<Authentication> authState = userService.logOut();
-
-        if (authState.isPresent()) {
-            return "error/errorPage";
-        } else {
-            return "redirect:/";
-        }
-    }
-
-
-    /*
      * 회원 탈퇴
      * POST
      *
      * */
     @PostMapping("/quit")
-    public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token,
-                                        @RequestParam("type") String loginType) {
+    public ResponseEntity<?> deleteUser(@CookieValue("access_token") Cookie token, @RequestParam("type") String loginType) {
         try {
             if(loginType.equals("BASIC")) {
                 userService.withdrawUser(token.getValue());
