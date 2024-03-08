@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.api;
 
+import com.donguri.jejudorang.domain.user.api.swagger.ProfileControllerDocs;
 import com.donguri.jejudorang.domain.user.dto.request.PasswordRequest;
 import com.donguri.jejudorang.domain.user.dto.request.ProfileRequest;
 import com.donguri.jejudorang.domain.user.dto.request.email.MailChangeRequest;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequestMapping("/profile")
-public class ProfileController {
+public class ProfileController implements ProfileControllerDocs {
 
     @Autowired private final UserService userService;
 
@@ -39,11 +40,8 @@ public class ProfileController {
     public String getProfileForm(@CookieValue("access_token") Cookie token, Model model) {
         try {
             String accessToken = token.getValue();
-            log.info("@CookieValue Cookie's access_token: {}", accessToken);
 
             ProfileResponse profileData = userService.getProfileData(accessToken);
-
-            log.info("profileResponse.loginType: {}", profileData.loginType());
 
             model.addAttribute(profileData);
             return "user/mypage/profile";
@@ -67,16 +65,22 @@ public class ProfileController {
                                            @Valid ProfileRequest profileRequest, BindingResult bindingResult) {
 
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             String accessToken = token.getValue();
 
             userService.updateProfileData(accessToken, profileRequest);
             return new ResponseEntity<>(HttpStatus.OK);
 
+        } catch (CustomException e) {
+            log.error("프로필 수정 실패: [오류] {}", e.getCustomErrorCode().getMessage());
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
         } catch (Exception e) {
-            log.error("프로필 수정 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            log.error("프로필 수정 실패: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -88,8 +92,6 @@ public class ProfileController {
      * */
     @DeleteMapping("/img")
     public ResponseEntity<HttpStatus> deleteProfileImg(@CookieValue("access_token") Cookie token) {
-        log.info("deleteProfileImg 컨트롤러 실행");
-
         try {
             String accessToken = token.getValue();
 
@@ -99,7 +101,7 @@ public class ProfileController {
 
         } catch (Exception e) {
             log.error("이미지 삭제 실패: {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -113,14 +115,16 @@ public class ProfileController {
     public ResponseEntity<?> updateEmail(@CookieValue("access_token") Cookie token,
                                          @RequestBody @Valid MailChangeRequest mailChangeRequest, BindingResult bindingResult) {
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             userService.updateEmail(token.getValue(), mailChangeRequest);
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
             log.error("이메일 변경 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -143,28 +147,21 @@ public class ProfileController {
                                             @Valid PasswordRequest passwordRequest, BindingResult bindingResult) {
 
         try {
-            checkValidationAndReturnException(bindingResult);
+            if (bindingResult.hasErrors()) {
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
 
             userService.updatePassword(token.getValue(), passwordRequest);
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (CustomException e) {
+            log.error("비밀번호 변경 실패: [오류] {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("비밀번호 수정 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            log.error("비밀번호 수정 실패: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
-    /*
-     * DTO Validation 에러 체크 후 에러 발생시에러 메세지 세팅한 Exception throw
-     * */
-    private static void checkValidationAndReturnException(BindingResult bindingResult) throws Exception {
-        if (bindingResult.hasErrors()) {
-            log.error("실패: {}", bindingResult.getFieldError().getDefaultMessage());
-            throw new Exception(bindingResult.getFieldError().getDefaultMessage());
-        }
-    }
 }
