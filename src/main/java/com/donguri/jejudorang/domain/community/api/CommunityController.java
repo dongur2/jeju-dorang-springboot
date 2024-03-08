@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.api;
 
+import com.donguri.jejudorang.domain.community.api.swagger.CommunityControllerDocs;
 import com.donguri.jejudorang.domain.community.dto.request.CommunityWriteRequest;
 import com.donguri.jejudorang.domain.community.dto.response.*;
 import com.donguri.jejudorang.domain.community.service.ChatService;
@@ -33,7 +34,7 @@ import java.util.Optional;
 @Slf4j
 @Controller
 @RequestMapping("/community")
-public class CommunityController {
+public class CommunityController implements CommunityControllerDocs {
 
     private final String kakaoApiKey;
     private final int viewCookieTime;
@@ -78,11 +79,12 @@ public class CommunityController {
             return new ResponseEntity<>(communityTypeResponseDto.typeForRedirect(), HttpStatus.OK);
 
         } catch (CustomException e) {
+            log.error("게시글 작성에 실패했습니다 : {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("게시글 작성에 실패했습니다 : {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            log.error("게시글 작성에 실패했습니다 : [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -120,9 +122,11 @@ public class CommunityController {
 
 
         } catch (CustomException e) {
+            log.error("글 수정 실패: {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
+            log.error("글 수정 실패: [서버 오류] {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -243,12 +247,14 @@ public class CommunityController {
             return "community/communityDetail";
 
         } catch (CustomException e) {
+            log.error("상세글 불러오기 실패: {}", e.getCustomErrorCode().getMessage());
             response.setStatus(e.getCustomErrorCode().getStatus().value());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
             return "error/error404";
 
         } catch (Exception e) {
-            log.error("상세글 불러오기 실패: {}", e.getMessage());
+            log.error("상세글 불러오기 실패: [서버 오류] {}", e.getMessage());
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             model.addAttribute("errorMsg", e.getMessage());
             return "error/errorPage";
         }
@@ -268,14 +274,13 @@ public class CommunityController {
             return new ResponseEntity<>("/community/boards/" + type, HttpStatus.OK);
 
         } catch (CustomException e) {
-            log.error("게시글 삭제 실패");
+            log.error("게시글 삭제 실패: {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("게시글 삭제 실패");
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            log.error("게시글 삭제 실패: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
 

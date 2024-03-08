@@ -20,6 +20,7 @@ public enum CustomErrorCode {
     NO_REQUEST_IMAGE(HttpStatus.BAD_REQUEST, "첨부된 이미지가 없습니다."),
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "입력한 비밀번호가 일치하지 않습니다."),
     EMAIL_AUTH_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다."),
+    EXCEEDED_TAG_NAME_LENGTH(HttpStatus.BAD_REQUEST, "태그 이름은 20자를 초과할 수 없습니다."),
 
     /*
      * 401 요청된 리소스에 대한 유효한 인증 자격 증명이 없기 때문에 클라이언트 요청이 완료되지 않았음
