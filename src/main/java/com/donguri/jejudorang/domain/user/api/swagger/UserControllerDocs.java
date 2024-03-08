@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "User", description = "회원 가입/탈퇴/로그인 API")
 public interface UserControllerDocs {
 
-    @Operation(summary = "회원가입 폼 화면 반환")
+    @Operation(summary = "회원가입 폼 화면 출력")
     String registerForm();
 
     @Operation(summary = "회원가입", description = "사용자가 제공한 정보(SignUpRequest)를 기반으로 새로운 회원을 등록합니다.")
@@ -37,7 +37,7 @@ public interface UserControllerDocs {
     ResponseEntity<?> registerUser(@Valid @ParameterObject SignUpRequest signUpRequest, BindingResult bindingResult);
 
 
-    @Operation(summary = "로그인 폼 화면 반환")
+    @Operation(summary = "로그인 폼 화면 출력")
     String signInForm(Model model);
 
     @Operation(summary = "로그인", description = "사용자가 제공한 정보(LoginRequest)를 기반으로 로그인을 수행하고, 성공할 경우 쿠키에 JWT 액세스 토큰과 리프레시 토큰을 저장합니다.")
