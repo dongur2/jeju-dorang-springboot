@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.api;
 
+import com.donguri.jejudorang.domain.user.api.swagger.MailControllerDocs;
 import com.donguri.jejudorang.domain.user.dto.request.email.*;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequestMapping("/email")
-public class MailController {
+public class MailController implements MailControllerDocs {
 
     @Autowired private final UserService userService;
 
@@ -44,7 +45,7 @@ public class MailController {
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (CustomException e) {
-            log.error("CUSTOM 이메일 인증 번호 전송 실패");
+            log.error("CUSTOM 이메일 인증 번호 전송 실패: {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (NullPointerException e) {
@@ -53,7 +54,7 @@ public class MailController {
 
         } catch (Exception e) {
             log.error("이메일 인증 번호 전송 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -85,8 +86,8 @@ public class MailController {
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
+            log.error("이메일 인증 실패: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -107,11 +108,12 @@ public class MailController {
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (CustomException e) {
+            log.error("아이디 찾기 실패: {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("아이디 찾기 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            log.error("아이디 찾기 실패: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -132,11 +134,12 @@ public class MailController {
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (CustomException e) {
+            log.error("아이디 찾기 실패: {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("아이디 찾기 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            log.error("아이디 찾기 실패: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -156,9 +159,13 @@ public class MailController {
             userService.changePwdRandomlyAndSendMail(mailSendForPwdRequest);
             return new ResponseEntity<>(HttpStatus.OK);
 
+        } catch (CustomException e) {
+            log.error("비밀번호 재설정 실패: {}", e.getCustomErrorCode().getMessage());
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
         } catch (Exception e) {
-            log.error("비밀번호 재설정 실패: {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            log.error("비밀번호 재설정 실패: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

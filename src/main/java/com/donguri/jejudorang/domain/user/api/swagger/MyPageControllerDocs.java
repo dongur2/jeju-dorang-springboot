@@ -48,5 +48,5 @@ public interface MyPageControllerDocs {
     String getMyBookmarkPage(@CookieValue("access_token") Cookie token, Model model,
                              @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
                              @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage);
-    
+
 }
