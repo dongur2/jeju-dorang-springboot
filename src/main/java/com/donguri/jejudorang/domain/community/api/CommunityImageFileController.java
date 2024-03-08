@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.api;
 
+import com.donguri.jejudorang.domain.community.api.swagger.CommunityImageFileControllerDocs;
 import com.donguri.jejudorang.global.common.s3.ImageService;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
@@ -17,7 +18,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/tui-editor")
-public class CommunityImageFileController {
+public class CommunityImageFileController implements CommunityImageFileControllerDocs {
 
     private final ImageService imageService;
     public CommunityImageFileController(ImageService imageService) {
@@ -43,7 +44,7 @@ public class CommunityImageFileController {
             return e.getCustomErrorCode().getMessage();
 
         } catch (Exception e) {
-            log.error("이미지 첨부 실패: {}", e.getMessage());
+            log.error("이미지 첨부 실패: [서버 오류] {}", e.getMessage());
             return e.getMessage();
         }
     }
