@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.community.api;
 
+import com.donguri.jejudorang.domain.community.api.swagger.PartyControllerDocs;
 import com.donguri.jejudorang.domain.community.service.PartyService;
 import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequestMapping("/community/parties")
-public class PartyController {
+public class PartyController implements PartyControllerDocs {
 
     @Autowired
     private PartyService partyService;
@@ -33,7 +34,7 @@ public class PartyController {
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -434,7 +434,7 @@ public class UserServiceI implements UserService {
             }
 
         } catch (Exception e) {
-            log.error("패스워드 업데이트에 실패했습니다. {}", e.getMessage());
+            log.error("패스워드 업데이트에 실패했습니다.");
             throw e;
         }
     }
@@ -451,9 +451,7 @@ public class UserServiceI implements UserService {
 
         try {
             User nowUser = getNowUser(token);
-
             nowUser.getAuth().updateEmail(emailToUpdate.emailToSend());
-            log.info("이메일 변경이 완료되었습니다. 변경된 이메일: {}", nowUser.getAuth().getEmail());
 
         } catch (Exception e) {
             log.error("이메일 변경에 실패했습니다. {}", e.getMessage());

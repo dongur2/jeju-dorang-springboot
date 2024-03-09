@@ -19,7 +19,7 @@ public interface NotificationService {
 
     List<NotificationResponse> getNotifications(String accessToken);
 
-    // 알림 읽음 처리 후 상세글 요청 url 리턴
+    // 알림 읽음 처리 후 상세글 요청 uri 리턴
     String updateNotificationToChecked(String accessToken, Long notificationId);
 
     // 알림 삭제

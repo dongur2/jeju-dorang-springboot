@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.trip.api;
 
+import com.donguri.jejudorang.domain.trip.api.swagger.TripControllerDocs;
 import com.donguri.jejudorang.domain.trip.dto.response.TripDetailResponseDto;
 import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import com.donguri.jejudorang.domain.trip.service.TripService;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequestMapping("/trip")
-public class TripController {
+public class TripController implements TripControllerDocs {
     @Autowired private final TripService tripService;
 
     public TripController(TripService tripService) {
@@ -41,8 +42,7 @@ public class TripController {
     public String getTripList(@RequestParam(name = "search", required = false) String word,
                               @RequestParam(name = "nowPage", required = false, defaultValue = "0") Integer nowPage,
                               @RequestParam(name = "category", required = false, defaultValue = "전체") String category,
-                              Model model) {
-
+                              Model model, HttpServletResponse response) {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10);
             Page<TripListResponseDto> result;
@@ -80,18 +80,16 @@ public class TripController {
             return "trip/tripList";
 
         } catch (Exception e) {
-            log.error("여행 리스트 데이터 불러오기 실패: {}", e.getMessage());
+            response.setStatus(500);
             model.addAttribute("errorMsg", e.getMessage());
             return "error/errorPage";
         }
-
     }
 
     @GetMapping("/places/{placeId}")
     public String tripDetail(@PathVariable("placeId") Long placeId,
                              @CookieValue(required = false, name = "access_token") Cookie accessToken,
                              Model model, HttpServletResponse response) {
-
         try {
             String token = null;
             if(accessToken != null) {
@@ -103,15 +101,9 @@ public class TripController {
             return "trip/tripDetail";
 
         } catch (CustomException e) {
-            log.error("잘못된 아이디 접근: {}", e.getCustomErrorCode().getMessage());
+            response.setStatus(e.getCustomErrorCode().getStatus().value());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
             return "error/error404";
-
-        } catch (Exception e) {
-            log.error("여행 상세글 조회에 실패했습니다. {}", e.getMessage());
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            model.addAttribute("errorMsg", e.getMessage());
-            return "error/errorPage";
         }
     }
 

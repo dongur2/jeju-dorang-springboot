@@ -1,12 +1,15 @@
 package com.donguri.jejudorang.domain.community.api.comment;
 
+import com.donguri.jejudorang.domain.community.api.comment.swagger.CommentControllerDocs;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
 import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequest;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequestMapping("/community/comments")
-public class CommentController {
+public class CommentController implements CommentControllerDocs {
 
     @Autowired private final CommentService commentService;
 
@@ -34,13 +37,12 @@ public class CommentController {
     *
     * */
     @PostMapping
-    public String createNewComment(@CookieValue("access_token") Cookie token,
-                                   @Valid CommentRequest commentRequest, BindingResult bindingResult,
-                                   @RequestParam("type") String type,
-                                   Model model) {
+    public ResponseEntity<?> createNewComment(@CookieValue("access_token") Cookie token,
+                                               @Valid CommentRequest commentRequest, BindingResult bindingResult,
+                                               @RequestParam("type") String type) {
         try {
             if (bindingResult.hasErrors()) {
-                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
 
             commentService.writeNewComment(token.getValue(), commentRequest);
@@ -48,17 +50,15 @@ public class CommentController {
             // PARTY -> parties, CHAT -> chats
             type = matchMappingBoardType(type);
 
-            return "redirect:/community/boards/" + type + "/" + commentRequest.postId();
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (CustomException e) {
-            log.error("대댓글 작성에 실패했습니다. {}", e.getCustomErrorCode().getMessage());
-            model.addAttribute("errorMsg", e.getCustomErrorCode().getMessage());
-            return "error/errorPage";
+            log.error("댓글 작성에 실패했습니다. {}", e.getCustomErrorCode().getMessage());
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("댓글 생성에 실패했습니다: {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "error/errorPage";
+            log.error("댓글 생성에 실패했습니다: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -69,12 +69,12 @@ public class CommentController {
      *
      * */
     @PostMapping("/re")
-    public String createNewReComment(@CookieValue("access_token") Cookie token,
-                                     @Valid ReCommentRequest request, BindingResult bindingResult,
-                                     @RequestParam("type") String type, Model model) {
+    public ResponseEntity<?> createNewReComment(@CookieValue("access_token") Cookie token,
+                                                 @Valid ReCommentRequest request, BindingResult bindingResult,
+                                                 @RequestParam("type") String type) {
         try {
             if (bindingResult.hasErrors()) {
-                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
 
             commentService.writeNewReComment(token.getValue(), request);
@@ -82,17 +82,15 @@ public class CommentController {
             // PARTY -> parties, CHAT -> chats
             type = matchMappingBoardType(type);
 
-            return "redirect:/community/boards/" + type + "/" + request.postId();
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (CustomException e) {
             log.error("대댓글 작성에 실패했습니다. {}", e.getCustomErrorCode().getMessage());
-            model.addAttribute("errorMsg", e.getCustomErrorCode().getMessage());
-            return "error/errorPage";
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("대댓글 작성에 실패했습니다. {}", e.getMessage());
-            model.addAttribute("errorMsg", e.getMessage());
-            return "error/errorPage";
+            log.error("대댓글 작성에 실패했습니다. [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -118,7 +116,7 @@ public class CommentController {
 
         try {
             if (bindingResult.hasErrors()) {
-                throw new Exception(bindingResult.getFieldError().getDefaultMessage());
+                return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
 
             commentService.modifyComment(token.getValue(), commentRequest);
@@ -130,7 +128,7 @@ public class CommentController {
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("댓글 수정 실패: {}", e.getMessage());
+            log.error("댓글 수정 실패: [서버 오류] {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -153,7 +151,7 @@ public class CommentController {
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("댓글 삭제 실패: {}", e.getMessage());
+            log.error("댓글 삭제 실패: [서버 오류] {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

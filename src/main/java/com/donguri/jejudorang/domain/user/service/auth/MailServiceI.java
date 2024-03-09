@@ -73,7 +73,6 @@ public class MailServiceI implements MailService {
                 // 인증 되지 않은 이메일 키가 존재할 경우 삭제 후 새로운 코드 저장
                 vop.getAndDelete(to);
                 vop.set(to, code, codeExpired, TimeUnit.MILLISECONDS);
-
             }
             log.info("Redis에 인증 번호 저장 완료 key {} : value {}", to, vop.get(to));
 

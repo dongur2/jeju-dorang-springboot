@@ -196,13 +196,13 @@
             </h3>
 
             <!-- 댓글 작성 -->
-            <form class="cmt-new-box" id="cmt-new-form" method="post" th:object="${commentRequest}" action="/community/comments"
+            <form class="cmt-new-box" id="cmt-new-form" method="post" th:object="${commentRequest}"
             style="width: 100%; height:50px; margin-bottom:1%; display: flex; justify-content: space-between">
 
                 <input name="content" style="width: 82%">
                 <input name="postId" th:value="${post.id}" type="hidden">
                 <input name="type" th:value="${post.type}" type="hidden">
-                <button type="submit" class="btn btn-warning cmt-new-btn" style="width:15%">등록</button>
+                <button type="button" class="btn btn-warning cmt-new-btn" style="width:15%" onclick="requestCmtWrite()">등록</button>
             </form>
         </div>
 
@@ -363,14 +363,14 @@
             <div class="re-cmt-form-box" th:id="'re-cmt-form-box-' + ${cmt.cmtId}"
                  style="width:100%; height:60px; display: none; flex-direction: row; align-items: center">
 
-                <form method="post" th:object="${reCommentRequest}" th:action="@{/community/comments/re(type=${post.type})}"
+                <form id="re-cmt-write-form" method="post" th:object="${reCommentRequest}" th:action="@{/community/comments/re(type=${post.type})}"
                       style="padding-left: 5%; width:100%; display: flex; flex-direction: row; justify-content: space-between">
 
                     <input name="content" style="width: 80%; height:40px">
                     <input type="hidden" name="postId" th:value="${post.id}">
                     <input type="hidden" name="cmtId" th:value="${cmt.cmtId}">
 
-                    <button type="submit" class="btn btn-warning" style="width: 9%; height:40px">답글 등록</button>
+                    <button type="button" class="btn btn-warning" style="width: 9%; height:40px" onclick="requestReCmtWrite()">답글 등록</button>
                     <button type="button" class="btn btn-outline-secondary" style="width: 9%; height:40px" th:onclick="'closeRecommentWriteForm(' + ${cmt.cmtId} + ')'">취소</button>
                 </form>
             </div>
@@ -506,6 +506,73 @@
             }).catch((error) => {
                 console.error('복사 실패:', error);
             });
+        }
+
+        /*
+        * 댓글 작성 요청
+        *
+        * 댓글 내용 입력 후 엔터 -> 원래 폼 제출 막고 비동기 요청
+        * */
+        document.getElementById("cmt-new-form").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                requestCmtWrite();
+            }
+        });
+        function requestCmtWrite() {
+            var form = document.getElementById('cmt-new-form');
+            var formData = new FormData(form);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/community/comments", true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        window.location.reload();
+                    } else {
+                        showAlert('error', xhr.responseText, true);
+                    }
+                }
+            };
+            xhr.send(formData);
+        }
+
+        /*
+        * 대댓글 작성 요청
+        *
+        * */
+        document.getElementById("re-cmt-write-form").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                requestReCmtWrite();
+            }
+        });
+        function requestReCmtWrite() {
+            var form = document.getElementById('re-cmt-write-form');
+
+            var content = document.querySelector("#re-cmt-write-form input[name='content']").value;
+            var postId = document.querySelector("#re-cmt-write-form input[name='postId']").value;
+            var cmtId = document.querySelector("#re-cmt-write-form input[name='cmtId']").value;
+
+            var formData = new FormData();
+            formData.append('content', content);
+            formData.append('postId', postId);
+            formData.append('cmtId', cmtId);
+
+            console.log(formData.content);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", form.action, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        window.location.reload();
+                    } else {
+                        showAlert('error', xhr.responseText, true);
+                    }
+                }
+            };
+            xhr.send(formData);
         }
 
 

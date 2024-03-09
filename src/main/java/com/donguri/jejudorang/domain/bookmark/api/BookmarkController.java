@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.bookmark.api;
 
+import com.donguri.jejudorang.domain.bookmark.api.swagger.BookmarkControllerDocs;
 import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/bookmarks")
-public class BookmarkController {
+public class BookmarkController implements BookmarkControllerDocs {
     @Autowired private final BookmarkService bookmarkService;
     public BookmarkController(BookmarkService bookmarkService) {
         this.bookmarkService = bookmarkService;
@@ -29,11 +30,8 @@ public class BookmarkController {
     public ResponseEntity<String> createBookmark(@CookieValue("access_token") Cookie accessToken,
                                                   @RequestParam("type") String type,
                                                   @RequestParam("id") Long postId) {
-
         try {
             bookmarkService.addBookmark(accessToken.getValue(), type, postId);
-
-            log.info("북마크 설정 완료: {}", postId);
             return new ResponseEntity<>("북마크가 설정되었습니다", HttpStatus.OK);
 
         } catch (CustomException e) {
@@ -55,7 +53,6 @@ public class BookmarkController {
     public ResponseEntity<String> deleteBookmark(@CookieValue("access_token") Cookie accessToken,
                                                  @RequestParam("type") String type,
                                                  @RequestParam("id") Long postId) {
-
         try {
             bookmarkService.deleteBookmark(accessToken.getValue(), type, postId);
             return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
@@ -78,8 +75,12 @@ public class BookmarkController {
             return new ResponseEntity<>("북마크 해제가 완료되었습니다.", HttpStatus.OK);
 
         } catch (CustomException e) {
-            log.error("북마크 해제 실패: {}", e.getMessage());
+            log.error("북마크 해제 실패: {}", e.getCustomErrorCode().getMessage());
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
+        } catch (Exception e) {
+            log.error("북마크 해제 실패: [서버 오류] {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

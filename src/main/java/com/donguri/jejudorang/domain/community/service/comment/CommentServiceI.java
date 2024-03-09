@@ -125,8 +125,9 @@ public class CommentServiceI implements CommentService{
                                     return null;}))
                         .getUser());
 
-        if(writer.isPresent() && !writer.get().equals(savedComment.getUser())
-            || writer.isPresent() && headCmtWriter.isPresent() && !writer.get().equals((User) headCmtWriter.get())) {
+
+        if((writer.isPresent() && !writer.get().equals(savedComment.getUser())) // 글 작성자 != 새댓글 작성자
+            && (headCmtWriter.isPresent() && !writer.get().equals(headCmtWriter.get()))) { // 글 작성자 != 원댓글 작성자
             // 새 댓글 알림 전송
             notificationService.sendNotification(writer.get(), nowPost, notificationId++, NotifyType.COMMENT);
         } else {

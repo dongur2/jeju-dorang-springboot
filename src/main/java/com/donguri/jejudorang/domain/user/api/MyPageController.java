@@ -1,6 +1,7 @@
 package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListResponse;
+import com.donguri.jejudorang.domain.user.api.swagger.MyPageControllerDocs;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Slf4j
 @Controller
 @RequestMapping("/mypage")
-public class MyPageController {
+public class MyPageController implements MyPageControllerDocs {
 
     @Autowired private final UserService userService;
 
@@ -96,7 +97,7 @@ public class MyPageController {
     @GetMapping("/bookmarks")
     public String getMyBookmarkPage (@CookieValue("access_token") Cookie token, Model model,
                                         @RequestParam(name = "type", required = false, defaultValue = "trip") String type,
-                                        @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage){
+                                        @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage) {
         try {
             Pageable pageable = PageRequest.of(nowPage, 10, Sort.by("createdAt").descending());
             Page<?> data = userService.getMyBookmarks(token.getValue(), type, pageable);

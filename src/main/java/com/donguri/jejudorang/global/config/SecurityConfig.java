@@ -140,7 +140,8 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web
                 .ignoring()
-                .requestMatchers("/img/**", "/css/**", "/js/**", "/favicon.ico");
+                .requestMatchers("/img/**", "/css/**", "/js/**", "/favicon.ico",
+                        "/swagger-ui/**", "/api-docs", "/api-docs/json");
     }
 
 }

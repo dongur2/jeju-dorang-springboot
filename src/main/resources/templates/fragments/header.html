@@ -71,7 +71,6 @@
                 const eventSource = new EventSource('/notifications/connect');
                 eventSource.addEventListener('notification', function(event) {
                     let msg = event.data;
-                    console.log(msg);
 
                     // 새 댓글이 달렸을 경우 실시간 알림 alert 표시
                     if(msg !== 'Connected') {
@@ -297,7 +296,7 @@
                         window.location.href = xhr.responseText;
 
                     } else {
-                        alert('요청 실패');
+                        showAlert('error', xhr.responseText, true);
                     }
                 }
             };
@@ -308,8 +307,6 @@
         * 알림 삭제
         * */
         function deleteNotification(notifyId) {
-            console.log('notifyId: ' + notifyId);
-
             var xhr = new XMLHttpRequest();
             xhr.open('DELETE', '/notifications?alertId=' + notifyId, true);
             xhr.setRequestHeader('Content-Type', 'application/json'); // JSON 요청으로 설정
@@ -320,7 +317,7 @@
                         getNotify();
 
                     } else {
-                        alert('요청 실패');
+                        showAlert('error', '요청 실패', true);
                     }
                 }
             };

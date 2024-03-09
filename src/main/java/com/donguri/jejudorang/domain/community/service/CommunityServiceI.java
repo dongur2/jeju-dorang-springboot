@@ -71,7 +71,6 @@ public class CommunityServiceI implements CommunityService {
             return new CommunityTypeResponse(setTypeForRedirect(savedCommunity));
 
         } catch (Exception e) {
-            log.error("게시글 작성에 실패했습니다 : {}", e.getMessage());
             throw e;
         }
     }
@@ -231,11 +230,9 @@ public class CommunityServiceI implements CommunityService {
             communityRepository.delete(nowPost);
 
         } catch (CustomException e) {
-            log.error("게시글 삭제 실패: {}", e.getCustomErrorCode().getMessage());
             throw e;
 
         } catch (Exception e) {
-            log.error("게시글 삭제 실패: {}", e.getMessage());
             throw e;
         }
     }

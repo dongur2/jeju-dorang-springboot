@@ -107,7 +107,7 @@ public class NotificationServiceI implements NotificationService{
     @Override
     public void saveNotification(User postWriter, Community post, NotifyType type, String notifyData) {
         try {
-            notificationRepository.save(Notification.builder()
+            Notification save = notificationRepository.save(Notification.builder()
                     .owner(postWriter)
                     .content(notifyData)
                     .post(post)
@@ -115,7 +115,7 @@ public class NotificationServiceI implements NotificationService{
                     .type(type)
                     .build()
             );
-            log.info("알림 DB에 저장 완료");
+            log.info("알림 DB에 저장 완료: {} - {}", save.getType().name(), save.getContent());
 
         } catch (Exception e) {
             log.error("알림 저장 실패: {}", e.getMessage());
@@ -133,7 +133,6 @@ public class NotificationServiceI implements NotificationService{
                         .sorted(Comparator.comparing(Notification::getCreatedAt).reversed())
                         .map(NotificationResponse::from).toList())
                 .orElseThrow(() -> new CustomException(CustomErrorCode.NO_NOTIFICATION));
-
     }
 
     @Override
@@ -143,7 +142,6 @@ public class NotificationServiceI implements NotificationService{
 
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new CustomException(CustomErrorCode.NOTIFICATION_NOT_FOUND));
-
         try {
             if (!Objects.equals(idFromJwtToken, notification.getOwner().getId())) {
                 throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
@@ -161,14 +159,13 @@ public class NotificationServiceI implements NotificationService{
             return "/community/boards/" + type + "/" + post.getId();
             
         } catch (Exception e) {
-            log.error("잘못된 접근: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage());
+            throw e;
         }
     }
 
     @Override
     @Transactional
-    public void deleteNotification(String accessToken, Long notificationId) throws Exception {
+    public void deleteNotification(String accessToken, Long notificationId) {
         Long idFromJwtToken = jwtProvider.getIdFromJwtToken(accessToken);
 
         Notification notification = notificationRepository.findById(notificationId)
@@ -182,7 +179,6 @@ public class NotificationServiceI implements NotificationService{
             notificationRepository.delete(notification);
 
         } catch (Exception e) {
-          log.error("알림 삭제 실패: {}", e.getMessage());
           throw e;
         }
     }
