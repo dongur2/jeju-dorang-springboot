@@ -49,7 +49,6 @@ public class BookmarkServiceI implements BookmarkService {
     @Override
     @Transactional
     public void addBookmark(String accessToken, String boardName, Long boardId) {
-
         try {
             // 현재 로그인한 유저
             User userForBookmark = getViewerFromJwt(accessToken);
@@ -142,7 +141,6 @@ public class BookmarkServiceI implements BookmarkService {
             deleteCommunityBookmarkAlreadyDeleted(bookmarkId);
 
         } catch (Exception e) {
-            log.error("북마크 삭제 실패: {}", e.getMessage());
             throw (RuntimeException) e;
         }
     }
@@ -180,7 +178,6 @@ public class BookmarkServiceI implements BookmarkService {
         Optional<TripBookmark> bookmark = tripBookmarkRepository.findByUserAndTripId(userForBookmark, postId);
 
         if(bookmark.isEmpty()) {
-            log.error("북마크한 글이 아닙니다.");
             throw new CustomException(CustomErrorCode.NOT_BOOKMARKED);
         }
 
@@ -188,7 +185,6 @@ public class BookmarkServiceI implements BookmarkService {
         tripRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(CustomErrorCode.TRIP_NOT_FOUND))
                 .updateBookmarks(bookmark.get());
-        log.info("북마크 삭제 완료");
     }
 
 

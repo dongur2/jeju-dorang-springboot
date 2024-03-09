@@ -10,10 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +42,7 @@ public interface CommentControllerDocs {
                                          @Valid ReCommentRequest request, BindingResult bindingResult,
                                          @RequestParam("type") String type);
 
-    
+
     @Parameter(name = "access_token", description = "사용자의 액세스 토큰", required = true, schema = @Schema(type = "string", format = "JWT"))
     @Operation(summary = "댓글 수정", description = "사용자가 제공한 정보(CommentRequestWithId)를 기반으로 수정한 댓글을 데이터베이스에 저장합니다. 이 요청은 댓글과 대댓글 공통으로 사용됩니다.")
     @ApiResponses(value = {
