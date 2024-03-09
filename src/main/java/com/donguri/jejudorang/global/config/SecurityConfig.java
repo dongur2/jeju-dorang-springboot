@@ -141,7 +141,7 @@ public class SecurityConfig {
         return web -> web
                 .ignoring()
                 .requestMatchers("/img/**", "/css/**", "/js/**", "/favicon.ico",
-                        "/swagger-ui/**", "/api-docs", "/api-docs/json");
+                        "/swagger-ui/**", "/api-docs", "/api-docs/json", "/v3/api-docs");
     }
 
 }
