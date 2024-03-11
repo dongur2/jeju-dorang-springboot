@@ -48,7 +48,7 @@ public interface CommentControllerDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 수정 성공"),
             @ApiResponse(responseCode = "400", description = "댓글 수정 실패: CommentRequestWithId 조건 미충족"),
-            @ApiResponse(responseCode = "403", description = "댓글 수정 실패: 사용자 권한 없음"),
+            @ApiResponse(responseCode = "403", description = "댓글 수정 실패: 권한 없는 사용자 (작성자/관리자만 삭제 가능)"),
             @ApiResponse(responseCode = "404", description = "댓글 수정 실패: 존재하지 않는 댓글"),
             @ApiResponse(responseCode = "500", description = "댓글 수정 실패: 서버 에러 발생")
     })
@@ -56,10 +56,10 @@ public interface CommentControllerDocs {
 
 
     @Parameter(name = "access_token", description = "사용자의 액세스 토큰", required = true, schema = @Schema(type = "string", format = "JWT"))
-    @Operation(summary = "댓글 삭제", description = "댓글을 삭제 처리합니다. 댓글의 데이터베이스 영구 삭제는 해당 게시글이 삭제될 때 수행됩니다. 이 요청은 댓글과 대댓글 공통으로 사용됩니다.")
+    @Operation(summary = "댓글 삭제", description = "댓글을 삭제 처리합니다. 댓글의 데이터베이스 영구 삭제는 해당 게시글이 삭제될 때 수행됩니다. 이 요청은 댓글과 대댓글 공통으로 사용됩니다. 로그인한 유저가 작성자나 관리자가 아닐 경우 403 예외를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "댓글 삭제 실패: 사용자 권한 없음"),
+            @ApiResponse(responseCode = "403", description = "댓글 삭제 실패: 권한 없는 사용자 (작성자/관리자만 삭제 가능)"),
             @ApiResponse(responseCode = "404", description = "댓글 삭제 실패: 존재하지 않는 댓글"),
             @ApiResponse(responseCode = "500", description = "댓글 삭제 실패: 서버 에러 발생")
     })

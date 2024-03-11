@@ -1,5 +1,6 @@
 package com.donguri.jejudorang.domain.user.api;
 
+import com.donguri.jejudorang.domain.user.api.swagger.AdminControllerDocs;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 @Controller
 @RequestMapping("/admin")
-public class AdminController {
-    @Autowired private final UserService userService;
-
-    public AdminController(UserService userService) {
-        this.userService = userService;
-    }
+public class AdminController implements AdminControllerDocs {
 
     @GetMapping
     public String adminRegisterForm() {

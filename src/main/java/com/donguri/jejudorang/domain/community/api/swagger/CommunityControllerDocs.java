@@ -81,11 +81,11 @@ public interface CommunityControllerDocs {
 
 
     @Parameter(name = "access_token", description = "사용자의 액세스 토큰", required = true, schema = @Schema(type = "string", format = "JWT"))
-    @Operation(summary = "글 삭제", description = "게시글을 데이터베이스에서 삭제합니다.")
+    @Operation(summary = "글 삭제", description = "게시글을 데이터베이스에서 삭제합니다. 로그인한 유저가 작성자나 관리자가 아닐 경우 403 예외를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "글 삭제 성공: 게시글 타입에 맞는 메인 글목록 화면의 uri를 포함한 ResponseEntity를 반환합니다."),
             @ApiResponse(responseCode = "400", description = "글 삭제 실패: 사용자 제공 정보(CommunityWriteRequest)의 조건 미충족/태그 이름 길이 초과"),
-            @ApiResponse(responseCode = "403", description = "글 삭제 실패: 권한 없는 사용자 (작성자만 삭제 가능)"),
+            @ApiResponse(responseCode = "403", description = "글 삭제 실패: 권한 없는 사용자 (작성자/관리자만 삭제 가능)"),
             @ApiResponse(responseCode = "404", description = "글 삭제 실패: 찾을 수 없는 게시글"),
             @ApiResponse(responseCode = "500", description = "글 삭제 실패: 서버 에러 발생")
     })
