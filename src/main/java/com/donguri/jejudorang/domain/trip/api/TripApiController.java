@@ -65,6 +65,6 @@ public class TripApiController implements TripApiControllerDocs {
         // Dto -> Entity -> DB
         tripService.saveApiTrips(response);
 
-        return "OK";
+        return "redirect:/trip/lists";
     }
 }
