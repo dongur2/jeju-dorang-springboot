@@ -25,6 +25,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,12 +46,15 @@ public class CommunityServiceI implements CommunityService {
     @Autowired private final CommunityRepository communityRepository;
     @Autowired private final CommunityWithTagService communityWithTagService;
 
-    public CommunityServiceI(JwtProvider jwtProvider, CommentService commentService, UserRepository userRepository, CommunityRepository communityRepository, CommunityWithTagService communityWithTagService) {
+    private final String bucketUrl;
+
+    public CommunityServiceI(JwtProvider jwtProvider, CommentService commentService, UserRepository userRepository, CommunityRepository communityRepository, CommunityWithTagService communityWithTagService, @Value("${aws.s3.url}") String bucketUrl) {
         this.jwtProvider = jwtProvider;
         this.commentService = commentService;
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
         this.communityWithTagService = communityWithTagService;
+        this.bucketUrl = bucketUrl;
     }
 
     @Override
@@ -210,6 +214,12 @@ public class CommunityServiceI implements CommunityService {
         } catch (Exception e) {
             log.error("작성글 작성자 삭제 실패: {}", e.getMessage());
         }
+    }
+
+    @Override
+    @Transactional
+    public List<String> getAllContents() {
+        return communityRepository.findAllContentsContainsS3Bucket(bucketUrl);
     }
 
     /*

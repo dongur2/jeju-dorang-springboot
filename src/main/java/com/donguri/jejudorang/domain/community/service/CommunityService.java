@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Map;
 
 public interface CommunityService {
@@ -39,4 +40,6 @@ public interface CommunityService {
     void findAllPostsByUserAndSetWriterNull(Long userId);
 
 
+    // 관리자: 사용되지 않는 이미지 삭제 위한 콘텐츠 추출
+    List<String> getAllContents();
 }

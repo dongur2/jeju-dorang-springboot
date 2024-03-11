@@ -113,7 +113,7 @@ public class SecurityConfig {
                                         "/community/comments/**",
                                         "/community/parties/{communityId}/state",
                                         "/bookmarks/**", "/bookmarks").authenticated()
-                                .requestMatchers("/trip/api/data").hasAuthority("ADMIN").anyRequest().authenticated()
+                                .requestMatchers("/trip/api/data", "/admin/img").hasAuthority("ADMIN").anyRequest().authenticated()
                         )
                 )
 

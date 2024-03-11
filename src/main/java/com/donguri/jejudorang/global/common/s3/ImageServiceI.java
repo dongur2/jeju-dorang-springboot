@@ -14,10 +14,7 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -103,6 +100,50 @@ public class ImageServiceI implements ImageService {
             log.error("S3의 이미지 삭제 실패 : {}", e.awsErrorDetails().errorMessage());
             System.exit(1);
         }
-        log.info("S3의 이미지 삭제 완료");
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrphanedImagesWithNames(List<String> profileImgNames, List<String> communityImgNames) {
+       try {
+           // DB에서 사용하고 있는 이미지 이름 리스트: 프로필 사진 이름 + 커뮤니티 게시글 첨부 이미지 이름
+           List<String> imgNameList = new ArrayList<>(profileImgNames);
+           imgNameList.addAll(communityImgNames);
+
+           // S3 bucket에 저장된 이미지 이름 리스트
+           List<String> imgNamesFromS3 = new ArrayList<>();
+           imgNameList.forEach(img -> {
+               ListObjectsRequest objectRequest = ListObjectsRequest.builder()
+                       .bucket(bucketName)
+                       .build();
+
+               ListObjectsResponse listResponse = s3Client.listObjects(objectRequest);
+               imgNamesFromS3.addAll(listResponse.contents()
+                       .stream().map(S3Object::key)
+                       .toList());
+           });
+
+           // 사용하고 있는 이미지가 있을 경우 & 버킷에 이미지가 존재할 경우
+           if (!imgNameList.isEmpty() && !imgNamesFromS3.isEmpty()) {
+               imgNamesFromS3.forEach(name -> {
+                   if (!imgNameList.contains(name)) {
+                       deleteImg(name);
+                   }
+               });
+
+           // 사용 이미지가 없을 경우: 버킷 이미지 전체 삭제
+           } else if (imgNameList.isEmpty()) {
+               imgNamesFromS3.forEach(this::deleteImg);
+           } else { // 버킷이 비어있을 경우
+               log.info("S3 bucket이 비어있습니다.");
+           }
+
+       } catch (S3Exception e) {
+           log.error("버킷에서 이미지 삭제 실패 {}", e.awsErrorDetails().errorMessage());
+           System.exit(1);
+       } catch (Exception e) {
+           log.error("이미지 삭제 실패: {}", e.getMessage());
+           throw e;
+       }
     }
 }

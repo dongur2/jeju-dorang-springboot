@@ -54,4 +54,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     // 작성글 모두 조회 - 페이징 처리
     Page<Community> findAllByWriterId(Long writerId, Pageable pageable);
+
+    // 관리자 - 게시글에 이미지가 첨부된 게시글 내용 모두 조회
+    @Query("select c.content from Community c where c.content like %:bucket%")
+    List<String> findAllContentsContainsS3Bucket(@Param("bucket") String bucketUrl);
 }

@@ -13,6 +13,7 @@ import com.donguri.jejudorang.domain.user.dto.request.email.MailVerifyRequest;
 import com.donguri.jejudorang.domain.user.dto.response.ProfileResponse;
 import com.donguri.jejudorang.domain.user.entity.*;
 import com.donguri.jejudorang.domain.user.entity.auth.Password;
+import com.donguri.jejudorang.domain.user.repository.ProfileRepository;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.domain.user.service.auth.MailService;
@@ -67,9 +68,11 @@ public class UserServiceI implements UserService {
     private final String defaultImgName;
     private final String defaultImgUrl;
 
+    private final ProfileRepository profileRepository;
+
     @Autowired
     public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider,
-                        @Value("${aws.s3.default-img.name}")String defaultImgName, @Value("${aws.s3.default-img.url}")String defaultImgUrl) {
+                        @Value("${aws.s3.default-img.name}")String defaultImgName, @Value("${aws.s3.default-img.url}")String defaultImgUrl, ProfileRepository profileRepository) {
         this.imageService = imageService;
         this.mailService = mailService;
         this.bookmarkService = bookmarkService;
@@ -84,6 +87,7 @@ public class UserServiceI implements UserService {
         this.jwtProvider = jwtProvider;
         this.defaultImgName = defaultImgName;
         this.defaultImgUrl = defaultImgUrl;
+        this.profileRepository = profileRepository;
     }
 
 
@@ -669,6 +673,12 @@ public class UserServiceI implements UserService {
             log.error("북마크 불러오기에 실패했습니다. {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    @Transactional
+    public List<String> getAllUsersProfileImageNames() {
+        return profileRepository.findAllImgName();
     }
 
 
