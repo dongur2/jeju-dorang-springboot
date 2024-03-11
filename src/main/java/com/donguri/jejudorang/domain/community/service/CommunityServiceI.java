@@ -13,7 +13,9 @@ import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
+import com.donguri.jejudorang.domain.user.entity.Role;
 import com.donguri.jejudorang.domain.user.entity.User;
+import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
@@ -25,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -220,7 +223,9 @@ public class CommunityServiceI implements CommunityService {
             Community nowPost = communityRepository.findById(communityId)
                     .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
-            if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)) {
+            // 작성자 or 관리자가 아닐 경우 권한 없음
+            if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)
+                && !jwtProvider.getAuthoritiesFromJWT(accessToken).get(0).getAuthority().equals("ADMIN")) {
                 throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
             }
 

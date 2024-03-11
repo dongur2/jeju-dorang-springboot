@@ -81,9 +81,9 @@
                                     th:if="${post.writerId != 'INVALID' && post.writerId == #authentication.name}"
                                     th:onclick="|location.href='@{/community/post/{communityId}/modify(communityId=${post.id})}'|">수정</button>
                         </div>
-                        <!-- 삭제 버튼: 작성자일 경우에만 노출 -->
+                        <!-- 삭제 버튼: 작성자이거나 관리자일 경우에만 노출 -->
                         <div sec:authorize="isAuthenticated()"
-                             th:if="${post.writerId != 'INVALID' && #authentication.name == post.writerId}"
+                             th:if="${post.writerId != 'INVALID' && (#authentication.name == post.writerId || #authorization.getAuthentication().authorities[0].authority.contains('ADMIN'))}"
                              class="board-post-feature board-back-to-list" style="margin-left:1%; width:90px; height:100% ">
                             <button class="feature-row board-share-btn btn btn-secondary" style="width:100%; height:96%"
                                     th:onclick="deletePost([[${post.type.name}]], [[${post.id}]], 'detail')">삭제</button>
