@@ -183,9 +183,6 @@ public class UserServiceI implements UserService {
          * 새로운 회원(User) 생성
          * */
         try {
-
-            log.info("USER ROLE :: {}", signUpRequest.role().toString());
-
             User userToSave = signUpRequest.toEntity();
             userToSave.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
@@ -200,24 +197,19 @@ public class UserServiceI implements UserService {
             Set<String> strRoles = signUpRequest.role();
             Set<Role> roles = new HashSet<>();
 
-            if (strRoles == null) {
-                Role userRole = roleRepository.findByName(ERole.USER)
-                        .orElseThrow(() -> new CustomException(CustomErrorCode.ROLE_NOT_FOUND));
-                roles.add(userRole);
-
-            } else {
-                strRoles.forEach(role -> {
-                    if (role.equals("admin")) {
-                        Role adminRole = roleRepository.findByName(ERole.ADMIN)
-                                .orElseThrow(() -> new CustomException(CustomErrorCode.ROLE_NOT_FOUND));
-                        roles.add(adminRole);
-                    } else {
-                        Role userRole = roleRepository.findByName(ERole.USER)
-                                .orElseThrow(() -> new CustomException(CustomErrorCode.ROLE_NOT_FOUND));
-                        roles.add(userRole);
-                    }
-                });
-            }
+            strRoles.forEach(role -> {
+                if (role.equals("user")) {
+                    Role adminRole = roleRepository.findByName(ERole.USER)
+                            .orElseThrow(() -> new CustomException(CustomErrorCode.ROLE_NOT_FOUND));
+                    roles.add(adminRole);
+                } else if (role.equals("admin")){
+                    Role userRole = roleRepository.findByName(ERole.ADMIN)
+                            .orElseThrow(() -> new CustomException(CustomErrorCode.ROLE_NOT_FOUND));
+                    roles.add(userRole);
+                } else {
+                    throw new CustomException(CustomErrorCode.ROLE_NOT_FOUND);
+                }
+            });
 
             userToSave.updateRole(roles);
 
