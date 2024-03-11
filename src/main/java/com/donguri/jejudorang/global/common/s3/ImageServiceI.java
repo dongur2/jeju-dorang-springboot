@@ -126,14 +126,18 @@ public class ImageServiceI implements ImageService {
            // 사용하고 있는 이미지가 있을 경우 & 버킷에 이미지가 존재할 경우
            if (!imgNameList.isEmpty() && !imgNamesFromS3.isEmpty()) {
                imgNamesFromS3.forEach(name -> {
-                   if (!imgNameList.contains(name)) {
+                   if (!name.equals("default-img.png") && !imgNameList.contains(name)) {
                        deleteImg(name);
                    }
                });
 
            // 사용 이미지가 없을 경우: 버킷 이미지 전체 삭제
            } else if (imgNameList.isEmpty()) {
-               imgNamesFromS3.forEach(this::deleteImg);
+               imgNamesFromS3.forEach(name -> {
+                   if(!name.equals("default-img.png")) {
+                       deleteImg(name);
+                   }
+               });
            } else { // 버킷이 비어있을 경우
                log.info("S3 bucket이 비어있습니다.");
            }
