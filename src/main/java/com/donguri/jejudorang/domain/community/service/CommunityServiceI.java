@@ -18,6 +18,7 @@ import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
+import com.donguri.jejudorang.global.common.s3.ImageService;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.persistence.EntityNotFoundException;
@@ -40,6 +41,7 @@ public class CommunityServiceI implements CommunityService {
 
     @Autowired private final JwtProvider jwtProvider;
 
+    @Autowired private final ImageService imageService;
     @Autowired private final CommentService commentService;
 
     @Autowired private final UserRepository userRepository;
@@ -48,8 +50,9 @@ public class CommunityServiceI implements CommunityService {
 
     private final String bucketUrl;
 
-    public CommunityServiceI(JwtProvider jwtProvider, CommentService commentService, UserRepository userRepository, CommunityRepository communityRepository, CommunityWithTagService communityWithTagService, @Value("${aws.s3.url}") String bucketUrl) {
+    public CommunityServiceI(JwtProvider jwtProvider, ImageService imageService, CommentService commentService, UserRepository userRepository, CommunityRepository communityRepository, CommunityWithTagService communityWithTagService, @Value("${aws.s3.url}") String bucketUrl) {
         this.jwtProvider = jwtProvider;
+        this.imageService = imageService;
         this.commentService = commentService;
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
@@ -234,18 +237,25 @@ public class CommunityServiceI implements CommunityService {
                     .orElseThrow(() -> new CustomException(CustomErrorCode.COMMUNITY_NOT_FOUND));
 
             // 작성자 or 관리자가 아닐 경우 권한 없음
-            if(!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)
+            if (!nowPost.getWriter().getProfile().getExternalId().equals(userNameFromJwtToken)
                 && !jwtProvider.getAuthoritiesFromJWT(accessToken).get(0).getAuthority().equals("ADMIN")) {
                 throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
+            }
+
+            // 첨부된 이미지가 존재한다면 이미지 삭제 호출
+            String content = nowPost.getContent();
+            if (content.contains(bucketUrl)) {
+                int startIndex = content.indexOf(".amazonaws.com/") + ".amazonaws.com/".length();
+                int endIndex = content.indexOf(" alt", startIndex) + " alt".length() - 5;
+                String usedImgName = content.substring(startIndex, endIndex).trim();
+
+                imageService.deleteImg(usedImgName);
             }
 
             // 북마크 연관관계 삭제: 게시글을 삭제해도 북마크는 남음
             nowPost.getBookmarks().forEach(CommunityBookmark::updateCommunityWhenDeleted);
 
             communityRepository.delete(nowPost);
-
-        } catch (CustomException e) {
-            throw e;
 
         } catch (Exception e) {
             throw e;
