@@ -3,6 +3,7 @@ package com.donguri.jejudorang.domain.user.api;
 import com.donguri.jejudorang.domain.user.api.swagger.AdminControllerDocs;
 import com.donguri.jejudorang.domain.user.service.AdminService;
 import com.donguri.jejudorang.domain.user.service.UserService;
+import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -50,5 +51,22 @@ public class AdminController implements AdminControllerDocs {
            model.addAttribute("message", e.getMessage());
            return "error/500";
        }
+    }
+
+    @GetMapping("/features")
+    public String adminPage(@CookieValue("access_token") Cookie token, HttpServletResponse response, Model model) {
+        try {
+            adminService.checkIsAdmin(token.getValue());
+            return "user/admin/adminFeaturesForm";
+
+        } catch (CustomException e) {
+            response.setStatus(e.getCustomErrorCode().getStatus().value());
+            return "error/404";
+
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            model.addAttribute("message", e.getMessage());
+            return "error/500";
+        }
     }
 }

@@ -1,7 +1,10 @@
 package com.donguri.jejudorang.domain.user.service;
 
 import com.donguri.jejudorang.domain.community.service.CommunityService;
+import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.common.s3.ImageService;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import com.donguri.jejudorang.global.error.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,11 +16,13 @@ import java.util.List;
 @Service
 public class AdminServiceI implements AdminService {
 
+    @Autowired private final JwtProvider jwtProvider;
     @Autowired private final UserService userService;
     @Autowired private final CommunityService communityService;
     @Autowired private final ImageService imageService;
 
-    public AdminServiceI(UserService userService, CommunityService communityService, ImageService imageService) {
+    public AdminServiceI(JwtProvider jwtProvider, UserService userService, CommunityService communityService, ImageService imageService) {
+        this.jwtProvider = jwtProvider;
         this.userService = userService;
         this.communityService = communityService;
         this.imageService = imageService;
@@ -25,7 +30,19 @@ public class AdminServiceI implements AdminService {
 
     @Override
     @Transactional
+    public void checkIsAdmin(String token) {
+        if(!jwtProvider.getAuthoritiesFromJWT(token).get(0).getAuthority().equals("ADMIN")
+                || !jwtProvider.validateJwtToken(token)) {
+            throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
+        }
+    }
+
+    @Override
+    @Transactional
     public void deleteUnusedImages(String token) {
+        // 권한 제한
+        checkIsAdmin(token);
+
         // 1. 사용중인 이미지 확인을 위해 Profile.imgName, Community.content의 이미지 이름 리스트 추출
         List<String> profileImgNames = userService.getAllUsersProfileImageNames()
                 .stream().filter(name -> !name.equals("default-img.png"))
@@ -40,4 +57,5 @@ public class AdminServiceI implements AdminService {
         // 2. 가져온 사용중 이미지 리스트를 버킷에 있는 이미지들의 이름과 비교해서, 존재하지 않는 파일은 삭제
         imageService.deleteOrphanedImagesWithNames(profileImgNames, allContents);
     }
+
 }
