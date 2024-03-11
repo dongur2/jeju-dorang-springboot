@@ -99,6 +99,7 @@ public class SecurityConfig {
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
+                                        "/admin",
                                         "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
                                         "/login/**",
                                         "/email/**",

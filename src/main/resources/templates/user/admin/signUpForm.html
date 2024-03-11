@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="fragments/layout">
+
+<head>
+<!--    <script th:src="@{/js/user/verifyEmail.js}"></script>-->
+    <title>관리자 가입 | 제주도랑</title>
+</head>
+<th layout:fragment="content">
+    <form id="sign-up-form" th:action th:method="post" th:object="${signUpRequest}"
+    style="width: 500px; padding:50px 35px; border:1px solid rgba(192,192,192,0.51); border-radius: 10px; display: flex; flex-direction: column; gap:15px">
+        <div>
+            <label for="externalId" class="form-label">아이디</label>
+            <input type="text" id="externalId" name="externalId" class="form-control">
+        </div>
+
+        <div>
+            <label for="nickname" class="form-label">닉네임</label>
+            <input type="text" id="nickname" name="nickname" class="form-control">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap:5px">
+            <label for="email" class="form-label">이메일</label>
+            <input type="email" id="email" name="email" class="form-control btn-verify">
+
+            <input type="text" id="email-verify-dto" name="emailToSend" class="form-control" style="display: none">
+            <button type="button" class="btn btn-outline-secondary btn-verify" onclick="sendMail()">인증번호 전송</button>
+
+            <div id="email-verify-container" style="display: none;">
+                <div>
+                    <label for="email-verify" class="form-label">이메일 인증번호 확인</label>
+                    <input type="text" id="email-verify" name="code" class="form-control btn-verify">
+
+                    <button type="button" class="btn btn-outline-warning btn-verify" onclick="checkMail()" style="width:100%; margin-top:5px">인증번호 확인</button>
+                    <input type="text" style="visibility: hidden" id="email-verify-status" name="isVerified"  value=false>
+                </div>
+            </div>
+        </div>
+
+
+        <div>
+            <label for="password" class="form-label">비밀번호</label>
+            <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordHelpBlock">
+        </div>
+
+        <div>
+            <label for="passwordForCheck" class="form-label">비밀번호 확인</label>
+            <input type="password" id="passwordForCheck" name="passwordForCheck" class="form-control" aria-describedby="passwordHelpBlock">
+        </div>
+
+        <!-- 약관 항목 동의 -->
+        <input class="form-check-input agreement-part" type="hidden" value="true" id="agreeForUsage" name="agreeForUsage">
+        <input class="form-check-input agreement-part" type="hidden" value="true" id="agreeForPrivateNecessary" name="agreeForPrivateNecessary">
+        <input class="form-check-input agreement-part" type="hidden" value="true" id="agreeForPrivateOptional" name="agreeForPrivateOptional">
+
+        <!-- role -->
+        <input type="hidden" value="admin" id="role" name="role">
+
+        <input class="btn btn-success" type="button" value="가입" onclick="submitSignUpForm()"
+        style="width:100%; height: 60px">
+    </form>
+
+
+    <script>
+
+        /*
+        * 인증 번호 전송 & 이메일 중복 확인
+        * */
+        function sendMail() {
+            var mailSendRequest = {
+                email: document.getElementById("email").value
+            };
+
+            if (mailSendRequest.email == null || mailSendRequest.email.trim() === "") {
+                showAlert('warning', '이메일을 입력해주세요.', true);
+
+            } else {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/email/available", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            showAlert('success', '이메일 인증 번호 전송이 완료되었습니다. 전송된 인증 번호를 입력해주세요.', true);
+
+                            // 인증 번호 입력란, 인증 번호 확인 버튼 노출
+                            document.getElementById("email-verify-container").style.display = "block";
+
+                        } else {
+                            showAlert('error', xhr.responseText, true);
+                        }
+                    }
+                }
+                xhr.send(JSON.stringify(mailSendRequest));
+            }
+        }
+
+        /*
+        * 인증 번호 확인
+        * */
+        function checkMail() {
+            var mailVerifyRequest = {
+                email: document.getElementById("email").value,
+                code: document.getElementById("email-verify").value
+            };
+
+            if (mailVerifyRequest.email === null || mailVerifyRequest.email.trim() === "") {
+                showAlert('warning', '이메일을 입력해주세요.', true);
+
+            } else if (mailVerifyRequest.code === null || mailVerifyRequest.code.trim() === "") {
+                showAlert('warning', '인증번호를 입력해주세요.', true);
+
+            } else if (mailVerifyRequest.code.trim().length < 6 || mailVerifyRequest.code.trim().length > 6) {
+                showAlert('warning', '인증번호는 6글자입니다.', true);
+
+            } else {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/email/verify", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            showAlert('success', '이메일 인증이 완료되었습니다', true);
+
+                            // 컨트롤러로 전달할 이메일 인증 상태 저장
+                            document.getElementById('email-verify-status').value = true;
+
+                            // 컨트롤러로 전달할 이메일 값 저장
+                            document.getElementById("email-verify-dto").value = document.getElementById("email").value;
+
+                            // 이메일 인증 완료 -> 이메일 수정, 인증 번호 전송/수정/확인 불가
+                            let elements = document.getElementsByClassName("btn-verify");
+                            for (var i = 0; i < elements.length; i++) {
+                                elements[i].disabled = true;
+                            }
+
+                            if(document.getElementById('btn-for-reset-pwd') != null) {
+                                document.getElementById('btn-for-reset-pwd').style.display = 'block';
+                            }
+
+                        } else {
+                            showAlert('error', xhr.responseText, true);
+                        }
+                    }
+                }
+                xhr.send(JSON.stringify(mailVerifyRequest));
+            }
+        }
+
+
+        /*
+        * 동의 항목 전체 선택/해제
+        * */
+        let allBox = document.getElementById('agree-all');
+        var checkBoxes = document.querySelectorAll('input[type="checkbox"]');
+
+        allBox.addEventListener('click', function() {
+            var isChecked = allBox.checked;
+
+            checkBoxes.forEach(function(checkbox) {
+                if (checkbox !== allBox) {
+                    checkbox.checked = isChecked;
+                }
+            });
+        });
+
+        /*
+        * 전체 동의 -> 개별 해제시 해제
+        * */
+        for (var box of checkBoxes) {
+            box.addEventListener('click', function () {
+                var allChecked = true;
+
+                checkBoxes.forEach(function(checkbox) {
+                    if (checkbox !== allBox && !checkbox.checked) {
+                        allChecked = false;
+                    }
+                });
+                allBox.checked = allChecked;
+            });
+        }
+
+
+        /*
+        * 폼 제출 (회원 가입)
+        * */
+        function submitSignUpForm() {
+            var form = document.getElementById('sign-up-form');
+            var formData = new FormData(form);
+
+            // 이용약관 동의 null -> true 변환 처리
+            let vars = ['agreeForUsage', 'agreeForPrivateNecessary', 'agreeForPrivateOptional'];
+            for(var agree of vars) {
+                if(!document.getElementById(agree).checked) {
+                    formData.set(agree, true);
+                }
+            }
+
+            formData.set(role, 'admin');
+
+            // 값 입력 누락 필터
+            let keys = formData.keys();
+            for(var key of keys) {
+                if (formData.get(key) === null || formData.get(key).trim() === "" || formData.get(key) === false) {
+
+                    switch (key) {
+                        case 'externalId': showAlert('warning', '아이디를 입력해주세요.', true); break;
+                        case 'nickname': showAlert('warning', '닉네임을 입력해주세요.', true); break;
+                        case 'emailToSend': showAlert('warning', '이메일을 인증해주세요.', true); break;
+                        case 'isVerified': showAlert('warning', '이메일을 인증해주세요.', true); break;
+                        case 'password': showAlert('warning', '비밀번호를 입력해주세요.', true); break;
+                        case 'passwordForCheck': showAlert('warning', '비밀번호를 한 번 더 입력해주세요.', true); break;
+                        case 'agreeForUsage': showAlert('warning', '필수 이용약관에 동의해야 가입이 가능합니다.', true); break;
+                        case 'agreeForPrivateNecessary': showAlert('warning', '필수 개인정보 수집 및 이용에 동의해야 가입이 가능합니다.', true); break;
+                        default: continue;
+                    }
+                    return;
+                }
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/user/signup", true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        window.location.href = "/";
+                    } else {
+                        showAlert('warning', xhr.responseText, true);
+                    }
+                }
+            }
+            xhr.send(formData);
+        }
+    </script>
+
+</th>
+</html>

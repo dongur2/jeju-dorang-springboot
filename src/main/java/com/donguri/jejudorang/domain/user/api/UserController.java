@@ -63,7 +63,7 @@ public class UserController implements UserControllerDocs {
             return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
 
         } catch (Exception e) {
-            log.error("회원 가입 실패");
+            log.error("회원 가입 실패: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

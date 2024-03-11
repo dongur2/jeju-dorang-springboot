@@ -183,6 +183,9 @@ public class UserServiceI implements UserService {
          * 새로운 회원(User) 생성
          * */
         try {
+
+            log.info("USER ROLE :: {}", signUpRequest.role().toString());
+
             User userToSave = signUpRequest.toEntity();
             userToSave.getProfile().updateImg(defaultImgName, defaultImgUrl);
 
