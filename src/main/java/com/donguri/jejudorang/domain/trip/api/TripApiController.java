@@ -3,17 +3,16 @@ package com.donguri.jejudorang.domain.trip.api;
 import com.donguri.jejudorang.domain.trip.api.swagger.TripApiControllerDocs;
 import com.donguri.jejudorang.domain.trip.dto.TripApiDataDto;
 import com.donguri.jejudorang.domain.trip.service.TripService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
+import com.donguri.jejudorang.global.error.CustomErrorCode;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import reactor.core.publisher.Mono;
@@ -22,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@RestController
+@Controller
 public class TripApiController implements TripApiControllerDocs {
     @Value("${jeju.key}")
     private String apiKey;
@@ -33,8 +32,7 @@ public class TripApiController implements TripApiControllerDocs {
     private final String locale = "kr";
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
 
-    @Autowired
-    private TripService tripService;
+    @Autowired private TripService tripService;
 
     @GetMapping("/trip/api/data")
     public String fetch() {

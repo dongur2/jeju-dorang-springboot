@@ -6,7 +6,6 @@ import com.donguri.jejudorang.domain.community.dto.response.*;
 import com.donguri.jejudorang.domain.community.service.ChatService;
 import com.donguri.jejudorang.domain.community.service.CommunityService;
 import com.donguri.jejudorang.domain.community.service.PartyService;
-import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -104,7 +103,7 @@ public class CommunityController implements CommunityControllerDocs {
         } catch (CustomException e) {
             response.setStatus(404);
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
-            return "error/error404";
+            return "404";
         }
     }
 
@@ -250,7 +249,7 @@ public class CommunityController implements CommunityControllerDocs {
             log.error("상세글 불러오기 실패: {}", e.getCustomErrorCode().getMessage());
             response.setStatus(e.getCustomErrorCode().getStatus().value());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
-            return "error/error404";
+            return "404";
 
         } catch (Exception e) {
             log.error("상세글 불러오기 실패: [서버 오류] {}", e.getMessage());

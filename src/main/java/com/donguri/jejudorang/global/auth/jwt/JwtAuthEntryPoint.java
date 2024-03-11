@@ -1,18 +1,16 @@
 package com.donguri.jejudorang.global.auth.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
 /*
 * Spring Security에서 사용자가 인증되지 않았을 때 호출
@@ -22,27 +20,28 @@ import java.util.Map;
 @Component
 public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
 
+    @Autowired JwtProvider jwtProvider;
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException, ServletException {
+            throws IOException {
 
-        log.error("Unauthorized error: {}", authException.getMessage());
+        /*
+        * 로그인하지 않았거나, 유효한 쿠키가 아닐 경우 로그인 화면으로 리다이렉트 (401: 인증되지 않음)
+        * */
+        if(request.getCookies() == null || Arrays.stream(request.getCookies()).anyMatch(cookie -> cookie.getName().equals("access_token"))
+        || !jwtProvider.validateJwtToken(Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("access_token")).toList().get(0).getValue())) {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendRedirect("/user/login");
 
-        // HTTP 응답 헤더 설정: JSON, 상태 코드 401(unauthorized)
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.sendRedirect("/user/login");
-
-        // HTTP 응답 바디 설정: 상태 코드 401, 에러 메세지, 요청 경로 포함 맵 생성
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
-
-        // 생성한 맵을 ObjectMapper를 사용해 JSON형식으로 변환해 응답 스트림에 전송
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
-
+        /*
+        * 로그인했지만 권한이 없을 경우 403 에러 페이지로 리다이렉트 (403: 권한 없음)
+        * */
+        } else {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
     }
+
 }

@@ -103,7 +103,7 @@ public class TripController implements TripControllerDocs {
         } catch (CustomException e) {
             response.setStatus(e.getCustomErrorCode().getStatus().value());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
-            return "error/error404";
+            return "404";
         }
     }
 
