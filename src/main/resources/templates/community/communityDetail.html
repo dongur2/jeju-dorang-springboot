@@ -254,15 +254,15 @@
                         <button class="btn btn-outline-success" id="re-cmt-btn" th:onclick="'openRecommentWriteForm(' + ${cmt.cmtId} + ')'" style="width:95%; height:60%">답글 달기</button>
                     </div>
 
-                    <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
+                    <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출: 삭제 버튼은 관리자에게도 노출 -->
                     <div class="cmt-card-header-btns"
                          sec:authorize="isAuthenticated()"
-                         th:if="${#authentication.name == cmt.writerId}"
                         style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end">
 
-                        <button type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
+                        <button th:if="${#authentication.name == cmt.writerId}" type="button" class="btn btn-outline-secondary cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
                                 style="width:45%; height:60%;">수정</button>
-                        <button type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId} + ')'">삭제</button>
+                        <button th:if="${#authentication.name == cmt.writerId || #authorization.getAuthentication().authorities[0].authority.contains('ADMIN')}"
+                                type="button" class="btn btn-secondary cmt-delete-btn" style="width:45%; height:60%;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId} + ')'">삭제</button>
                     </div>
 
                 </div>
@@ -327,15 +327,15 @@
                             </div>
                         </div>
 
-                        <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출 -->
+                        <!-- 수정/삭제 버튼: 댓글 작성자일 경우에만 노출; 삭제버튼은 관리자에게도 노출-->
                         <div class="re-cmt-card-header-btns"
                              sec:authorize="isAuthenticated()"
-                             th:if="${#authentication.getName() == cmt.writerId}"
                              style="width:150px; margin-left:auto; display: flex; flex-direction: row; justify-content: space-between; align-items: center">
 
-                            <button type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
+                            <button th:if="${#authentication.getName() == cmt.writerId}" type="button" class="btn btn-outline-secondary re-cmt-modify-btn" th:onclick="'openCmtModifyInput('+ ${cmt.cmtId} + ')'"
                                     style="width:45%; height:40px;">수정</button>
-                            <button type="button" class="btn btn-secondary re-cmt-delete-btn" style="width:45%; height:40px;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId} + ')'">삭제</button>
+                            <button th:if="${#authentication.name == cmt.writerId || #authorization.getAuthentication().authorities[0].authority.contains('ADMIN')}"
+                                    type="button" class="btn btn-secondary re-cmt-delete-btn" style="width:45%; height:40px;" th:onclick="'deleteCmtRequest(' + ${cmt.cmtId} + ')'">삭제</button>
                         </div>
                     </div>
 
