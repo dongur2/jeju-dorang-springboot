@@ -31,7 +31,7 @@ public class AdminController implements AdminControllerDocs {
     * */
     @GetMapping
     public String adminRegisterForm() {
-        return "/user/admin/signUpForm";
+        return "user/admin/signUpForm";
     }
 
 
@@ -60,10 +60,12 @@ public class AdminController implements AdminControllerDocs {
             return "user/admin/adminFeaturesForm";
 
         } catch (CustomException e) {
+            log.error("관리자 페이지 조회 실패: {}",e.getCustomErrorCode().getMessage());
             response.setStatus(e.getCustomErrorCode().getStatus().value());
             return "error/404";
 
         } catch (Exception e) {
+            log.error("관리자 페이지 조회 실패; 서버 오류 {}", e.getMessage());
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             model.addAttribute("message", e.getMessage());
             return "error/500";
