@@ -45,7 +45,7 @@ public class UserController implements UserControllerDocs {
      * */
     @GetMapping("/signup")
     public String registerForm() {
-        return "/user/login/signUpForm";
+        return "user/login/signUpForm";
     }
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid SignUpRequest signUpRequest, BindingResult bindingResult) {
