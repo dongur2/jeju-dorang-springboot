@@ -2,7 +2,6 @@ package com.donguri.jejudorang.domain.user.api;
 
 import com.donguri.jejudorang.domain.user.api.swagger.AdminControllerDocs;
 import com.donguri.jejudorang.domain.user.service.AdminService;
-import com.donguri.jejudorang.domain.user.service.UserService;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -62,7 +60,7 @@ public class AdminController implements AdminControllerDocs {
         } catch (CustomException e) {
             log.error("관리자 페이지 조회 실패: {}",e.getCustomErrorCode().getMessage());
             response.setStatus(e.getCustomErrorCode().getStatus().value());
-            return "error/404";
+            return "error/403";
 
         } catch (Exception e) {
             log.error("관리자 페이지 조회 실패; 서버 오류 {}", e.getMessage());
