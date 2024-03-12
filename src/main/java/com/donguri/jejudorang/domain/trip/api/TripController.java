@@ -40,11 +40,13 @@ public class TripController implements TripControllerDocs {
     * */
     @GetMapping("/lists")
     public String getTripList(@RequestParam(name = "search", required = false) String word,
-                              @RequestParam(name = "nowPage", required = false, defaultValue = "0") Integer nowPage,
+                              @RequestParam(name = "nowPage", required = false, defaultValue = "1") Integer nowPage,
                               @RequestParam(name = "category", required = false, defaultValue = "전체") String category,
                               Model model, HttpServletResponse response) {
         try {
-            Pageable pageable = PageRequest.of(nowPage, 10);
+            int realPageNum = nowPage - 1;
+
+            Pageable pageable = PageRequest.of(realPageNum, 10);
             Page<TripListResponseDto> result;
 
             // 검색어가 없을 경우
@@ -74,7 +76,7 @@ public class TripController implements TripControllerDocs {
             if(result == null) {
                 model.addAttribute("endPage", 0);
             } else {
-                model.addAttribute("endPage", result.getTotalPages());
+                model.addAttribute("endPage", result.getTotalPages() + 1);
             }
 
             return "trip/tripList";
