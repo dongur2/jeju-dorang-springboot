@@ -135,6 +135,12 @@
         /*
         * 로그인
         * */
+        document.getElementById('sign-in-form').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                requestSignIn();
+            }
+        });
         function requestSignIn() {
             let externalId = document.getElementById('externalId').value;
             let password = document.getElementById('password').value;
