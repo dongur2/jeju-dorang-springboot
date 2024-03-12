@@ -142,7 +142,6 @@ public class TripServiceI implements TripService{
             }
 
         } catch (CustomException e) {
-            log.error("여행 상세글 조회 실패: {}", e.getCustomErrorCode().getMessage());
             throw e;
         }
     }

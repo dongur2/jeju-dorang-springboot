@@ -103,9 +103,10 @@ public class TripController implements TripControllerDocs {
             return "trip/tripDetail";
 
         } catch (CustomException e) {
+            log.error("여행 상세글 조회 실패: {}", e.getCustomErrorCode().getMessage());
             response.setStatus(e.getCustomErrorCode().getStatus().value());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
-            return "404";
+            return "error/404";
         }
     }
 
