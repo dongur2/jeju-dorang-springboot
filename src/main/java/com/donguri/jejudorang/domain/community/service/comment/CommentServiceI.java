@@ -182,8 +182,9 @@ public class CommentServiceI implements CommentService{
             Comment cmtToDelete = commentRepository.findById(cmtId)
                     .orElseThrow(() -> new CustomException(CustomErrorCode.COMMENT_NOT_FOUND));
 
-            // 로그인 유저가 댓글 작성자가 아닐 경우 예외 처리
-            if(!userNameFromJwtToken.equals(cmtToDelete.getUser().getProfile().getExternalId())) {
+            // 로그인 유저가 댓글 작성자가 아닐 경우 or 관리자가 아닐 경우 예외 처리
+            if(!userNameFromJwtToken.equals(cmtToDelete.getUser().getProfile().getExternalId())
+                && !jwtProvider.getAuthoritiesFromJWT(accessToken).get(0).getAuthority().equals("ADMIN")) {
                 throw new CustomException(CustomErrorCode.PERMISSION_ERROR);
             }
 

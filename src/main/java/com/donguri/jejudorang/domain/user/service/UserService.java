@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -76,4 +77,8 @@ public interface UserService {
 
     // 마이페이지: 내 북마크 목록 조회
     Page<?> getMyBookmarks(String accessToken, String type, Pageable pageable);
+
+
+    // 관리자: 모든 프로필 이미지 url 수집
+    List<String> getAllUsersProfileImageNames();
 }

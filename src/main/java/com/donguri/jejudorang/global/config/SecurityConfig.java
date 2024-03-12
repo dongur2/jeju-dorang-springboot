@@ -77,8 +77,6 @@ public class SecurityConfig {
     * */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("** init of http security START ** ");
-
         http
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable) // HTTP 기본 인증 비활성화
@@ -99,12 +97,13 @@ public class SecurityConfig {
                         (authorizationManagerRequestMatcherRegistry
                                 -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                                         "/",
+                                        "/admin",
                                         "/user/login", "/user/signup", "/user/signup/**", "/user/logout",
                                         "/login/**",
                                         "/email/**",
                                         "/trip/lists**", "/trip/places/*",
                                         "/community/boards/**",
-                                        "/templates/**", "/error/**", "/trip/api/data")
+                                        "/templates/**", "/error/**")
                                 .permitAll()
                                 .requestMatchers(
                                         "/user/quit",
@@ -113,8 +112,8 @@ public class SecurityConfig {
                                         "/community/post/**", "/tui-editor/**",
                                         "/community/comments/**",
                                         "/community/parties/{communityId}/state",
-                                        "/bookmarks/**", "/bookmarks"
-                                ).authenticated()
+                                        "/bookmarks/**", "/bookmarks").authenticated()
+                                .requestMatchers("/trip/api/data", "/admin/img").hasAuthority("ADMIN").anyRequest().authenticated()
                         )
                 )
 
@@ -141,7 +140,7 @@ public class SecurityConfig {
         return web -> web
                 .ignoring()
                 .requestMatchers("/img/**", "/css/**", "/js/**", "/favicon.ico",
-                        "/swagger-ui/**", "/api-docs", "/api-docs/json", "/v3/api-docs");
+                        "/swagger-ui/**", "/api-docs", "/api-docs/json", "/v3/api-docs", "/error/**");
     }
 
 }

@@ -186,6 +186,8 @@
 
         </div>
 
+        <!-- role -->
+        <input type="hidden" value="user" id="role" name="role">
 
         <input class="btn btn-success" type="button" value="가입" onclick="submitSignUpForm()"
         style="width:100%; height: 60px">
@@ -328,6 +330,9 @@
                     formData.set(agree, false);
                 }
             }
+
+            // 권한 설정: USER
+            formData.set(role, 'user');
 
             // 값 입력 누락 필터
             let keys = formData.keys();
