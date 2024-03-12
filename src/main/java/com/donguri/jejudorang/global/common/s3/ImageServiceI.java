@@ -123,6 +123,10 @@ public class ImageServiceI implements ImageService {
                        .toList());
            });
 
+           imgNamesFromS3.forEach(name -> log.info("S3 is {}", name));
+           log.info("=================================================");
+           imgNameList.forEach(name -> log.info("DB is {}", name));
+
            // 사용하고 있는 이미지가 있을 경우 & 버킷에 이미지가 존재할 경우
            if (!imgNameList.isEmpty() && !imgNamesFromS3.isEmpty()) {
                imgNamesFromS3.forEach(name -> {
