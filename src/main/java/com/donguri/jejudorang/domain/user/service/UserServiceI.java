@@ -598,18 +598,12 @@ public class UserServiceI implements UserService {
     @Override
     @Transactional
     public void withdrawKakaoUser(String accessToken) {
-        try {
-            Long socialCodeFromJwt = jwtProvider.getIdFromJwtToken(accessToken);
-            Long nowUserId = userRepository.findByLoginTypeAndSocialCode(LoginType.KAKAO, String.valueOf(socialCodeFromJwt))
-                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND))
-                    .getId();
+        Long idFromJwt = jwtProvider.getIdFromJwtToken(accessToken);
+        Long nowUserId = userRepository.findByLoginTypeAndId(LoginType.KAKAO, String.valueOf(idFromJwt))
+                .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND))
+                .getId();
 
-            cutRelationshipAndDeleteAll(nowUserId);
-
-        } catch (Exception e) {
-            log.error("회원을 삭제하지 못했습니다. {}", e.getMessage());
-            throw e;
-        }
+        cutRelationshipAndDeleteAll(nowUserId);
     }
 
 
