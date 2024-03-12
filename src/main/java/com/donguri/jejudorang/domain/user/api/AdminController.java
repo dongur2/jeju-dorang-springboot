@@ -55,7 +55,7 @@ public class AdminController implements AdminControllerDocs {
     public String adminPage(@CookieValue("access_token") Cookie token, HttpServletResponse response, Model model) {
         try {
             adminService.checkIsAdmin(token.getValue());
-            return "user/admin/adminFeaturesForm";
+            return "user/admin/adminFeatures";
 
         } catch (CustomException e) {
             log.error("관리자 페이지 조회 실패: {}",e.getCustomErrorCode().getMessage());
