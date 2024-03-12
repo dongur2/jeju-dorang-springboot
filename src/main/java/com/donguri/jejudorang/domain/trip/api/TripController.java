@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -73,16 +74,15 @@ public class TripController implements TripControllerDocs {
             model.addAttribute("trips", result);
 
             // 데이터가 없을 경우 페이지 수 null -> 0 처리
-            if(result == null) {
+            if(result.getTotalPages() < 1) {
                 model.addAttribute("endPage", 0);
             } else {
                 model.addAttribute("endPage", result.getTotalPages() + 1);
             }
-
             return "trip/tripList";
 
         } catch (Exception e) {
-            response.setStatus(500);
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             model.addAttribute("errorMsg", e.getMessage());
             return "error/errorPage";
         }
