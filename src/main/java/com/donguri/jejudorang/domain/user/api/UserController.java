@@ -127,8 +127,12 @@ public class UserController implements UserControllerDocs {
 
             return new ResponseEntity<>(HttpStatus.OK);
 
+        } catch (CustomException e) {
+            log.error("회원 삭제 실패: {}", e.getCustomErrorCode().getMessage());
+            return new ResponseEntity<>(e.getCustomErrorCode().getMessage(), e.getCustomErrorCode().getStatus());
+
         } catch (Exception e) {
-            log.error("회원 삭제 실패: {}", e.getMessage());
+            log.error("회원 삭제 실패 [서버 오류] {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
