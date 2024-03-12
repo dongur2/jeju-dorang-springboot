@@ -160,7 +160,7 @@ public class CommunityController implements CommunityControllerDocs {
     * */
     @GetMapping("/boards/{type}")
     public String getCommunityList(@PathVariable(name = "type") String type,
-                                   @RequestParam(name = "page", required = false, defaultValue = "0") Integer nowPage,
+                                   @RequestParam(name = "page", required = false, defaultValue = "1") Integer nowPage,
                                    @RequestParam(name = "state", required = false, defaultValue = "all") String state, // all, recruiting, done
                                    @RequestParam(name = "order", required = false, defaultValue = "recent") String order, // recent, comment, bookmark
                                    @RequestParam(name = "search", required = false) String searchWord,
@@ -168,11 +168,13 @@ public class CommunityController implements CommunityControllerDocs {
                                    Model model) {
 
         try {
+            int realPageNum = nowPage - 1;
+
             // 넘어온 정렬 기준값 -> 컬럼명으로 변환
             order = convertToProperty(order);
 
             // 현재 페이지, 정렬 기준 컬럼명으로 Pageable 인스턴스
-            Pageable pageable = PageRequest.of(nowPage, 5, Sort.by(order).descending());
+            Pageable pageable = PageRequest.of(realPageNum, 5, Sort.by(order).descending());
 
             Page<?> data = null;
             if (type.equals("parties")) {

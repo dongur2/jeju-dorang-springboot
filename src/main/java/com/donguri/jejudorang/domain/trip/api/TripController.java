@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,11 +41,13 @@ public class TripController implements TripControllerDocs {
     * */
     @GetMapping("/lists")
     public String getTripList(@RequestParam(name = "search", required = false) String word,
-                              @RequestParam(name = "nowPage", required = false, defaultValue = "0") Integer nowPage,
+                              @RequestParam(name = "nowPage", required = false, defaultValue = "1") Integer nowPage,
                               @RequestParam(name = "category", required = false, defaultValue = "전체") String category,
                               Model model, HttpServletResponse response) {
         try {
-            Pageable pageable = PageRequest.of(nowPage, 10);
+            int realPageNum = nowPage - 1;
+
+            Pageable pageable = PageRequest.of(realPageNum, 10);
             Page<TripListResponseDto> result;
 
             // 검색어가 없을 경우
@@ -71,16 +74,15 @@ public class TripController implements TripControllerDocs {
             model.addAttribute("trips", result);
 
             // 데이터가 없을 경우 페이지 수 null -> 0 처리
-            if(result == null) {
+            if(result.getTotalPages() < 1) {
                 model.addAttribute("endPage", 0);
             } else {
-                model.addAttribute("endPage", result.getTotalPages());
+                model.addAttribute("endPage", result.getTotalPages() + 1);
             }
-
             return "trip/tripList";
 
         } catch (Exception e) {
-            response.setStatus(500);
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             model.addAttribute("errorMsg", e.getMessage());
             return "error/errorPage";
         }
@@ -101,9 +103,10 @@ public class TripController implements TripControllerDocs {
             return "trip/tripDetail";
 
         } catch (CustomException e) {
+            log.error("여행 상세글 조회 실패: {}", e.getCustomErrorCode().getMessage());
             response.setStatus(e.getCustomErrorCode().getStatus().value());
             model.addAttribute("message", e.getCustomErrorCode().getMessage());
-            return "404";
+            return "error/404";
         }
     }
 

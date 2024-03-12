@@ -65,7 +65,7 @@
                         </a>
                     </li>
 
-                    <li th:if="${nowPage > 0}" class="page-item">
+                    <li th:if="${nowPage > 1}" class="page-item">
                         <a class="page-link" href="#" th:text="${nowPage - 1}" th:href="@{/trip/lists(category=${nowCategory}, nowPage=${nowPage - 1}, search=${searchWord})}">1</a>
                     </li>
                     <li class="page-item">

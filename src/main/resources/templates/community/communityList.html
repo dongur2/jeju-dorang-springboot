@@ -146,6 +146,13 @@
             </div>
 
 
+            <!-- 데이터 없을 경우 (검색 결과 없을 경우) -->
+            <div th:if="${endPage == 0}"
+                 style="width:100%; height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family:'GmarketSansMedium'">
+                <div style="width:150px; height:150px; font-size:120px; display:flex; justify-content: center; align-items: center">&#x1FAE5;</div>
+                <div style="width:400px; height:70px; font-size:30px; color: #696969; display:flex; justify-content: center; align-items: center">검색 결과가 없습니다.</div>
+            </div>
+
             <!--     게시글 카드       -->
             <div class="board-cards-box">
                 <div th:if="${nowType == 'parties'}" th:each="post : ${posts}" class="card w-75 mb-3" style="min-width:100%; max-height:170px;">
@@ -220,12 +227,12 @@
                 <nav aria-label="Page navigation example">
                     <ul class="pagination" th:if="${nowType == 'parties'}">
                         <li class="page-item">
-                            <a class="page-link" th:href="@{/community/boards/parties(page='0', state=${nowState}, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" aria-label="Previous">
+                            <a class="page-link" th:href="@{/community/boards/parties(page='1', state=${nowState}, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
 
-                        <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/community/boards/parties(page=${nowPage}-1, state=${nowState}, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage - 1}">0</a></li>
+                        <li class="page-item" th:if="${nowPage > 1}"><a class="page-link" th:href="@{/community/boards/parties(page=${nowPage}-1, state=${nowState}, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage - 1}">0</a></li>
                         <li class="page-item"}><a class="page-link" th:href="@{/community/boards/parties(page=${nowPage}, state=${nowState}, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage}">2</a>
                         <li class="page-item" th:if="${nowPage < endPage - 1}"><a class="page-link" th:href="@{/community/boards/parties(page=${nowPage}+1, state=${nowState}, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage + 1}">3</a></li>
 
@@ -239,12 +246,12 @@
 
                     <ul class="pagination" th:if="${nowType == 'chats'}">
                         <li class="page-item">
-                            <a class="page-link" th:href="@{/community/boards/chats(page='0', order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" aria-label="Previous">
+                            <a class="page-link" th:href="@{/community/boards/chats(page='1', order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
 
-                        <li class="page-item" th:if="${nowPage > 0}"><a class="page-link" th:href="@{/community/boards/chats(page=${nowPage}-1, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage - 1}">0</a></li>
+                        <li class="page-item" th:if="${nowPage > 1}"><a class="page-link" th:href="@{/community/boards/chats(page=${nowPage}-1, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage - 1}">0</a></li>
                         <li class="page-item"><a class="page-link" th:href="@{/community/boards/chats(page=${nowPage}, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage}">2</a>
                         <li class="page-item" th:if="${nowPage < endPage - 1}"><a class="page-link" th:href="@{/community/boards/chats(page=${nowPage}+1, order=${order}, search=${currentSearchWord}, tags=${currentSearchTag})}" href="#" th:text="${nowPage + 1}">3</a></li>
 

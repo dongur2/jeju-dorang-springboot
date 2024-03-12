@@ -149,9 +149,8 @@
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     window.location.reload();
-
                 } else {
-                    alert(xhr.responseText);
+                    showAlert('error', xhr.responseText, true);
                 }
             };
             xhr.send(formData);
