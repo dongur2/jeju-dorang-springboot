@@ -8,9 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -37,17 +39,17 @@ public class AdminController implements AdminControllerDocs {
     * S3 Bucket의 사용되지 않는 이미지 삭제
     * - 게시글 작성중 이미지 업로드 후 글 작성 미완료/취소할 경우 버킷에 남는 이미지
     * */
-    @GetMapping("/img")
-    public String deleteImages(@CookieValue("access_token") Cookie token, HttpServletResponse response, Model model) {
+    @DeleteMapping("/img")
+    public ResponseEntity<?> deleteImages(@CookieValue("access_token") Cookie token, HttpServletResponse response, Model model) {
        try {
            adminService.deleteUnusedImages(token.getValue());
-           return "redirect:/";
+           response.setStatus(HttpStatus.OK.value());
+           return new ResponseEntity<>(HttpStatus.OK);
 
        } catch (Exception e) {
            log.error("이미지 삭제 실패: {}", e.getMessage());
            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-           model.addAttribute("message", e.getMessage());
-           return "error/500";
+           return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
        }
     }
 

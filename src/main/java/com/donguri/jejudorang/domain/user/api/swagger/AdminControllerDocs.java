@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 
@@ -24,7 +25,7 @@ public interface AdminControllerDocs {
             @ApiResponse(responseCode = "403", description = "미사용 이미지 일괄 삭제 실패: 권한 없는 사용자"),
             @ApiResponse(responseCode = "500", description = "미사용 이미지 일괄 삭제 실패: 서버 에러 발생")
     })
-    String deleteImages(@CookieValue("access_token") Cookie token, HttpServletResponse response, Model model);
+    ResponseEntity<?> deleteImages(@CookieValue("access_token") Cookie token, HttpServletResponse response, Model model);
 
     @Parameter(name = "access_token", description = "사용자의 액세스 토큰", required = true, schema = @Schema(type = "string", format = "JWT"))
     @Operation(summary = "마이페이지의 관리자페이지 화면을 출력")

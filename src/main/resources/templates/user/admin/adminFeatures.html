@@ -16,14 +16,40 @@
 
         <!-- 컨텐츠 블록  -->
         <div class="board-item board-main"
-             style="width: 100%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%; background: pink">
+             style="width: 100%; height:100%; display: flex; flex-direction:column; justify-content: center; align-content: center; gap:3%">
 
-            <table style="width:100%; height:750px; margin-bottom:auto; border: 1px solid rgba(134,134,134,0.37); border-radius: 15px;
-                            display: flex; flex-direction: column; gap: 3%; justify-content: center; align-items: center; background: yellowgreen">
-            </table>
+            <form class="row g-3"
+                  style="width:100%; height:250px; margin-bottom:auto; display: flex; flex-direction: column; gap: 3%; align-items: center; padding:1%;">
+
+                <div class="col-12">
+                    <label for="deleteImgs" class="form-label" style="font-weight: bold">미사용 이미지 삭제</label>
+                    <button type="button" class="form-control" id="deleteImgs" onclick="request()"
+                            style="width:500px; background: #FB7A51; color:white; border: none">삭제</button>
+                    <p style="font-size:14px; color:#696969">S3 Bucket에서 미사용되고있는 이미지 파일을 일괄 삭제합니다. </p>
+                </div>
+
+            </form>
         </div>
 
     </div>
+
+    <script>
+        function request() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/admin/img", true);
+
+            xhr.onreadystatechange = function () {
+                if(xhr.readyState === 4) {
+                    if(xhr.status === 200) {
+                        showAlert('success', '이미지 삭제가 완료되었습니다.', true);
+                    } else {
+                        showAlert('error', xhr.responseText, true);
+                    }
+                }
+            }
+            xhr.send();
+        }
+    </script>
 
 </th>
 </html>
