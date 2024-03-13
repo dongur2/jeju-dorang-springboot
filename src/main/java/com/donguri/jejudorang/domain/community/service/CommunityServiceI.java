@@ -13,15 +13,12 @@ import com.donguri.jejudorang.domain.community.entity.comment.IsDeleted;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.domain.community.service.tag.CommunityWithTagService;
-import com.donguri.jejudorang.domain.user.entity.Role;
 import com.donguri.jejudorang.domain.user.entity.User;
-import com.donguri.jejudorang.domain.user.repository.RoleRepository;
 import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.common.s3.ImageService;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -29,35 +26,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-@Service
 @Slf4j
+@Service
 public class CommunityServiceI implements CommunityService {
-
-    @Autowired private final JwtProvider jwtProvider;
-
-    @Autowired private final ImageService imageService;
-    @Autowired private final CommentService commentService;
-
-    @Autowired private final UserRepository userRepository;
-    @Autowired private final CommunityRepository communityRepository;
-    @Autowired private final CommunityWithTagService communityWithTagService;
-
     private final String bucketUrl;
+    private final JwtProvider jwtProvider;
 
-    public CommunityServiceI(JwtProvider jwtProvider, ImageService imageService, CommentService commentService, UserRepository userRepository, CommunityRepository communityRepository, CommunityWithTagService communityWithTagService, @Value("${aws.s3.url}") String bucketUrl) {
+    private final ImageService imageService;
+    private final CommentService commentService;
+    private final CommunityWithTagService communityWithTagService;
+
+    private final UserRepository userRepository;
+    private final CommunityRepository communityRepository;
+
+    @Autowired
+    public CommunityServiceI(JwtProvider jwtProvider, ImageService imageService, CommentService commentService, UserRepository userRepository, CommunityRepository communityRepository, CommunityWithTagService communityWithTagService,
+                             @Value("${aws.s3.url}") String bucketUrl) {
+        this.bucketUrl = bucketUrl;
         this.jwtProvider = jwtProvider;
         this.imageService = imageService;
         this.commentService = commentService;
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
         this.communityWithTagService = communityWithTagService;
-        this.bucketUrl = bucketUrl;
     }
 
     @Override
@@ -269,6 +265,5 @@ public class CommunityServiceI implements CommunityService {
             return "chats";
         }
     }
-
 
 }

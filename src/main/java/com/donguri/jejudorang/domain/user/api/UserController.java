@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
@@ -21,23 +20,21 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Controller
 @RequestMapping("/user")
 public class UserController implements UserControllerDocs {
-
     private final int cookieTime;
     private final String kakaoApiKey;
-    @Autowired private final UserService userService;
+    private final UserService userService;
 
-    public UserController(@Value("${jwt.cookie-expire}") int cookieTime, UserService userService, @Value("${kakao.key}") String kakaoApiKey) {
+    @Autowired
+    public UserController(@Value("${jwt.cookie-expire}") int cookieTime, @Value("${kakao.key}") String kakaoApiKey, UserService userService) {
         this.cookieTime = cookieTime;
-        this.userService = userService;
         this.kakaoApiKey = kakaoApiKey;
+        this.userService = userService;
     }
-
 
 
     /*

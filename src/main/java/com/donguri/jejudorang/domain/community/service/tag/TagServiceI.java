@@ -4,23 +4,22 @@ import com.donguri.jejudorang.domain.community.entity.tag.Tag;
 import com.donguri.jejudorang.domain.community.repository.tag.TagRepository;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
-import jakarta.validation.ValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class TagServiceI implements TagService{
-    @Autowired
-    TagRepository tagRepository;
+    private final TagRepository tagRepository;
+
 
     @Override
     @Transactional
     public Optional<Tag> checkDuplicated(String tag) {
         return tagRepository.findByKeyword(tag);
-
     }
 
     @Override

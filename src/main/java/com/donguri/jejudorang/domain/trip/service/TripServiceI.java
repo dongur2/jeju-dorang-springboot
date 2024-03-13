@@ -8,8 +8,8 @@ import com.donguri.jejudorang.domain.trip.repository.TripRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,15 +20,10 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TripServiceI implements TripService{
-
-    @Autowired private final JwtProvider jwtProvider;
-    @Autowired private final TripRepository tripRepository;
-
-    public TripServiceI(JwtProvider jwtProvider, TripRepository tripRepository) {
-        this.jwtProvider = jwtProvider;
-        this.tripRepository = tripRepository;
-    }
+    private final JwtProvider jwtProvider;
+    private final TripRepository tripRepository;
 
 
     /*

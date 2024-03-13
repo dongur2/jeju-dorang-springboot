@@ -23,9 +23,7 @@ import java.util.List;
 
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    @Value("${jwt.cookie-expire}")
-    private int cookieTime;
+    @Value("${jwt.cookie-expire}") private int cookieTime;
 
     @Autowired private JwtProvider jwtProvider;
     @Autowired private JwtUserDetailsService jwtUserDetailsService;

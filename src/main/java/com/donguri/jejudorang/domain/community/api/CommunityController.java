@@ -34,22 +34,22 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/community")
 public class CommunityController implements CommunityControllerDocs {
-
     private final String kakaoApiKey;
     private final int viewCookieTime;
 
-    @Autowired private final CommunityService communityService;
-    @Autowired private final ChatService chatService;
-    @Autowired private final PartyService partyService;
+    private final ChatService chatService;
+    private final PartyService partyService;
+    private final CommunityService communityService;
 
+    @Autowired
     public CommunityController(@Value("${kakao.key}") String kakaoApiKey,
                                @Value("${view.cookie-expire}") int viewCookieTime,
-                               CommunityService communityService, ChatService chatService, PartyService partyService) {
+                               ChatService chatService, PartyService partyService, CommunityService communityService) {
         this.kakaoApiKey = kakaoApiKey;
         this.viewCookieTime = viewCookieTime;
-        this.communityService = communityService;
         this.chatService = chatService;
         this.partyService = partyService;
+        this.communityService = communityService;
     }
 
 

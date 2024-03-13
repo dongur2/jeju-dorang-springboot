@@ -6,8 +6,8 @@ import com.donguri.jejudorang.global.auth.oauth.OAuth2UserService;
 import com.donguri.jejudorang.global.auth.jwt.JwtAuthEntryPoint;
 import com.donguri.jejudorang.global.auth.jwt.JwtAuthenticationFilter;
 import com.donguri.jejudorang.global.auth.jwt.JwtUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,27 +23,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
-@Slf4j
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtUserDetailsService jwtUserDetailsService;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final OAuth2UserService oAuth2UserService;
 
-    @Autowired private final JwtUserDetailsService jwtUserDetailsService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
 
-    @Autowired private final JwtAuthEntryPoint jwtAuthEntryPoint;
-
-    @Autowired private final OAuth2UserService oAuth2UserService;
-
-    @Autowired private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    @Autowired private final OAuth2FailureHandler oAuth2FailureHandler;
-
-    public SecurityConfig(JwtUserDetailsService jwtUserDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint, OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler, OAuth2FailureHandler oAuth2FailureHandler) {
-        this.jwtUserDetailsService = jwtUserDetailsService;
-        this.jwtAuthEntryPoint = jwtAuthEntryPoint;
-        this.oAuth2UserService = oAuth2UserService;
-        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
-        this.oAuth2FailureHandler = oAuth2FailureHandler;
-    }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {

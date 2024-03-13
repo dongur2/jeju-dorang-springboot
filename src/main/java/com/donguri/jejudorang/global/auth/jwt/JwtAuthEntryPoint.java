@@ -19,7 +19,6 @@ import java.util.Arrays;
 @Slf4j
 @Component
 public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
-
     @Autowired JwtProvider jwtProvider;
 
     @Override

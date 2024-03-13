@@ -4,21 +4,18 @@ import com.donguri.jejudorang.domain.bookmark.api.swagger.BookmarkControllerDocs
 import com.donguri.jejudorang.domain.bookmark.service.BookmarkService;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/bookmarks")
 public class BookmarkController implements BookmarkControllerDocs {
-    @Autowired private final BookmarkService bookmarkService;
-    public BookmarkController(BookmarkService bookmarkService) {
-        this.bookmarkService = bookmarkService;
-    }
-
+    private final BookmarkService bookmarkService;
 
     /*
     * 북마크 생성

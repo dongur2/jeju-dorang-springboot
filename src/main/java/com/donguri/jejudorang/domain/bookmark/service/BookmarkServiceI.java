@@ -14,8 +14,8 @@ import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,23 +25,15 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class BookmarkServiceI implements BookmarkService {
-    @Autowired private final JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
 
-    @Autowired private final UserRepository userRepository;
-    @Autowired private final TripRepository tripRepository;
-    @Autowired private final CommunityRepository communityRepository;
-    @Autowired private final TripBookmarkRepository tripBookmarkRepository;
-    @Autowired private final CommunityBookmarkRepository communityBookmarkRepository;
-
-    public BookmarkServiceI(JwtProvider jwtProvider, UserRepository userRepository, TripRepository tripRepository, CommunityBookmarkRepository communityBookmarkRepository, TripBookmarkRepository tripBookmarkRepository, CommunityRepository communityRepository) {
-        this.jwtProvider = jwtProvider;
-        this.userRepository = userRepository;
-        this.tripRepository = tripRepository;
-        this.communityRepository = communityRepository;
-        this.tripBookmarkRepository = tripBookmarkRepository;
-        this.communityBookmarkRepository = communityBookmarkRepository;
-    }
+    private final UserRepository userRepository;
+    private final TripRepository tripRepository;
+    private final CommunityRepository communityRepository;
+    private final TripBookmarkRepository tripBookmarkRepository;
+    private final CommunityBookmarkRepository communityBookmarkRepository;
 
     /*
     * 북마크 생성

@@ -21,11 +21,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class MailServiceI implements MailService {
+    private final int codeExpired;
 
-    private int codeExpired;
-    @Autowired private final JavaMailSender mailSender;
-    @Autowired private final RedisTemplate<String, String> redisTemplate;
+    private final JavaMailSender mailSender;
+    private final RedisTemplate<String, String> redisTemplate;
 
+    @Autowired
     public MailServiceI(@Value("${redis.email-code.expired}") int codeExpired, JavaMailSender mailSender, RedisTemplate<String, String> redisTemplate) {
         this.codeExpired = codeExpired;
         this.mailSender = mailSender;

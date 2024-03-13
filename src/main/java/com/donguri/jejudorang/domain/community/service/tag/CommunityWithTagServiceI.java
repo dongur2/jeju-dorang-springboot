@@ -4,8 +4,8 @@ import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.tag.CommunityWithTag;
 import com.donguri.jejudorang.domain.community.entity.tag.Tag;
 import com.donguri.jejudorang.domain.community.repository.tag.CommunityWithTagRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +14,11 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CommunityWithTagServiceI implements CommunityWithTagService {
-    @Autowired
-    CommunityWithTagRepository communityWithTagRepository;
-    @Autowired
-    TagService tagService;
+    private final TagService tagService;
+    private final CommunityWithTagRepository communityWithTagRepository;
+
 
     @Override
     @Transactional

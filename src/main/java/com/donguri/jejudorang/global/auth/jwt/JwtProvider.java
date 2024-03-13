@@ -26,15 +26,8 @@ public class JwtProvider {
 
     private static final String AUTHORITIES_CLAIM = "authorities";
     private static final String ID_CLAIM = "id";
-    private final long jwtAccessExpirationInMs;
-    private final long jwtRefreshExpirationInMs;
-
-    public JwtProvider(@Value("${jwt.expiration-time.access}") long jwtAccessExpirationInMs,
-                       @Value("${jwt.expiration-time.refresh}") long jwtRefreshExpirationInMs) {
-        this.jwtAccessExpirationInMs = jwtAccessExpirationInMs;
-        this.jwtRefreshExpirationInMs = jwtRefreshExpirationInMs;
-    }
-
+    @Value("${jwt.expiration-time.access}") private long jwtAccessExpirationInMs;
+    @Value("${jwt.expiration-time.refresh}") private long jwtRefreshExpirationInMs;
 
     /*
     * 일반 로그인

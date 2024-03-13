@@ -4,8 +4,8 @@ import com.donguri.jejudorang.domain.community.dto.response.CommunityListRespons
 import com.donguri.jejudorang.domain.community.entity.BoardType;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,11 +17,10 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChatServiceI implements ChatService {
-    @Autowired private final CommunityRepository communityRepository;
-    public ChatServiceI(CommunityRepository communityRepository) {
-        this.communityRepository = communityRepository;
-    }
+    private final CommunityRepository communityRepository;
+
 
     @Override
     @Transactional
@@ -63,7 +62,6 @@ public class ChatServiceI implements ChatService {
                         .map(tag -> tag.getTag().getKeyword())
                         .toList())
         );
-
     }
 
 }

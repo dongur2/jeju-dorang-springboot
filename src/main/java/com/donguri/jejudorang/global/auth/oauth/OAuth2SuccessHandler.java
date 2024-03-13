@@ -25,12 +25,12 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
-
     private final int cookieTime;
-    @Autowired private final JwtProvider jwtProvider;
-    @Autowired private final RefreshTokenRepository refreshTokenRepository;
-    @Autowired private final UserRepository userRepository;
+    private final JwtProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
+    @Autowired
     public OAuth2SuccessHandler(JwtProvider jwtProvider, @Value("${jwt.cookie-expire}") int cookieTime, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
         this.jwtProvider = jwtProvider;
         this.cookieTime = cookieTime;
