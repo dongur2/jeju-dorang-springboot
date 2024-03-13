@@ -25,7 +25,6 @@ import com.donguri.jejudorang.global.common.s3.ImageService;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.mail.MessagingException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,28 +46,24 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserServiceI implements UserService {
-
-    private final ImageService imageService;
-    private final MailService mailService;
-
-    private final CommunityService communityService;
-    private final BookmarkService bookmarkService;
-    private final CommentService commentService;
-    private final NotificationService notificationService;
-
-    private final AuthenticationManager authenticationManager;
-    private final RefreshTokenRepository refreshTokenRepository;
-
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-
-    private final PasswordEncoder encoder;
-    private final JwtProvider jwtProvider;
-
     private final String defaultImgName;
     private final String defaultImgUrl;
 
+    private final PasswordEncoder encoder;
+    private final JwtProvider jwtProvider;
+    private final AuthenticationManager authenticationManager;
+
+    private final MailService mailService;
+    private final ImageService imageService;
+    private final CommentService commentService;
+    private final BookmarkService bookmarkService;
+    private final CommunityService communityService;
+    private final NotificationService notificationService;
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final ProfileRepository profileRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
     public UserServiceI(ImageService imageService, MailService mailService, BookmarkService bookmarkService, CommentService commentService, NotificationService notificationService, AuthenticationManager authenticationManager, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, RoleRepository roleRepository, CommunityService communityService, PasswordEncoder encoder, JwtProvider jwtProvider,
@@ -615,6 +610,7 @@ public class UserServiceI implements UserService {
     *
     * */
     @Override
+    @Transactional
     public Page<CommunityMyPageListResponse> getMyCommunityWritings(String token, Pageable pageable) {
         try {
             User nowUser = getNowUser(token);
@@ -657,6 +653,7 @@ public class UserServiceI implements UserService {
     *
     * */
     @Override
+    @Transactional
     public Page<?> getMyBookmarks(String token, String type, Pageable pageable) {
         try {
             User nowUser = getNowUser(token);

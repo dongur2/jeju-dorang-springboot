@@ -5,8 +5,8 @@ import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.common.s3.ImageService;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,19 +14,13 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AdminServiceI implements AdminService {
+    private final JwtProvider jwtProvider;
+    private final UserService userService;
+    private final ImageService imageService;
+    private final CommunityService communityService;
 
-    @Autowired private final JwtProvider jwtProvider;
-    @Autowired private final UserService userService;
-    @Autowired private final CommunityService communityService;
-    @Autowired private final ImageService imageService;
-
-    public AdminServiceI(JwtProvider jwtProvider, UserService userService, CommunityService communityService, ImageService imageService) {
-        this.jwtProvider = jwtProvider;
-        this.userService = userService;
-        this.communityService = communityService;
-        this.imageService = imageService;
-    }
 
     @Override
     @Transactional

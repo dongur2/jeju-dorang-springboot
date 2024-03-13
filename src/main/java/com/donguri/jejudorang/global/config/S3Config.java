@@ -14,12 +14,8 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @Slf4j
 @Configuration
 public class S3Config {
-
-    @Value("${aws.credentials.accessKey}")
-    private String accessKey;
-
-    @Value("${aws.credentials.secretKey}")
-    private String secretKey;
+    @Value("${aws.credentials.accessKey}") private String accessKey;
+    @Value("${aws.credentials.secretKey}") private String secretKey;
 
     @Bean
     public S3Client s3Client() {

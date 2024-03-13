@@ -15,15 +15,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
 public class RedisConfig {
-
-    @Value("${redis.host}")
-    private String host;
-
-    @Value("${redis.port}")
-    private int port;
-
-    @Value("${redis.password}")
-    private String password;
+    @Value("${redis.port}") private int port;
+    @Value("${redis.host}") private String host;
+    @Value("${redis.password}") private String password;
 
     /*
     * Redis DB 연결 생성하는 팩토리 설정

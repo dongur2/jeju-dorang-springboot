@@ -5,8 +5,8 @@ import com.donguri.jejudorang.domain.user.service.AdminService;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,13 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController implements AdminControllerDocs {
+    private final AdminService adminService;
 
-    @Autowired private final AdminService adminService;
-    public AdminController(AdminService adminService) {
-        this.adminService = adminService;
-    }
 
     /*
     * 관리자 회원가입 폼 화면 출력
@@ -39,7 +37,7 @@ public class AdminController implements AdminControllerDocs {
     * S3 Bucket의 사용되지 않는 이미지 삭제
     * - 게시글 작성중 이미지 업로드 후 글 작성 미완료/취소할 경우 버킷에 남는 이미지
     * */
-    @DeleteMapping("/img")
+    @DeleteMapping("/features/img")
     public ResponseEntity<?> deleteImages(@CookieValue("access_token") Cookie token, HttpServletResponse response, Model model) {
        try {
            adminService.deleteUnusedImages(token.getValue());

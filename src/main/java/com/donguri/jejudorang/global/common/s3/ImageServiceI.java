@@ -19,10 +19,10 @@ import java.util.*;
 @Slf4j
 @Service
 public class ImageServiceI implements ImageService {
-
     private final String bucketName;
-    @Autowired private final S3Client s3Client;
+    private final S3Client s3Client;
 
+    @Autowired
     public ImageServiceI(@Value("${aws.s3.bucket.name}") String bucketName, S3Client s3Client) {
         this.bucketName = bucketName;
         this.s3Client = s3Client;

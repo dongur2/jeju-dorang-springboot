@@ -22,7 +22,6 @@ import java.util.*;
 @Slf4j
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 

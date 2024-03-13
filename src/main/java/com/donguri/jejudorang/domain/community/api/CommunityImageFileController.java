@@ -4,6 +4,7 @@ import com.donguri.jejudorang.domain.community.api.swagger.CommunityImageFileCon
 import com.donguri.jejudorang.global.common.s3.ImageService;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,13 +18,10 @@ import java.util.Map;
 * */
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/tui-editor")
 public class CommunityImageFileController implements CommunityImageFileControllerDocs {
-
     private final ImageService imageService;
-    public CommunityImageFileController(ImageService imageService) {
-        this.imageService = imageService;
-    }
 
     @PostMapping("/img-upload")
     public String uploadEditorImage(@RequestParam("image") final MultipartFile image) {

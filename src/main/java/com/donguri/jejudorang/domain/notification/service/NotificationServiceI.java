@@ -12,8 +12,8 @@ import com.donguri.jejudorang.domain.user.entity.User;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,23 +27,18 @@ import java.util.Objects;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotificationServiceI implements NotificationService{
-
     private final Long DEFAULT_TIMEOUT = 60 * 1000 * 60L; // 60M
     private final String NOTIFICATION_NAME = "notification";
 
-    @Autowired private final JwtProvider jwtProvider;
-    @Autowired private final SseEmitterRepository sseEmitterRepository;
-    @Autowired private final NotificationRepository notificationRepository;
-
-    public NotificationServiceI(JwtProvider jwtProvider, SseEmitterRepository sseEmitterRepository, NotificationRepository notificationRepository) {
-        this.jwtProvider = jwtProvider;
-        this.sseEmitterRepository = sseEmitterRepository;
-        this.notificationRepository = notificationRepository;
-    }
+    private final JwtProvider jwtProvider;
+    private final SseEmitterRepository sseEmitterRepository;
+    private final NotificationRepository notificationRepository;
 
 
     @Override
+    @Transactional
     public SseEmitter connectNotification(String accessToken) throws IOException {
         try {
             Long userId = jwtProvider.getIdFromJwtToken(accessToken);
@@ -72,6 +67,7 @@ public class NotificationServiceI implements NotificationService{
     }
 
     @Override
+    @Transactional
     public void sendNotification(User postWriter, Community post, Long notificationId, NotifyType type) {
 
         StringBuilder notifyData = new StringBuilder();
@@ -105,6 +101,7 @@ public class NotificationServiceI implements NotificationService{
     }
 
     @Override
+    @Transactional
     public void saveNotification(User postWriter, Community post, NotifyType type, String notifyData) {
         try {
             Notification save = notificationRepository.save(Notification.builder()

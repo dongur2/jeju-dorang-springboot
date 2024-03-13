@@ -3,11 +3,10 @@ package com.donguri.jejudorang.domain.user.api;
 import com.donguri.jejudorang.domain.user.api.swagger.MailControllerDocs;
 import com.donguri.jejudorang.domain.user.dto.request.email.*;
 import com.donguri.jejudorang.domain.user.service.UserService;
-import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,14 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/email")
 public class MailController implements MailControllerDocs {
-
-    @Autowired private final UserService userService;
-
-    public MailController(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
 
     /*

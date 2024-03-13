@@ -7,8 +7,8 @@ import com.donguri.jejudorang.domain.trip.service.TripService;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/trip")
 public class TripController implements TripControllerDocs {
-    @Autowired private final TripService tripService;
-
-    public TripController(TripService tripService) {
-        this.tripService = tripService;
-    }
+    private final TripService tripService;
 
 
     /*

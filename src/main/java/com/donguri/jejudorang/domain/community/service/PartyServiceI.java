@@ -7,9 +7,8 @@ import com.donguri.jejudorang.domain.community.entity.JoinState;
 import com.donguri.jejudorang.domain.community.repository.CommunityRepository;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
-import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,11 +20,10 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PartyServiceI implements PartyService{
-    @Autowired private final CommunityRepository communityRepository;
-    public PartyServiceI(CommunityRepository communityRepository) {
-        this.communityRepository = communityRepository;
-    }
+    private final CommunityRepository communityRepository;
+
 
     @Override
     @Transactional

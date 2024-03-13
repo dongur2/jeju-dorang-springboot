@@ -5,10 +5,11 @@ import com.donguri.jejudorang.domain.notification.dto.NotificationResponse;
 import com.donguri.jejudorang.domain.notification.service.NotificationService;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -17,14 +18,13 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/notifications")
 public class NotificationController implements NotificationControllerDocs {
+    private final NotificationService notificationService;
 
-    @Autowired private final NotificationService notificationService;
-    public NotificationController(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
 
+    @Transactional
     @GetMapping("/connect")
     public SseEmitter connect(@CookieValue("access_token") Cookie token) {
         try {
@@ -36,6 +36,7 @@ public class NotificationController implements NotificationControllerDocs {
         }
     }
 
+    @Transactional
     @GetMapping
     public ResponseEntity<?> getNotifications(@CookieValue("access_token") Cookie token) {
         try {
@@ -52,6 +53,7 @@ public class NotificationController implements NotificationControllerDocs {
         }
     }
 
+    @Transactional
     @PutMapping("/check")
     public ResponseEntity<?> updateNotificationCheck(@CookieValue("access_token") Cookie token, @RequestParam(name = "alertId") Long alertId) {
         try {
@@ -67,6 +69,7 @@ public class NotificationController implements NotificationControllerDocs {
         }
     }
 
+    @Transactional
     @DeleteMapping
     public ResponseEntity<HttpStatus> deleteNotification(@CookieValue("access_token") Cookie token,
                                                          @RequestParam(name = "alertId") Long alertId) {

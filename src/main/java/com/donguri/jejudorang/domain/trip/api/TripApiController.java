@@ -3,15 +3,9 @@ package com.donguri.jejudorang.domain.trip.api;
 import com.donguri.jejudorang.domain.trip.api.swagger.TripApiControllerDocs;
 import com.donguri.jejudorang.domain.trip.dto.TripApiDataDto;
 import com.donguri.jejudorang.domain.trip.service.TripService;
-import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
-import com.donguri.jejudorang.global.error.CustomErrorCode;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -23,16 +17,21 @@ import java.util.List;
 @Slf4j
 @Controller
 public class TripApiController implements TripApiControllerDocs {
-    @Value("${jeju.key}")
-    private String apiKey;
-    @Value("${jeju.url}")
-    private String baseUrl;
+    private final String apiKey;
+    private final String baseUrl;
 
     private final int page = 37;
     private final String locale = "kr";
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
 
-    @Autowired private TripService tripService;
+    private final TripService tripService;
+
+    public TripApiController(@Value("${jeju.key}") String apiKey,
+                             @Value("${jeju.url}") String baseUrl, TripService tripService) {
+        this.apiKey = apiKey;
+        this.baseUrl = baseUrl;
+        this.tripService = tripService;
+    }
 
     @GetMapping("/trip/api/data")
     public String fetch() {

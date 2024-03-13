@@ -16,8 +16,8 @@ import com.donguri.jejudorang.domain.user.repository.UserRepository;
 import com.donguri.jejudorang.global.auth.jwt.JwtProvider;
 import com.donguri.jejudorang.global.error.CustomErrorCode;
 import com.donguri.jejudorang.global.error.CustomException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,24 +28,17 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CommentServiceI implements CommentService{
-
     private Long notificationId = 0L;
 
-    @Autowired private final JwtProvider jwtProvider;
-    @Autowired private final UserRepository userRepository;
-    @Autowired private final CommentRepository commentRepository;
-    @Autowired private final CommunityRepository communityRepository;
+    private final JwtProvider jwtProvider;
 
-    @Autowired private final NotificationService notificationService;
+    private final NotificationService notificationService;
 
-    public CommentServiceI(JwtProvider jwtProvider, UserRepository userRepository, CommentRepository commentRepository, CommunityRepository communityRepository, NotificationService notificationService) {
-        this.jwtProvider = jwtProvider;
-        this.userRepository = userRepository;
-        this.commentRepository = commentRepository;
-        this.communityRepository = communityRepository;
-        this.notificationService = notificationService;
-    }
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final CommunityRepository communityRepository;
 
 
     @Override
@@ -223,6 +216,5 @@ public class CommentServiceI implements CommentService{
             throw e;
         }
     }
-
 
 }

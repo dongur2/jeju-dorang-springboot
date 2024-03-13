@@ -55,24 +55,22 @@
             <form th:if="${nowType == 'parties'}" class="search-input-box" th:method="get" th:action="@{/community/boards/parties(search=${currentSearchWord})}">
                 <div class="search-input-box-sub">
                     <input class="search-words" name="search" th:value="${currentSearchWord}" th:placeholder="${currentSearchWord}">
-                    <button type="submit" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
-                </div>
-                <div class="search-input-tag-box-sub">
                     <input type="text" class="search-tags" id="search-form-tags-party" name="tags" placeholder="태그로 검색해보세요"
                     th:value="${currentSearchTag}">
-<!--                    <button type="button" class="btn btn-light reset-btn" th:onclick="">초기화</button>-->
+                </div>
+                <div class="search-input-btn-box">
+                    <button type="submit" class="btn btn-success search-btn" style="height:90px; background: #FB7A51; border: none">검색</button>
                 </div>
             </form>
 
             <form th:if="${nowType == 'chats'}" class="search-input-box" th:method="get" th:action="@{/community/boards/chats(search=${currentSearchWord})}">
                 <div class="search-input-box-sub">
                     <input class="search-words" name="search" th:value="${currentSearchWord}" th:placeholder="${currentSearchWord}">
-                    <button type="submit" class="btn btn-success search-btn" style="background: #FB7A51; border: none">검색</button>
-                </div>
-                <div class="search-input-tag-box-sub">
                     <input type="text" class="search-tags" id="search-form-tags-chat" name="tags" placeholder="태그로 검색해보세요"
                            th:value="${currentSearchTag}">
-<!--                    <button type="button" class="btn btn-light reset-btn" th:onclick="">초기화</button>-->
+                </div>
+                <div class="search-input-btn-box">
+                    <button type="submit" class="btn btn-success search-btn" style="height:90px; background: #FB7A51; border: none">검색</button>
                 </div>
             </form>
 

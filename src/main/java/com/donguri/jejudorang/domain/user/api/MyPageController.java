@@ -4,8 +4,8 @@ import com.donguri.jejudorang.domain.community.dto.response.CommunityMyPageListR
 import com.donguri.jejudorang.domain.user.api.swagger.MyPageControllerDocs;
 import com.donguri.jejudorang.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,14 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/mypage")
 public class MyPageController implements MyPageControllerDocs {
-
-    @Autowired private final UserService userService;
-
-    public MyPageController(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
 
     /*
