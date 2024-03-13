@@ -39,7 +39,7 @@ public class AdminController implements AdminControllerDocs {
     * S3 Bucket의 사용되지 않는 이미지 삭제
     * - 게시글 작성중 이미지 업로드 후 글 작성 미완료/취소할 경우 버킷에 남는 이미지
     * */
-    @DeleteMapping("/img")
+    @DeleteMapping("/features/img")
     public ResponseEntity<?> deleteImages(@CookieValue("access_token") Cookie token, HttpServletResponse response, Model model) {
        try {
            adminService.deleteUnusedImages(token.getValue());
