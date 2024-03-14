@@ -46,7 +46,6 @@ public class User {
 
     @OneToOne(fetch = FetchType.LAZY,
             mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    @JoinColumn(name = "social_login_code")
     private SocialLogin socialLogin;
 
 
