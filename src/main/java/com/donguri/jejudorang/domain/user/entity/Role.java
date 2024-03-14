@@ -19,6 +19,7 @@ public class Role {
 
     @Size(max = 10)
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ERole name;
 
 

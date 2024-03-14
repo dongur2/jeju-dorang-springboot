@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 public class Authentication extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "authentication_id")
+    @Column(name = "authentication_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "user_id")
     @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Size(max = 80)

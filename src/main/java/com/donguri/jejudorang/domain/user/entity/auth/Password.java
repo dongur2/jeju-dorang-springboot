@@ -16,12 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class Password extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "password_id")
+    @Column(name = "password_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "user_id")
     @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
