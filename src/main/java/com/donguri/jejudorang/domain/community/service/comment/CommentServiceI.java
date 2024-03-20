@@ -2,7 +2,7 @@ package com.donguri.jejudorang.domain.community.service.comment;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
-import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequest;
+import com.donguri.jejudorang.domain.community.dto.request.comment.RecommentRequest;
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 import com.donguri.jejudorang.domain.community.entity.Community;
 import com.donguri.jejudorang.domain.community.entity.comment.Comment;
@@ -75,7 +75,7 @@ public class CommentServiceI implements CommentService{
 
     @Override
     @Transactional
-    public void writeNewReComment(String accessToken, ReCommentRequest newReComment) {
+    public void writeNewReComment(String accessToken, RecommentRequest newReComment) {
         try {
             String userNameFromJwtToken = jwtProvider.getUserNameFromJwtToken(accessToken);
 
@@ -128,7 +128,7 @@ public class CommentServiceI implements CommentService{
         }
     }
 
-    private void sendNotificationToCmtWriter(ReCommentRequest newReComment, Comment savedReComment, Community nowPost) {
+    private void sendNotificationToCmtWriter(RecommentRequest newReComment, Comment savedReComment, Community nowPost) {
         Optional<User> cmtWriter  = Optional.ofNullable(commentRepository.findById(newReComment.cmtId())
                 .orElseThrow(() -> new CustomException(CustomErrorCode.COMMENT_NOT_FOUND))
                 .getUser());

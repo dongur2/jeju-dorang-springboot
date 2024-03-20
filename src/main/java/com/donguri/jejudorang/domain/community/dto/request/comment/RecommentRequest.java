@@ -7,7 +7,7 @@ import lombok.Builder;
 
 @Builder
 @Schema(description = "대댓글 작성 요청 정보")
-public record ReCommentRequest(
+public record RecommentRequest(
 
         @Schema(description = "해당 게시글 ID")
         Long postId,

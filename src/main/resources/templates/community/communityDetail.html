@@ -363,14 +363,16 @@
             <div class="re-cmt-form-box" th:id="'re-cmt-form-box-' + ${cmt.cmtId}"
                  style="width:100%; height:60px; display: none; flex-direction: row; align-items: center">
 
-                <form id="re-cmt-write-form" method="post" th:object="${reCommentRequest}" th:action="@{/community/comments/re(type=${post.type})}"
+                <form class="re-cmt-write-forms" th:id="'re-cmt-write-form-' + ${cmt.cmtId}"  method="post" th:object="${recommentRequest}" th:action="@{/community/comments/re}"
                       style="padding-left: 5%; width:100%; display: flex; flex-direction: row; justify-content: space-between">
 
-                    <input name="content" style="width: 80%; height:40px">
-                    <input type="hidden" name="postId" th:value="${post.id}">
-                    <input type="hidden" name="cmtId" th:value="${cmt.cmtId}">
+                    <input id="re-cmt-post-id" type="hidden" name="postId" th:value="${post.id}">
+                    <input id="re-cmt-origin-cmt-id" type="hidden" name="cmtId" th:value="${cmt.cmtId}">
+                    <input id="re-cmt-content-input" name="content" style="width: 80%; height:40px">
 
-                    <button type="button" class="btn btn-warning" style="width: 9%; height:40px" onclick="requestReCmtWrite()">답글 등록</button>
+                    <input type="hidden" name="type" th:value="${post.type}">
+
+                    <button type="button" class="btn btn-warning" style="width: 9%; height:40px" th:onclick="'requestRecmt(' + ${cmt.cmtId} + ')'">답글 등록</button>
                     <button type="button" class="btn btn-outline-secondary" style="width: 9%; height:40px" th:onclick="'closeRecommentWriteForm(' + ${cmt.cmtId} + ')'">취소</button>
                 </form>
             </div>
@@ -514,7 +516,6 @@
         document.getElementById("cmt-new-form").addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
-                requestCmtWrite();
             }
         });
         function requestCmtWrite() {
@@ -539,28 +540,22 @@
         * 대댓글 작성 요청
         *
         * */
-        // document.getElementById("re-cmt-write-form").addEventListener("keydown", function(event) {
-        //     if (event.key === "Enter") {
-        //         event.preventDefault();
-        //         requestReCmtWrite();
-        //     }
-        // });
-        function requestReCmtWrite() {
-            var form = document.getElementById('re-cmt-write-form');
-
-            var content = document.querySelector("#re-cmt-write-form input[name='content']").value;
-            var postId = document.querySelector("#re-cmt-write-form input[name='postId']").value;
-            var cmtId = document.querySelector("#re-cmt-write-form input[name='cmtId']").value;
-
-            var formData = new FormData();
-            formData.append('content', content);
-            formData.append('postId', postId);
-            formData.append('cmtId', cmtId);
-
-            console.log(formData.content);
+        document.addEventListener('DOMContentLoaded', function (e) {
+            var forms = document.querySelectorAll('.re-cmt-write-forms');
+            forms.forEach(function(form) {
+                form.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+        function requestRecmt(cmtId) {
+            var form = document.getElementById('re-cmt-write-form-' + cmtId);
+            var formData = new FormData(form);
 
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", form.action, true);
+            xhr.open("POST", '/community/comments/re', true);
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
@@ -572,6 +567,8 @@
             };
             xhr.send(formData);
         }
+
+
 
 
         /*
