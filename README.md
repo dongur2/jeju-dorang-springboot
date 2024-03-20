@@ -57,8 +57,11 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 
 <br>
 
-### 
+### ERD
+<img src="images/erd.png" alt="erd" />
 
+
+<br>
 
 
 <br>
