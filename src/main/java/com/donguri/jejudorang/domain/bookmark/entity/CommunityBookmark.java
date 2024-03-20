@@ -14,16 +14,16 @@ import lombok.NoArgsConstructor;
 public class CommunityBookmark extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "community_bookmark_id")
+    @Column(name = "community_bookmark_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "user_id")
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @JoinColumn(name = "community_id")
     @ManyToOne
+    @JoinColumn(name = "community_id")
     private Community community;
 
     @Builder

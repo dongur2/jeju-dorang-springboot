@@ -25,7 +25,7 @@ import java.util.Set;
 public class Community extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "community_id")
+    @Column(name = "community_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -38,7 +38,8 @@ public class Community extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private BoardType type;
 
-    // 모임글인 경우 모집 상태 (RECRUITING: 모집중, DONE: 모집완료)
+    // 모임글인 경우 모집 상태 (RECRUITING: 모집중, DONE: 모집완료, NOT_PARTY: 잡담글)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private JoinState state;
 
@@ -132,7 +133,7 @@ public class Community extends BaseEntity {
         if (type.equals(BoardType.PARTY) && state != JoinState.DONE) {
             state = JoinState.RECRUITING;
         } else if (type.equals(BoardType.CHAT)) {
-            state = null;
+            state = JoinState.NOT_PARTY;
         }
     }
 

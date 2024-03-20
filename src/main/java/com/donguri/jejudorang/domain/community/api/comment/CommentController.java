@@ -3,7 +3,7 @@ package com.donguri.jejudorang.domain.community.api.comment;
 import com.donguri.jejudorang.domain.community.api.comment.swagger.CommentControllerDocs;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
-import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequest;
+import com.donguri.jejudorang.domain.community.dto.request.comment.RecommentRequest;
 import com.donguri.jejudorang.domain.community.service.comment.CommentService;
 import com.donguri.jejudorang.global.error.CustomException;
 import jakarta.servlet.http.Cookie;
@@ -40,9 +40,6 @@ public class CommentController implements CommentControllerDocs {
 
             commentService.writeNewComment(token.getValue(), commentRequest);
 
-            // PARTY -> parties, CHAT -> chats
-            type = matchMappingBoardType(type);
-
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (CustomException e) {
@@ -63,17 +60,14 @@ public class CommentController implements CommentControllerDocs {
      * */
     @PostMapping("/re")
     public ResponseEntity<?> createNewReComment(@CookieValue("access_token") Cookie token,
-                                                 @Valid ReCommentRequest request, BindingResult bindingResult,
-                                                 @RequestParam("type") String type) {
+                                                @Valid RecommentRequest request, BindingResult bindingResult,
+                                                @RequestParam("type") String type) {
         try {
             if (bindingResult.hasErrors()) {
                 return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
 
             commentService.writeNewReComment(token.getValue(), request);
-
-            // PARTY -> parties, CHAT -> chats
-            type = matchMappingBoardType(type);
 
             return new ResponseEntity<>(HttpStatus.OK);
 
@@ -85,16 +79,6 @@ public class CommentController implements CommentControllerDocs {
             log.error("대댓글 작성에 실패했습니다. [서버 오류] {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-
-    private static String matchMappingBoardType(String type) {
-        if(type.equals("PARTY")) {
-            type = "parties";
-        } else {
-            type = "chats";
-        }
-        return type;
     }
 
 

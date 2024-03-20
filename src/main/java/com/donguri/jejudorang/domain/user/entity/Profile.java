@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 public class Profile extends BaseEntity {
 
     @Id
-    @Column(nullable = false, name = "profile_id")
+    @Column(name = "profile_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "user_id")
     @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Size(max = 20)

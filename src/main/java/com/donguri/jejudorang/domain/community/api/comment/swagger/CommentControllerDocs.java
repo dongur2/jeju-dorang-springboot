@@ -2,7 +2,7 @@ package com.donguri.jejudorang.domain.community.api.comment.swagger;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
-import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequest;
+import com.donguri.jejudorang.domain.community.dto.request.comment.RecommentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +39,7 @@ public interface CommentControllerDocs {
             @ApiResponse(responseCode = "500", description = "대댓글 작성 실패: 서버 에러 발생")
     })
     ResponseEntity<?> createNewReComment(@CookieValue("access_token") Cookie token,
-                                         @Valid ReCommentRequest request, BindingResult bindingResult,
+                                         @Valid RecommentRequest request, BindingResult bindingResult,
                                          @RequestParam("type") String type);
 
 

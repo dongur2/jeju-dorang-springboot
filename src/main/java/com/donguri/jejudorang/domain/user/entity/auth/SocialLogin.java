@@ -13,14 +13,13 @@ import lombok.NoArgsConstructor;
 public class SocialLogin extends BaseEntity {
 
     @Id
-    @Column(nullable = false)
     private String socialCode;
 
     @Column(nullable = false)
     private String socialExternalId;
 
-    @JoinColumn(name = "user_id", nullable = false)
     @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Builder

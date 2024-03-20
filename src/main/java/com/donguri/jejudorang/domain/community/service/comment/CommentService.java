@@ -2,7 +2,7 @@ package com.donguri.jejudorang.domain.community.service.comment;
 
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequest;
 import com.donguri.jejudorang.domain.community.dto.request.comment.CommentRequestWithId;
-import com.donguri.jejudorang.domain.community.dto.request.comment.ReCommentRequest;
+import com.donguri.jejudorang.domain.community.dto.request.comment.RecommentRequest;
 import com.donguri.jejudorang.domain.community.dto.response.comment.CommentResponse;
 
 import java.util.List;
@@ -13,7 +13,7 @@ public interface CommentService {
     void writeNewComment(String accessToken, CommentRequest newComment);
 
     // 새 대댓글 작성
-    void writeNewReComment(String accessToken, ReCommentRequest newReComment);
+    void writeNewReComment(String accessToken, RecommentRequest newReComment);
 
     // 댓글 수정
     void modifyComment(String accessToken, CommentRequestWithId commentToUpdate) throws IllegalAccessException;
