@@ -53,7 +53,7 @@
 
 http://43.201.67.46:8080/
 
-GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스턴스 내에서 Dokcer를 이용해 MariaDB, Redis로 데이터베이스 컨테이너를 실행하고 스프링부트 프로젝트 컨테이너를 실행하는 방식으로 배포했습니다.
+GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스턴스 내에서 MariaDB, Redis, 스프링부트 프로젝트 Docker Container를 실행하는 방식으로 배포했습니다.
 
 <br>
 
