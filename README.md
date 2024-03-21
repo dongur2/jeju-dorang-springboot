@@ -14,7 +14,7 @@
 
 <br>
 
-### 🛠 기술
+### 🛠 사용 기술
 - IDE
 
     <img src="https://img.shields.io/badge/IntelliJ-000000?style=for-the-badge&logo=intellijidea&logoColor=white"/>
@@ -48,8 +48,8 @@
 <br>
 
 ### 🌐 2024.03.05 배포
-<img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
 <img src="https://img.shields.io/badge/github actions-181717?style=for-the-badge&logo=github&logoColor=white"/>
+<img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
 
 http://43.201.67.46:8080/
 
@@ -63,7 +63,108 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 <br>
 
 ### System Architecture
-<img src="images/architecture.png" alt="system architecture" />
+<img src="images/architecture.png" alt="system_architecture" />
+
+<br>
+
+### 화면 구성
+#### 메인 페이지
+
+|  | 로그인하지 않았을 경우                                              | 로그인한 경우                                                   | 
+|--|-----------------------------------------------------------|-----------------------------------------------------------|
+|  | <img src="images/home/home_guest.png" alt="home_guest" /> | <img src="images/home/home_login.png" alt="home_login" /> |
+메인 페이지 배경 사진: https://unsplash.com/ko
+
+
+- 헤더 알림
+
+  |   | 알림 없을 경우                                                                                 | 알림 발생                                                                        |
+  |---|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+  |   | <img src="images/home/home_no_noti.png" alt="home_none_notification" />                  | <img src="images/home/home_new_noti.png" alt="home_new_notification" />      |
+  |   | 알림 모달                                                                                    | 알림 모달                                                                        |
+  |   | <img src="images/home/home_noti_modal_none.png" alt="home_modal_notification_nothing" /> | <img src="images/home/home_noti_modal.png" alt="home_modal_notifications" /> |
+
+  - 새 알림이 발생할 경우 헤더의 알림 메뉴 색상 변경
+  - 알림 모달의 읽은 알림과 읽지 않은 알림을 카드 배경색으로 구분
+  - 알림 카드를 클릭할 경우 해당 게시글로 이동
+  - 알림은 댓글과 대댓글로 구분
+  - 카드 우측 상단 X 아이콘을 클릭해 알림 삭제
+  
+  <br>
+
+  - 게시글/댓글 작성자가 로그인하고 있는 상황에서 새로운 알림이 발생할 경우 실시간 알림 모달 발생
+  
+    <img src="images/home/home_noti_sse.gif" alt="home_sse_notification" />
+
+  <br>
+
+#### 여행 페이지
+
+|   | 여행 메인 페이지                                               | 여행 상세 페이지                                                   |
+|---|---------------------------------------------------------|-------------------------------------------------------------|
+|   | <img src="images/trip/trip_main.png" alt="trip_main" /> | <img src="images/trip/trip_detail.png" alt="trip_detail" /> |
+
+- 여행 데이터는 카테고리별로 정렬하거나 태그로 검색 가능
+  <img src="images/trip/trip_main_search.gif" alt="trip_main_search" />
+  - 카테고리 정렬과 태그 검색 동시에 적용 가능
+  - 태그 복수 검색은 ','으로 구분해 검색
+  - 검색 결과가 없을 경우 결과 없음 표시
+
+| 북마크 | 로그인하지 않은 경우                                                                 | 로그인한 경우                                                                   |
+|-----|-----------------------------------------------------------------------------|---------------------------------------------------------------------------|
+|     | <img src="images/trip/trip_bookmark_guest.gif" alt="trip_bookmark_guest" /> | <img src="images/trip/trip_bookmark_user.gif" alt="trip_bookmark_user" /> |
+
+- 로그인하지 않은 상태에서 북마크 버튼을 클릭할 경우 로그인 필요 모달 표시
+- 로그인한 경우 북마크 설정 (채워진 하트로 표시): 채워진 하트를 클릭할 경우 북마크 삭제
+- 북마크 목록은 마이페이지에서도 열람/삭제 가능
+
+  <br>
+
+#### 커뮤니티 페이지
+| 메인 | 모임                                                                           | 잡담                                                                         | 
+|----|---------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+|    | <img src="images/community/co_party_main.png" alt="community_party_main" />     | <img src="images/community/co_chat_main.png" alt="community_chat_main" />  |
+|    | 글 검색/정렬                                                                         | 글 검색/정렬                                                                    |
+|    | <img src="images/community/co_party_search.gif" alt="community_party_search" /> | <img src="images/community/co_chat_search.gif" alt="community_chat_search" /> |
+인프런 스터디 페이지 레이아웃/디자인 참고: https://www.inflearn.com/community/studies
+
+태그 작성: Tagify https://github.com/yairEO/tagify
+
+- 글제목 검색 & 태그 검색 & 기준별 정렬 
+- 모집 게시판의 경우 모집상태(전체/모집중/모집완료)까지 적용한 검색/정렬 가능
+- 검색 결과가 없을 경우 결과 없음 표시
+
+
+- 글작성 페이지
+
+  <img src="images/community/co_write_form.gif" alt="community_write_form" />
+  
+  인프런 스터디 글쓰기 페이지 레이아웃/디자인 참고: https://www.inflearn.com/community/studies
+
+  태그 작성: Tagify https://github.com/yairEO/tagify
+
+  글 작성: TOAST UI Editor https://github.com/nhn/tui.editor
+
+  - 로그인하지 않은 경우 로그인 폼으로 리다이렉트
+
+| 상세글 | 모임                                                                              | 잡담                                                                            | 
+|-----|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+|     | <img src="images/community/co_party_detail.gif" alt="community_party_detail" /> | <img src="images/community/co_chat_detail.png" alt="community_chat_detail" /> |
+- 모임 게시글 작성자는 모집상태 버튼 클릭을 통해 모집중/모집완료 상태 변경 가능
+- 게시글 작성자: 게시글 수정/삭제 가능
+- 로그인한 회원은 댓글/대댓글 작성 가능, 댓글 작성자 본인은 댓글 수정/삭제 가능
+- 삭제된 댓글은 '삭제된 댓글입니다'로 표시
+- 삭제된 댓글을 뺀 댓글 합으로 총 댓글 개수 표시: 댓글순 정렬할 때 삭제되지 않은 댓글 수로 정렬
+- 게시글 SNS 공유 가능
+- 로그인한 회원은 게시글 북마크 가능 (여행 북마크와 동일)
+
+<br>
+
+#### 회원가입/로그인
+<img src="images/user/signup_login_basic.gif" alt="signup_login_basic" /> 
+
+
+
 
 
 <br>
