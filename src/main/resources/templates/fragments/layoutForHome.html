@@ -15,16 +15,16 @@
 
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>test</title>
+        <title>home layout</title>
     </head>
 
     <body>
         <div class="whole-body" style="width:100%; display: flex; flex-direction: column; align-content: space-between">
-            <div class="header-body" style="width:1280px; margin:0 auto;">
-                <div th:replace="fragments/header :: headerFragment"></div>
+            <div class="header-body" style="width:1280px; margin:0 auto; z-index:5">
+                <div th:replace="fragments/headerForHome :: headerFragment"></div>
             </div>
 
-            <div style="width:100%; height: 850px;">
+            <div style="width:100%; height: 1000px; margin-top:-120px;">
                 <div layout:fragment="content"></div>
             </div>
 
