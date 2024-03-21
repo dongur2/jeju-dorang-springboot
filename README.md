@@ -51,7 +51,7 @@
 <img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
 <img src="https://img.shields.io/badge/github actions-181717?style=for-the-badge&logo=github&logoColor=white"/>
 
-http://15.164.163.248:8080/
+http://43.201.67.46:8080/
 
 GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스턴스 내에서 Dokcer를 이용해 MariaDB, Redis로 데이터베이스 컨테이너를 실행하고 스프링부트 프로젝트 컨테이너를 실행하는 방식으로 배포했습니다.
 
