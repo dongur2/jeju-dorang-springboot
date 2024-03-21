@@ -39,7 +39,7 @@
 #viewer{
     width:100%;
 }
-#viewer > p > img {
+#viewer > img {
     max-width:100%;
 }
 
