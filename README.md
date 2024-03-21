@@ -12,12 +12,9 @@
 ### 🗓️ 개발 기간
 2023.12.28 ~ 2024.03
 
-- 개발 일지
+<a href="https://cute-skipjack-fb9.notion.site/Spring-SpringBoot-Migration-a303908d6b6349e38938166b269c20d8?pvs=4"><img src="https://img.shields.io/badge/개발일지-000000?style=flat-square&logo=notion&logoColor=white"></a>
 
-  <img src="https://img.shields.io/badge/Notion-000000?style=flat-square&logo=notion&logoColor=white"/> 
   
-  `https://cute-skipjack-fb9.notion.site/Spring-SpringBoot-Migration-a303908d6b6349e38938166b269c20d8?pvs=4`
-
 <br>
 
 ### 🛠 사용 기술
