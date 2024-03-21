@@ -51,8 +51,7 @@
 <br>
 
 ### 🌐 2024.03.05 배포
-<img src="https://img.shields.io/badge/github actions-181717?style=for-the-badge&logo=github&logoColor=white"/>
-<img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
+<img src="https://img.shields.io/badge/github actions-181717?style=for-the-badge&logo=github&logoColor=white"/><img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/><img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
 
 http://43.201.67.46:8080/
 
