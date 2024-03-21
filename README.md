@@ -73,6 +73,7 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 |  | 로그인하지 않았을 경우                                              | 로그인한 경우                                                   | 
 |--|-----------------------------------------------------------|-----------------------------------------------------------|
 |  | <img src="images/home/home_guest.png" alt="home_guest" /> | <img src="images/home/home_login.png" alt="home_login" /> |
+
 메인 페이지 배경 사진: https://unsplash.com/ko
 
 
@@ -146,10 +147,12 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
   글 작성: TOAST UI Editor https://github.com/nhn/tui.editor
 
   - 로그인하지 않은 경우 로그인 폼으로 리다이렉트
+  
 
-| 상세글 | 모임                                                                              | 잡담                                                                            | 
-|-----|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-|     | <img src="images/community/co_party_detail.gif" alt="community_party_detail" /> | <img src="images/community/co_chat_detail.png" alt="community_chat_detail" /> |
+- 커뮤니티 상세글(모임)
+
+  <img src="images/community/co_party_detail.gif" alt="community_party_detail" />
+
 - 모임 게시글 작성자는 모집상태 버튼 클릭을 통해 모집중/모집완료 상태 변경 가능
 - 게시글 작성자: 게시글 수정/삭제 가능
 - 로그인한 회원은 댓글/대댓글 작성 가능, 댓글 작성자 본인은 댓글 수정/삭제 가능
