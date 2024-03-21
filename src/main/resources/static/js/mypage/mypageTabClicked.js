@@ -3,7 +3,7 @@ window.onload = function() {
 
     if (nowLocation.includes('/pwd')) {
         document.getElementById('mypage-tab-pwd').style.borderLeft = '3px solid #3CB728';
-    } else if (nowLocation.includes('/writings')) {
+    } else if (nowLocation.includes('/writings') || nowLocation.includes('/comments')) {
         document.getElementById('mypage-tab-writings').style.borderLeft = '3px solid #3CB728';
     } else if (nowLocation.includes('/bookmarks')) {
         document.getElementById('mypage-tab-bookmarks').style.borderLeft = '3px solid #3CB728';
