@@ -28,7 +28,7 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
         /*
         * 로그인하지 않았거나, 유효한 쿠키가 아닐 경우 로그인 화면으로 리다이렉트 (401: 인증되지 않음)
         * */
-        if(request.getCookies() == null || Arrays.stream(request.getCookies()).anyMatch(cookie -> cookie.getName().equals("access_token"))
+        if(request.getCookies() == null || Arrays.stream(request.getCookies()).noneMatch(cookie -> cookie.getName().equals("access_token"))
         || !jwtProvider.validateJwtToken(Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("access_token")).toList().get(0).getValue())) {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
