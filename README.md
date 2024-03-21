@@ -12,6 +12,12 @@
 ### 🗓️ 개발 기간
 2023.12.28 ~ 2024.03
 
+- 개발 일지
+
+  <img src="https://img.shields.io/badge/Notion-000000?style=flat-square&logo=notion&logoColor=white"/> 
+  
+  `https://cute-skipjack-fb9.notion.site/Spring-SpringBoot-Migration-a303908d6b6349e38938166b269c20d8?pvs=4`
+
 <br>
 
 ### 🛠 사용 기술
@@ -76,6 +82,8 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 
 메인 페이지 배경 사진: https://unsplash.com/ko
 
+모든 알림 모달: SweetAlert2 https://sweetalert2.github.io/
+
 
 - 헤더 알림
 
@@ -127,6 +135,7 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 |    | <img src="images/community/co_party_main.png" alt="community_party_main" />     | <img src="images/community/co_chat_main.png" alt="community_chat_main" />  |
 |    | 글 검색/정렬                                                                         | 글 검색/정렬                                                                    |
 |    | <img src="images/community/co_party_search.gif" alt="community_party_search" /> | <img src="images/community/co_chat_search.gif" alt="community_chat_search" /> |
+
 인프런 스터디 페이지 레이아웃/디자인 참고: https://www.inflearn.com/community/studies
 
 태그 작성: Tagify https://github.com/yairEO/tagify
@@ -166,9 +175,29 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 #### 회원가입/로그인
 <img src="images/user/signup_login_basic.gif" alt="signup_login_basic" /> 
 
+|  | 아이디 찾기                                              | 비밀번호 찾기                                               | 
+|--|-----------------------------------------------------|-------------------------------------------------------|
+|  | <img src="images/user/find_id.png" alt="find_id" /> | <img src="images/user/find_pwd.png" alt="find_pwd" /> |
+| | 가입된 이메일을 입력할 경우 입력한 이메일로 아이디 전송 | 가입된 회원정보와 일치하는 이메일과 아이디를 입력할 경우 입력한 이메일로 임시 비밀번호 전송 |
 
+<br>
 
+#### 마이페이지
+<img src="images/user/mypage.gif" alt="mypage" />
 
+- 소셜로그인 회원의 경우 이메일, 비밀번호 변경이 불가능
+
+  <img src="images/user/user_social_email.png" alt="social_cant_change_email" />
+
+  <img src="images/user/user_social_pwd.png" alt="social_cant_change_pwd" />
+
+<br>
+
+#### 관리자
+| | 관리자 회원가입                                                      | 관리자 페이지                                                   | 커뮤니티 상세글                                                     | 
+|-|---------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------|
+| | <img src="images/user/admin_signup.png" alt="admin_signup" /> | <img src="images/user/admin_page.png" alt="admin_page" /> | <img src="images/user/admin_co.png" alt="admin_community" /> |
+| | 관리자 회원가입 페이지                                        | 관리자 마이페이지: S3 버킷에 저장된 주인없는 이미지 일괄 삭제 가능                   | 회원들이 작성한 게시글/댓글 삭제 가능                                        |
 
 <br>
 
@@ -235,6 +264,8 @@ Redis 비밀번호 설정
 vi /etc/redis/redis.conf
 ```
 
+- `requirepass {비밀번호}`
+
 
 
 #### Mac
@@ -263,6 +294,12 @@ vi /etc/redis/redis.conf
 insert into role(name) values('ADMIN');
 insert into role(name) values('USER');
 ```
+
+### 관리자 생성
+`http://43.201.67.46:8080/admin`
+
+### 여행 API 데이터 다운로드 (관리자 권한 필요)
+`http://43.201.67.46:8080/trip/api/data`
 
 <br>
 
