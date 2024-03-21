@@ -36,15 +36,15 @@
                     <ul class="nav nav-tabs" style="margin-bottom: 25px" id="menuTabs">
                         <li class="nav-item">
                             <a th:if="${type=='chat'}" class="nav-link active" aria-current="page" th:href="@{/community/post/new(type='chat')}"
-                               href="#" style="font-size:22px">커뮤니티</a>
+                               href="#" style="font-size:22px">잡담</a>
                             <a th:if="${type!='chat'}" class="nav-link" aria-current="page" th:href="@{/community/post/new(type='chat')}"
-                               href="#" style="font-size:22px">커뮤니티</a>
+                               href="#" style="font-size:22px">잡담</a>
                         </li>
                         <li class="nav-item">
                             <a th:if="${type=='party'}" class="nav-link active" th:href="@{/community/post/new(type='party')}"
-                               href="#" style="font-size:22px">동행모집</a>
+                               href="#" style="font-size:22px">모임</a>
                             <a th:if="${type!='party'}" class="nav-link" th:href="@{/community/post/new(type='party')}"
-                               href="#" style="font-size:22px">동행모집</a>
+                               href="#" style="font-size:22px">모임</a>
                         </li>
                     </ul>
                     <input type="text" id="community-dto-type" name="type" value="" style="display: none">
