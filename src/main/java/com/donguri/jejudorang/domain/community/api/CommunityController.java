@@ -260,10 +260,6 @@ public class CommunityController implements CommunityControllerDocs {
             return "error/errorPage";
         }
     }
-//    @PostMapping("/boards/{type}/{communityId}")
-//    public String redirectToDetail(@PathVariable("type") String type, @PathVariable("communityId") Long communityId) {
-//        return "redirect:/community/boards/" +type + "/" + communityId;
-//    }
 
 
     /*
