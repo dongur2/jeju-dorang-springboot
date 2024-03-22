@@ -69,7 +69,13 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 
 <br>
 
-### 화면 구성
+### Swagger: API 명세서
+http://43.201.67.46:8080/api-docs 에서 /api-docs/json 검색
+- json 문서로 열람: http://43.201.67.46:8080/api-docs/json
+
+<br>
+
+## 화면 구성
 #### 메인 페이지
 
 |  | 로그인하지 않았을 경우                                              | 로그인한 경우                                                   | 
@@ -197,7 +203,7 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 
 <br>
 
-# 설치
+## 설치
 ### Project Clone
 ```bash
 ~$ git clone https://github.com/dongur2/jeju-dorang-springboot.git
@@ -299,4 +305,4 @@ insert into role(name) values('USER');
 
 <br>
 
-# 변경 로그
+## 변경 로그
