@@ -202,7 +202,10 @@
                 <input name="content" style="width: 82%">
                 <input name="postId" th:value="${post.id}" type="hidden">
                 <input name="type" th:value="${post.type}" type="hidden">
-                <button type="button" class="btn btn-warning cmt-new-btn" style="width:15%" onclick="requestCmtWrite()">등록</button>
+
+                <!-- 댓글 작성 회원만 가능: 비회원은 제한 팝업 표시 -->
+                <button sec:authorize="!isAuthenticated()" type="button" class="btn btn-warning cmt-new-btn" style="width:15%" onclick="showAlert('warning', '댓글 작성은 회원만 가능합니다.', true)">등록</button>
+                <button sec:authorize="isAuthenticated()" type="button" class="btn btn-warning cmt-new-btn" style="width:15%" onclick="requestCmtWrite()">등록</button>
             </form>
         </div>
 
