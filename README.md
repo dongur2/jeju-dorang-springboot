@@ -2,7 +2,7 @@
 <img src="images/logo.png" alt='jeju-dorang main logo' />
 
 
-서비스 페이지: http://15.164.170.57:8080/
+서비스 페이지: http://15.164.94.154:8080/
 
 
 <p>제주도랑은 사용자들이 편리하게 소통할 수 있는 커뮤니티를 제공합니다. 커뮤니티는 '모임'과 '잡담' 두 개의 게시판으로 구성되는데, '모임' 게시판은 사용자들이 각자의 여행에 함께할 동행 파트너를 구하는, 제주도랑의 주 기능을 제공하는 공간입니다. 혼자 간 여행에서 2인 식사부터 가능한 식당에 결국 가지 못했을 때 우울했던, 관광 체험 상품을 혼자 신청하기는 머쓱했던 경험으로 편하고 자유롭게 동행을 구하는 공간이 있으면 좋겠다고 생각되어 구현하게 된 게시판입니다. 이 게시판에서는 여행 전체를 함께 할 동행을 찾거나, 특정 액티비티를 함께 즐길 동행을 구하거나, 식사를 함께 할 동행을 찾는 등 기간이나 활동에 구애받지 않고 다양한 동행 파트너를 구할 수 있습니다. 글 작성 형식에 제한을 두지 않아 사용자들이 자유롭게 동행을 구할 수 있도록 했습니다. 여행 합류를 원하는 사용자는 해당 게시글에 댓글을 작성하고, 게시글 작성자는 발생한 새 댓글 알림을 통해 이를 확인하고 카카오톡 오픈 채팅 링크 같은 연락 수단을 대댓글로 작성하는 것 같은 방법으로 합류가 이루어지게 됩니다. 댓글 작성자에게도 똑같이 새 대댓글 알림을 발생시켜 원활한 확인을 가능하게 했습니다. 게시글 작성자는 원하는 동행을 모두 구했을 경우 게시글의 모집중 버튼을 모집완료 버튼으로 변경해 상태를 표시할 수 있습니다.</p>
@@ -57,7 +57,7 @@
 ### 🌐 2024.03.05 배포
 <img src="https://img.shields.io/badge/github actions-181717?style=for-the-badge&logo=github&logoColor=white"/><img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/><img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
 
-http://15.164.170.57:8080/
+http://15.164.94.154:8080/
 
 GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스턴스 내에서 MariaDB, Redis, 스프링부트 프로젝트 Docker Container를 실행하는 방식으로 배포했습니다.
 
@@ -74,8 +74,8 @@ GitHub Actions를 사용하여 CI/CD 파이프라인을 구축하고, EC2 인스
 <br>
 
 ### Swagger: API 명세서
-http://15.164.170.57:8080/api-docs 에서 /api-docs/json 검색
-- json 문서로 열람: http://15.164.170.57:8080/api-docs/json
+http://15.164.94.154:8080/api-docs 에서 /api-docs/json 검색
+- json 문서로 열람: http://15.164.94.154:8080/api-docs/json
 
 <br>
 
@@ -302,10 +302,10 @@ insert into role(name) values('USER');
 ```
 
 ### 관리자 생성
-`http://15.164.170.57:8080/admin`
+`http://15.164.94.154:8080/admin`
 
 ### 여행 API 데이터 다운로드 (관리자 권한 필요)
-`http://15.164.170.57:8080/trip/api/data`
+`http://15.164.94.154:8080/trip/api/data`
 
 <br>
 
@@ -390,4 +390,7 @@ insert into role(name) values('USER');
   - 비회원이 댓글 작성 버튼을 클릭할 경우 로그인 필요 제한 팝업이 표시되도록 수정
  
 <b>24.04.11</b>
+- EC2 인스턴스 재시작: IP 변경
+
+<b>24.05.08</b>
 - EC2 인스턴스 재시작: IP 변경
