@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -143,11 +142,9 @@ public class TripServiceI implements TripService{
 
     @Override
     @Transactional
-    public void saveApiTrips(Mono<TripApiDataDto> response) {
+    public void saveApiTrips(TripApiDataDto response) {
         // Dto -> Entity
-        List<Trip> data = response
-                .map(TripApiDataDto::toEntity)
-                .block();
+        List<Trip> data = response.toEntity();
 
         // Entity -> DB
         tripRepository.saveAll(data);

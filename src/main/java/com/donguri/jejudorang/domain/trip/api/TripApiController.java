@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +20,6 @@ public class TripApiController implements TripApiControllerDocs {
     private final String apiKey;
     private final String baseUrl;
 
-    private final int page = 37;
     private final String locale = "kr";
     private final List<String> categories = Arrays.asList("c1", "c2", "c4");
 
@@ -35,6 +34,9 @@ public class TripApiController implements TripApiControllerDocs {
 
     @GetMapping("/trip/api/data")
     public String fetch() {
+
+        long start = System.currentTimeMillis();
+
         // DefaultUriBuilderFactory implements UriBuilderFactory
         // URI에 alternative encoding mode를 설정해 UriBuilder 인스턴스를 생성할 수 있게 하는 DefaultUriBuilderFactory
         // WebClient를 이용하면 인코딩을 하지 않아 API KEY가 달라지는 문제 발생 가능
@@ -50,19 +52,40 @@ public class TripApiController implements TripApiControllerDocs {
                         .maxInMemorySize(16 * 1024 * 1024))
                 .build(); // WebClient 인스턴스 생성
 
-        // Data
-        Mono<TripApiDataDto> response = webClient.get() // HTTP GET Request 빌드 시작 - Returns: a spec for specifying the target URL (Interface WebClient.RequestHeadersUriSpec<S extends WebClient.RequestHeadersSpec<S>>)
-                    .uri(uriBuilder -> uriBuilder
-                            .queryParam("apiKey", apiKey)
-                            .queryParam("locale", locale)
-                            .queryParam("category", categories.toArray()) // Query Parameter 설정
-                            .queryParam("page", page)
-                            .build()) // URI 빌드
-                    .retrieve() // Response를 추출할 방법 선언
-                    .bodyToMono(TripApiDataDto.class);
+        // 1페이지 먼저 요청해서 pageCount 받아오기
+        TripApiDataDto firstPageDto = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("apiKey", apiKey)
+                        .queryParam("locale", locale)
+                        .queryParam("category", categories.toArray())
+                        .queryParam("page", 1)
+                        .build())
+                .retrieve()
+                .bodyToMono(TripApiDataDto.class)
+                .block(); // 동기적으로 첫 페이지 요청
 
-        // Dto -> Entity -> DB
-        tripService.saveApiTrips(response);
+        if (firstPageDto == null) {
+            throw new RuntimeException("첫 페이지 API 호출 실패");
+        }
+
+        int maxPage = firstPageDto.pageCount(); // 전체 페이지 수 가져오기
+
+        Flux.range(1, maxPage)
+                .flatMap(pageNum -> webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .queryParam("apiKey", apiKey)
+                                .queryParam("locale", locale)
+                                .queryParam("category", categories.toArray())
+                                .queryParam("page", pageNum)
+                                .build())
+                        .retrieve()
+                        .bodyToMono(TripApiDataDto.class))
+                .doOnNext(tripService::saveApiTrips)
+                .blockLast(); //마지막 요소 끝날 때까지 대기
+
+        long finish = System.currentTimeMillis();
+
+        System.out.println("응답 시간: " + (finish - start) + "ms"); //응답 시간: 3590ms 기존 29페이지 기준
 
         return "redirect:/trip/lists";
     }
