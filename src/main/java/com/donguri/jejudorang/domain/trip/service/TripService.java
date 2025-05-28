@@ -5,16 +5,13 @@ import com.donguri.jejudorang.domain.trip.dto.response.TripDetailResponseDto;
 import com.donguri.jejudorang.domain.trip.dto.response.TripListResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import reactor.core.publisher.Mono;
 
-import java.util.Map;
 
 
 public interface TripService {
 
     // 제주도 여행 API 데이터 저장
-    void saveApiTrips(Mono<TripApiDataDto> response);
-
+    void saveApiTrips(TripApiDataDto response);
 
     // 전체 여행 데이터 조회
     Page<TripListResponseDto> getAllTrips(Pageable pageable);
